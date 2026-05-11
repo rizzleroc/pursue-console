@@ -108,6 +108,19 @@ Build a production bundle:
 npm run build        # → dist/
 ```
 
+### Full-text corpus (powers the Constellation view)
+
+`src/data/corpus.json` is the extracted full-text index of the primary PDFs. It's committed so the app works out of the box. To regenerate or extend it:
+
+```bash
+npm run corpus:fetch      # downloads every event's PDF into data-raw/ (gitignored, ~800 MB)
+npm run corpus:extract    # pdfjs-dist text extraction → src/data/corpus.json
+npm run corpus:ocr        # OCR pass for image-only/scanned PDFs (slow; tesseract.js)
+                          #   env: MAX_PAGES=40 ONLY=id1,id2 SKIP=id3
+```
+
+The text-extraction step is fast (seconds). The OCR step is slow (~5–10 s per page) — many of the older records (FBI Vault sections, COMETA, Project Blue Book incident summaries) are scanned page images. Run, walk away.
+
 Stack: Vite + React 19 + Tailwind v3. **No graph or chart libraries** — the network view is a ~70-line force-directed layout, the globe is a hand-rolled orthographic projection, the heatmap and patterns view are CSS grid + computed widths.
 
 ---
