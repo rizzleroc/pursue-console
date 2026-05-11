@@ -1,14 +1,16 @@
 // OCR pass for PDFs whose text extraction was empty.
-// Renders each page via pdfjs + @napi-rs/canvas, then runs tesseract.js.
-// Merges results back into src/data/corpus.json.
+// Renders each page via pdfjs + @napi-rs/canvas, OCRs via tesseract.js.
+// RESUMABLE: each page's OCR text is cached to data-raw/.ocr-cache/<id>/p<NNN>.txt
+//   — re-runs skip already-cached pages. Delete a cache file to redo it.
 //
-// SLOW: ~5–10s/page. The largest docs (incident-summaries 209p, fbi-vault
-// 185p, COMETA 94p) take meaningful time. Run, walk away, come back.
-//
-// Skip specific ids via SKIP=id1,id2; only do specific via ONLY=id1,id2.
-// Limit max pages per doc via MAX_PAGES=40.
+// Env:
+//   ONLY=id1,id2    — only these event ids
+//   SKIP=id1,id2    — skip these event ids
+//   MAX_PAGES=N     — cap pages per doc (default: all pages)
+//   DPI_SCALE=2.0   — render scale (higher = slower but more accurate)
 
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
@@ -17,8 +19,11 @@ import { createWorker } from "tesseract.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data-raw");
+const CACHE_DIR = path.join(RAW_DIR, ".ocr-cache");
 const OUT = path.join(ROOT, "src/data/corpus.json");
-const MAX_PAGES = Number(process.env.MAX_PAGES || 40);
+
+const MAX_PAGES = process.env.MAX_PAGES ? Number(process.env.MAX_PAGES) : Infinity;
+const DPI_SCALE = Number(process.env.DPI_SCALE || 2.0);
 const SKIP = new Set((process.env.SKIP || "").split(",").filter(Boolean));
 const ONLY = new Set((process.env.ONLY || "").split(",").filter(Boolean));
 
@@ -34,7 +39,6 @@ const tokenize = (text) => text
 
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-// Provide a Node canvas factory for pdfjs.
 class NodeCanvasFactory {
   create(width, height) {
     const canvas = createCanvas(width, height);
@@ -44,7 +48,7 @@ class NodeCanvasFactory {
   destroy(cv) { cv.canvas.width = 0; cv.canvas.height = 0; cv.canvas = null; cv.context = null; }
 }
 
-async function renderPage(doc, pageNum, scale = 2.0) {
+async function renderPagePng(doc, pageNum, scale) {
   const page = await doc.getPage(pageNum);
   const viewport = page.getViewport({ scale });
   const factory = new NodeCanvasFactory();
@@ -55,23 +59,57 @@ async function renderPage(doc, pageNum, scale = 2.0) {
   return buf;
 }
 
-const corpus = JSON.parse(await readFile(OUT, "utf8"));
-const targets = Object.entries(corpus.byEvent)
-  .filter(([id, d]) => d.charCount < 200)
+async function loadCorpus() {
+  try { return JSON.parse(await readFile(OUT, "utf8")); }
+  catch { return { stats: {}, byEvent: {}, globalTerms: {}, byTerm: {} }; }
+}
+
+async function rebuildIndexes(corpus) {
+  const globalTerms = {}, byTerm = {};
+  for (const [id, d] of Object.entries(corpus.byEvent)) {
+    for (const [w, c] of Object.entries(d.terms || {})) {
+      globalTerms[w] = (globalTerms[w] || 0) + c;
+      (byTerm[w] = byTerm[w] || []).push(id);
+    }
+  }
+  const kept = Object.entries(globalTerms)
+    .filter(([w, c]) => (byTerm[w]?.length || 0) >= 2 || c >= 4)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 2500);
+  const keepSet = new Set(kept.map(([w]) => w));
+  for (const id of Object.keys(corpus.byEvent)) {
+    const t = corpus.byEvent[id].terms || {};
+    corpus.byEvent[id].terms = Object.fromEntries(Object.entries(t).filter(([w]) => keepSet.has(w)));
+  }
+  const byTermClean = {};
+  for (const [w, ids] of Object.entries(byTerm)) if (keepSet.has(w)) byTermClean[w] = [...new Set(ids)];
+  corpus.globalTerms = Object.fromEntries(kept);
+  corpus.byTerm = byTermClean;
+  corpus.stats.uniqueTerms = keepSet.size;
+  corpus.generatedAt = new Date().toISOString();
+}
+
+await mkdir(CACHE_DIR, { recursive: true });
+
+// Discover targets: docs with no/low extracted text in the current corpus
+const corpus = await loadCorpus();
+const targets = Object.entries(corpus.byEvent || {})
+  .filter(([id, d]) => (d.charCount || 0) < 200 || d.ocr === "partial")
   .map(([id]) => id)
   .filter(id => !SKIP.has(id))
   .filter(id => ONLY.size === 0 || ONLY.has(id));
 
 if (!targets.length) {
-  console.log("[ocr] nothing to do.");
+  console.log("[ocr] nothing to do — every doc already has extracted text.");
   process.exit(0);
 }
 
-console.log(`[ocr] ${targets.length} candidate(s): ${targets.join(", ")}`);
-console.log(`[ocr] MAX_PAGES=${MAX_PAGES} per doc`);
+console.log(`[ocr] ${targets.length} target(s): ${targets.join(", ")}`);
+console.log(`[ocr] MAX_PAGES=${MAX_PAGES === Infinity ? "ALL" : MAX_PAGES}  DPI_SCALE=${DPI_SCALE}`);
 
 const worker = await createWorker("eng", 1, { logger: () => {} });
-let touched = 0;
+let docsTouched = 0;
+const t0 = Date.now();
 
 for (const id of targets) {
   const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
@@ -79,62 +117,61 @@ for (const id of targets) {
   try { buf = await readFile(pdfPath); } catch { console.log(`  ✗ ${id} — pdf not on disk`); continue; }
   const doc = await pdfjs.getDocument({ data: new Uint8Array(buf), useSystemFonts: false, disableFontFace: true }).promise;
   const nPages = Math.min(doc.numPages, MAX_PAGES);
+  const docCacheDir = path.join(CACHE_DIR, id);
+  await mkdir(docCacheDir, { recursive: true });
+
   console.log(`\n→ ${id}  (${doc.numPages} pages, OCRing ${nPages})`);
-  let text = "";
+  const docT0 = Date.now();
+  let pagesOcrd = 0, pagesCached = 0, pagesErr = 0;
+  let fullText = "";
+
   for (let p = 1; p <= nPages; p++) {
+    const cachePath = path.join(docCacheDir, `p${String(p).padStart(4, "0")}.txt`);
+    if (existsSync(cachePath)) {
+      const cached = await readFile(cachePath, "utf8");
+      fullText += " " + cached;
+      pagesCached++;
+      continue;
+    }
     try {
-      const png = await renderPage(doc, p, 2.0);
+      const png = await renderPagePng(doc, p, DPI_SCALE);
       const { data } = await worker.recognize(png);
-      text += " " + (data.text || "");
-      process.stdout.write(`  p${p}: ${(data.text || "").length}c\r`);
+      const pageText = (data.text || "").trim();
+      await writeFile(cachePath, pageText, "utf8");
+      fullText += " " + pageText;
+      pagesOcrd++;
+      const elapsed = ((Date.now() - docT0) / 1000).toFixed(0);
+      process.stdout.write(`  p${p}/${nPages} ocr ${pageText.length}c  [doc ${elapsed}s, total ${((Date.now()-t0)/60000).toFixed(1)}m]\r`);
     } catch (e) {
-      process.stdout.write(`  p${p}: ERR ${e.message}\n`);
+      pagesErr++;
+      await writeFile(cachePath, "", "utf8");  // empty cache so we don't retry
+      process.stdout.write(`  p${p}/${nPages} ERR ${e.message.slice(0,50)}\n`);
     }
   }
   await doc.cleanup(); await doc.destroy();
 
-  const tokens = tokenize(text);
+  const tokens = tokenize(fullText);
   const terms = {};
   for (const t of tokens) terms[t] = (terms[t] || 0) + 1;
+  const isPartial = nPages < doc.numPages;
   corpus.byEvent[id] = {
     pages: doc.numPages,
-    charCount: text.length,
+    charCount: fullText.length,
     terms,
-    sample: text.slice(0, 800).replace(/\s+/g, " ").trim(),
-    ocr: true,
+    sample: fullText.slice(0, 800).replace(/\s+/g, " ").trim(),
+    ocr: isPartial ? "partial" : true,
     ocrPages: nPages,
   };
-  console.log(`  ✓ ${id} — chars=${text.length} terms=${Object.keys(terms).length}${nPages < doc.numPages ? ` (truncated at p${nPages})` : ""}`);
-  touched++;
+  const dt = ((Date.now() - docT0) / 1000).toFixed(0);
+  console.log(`\n  ✓ ${id} — chars=${fullText.length} terms=${Object.keys(terms).length}  [${pagesOcrd} ocr'd, ${pagesCached} cached, ${pagesErr} err, ${dt}s]`);
+
+  // Save progress after each doc — incremental
+  await rebuildIndexes(corpus);
+  corpus.stats.eventsProcessed = Object.keys(corpus.byEvent).length;
+  await writeFile(OUT, JSON.stringify(corpus, null, 0));
+  docsTouched++;
 }
 
 await worker.terminate();
-
-// Rebuild global indexes
-const globalTerms = {}, byTerm = {};
-for (const [id, d] of Object.entries(corpus.byEvent)) {
-  for (const [w, c] of Object.entries(d.terms || {})) {
-    globalTerms[w] = (globalTerms[w] || 0) + c;
-    (byTerm[w] = byTerm[w] || []).push(id);
-  }
-}
-const kept = Object.entries(globalTerms)
-  .filter(([w, c]) => (byTerm[w]?.length || 0) >= 2 || c >= 4)
-  .sort((a,b) => b[1] - a[1])
-  .slice(0, 2500);
-const keepSet = new Set(kept.map(([w]) => w));
-for (const id of Object.keys(corpus.byEvent)) {
-  const t = corpus.byEvent[id].terms || {};
-  corpus.byEvent[id].terms = Object.fromEntries(Object.entries(t).filter(([w]) => keepSet.has(w)));
-}
-const byTermClean = {};
-for (const [w, ids] of Object.entries(byTerm)) if (keepSet.has(w)) byTermClean[w] = [...new Set(ids)];
-
-corpus.globalTerms = Object.fromEntries(kept);
-corpus.byTerm = byTermClean;
-corpus.stats.uniqueTerms = keepSet.size;
-corpus.stats.ocrEvents = (corpus.stats.ocrEvents || 0) + touched;
-corpus.generatedAt = new Date().toISOString();
-
-await writeFile(OUT, JSON.stringify(corpus, null, 0));
-console.log(`\n[ocr] merged ${touched} OCR'd docs. corpus terms=${keepSet.size}`);
+const totalMin = ((Date.now() - t0) / 60000).toFixed(1);
+console.log(`\n[ocr] done. ${docsTouched} docs merged. corpus terms=${Object.keys(corpus.globalTerms).length}. ${totalMin} min total.`);

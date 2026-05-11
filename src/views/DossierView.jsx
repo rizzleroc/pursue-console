@@ -1,10 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AGENCY_COLORS, FLAG_LABEL } from "../data/events.js";
 import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
 import { THREADS } from "../data/threads.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
+import ReadingMode from "../components/ReadingMode.jsx";
+
+// Lazy: load /text/manifest.json once so we know which events have full text.
+let _manifestPromise = null;
+function useTextManifest() {
+  const [manifest, setManifest] = useState(null);
+  useEffect(() => {
+    if (!_manifestPromise) {
+      _manifestPromise = fetch(`${import.meta.env.BASE_URL}text/manifest.json`)
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}));
+    }
+    _manifestPromise.then(setManifest);
+  }, []);
+  return manifest;
+}
 
 export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents }) {
+  const manifest = useTextManifest();
+  const [reading, setReading] = useState(false);
   if (!event) {
     return (
       <div className="px-3 sm:px-8 py-12 text-center">
@@ -59,6 +77,20 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
         </div>
       </div>
 
+      {/* Full text CTA */}
+      {manifest && manifest[event.id] && (
+        <button onClick={() => setReading(true)}
+          className="w-full block border border-emerald-400/50 bg-emerald-400/5 hover:bg-emerald-400/10 rounded-sm p-3 mb-5 font-mono text-xs text-emerald-200 transition-colors text-left">
+          <div className="text-[9px] text-emerald-400/80 tracking-widest mb-1">▌ READ THE EXTRACTED FULL TEXT</div>
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
+            <span className="text-emerald-100">→ Open the {manifest[event.id].pages}-page document in Reading Mode</span>
+            <span className="text-[10px] text-emerald-600">
+              {manifest[event.id].chars.toLocaleString()} chars · {manifest[event.id].source === "ocr" ? "OCR" : "TEXT LAYER"}
+            </span>
+          </div>
+        </button>
+      )}
+
       <div className="border border-emerald-700/30 bg-black/40 rounded-sm p-4 sm:p-6 mb-5">
         <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-3">▌ SUMMARY</div>
         <p className="text-emerald-100 leading-relaxed text-sm sm:text-base font-mono">{event.summary}</p>
@@ -66,6 +98,8 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
           <div className="mt-3 pt-3 border-t border-emerald-700/30 font-mono text-[11px] text-amber-300">◇ {event.note}</div>
         )}
       </div>
+
+      {reading && <ReadingMode event={event} onClose={() => setReading(false)} />}
 
       {/* CONNECTIVE TISSUE — entities */}
       {ents.length > 0 && (
