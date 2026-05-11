@@ -1,5 +1,7 @@
 # PURSUE Console — Release 01
 
+![PURSUE Console](./public/og-card.png)
+
 > **An open, community-built investigation unit for the [war.gov/UFO Release 01](https://www.war.gov/UFO) disclosure.**
 > *Department of War, May 8 2026 — 162 records. All cases UNRESOLVED.*
 
