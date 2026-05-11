@@ -38,6 +38,8 @@ const tokenize = (text) => text
   .filter(w => w.length >= 3 && w.length <= 30 && !/^\d+$/.test(w) && !STOP.has(w));
 
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+const PDFJS_WASM_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\","/");
+const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\","/");
 
 class NodeCanvasFactory {
   create(width, height) {
@@ -91,13 +93,35 @@ async function rebuildIndexes(corpus) {
 
 await mkdir(CACHE_DIR, { recursive: true });
 
-// Discover targets: docs with no/low extracted text in the current corpus
+// Discover targets:
+//   - any doc with charCount < 200 in current corpus, OR
+//   - any doc whose .ocr-cache is incomplete (page count < pdf page count)
 const corpus = await loadCorpus();
-const targets = Object.entries(corpus.byEvent || {})
-  .filter(([id, d]) => (d.charCount || 0) < 200 || d.ocr === "partial")
-  .map(([id]) => id)
-  .filter(id => !SKIP.has(id))
-  .filter(id => ONLY.size === 0 || ONLY.has(id));
+async function cacheCount(id) {
+  const dir = path.join(CACHE_DIR, id);
+  if (!existsSync(dir)) return 0;
+  return (await readdir(dir)).filter(f => /^p\d+\.txt$/.test(f)).length;
+}
+async function pdfPageCount(id) {
+  const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
+  if (!existsSync(pdfPath)) return 0;
+  const buf = await readFile(pdfPath);
+  const d = await pdfjs.getDocument({ data: new Uint8Array(buf), useSystemFonts: false, disableFontFace: true,
+    wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL }).promise;
+  const n = d.numPages; await d.cleanup(); await d.destroy(); return n;
+}
+const candidates = Object.keys(corpus.byEvent || {});
+const targets = [];
+for (const id of candidates) {
+  if (SKIP.has(id)) continue;
+  if (ONLY.size && !ONLY.has(id)) continue;
+  const d = corpus.byEvent[id];
+  const lowText = (d.charCount || 0) < 200;
+  const cc = await cacheCount(id);
+  const pp = lowText || cc > 0 ? await pdfPageCount(id) : 0;
+  const incompleteCache = pp > 0 && cc < pp;
+  if (lowText || incompleteCache) targets.push(id);
+}
 
 if (!targets.length) {
   console.log("[ocr] nothing to do — every doc already has extracted text.");
@@ -115,7 +139,13 @@ for (const id of targets) {
   const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
   let buf;
   try { buf = await readFile(pdfPath); } catch { console.log(`  ✗ ${id} — pdf not on disk`); continue; }
-  const doc = await pdfjs.getDocument({ data: new Uint8Array(buf), useSystemFonts: false, disableFontFace: true }).promise;
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(buf),
+    useSystemFonts: false,
+    disableFontFace: true,
+    wasmUrl: PDFJS_WASM_URL,
+    standardFontDataUrl: PDFJS_FONTS_URL,
+  }).promise;
   const nPages = Math.min(doc.numPages, MAX_PAGES);
   const docCacheDir = path.join(CACHE_DIR, id);
   await mkdir(docCacheDir, { recursive: true });

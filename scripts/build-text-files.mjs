@@ -18,6 +18,8 @@ const OUT_DIR = path.join(ROOT, "public/text");
 
 const { EVENTS } = await import("../src/data/events.js");
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+const PDFJS_WASM_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\","/");
+const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\","/");
 
 await mkdir(OUT_DIR, { recursive: true });
 
@@ -39,7 +41,13 @@ async function fromPdfText(id) {
   const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
   if (!existsSync(pdfPath)) return null;
   const buf = await readFile(pdfPath);
-  const doc = await pdfjs.getDocument({ data: new Uint8Array(buf), useSystemFonts: false, disableFontFace: true }).promise;
+  const doc = await pdfjs.getDocument({
+    data: new Uint8Array(buf),
+    useSystemFonts: false,
+    disableFontFace: true,
+    wasmUrl: PDFJS_WASM_URL,
+    standardFontDataUrl: PDFJS_FONTS_URL,
+  }).promise;
   const parts = [];
   let totalChars = 0;
   for (let p = 1; p <= doc.numPages; p++) {
