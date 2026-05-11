@@ -9,8 +9,10 @@
 //   MAX_PAGES=N     — cap pages per doc (default: all pages)
 //   DPI_SCALE=2.0   — render scale (higher = slower but more accurate)
 
-import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, stat, unlink } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { randomBytes } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
@@ -163,9 +165,13 @@ for (const id of targets) {
       pagesCached++;
       continue;
     }
+    // tesseract.js v7 rejects Buffer in some node setups with
+    // "Value is none of these types `String`, `Path`". Always go via temp file.
+    const tmpPath = path.join(tmpdir(), `whg-${randomBytes(4).toString("hex")}.png`);
     try {
       const png = await renderPagePng(doc, p, DPI_SCALE);
-      const { data } = await worker.recognize(png);
+      await writeFile(tmpPath, png);
+      const { data } = await worker.recognize(tmpPath);
       const pageText = (data.text || "").trim();
       await writeFile(cachePath, pageText, "utf8");
       fullText += " " + pageText;
@@ -174,8 +180,10 @@ for (const id of targets) {
       process.stdout.write(`  p${p}/${nPages} ocr ${pageText.length}c  [doc ${elapsed}s, total ${((Date.now()-t0)/60000).toFixed(1)}m]\r`);
     } catch (e) {
       pagesErr++;
-      await writeFile(cachePath, "", "utf8");  // empty cache so we don't retry
+      await writeFile(cachePath, "", "utf8");
       process.stdout.write(`  p${p}/${nPages} ERR ${e.message.slice(0,50)}\n`);
+    } finally {
+      try { await unlink(tmpPath); } catch {}
     }
   }
   await doc.cleanup(); await doc.destroy();
