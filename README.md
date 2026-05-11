@@ -1,49 +1,131 @@
 # PURSUE Console — Release 01
 
-Interactive investigation unit for **war.gov/UFO Release 01** (Department of War, May 8 2026 — 162 records). The official site is a flat directory of PDFs and videos. This console adds the connective tissue: an entity graph, recurring signatures, and curated narrative threads through 51 source records.
+> **An open, community-built investigation unit for the [war.gov/UFO Release 01](https://www.war.gov/UFO) disclosure.**
+> *Department of War, May 8 2026 — 162 records. All cases UNRESOLVED.*
 
-## Why this exists
+[![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-7CFFB2.svg)](./CONTRIBUTING.md)
+[![Live site](https://img.shields.io/badge/live-rizzleroc.github.io%2Fpursue--console-FFD93D)](https://rizzleroc.github.io/pursue-console/)
 
-The raw release is a haystack. Reading the documents one by one tells you each story. Reading them as a system — same names recurring, same morphologies recurring, same commands filing the same kinds of reports — tells you what the corpus is actually saying.
+**Live:** https://rizzleroc.github.io/pursue-console/
 
-## Views
+---
 
-| View | What it shows |
-|------|---------------|
-| **TIMELINE** | Chronology, 1944 → 2026, by decade, color-coded by agency |
-| **GLOBE** | Orthographic projection with drag-to-rotate; terrestrial events plotted, extra-planetary cases in a sidebar |
-| **ATLAS** | Agency × decade heatmap with type-of-record counters |
-| **NETWORK** | Force-directed graph — events ↔ entities (people, programs, commands, platforms, sensors, morphologies, behaviors). Pin an entity to see every record that references it. **The connective tissue.** |
-| **PATTERNS** | Ranked signatures: which morphologies, behaviors, sensor modalities, platforms, commands recur — and exactly which records exhibit them |
-| **THREADS** | Eight curated narrative arcs (Foo Fighters → Project Sign, the NASA Arc, the CENTCOM Cluster, the Hard Cases, etc.) |
-| **TAGS** | Keyword cloud sized by frequency; pivot to find shared tags |
-| **DOSSIER** | Per-record reading view with primary-source link, DVIDS video, attached entities, threads-it-appears-in, and co-occurring records ranked by shared-entity overlap |
+## What this is
 
-## How the connective tissue works
+The official Release 01 site is a flat directory of PDFs and videos. **Reading the documents one by one tells you each story. Reading them as a system tells you what the corpus is actually saying.** This console adds the connective tissue:
 
-- `src/data/events.js` — the 51 records, in structured form.
-- `src/data/entities.js` — hand-curated index of people, programs, commands, platforms, weapons, sensors, morphologies, and behaviors. Each entity points to the event ids that reference it. The reverse index is computed at load.
-- `src/data/threads.js` — eight narrative arcs, each an ordered sequence of event ids plus a thesis.
+- a **chronological** view (1944 → 2026)
+- a **geospatial** view (drag-rotate globe + extra-planetary sidebar)
+- an **agency × decade** heatmap
+- a **force-directed graph** of events ↔ entities (people, programs, commands, platforms, sensors, morphologies, behaviors)
+- a **patterns** view ranking the signatures that recur across cases
+- **curated narrative threads** with theses (Foo Fighters → Project Sign, the NASA Arc, the CENTCOM Cluster, the Hard Cases…)
+- a **dossier** per record cross-linking attached entities, threads it appears in, and co-occurring records ranked by shared-entity overlap
 
-That's the whole graph. The Network view runs a small in-process force-directed layout over it.
+Currently **51 of 162** records are catalogued. Help us get to 162.
 
-## Run
+---
+
+## 🌍 Open project — contributions welcome
+
+**You don't need to be a developer.** The highest-value contributions are reading the actual primary documents and improving the data:
+
+- **Add a missing record** from the official inventory ([`src/data/events.js`](./src/data/events.js))
+- **Improve a summary** by grounding it more tightly to the source PDF
+- **Add or correct entities** in the connective-tissue index ([`src/data/entities.js`](./src/data/entities.js))
+- **Propose a new narrative thread** ([`src/data/threads.js`](./src/data/threads.js))
+- **Build a new view** — search, compare, witness-reliability matrix, sensor-modality matrix — see [CONTRIBUTING.md](./CONTRIBUTING.md) for ideas
+- **A11y + polish** — keyboard nav, reduced-motion preference, screen-reader labels
+
+**→ Start with [CONTRIBUTING.md](./CONTRIBUTING.md).** It has concrete how-tos for each kind of contribution.
+**→ Read [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).** The short version: discuss claims, not contributors.
+
+If you're poking around for the first time, the [`good first issue`](https://github.com/rizzleroc/pursue-console/labels/good%20first%20issue) and [`data`](https://github.com/rizzleroc/pursue-console/labels/data) labels are good starting points.
+
+---
+
+## Project structure
+
+The structure makes the contribution surfaces obvious. Most data contributions touch one file:
+
+```
+pursue-console/
+├── src/
+│   ├── data/                      ← the corpus + the graph (most PRs land here)
+│   │   ├── events.js              ← 51 records — add a record, fix a summary
+│   │   ├── entities.js            ← people · programs · commands · platforms
+│   │   │                            sensors · morphologies · behaviors
+│   │   │                            (the connective tissue — add an entity,
+│   │   │                            link an event id)
+│   │   └── threads.js             ← curated narrative arcs (propose a thread)
+│   │
+│   ├── views/                     ← one file per view — drop in a new one
+│   │   ├── TimelineView.jsx       ← chronology by decade
+│   │   ├── GlobeView.jsx          ← drag-rotate orthographic globe
+│   │   ├── AtlasView.jsx          ← agency × decade heatmap
+│   │   ├── NetworkView.jsx        ← force-directed entity graph
+│   │   ├── PatternsView.jsx       ← ranked signatures
+│   │   ├── ThreadsView.jsx        ← curated arcs
+│   │   ├── ConstellationView.jsx  ← keyword cloud
+│   │   └── DossierView.jsx        ← per-record reading + cross-links
+│   │
+│   ├── components/                ← shared primitives
+│   │   ├── Header.jsx             ← register a new view here
+│   │   └── Primitives.jsx         ← MiniChip, GlitchText, RadarSweep, etc.
+│   │
+│   ├── App.jsx                    ← view router + filter pipeline
+│   └── main.jsx
+│
+├── .github/
+│   ├── workflows/deploy.yml       ← Pages deploy on push to main
+│   ├── ISSUE_TEMPLATE/            ← bug · data correction · feature
+│   └── pull_request_template.md
+│
+├── CONTRIBUTING.md                ← how to contribute (read this first)
+├── CODE_OF_CONDUCT.md
+├── LICENSE                        ← MIT
+└── README.md
+```
+
+**Adding a record** = edit one file. **Adding a view** = add one file + one import + one nav entry. **Adding an entity** = append one object to a list.
+
+---
+
+## Run locally
 
 ```bash
+git clone https://github.com/rizzleroc/pursue-console
+cd pursue-console
 npm install
-npm run dev
+npm run dev          # http://localhost:5173
 ```
 
-Build:
+Build a production bundle:
 
 ```bash
-npm run build
+npm run build        # → dist/
 ```
 
-## Source
+Stack: Vite + React 19 + Tailwind v3. **No graph or chart libraries** — the network view is a ~70-line force-directed layout, the globe is a hand-rolled orthographic projection, the heatmap and patterns view are CSS grid + computed widths.
 
-All records cite back to `https://www.war.gov/medialink/ufo/release_1/...`. Videos link to DVIDS. **All cases marked UNRESOLVED by the originating agencies.** This console is an unofficial mirror with derived structure; nothing here adds claims beyond the primary documents.
+---
 
-## Stack
+## Deploys automatically
 
-Vite + React + Tailwind v3. No external graph or chart library — the network view is ~70 lines of force-layout, the globe is hand-rolled orthographic projection, the heatmap and patterns view are CSS grid + computed widths.
+Every push to `main` runs [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml), which builds and ships to GitHub Pages. After your PR merges, your change is live in ~40 seconds.
+
+---
+
+## Source posture
+
+Every record cites back to `https://www.war.gov/medialink/ufo/release_1/...`. Videos link to DVIDS. **All cases marked UNRESOLVED by the originating agencies.** This console is an unofficial mirror with hand-curated structure on top; nothing here adds claims beyond the primary documents. See the rules in [CONTRIBUTING.md](./CONTRIBUTING.md#ground-rules).
+
+Release 01 is the first of rolling tranches arriving every few weeks. When the next tranche drops, that's where new event records come from.
+
+---
+
+## License
+
+[MIT](./LICENSE) © 2026 PURSUE Console contributors.
