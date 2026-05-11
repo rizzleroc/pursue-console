@@ -43,6 +43,32 @@ export function RadarSweep({ size = 220 }) {
   );
 }
 
+// Doc-type badge — for records that are primarily visual (photos, sketches,
+// handwritten letters) rather than typed text. Tells the reader: don't expect
+// transcribed prose; open the PDF to look at the actual evidence.
+export const DOC_TYPE_BADGE = {
+  photoset:    { label: "PHOTOS",      glyph: "▣", color: "#FF6B9D" },
+  handwritten: { label: "HANDWRITTEN", glyph: "✎", color: "#FFD93D" },
+  sketch:      { label: "SKETCH",      glyph: "✦", color: "#FFD93D" },
+  annotated:   { label: "ANNOTATED",   glyph: "◎", color: "#82B6FF" },
+  mixed:       { label: "MIXED",       glyph: "▥", color: "#B794F4" },
+};
+
+export function DocTypeBadge({ docType, size = "sm" }) {
+  if (!docType || !DOC_TYPE_BADGE[docType]) return null;
+  const b = DOC_TYPE_BADGE[docType];
+  const cls = size === "lg"
+    ? "px-2 py-0.5 text-[10px] tracking-widest"
+    : "px-1.5 py-0.5 text-[8px] tracking-wider";
+  return (
+    <span className={`inline-flex items-center gap-1 font-mono rounded-sm border ${cls}`}
+      style={{ color: b.color, borderColor: b.color + "60", backgroundColor: b.color + "12" }}
+      title={`Primarily visual: ${b.label.toLowerCase()}`}>
+      <span>{b.glyph}</span>{b.label}
+    </span>
+  );
+}
+
 export function flagBg(flag) {
   if (flag === "anchor") return "bg-amber-400/15 border-amber-400/60";
   if (flag === "high")   return "bg-emerald-400/10 border-emerald-400/50";
@@ -60,6 +86,12 @@ export function MiniChip({ event, onClick }) {
           {event.agency.replace("Department of ","DEPT/").toUpperCase().slice(0,7)}
         </span>
         {event.flag === "anchor" && <span className="text-amber-400 text-[8px]">●</span>}
+        {event.docType && DOC_TYPE_BADGE[event.docType] && (
+          <span className="ml-auto text-[8px]" style={{ color: DOC_TYPE_BADGE[event.docType].color }}
+            title={DOC_TYPE_BADGE[event.docType].label}>
+            {DOC_TYPE_BADGE[event.docType].glyph}
+          </span>
+        )}
       </div>
       <div className="text-emerald-100 text-[11px] leading-tight mt-0.5 line-clamp-2 font-mono">{event.title}</div>
       <div className="text-emerald-600 text-[9px] mt-0.5 font-mono">{event.date}</div>

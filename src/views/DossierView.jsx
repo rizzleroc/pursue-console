@@ -1,27 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AGENCY_COLORS, FLAG_LABEL } from "../data/events.js";
 import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
 import { THREADS } from "../data/threads.js";
-import { GlitchText, MiniChip } from "../components/Primitives.jsx";
+import { GlitchText, MiniChip, DocTypeBadge, DOC_TYPE_BADGE } from "../components/Primitives.jsx";
 import ReadingMode from "../components/ReadingMode.jsx";
 
-// Lazy: load /text/manifest.json once so we know which events have full text.
-let _manifestPromise = null;
-function useTextManifest() {
-  const [manifest, setManifest] = useState(null);
-  useEffect(() => {
-    if (!_manifestPromise) {
-      _manifestPromise = fetch(`${import.meta.env.BASE_URL}text/manifest.json`)
-        .then(r => r.ok ? r.json() : {})
-        .catch(() => ({}));
-    }
-    _manifestPromise.then(setManifest);
-  }, []);
-  return manifest;
-}
-
 export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents }) {
-  const manifest = useTextManifest();
   const [reading, setReading] = useState(false);
   if (!event) {
     return (
@@ -77,16 +61,23 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
         </div>
       </div>
 
-      {/* Full text CTA */}
-      {manifest && manifest[event.id] && (
+      {/* Reading-mode CTA — opens the actual PDF in an embedded viewer */}
+      {event.url && (
         <button onClick={() => setReading(true)}
           className="w-full block border border-emerald-400/50 bg-emerald-400/5 hover:bg-emerald-400/10 rounded-sm p-3 mb-5 font-mono text-xs text-emerald-200 transition-colors text-left">
-          <div className="text-[9px] text-emerald-400/80 tracking-widest mb-1">▌ READ THE EXTRACTED FULL TEXT</div>
+          <div className="text-[9px] text-emerald-400/80 tracking-widest mb-1 flex items-center gap-2">
+            ▌ OPEN THE DOCUMENT
+            <DocTypeBadge docType={event.docType} size="lg" />
+          </div>
           <div className="flex items-baseline justify-between gap-3 flex-wrap">
-            <span className="text-emerald-100">→ Open the {manifest[event.id].pages}-page document in Reading Mode</span>
-            <span className="text-[10px] text-emerald-600">
-              {manifest[event.id].chars.toLocaleString()} chars · {manifest[event.id].source === "ocr" ? "OCR" : "TEXT LAYER"}
+            <span className="text-emerald-100">
+              {event.docType === "photoset" ? "→ View the image set in Reading Mode"
+                : event.docType === "handwritten" ? "→ View the handwritten document in Reading Mode"
+                : event.docType === "sketch" ? "→ View the sketch / composite in Reading Mode"
+                : event.docType === "annotated" ? "→ View the annotated image in Reading Mode"
+                : "→ Open the PDF in Reading Mode"}
             </span>
+            <span className="text-[10px] text-emerald-600">embeds war.gov source</span>
           </div>
         </button>
       )}

@@ -1,6 +1,6 @@
 import React from "react";
 import { AGENCY_COLORS } from "../data/events.js";
-import { GlitchText, flagBg } from "../components/Primitives.jsx";
+import { GlitchText, flagBg, DocTypeBadge } from "../components/Primitives.jsx";
 
 const ERAS = [
   { id: "40s", label: "1944–1949" }, { id: "50s", label: "1950–1959" },
@@ -41,6 +41,7 @@ export default function TimelineView({ events, onSelect }) {
                         {event.agency === "Department of War" ? "DOW" : event.agency === "Department of State" ? "DOS" : event.agency.toUpperCase()}
                       </div>
                       <div className="flex items-center gap-1">
+                        <DocTypeBadge docType={event.docType} />
                         {event.flag === "anchor" && <span className="text-amber-400 text-[10px]">▲</span>}
                         {event.redacted && <span className="font-mono text-[8px] text-rose-400/70">REDACT</span>}
                       </div>
