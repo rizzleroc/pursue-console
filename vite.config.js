@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+// Project pages live at https://<user>.github.io/pursue-console/
 export default defineConfig({
   plugins: [react()],
+  base: '/pursue-console/',
 })
