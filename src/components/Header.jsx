@@ -1,6 +1,7 @@
 import React from "react";
 
 const VIEWS = [
+  { id: "semantic", label: "SEMANTIC", glyph: "∿" },
   { id: "search", label: "SEARCH", glyph: "⌕" },
   { id: "timeline", label: "TIMELINE", glyph: "▬" },
   { id: "globe", label: "GLOBE", glyph: "◉" },

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS } from "./data/events.js";
 import { ScanlineOverlay, GrainOverlay, VignetteOverlay, RadarSweep } from "./components/Primitives.jsx";
 import Header from "./components/Header.jsx";
@@ -11,6 +11,10 @@ import ThreadsView from "./views/ThreadsView.jsx";
 import ConstellationView from "./views/ConstellationView.jsx";
 import SearchView from "./views/SearchView.jsx";
 import DossierView from "./views/DossierView.jsx";
+
+// Semantic search pulls in transformers.js (~25MB INT8 model + ORT wasm) —
+// lazy-load it so first paint isn't gated on that bundle.
+const SemanticSearchView = lazy(() => import("./views/SemanticSearchView.jsx"));
 
 export default function App() {
   const [view, setView] = useState("timeline");
@@ -98,6 +102,15 @@ export default function App() {
           {view === "threads" && <ThreadsView events={filtered} onSelect={handleSelect} />}
           {view === "constellation" && <ConstellationView events={filtered} onSelect={handleSelect} />}
           {view === "search" && <SearchView onSelect={handleSelect} />}
+          {view === "semantic" && (
+            <Suspense fallback={
+              <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest">
+                ◌ loading semantic search engine…
+              </div>
+            }>
+              <SemanticSearchView onSelect={handleSelect} />
+            </Suspense>
+          )}
           {view === "dossier" && (
             <DossierView event={selected}
               onClose={() => { setSelected(null); setView("timeline"); }}
