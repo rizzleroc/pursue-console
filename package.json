@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-search-index.mjs && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
@@ -16,6 +16,7 @@
     "corpus": "npm run corpus:fetch && npm run corpus:extract"
   },
   "dependencies": {
+    "minisearch": "^7.2.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },

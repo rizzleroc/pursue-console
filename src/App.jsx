@@ -9,6 +9,7 @@ import NetworkView from "./views/NetworkView.jsx";
 import PatternsView from "./views/PatternsView.jsx";
 import ThreadsView from "./views/ThreadsView.jsx";
 import ConstellationView from "./views/ConstellationView.jsx";
+import SearchView from "./views/SearchView.jsx";
 import DossierView from "./views/DossierView.jsx";
 
 export default function App() {
@@ -96,6 +97,7 @@ export default function App() {
           {view === "patterns" && <PatternsView events={filtered} onSelect={handleSelect} />}
           {view === "threads" && <ThreadsView events={filtered} onSelect={handleSelect} />}
           {view === "constellation" && <ConstellationView events={filtered} onSelect={handleSelect} />}
+          {view === "search" && <SearchView onSelect={handleSelect} />}
           {view === "dossier" && (
             <DossierView event={selected}
               onClose={() => { setSelected(null); setView("timeline"); }}
