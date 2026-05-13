@@ -19,9 +19,20 @@ import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 const MODEL = "Xenova/all-MiniLM-L6-v2";
 const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 
-// Make transformers.js fetch from a CDN; we don't ship the model.
+// Make transformers.js fetch from a CDN; we don't ship the model weights.
 env.allowLocalModels = false;
 env.useBrowserCache = true;
+
+// ORT ships 8 wasm/mjs variants — Vite only bundles whichever one its static
+// analysis happens to resolve, so on GH Pages the loader 404s the others
+// (jsep, jspi, plain simd-threaded). Pin the WASM root to a CDN so every
+// variant is reachable. The actual model weights still come from HF Hub.
+const ORT_VERSION = "1.22.0";
+env.backends.onnx.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+// Single-threaded keeps us away from cross-origin-isolation requirements
+// (GH Pages doesn't send COOP/COEP headers).
+env.backends.onnx.wasm.numThreads = 1;
+env.backends.onnx.wasm.proxy = false;
 
 // ---- one-time loaders (module-level cache) ----
 let _vectorsP = null;
@@ -44,8 +55,14 @@ let _modelP = null;
 function loadModel(onProgress) {
   if (!_modelP) {
     _modelP = pipeline("feature-extraction", MODEL, {
-      quantized: true,
+      // transformers.js v3+: `quantized: true` was replaced by `dtype`.
+      // q8 keeps the model small (~25 MB) and runs cleanly on CPU+wasm.
+      dtype: "q8",
+      device: "wasm",
       progress_callback: onProgress,
+    }).catch(err => {
+      _modelP = null;        // allow retries after a failed first load
+      throw err;
     });
   }
   return _modelP;
@@ -166,7 +183,11 @@ export default function SemanticSearchView({ onSelect }) {
       const grouped = Array.from(groups.values()).sort((a, b) => b.best - a.best).slice(0, 12);
       setResults({ grouped, elapsedMs });
     } catch (e) {
-      setError(e.message);
+      console.error("[semantic] search failed:", e);
+      setError({
+        msg: e.message || String(e),
+        stack: e.stack ? e.stack.split("\n").slice(0, 4).join("\n") : null,
+      });
     } finally {
       setSearching(false);
     }
@@ -224,8 +245,15 @@ export default function SemanticSearchView({ onSelect }) {
       )}
 
       {error && (
-        <div className="border border-rose-400/40 bg-rose-400/5 rounded-sm p-3 font-mono text-[12px] text-rose-300 mb-4">
-          ⊘ {error}
+        <div className="border border-rose-400/40 bg-rose-400/5 rounded-sm p-3 font-mono text-[11px] text-rose-300 mb-4 space-y-1">
+          <div className="text-rose-200 tracking-widest">⊘ SEMANTIC SEARCH FAILED</div>
+          <div className="break-words">{typeof error === "string" ? error : error.msg}</div>
+          {error?.stack && (
+            <pre className="text-[10px] text-rose-400/80 mt-2 whitespace-pre-wrap leading-tight">{error.stack}</pre>
+          )}
+          <div className="text-[10px] text-emerald-700 pt-2">
+            Open the browser console for the full stack trace. If this is the first time you tried semantic search and the model download timed out, retry — files are cached after success.
+          </div>
         </div>
       )}
 
