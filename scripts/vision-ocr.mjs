@@ -21,6 +21,17 @@ import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
 
+// pdfjs occasionally emits an AbortException from internal aborted-render
+// machinery that escapes our try/catch as an unhandled rejection. Without
+// this handler Node v24 terminates the whole process on first occurrence,
+// killing the long-running OCR loop. We log and keep going.
+process.on("unhandledRejection", (err) => {
+  console.error("  ! unhandledRejection (continuing):", (err && (err.message || err.toString())) || err);
+});
+process.on("uncaughtException", (err) => {
+  console.error("  ! uncaughtException (continuing):", (err && (err.message || err.toString())) || err);
+});
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data-raw");
@@ -74,7 +85,7 @@ async function visionTranscribe(pngPath, label) {
       provider: "chatgpt",
       label,
       freshChat: true,        // each page in its own chat so context doesn't bleed
-      timeoutMs: 180_000,
+      timeoutMs: 300_000,     // 5 min — dense pages occasionally take 3-4 min
     }),
   });
   if (!r.ok) {

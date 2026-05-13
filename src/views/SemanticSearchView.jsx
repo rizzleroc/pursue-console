@@ -343,24 +343,30 @@ export default function SemanticSearchView({ onSelect }) {
             <div className="text-[9px] text-emerald-600">not yet searchable</div>
           </div>
         </div>
-        {/* OCR quality summary */}
+        {/* Source quality summary */}
         {vecState?.info?.rejectedByQuality && (
-          <div className="mt-2 pt-2 border-t border-emerald-700/20 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] text-emerald-600">
+          <div className="mt-2 pt-2 border-t border-emerald-700/20 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] text-emerald-600">
+            {vecState.info.bySource?.vision && (
+              <div>
+                <span className="text-cyan-300 tracking-widest text-[9px]">VISION </span>
+                {vecState.info.bySource.vision.count} chunks · q={vecState.info.bySource.vision.meanQuality} <span className="text-emerald-700">(GPT)</span>
+              </div>
+            )}
             <div>
-              <span className="text-emerald-700 tracking-widest text-[9px]">OCR DOCS </span>
-              {vecState.info.bySource?.ocr
-                ? <>{vecState.info.bySource.ocr.count} chunks · mean q={vecState.info.bySource.ocr.meanQuality}</>
+              <span className="text-emerald-400 tracking-widest text-[9px]">TEXT-LAYER </span>
+              {vecState.info.bySource?.pdfjs
+                ? <>{vecState.info.bySource.pdfjs.count} chunks · q={vecState.info.bySource.pdfjs.meanQuality}</>
                 : "—"}
             </div>
             <div>
-              <span className="text-emerald-700 tracking-widest text-[9px]">PDFjs DOCS </span>
-              {vecState.info.bySource?.pdfjs
-                ? <>{vecState.info.bySource.pdfjs.count} chunks · mean q={vecState.info.bySource.pdfjs.meanQuality}</>
+              <span className="text-amber-300 tracking-widest text-[9px]">OCR </span>
+              {vecState.info.bySource?.ocr
+                ? <>{vecState.info.bySource.ocr.count} chunks · q={vecState.info.bySource.ocr.meanQuality} <span className="text-emerald-700">(tesseract)</span></>
                 : "—"}
             </div>
             <div>
               <span className="text-rose-400 tracking-widest text-[9px]">REJECTED </span>
-              {(vecState.info.rejectedByQuality.ocr || 0) + (vecState.info.rejectedByQuality.pdfjs || 0)} chunks (q&lt;{vecState.info.minQuality}) — OCR garbage filtered to keep precision
+              {(vecState.info.rejectedByQuality.ocr || 0) + (vecState.info.rejectedByQuality.pdfjs || 0)} chunks (q&lt;{vecState.info.minQuality})
             </div>
           </div>
         )}
@@ -559,12 +565,15 @@ export default function SemanticSearchView({ onSelect }) {
                   {pageHits.length > 0 && (
                     <div className="mt-2 space-y-1.5">
                       {pageHits.map((h, i) => {
-                        // OCR-quality color: green for curated/clean, amber for mid OCR, dim for low-q
+                        // Source-aware badge: vision (clean GPT-transcription) > pdfjs
+                        // (text layer) > curated (events.js) > OCR (noisy tesseract).
                         const qColor = h.chunkKind === "meta" || h.chunkSource === "curated" ? "text-emerald-400"
+                          : h.chunkSource === "vision" ? "text-cyan-300"
                           : h.chunkSource === "pdfjs" ? "text-emerald-400"
                           : (h.chunkQuality ?? 1) >= 0.55 ? "text-amber-300"
                           : "text-amber-600";
                         const qLabel = h.chunkKind === "meta" ? "CURATED"
+                          : h.chunkSource === "vision" ? "VISION"
                           : h.chunkSource === "pdfjs" ? "TEXT-LAYER"
                           : h.chunkSource === "ocr" ? `OCR q${(h.chunkQuality ?? 0).toFixed(2)}`
                           : "";

@@ -95,16 +95,20 @@ def load_events_meta():
 
 
 def page_chunks_of(text):
-    """Split a text dump into [(page, body), ...] using === Page N === markers."""
+    """Split a text dump into [(page, body, source), ...] using
+       === Page N === (tesseract OCR / pdfjs) or
+       === Page N (vision) === markers (whipgen + ChatGPT)."""
     if "=== Page" not in text:
-        return [(0, text.strip())]
-    parts = re.split(r"=== Page (\d+) ===", text)
+        return [(0, text.strip(), None)]
+    # Capture page number and optional source tag in parentheses.
+    parts = re.split(r"=== Page (\d+)(?:\s*\((\w+)\))? ===", text)
     out = []
-    for i in range(1, len(parts), 2):
+    for i in range(1, len(parts), 3):
         page = int(parts[i])
-        body = (parts[i + 1] if i + 1 < len(parts) else "").strip()
+        marker_src = parts[i + 1] if i + 1 < len(parts) else None
+        body = (parts[i + 2] if i + 2 < len(parts) else "").strip()
         if body:
-            out.append((page, body))
+            out.append((page, body, marker_src))
     return out
 
 
@@ -146,8 +150,12 @@ def main():
         manifest = json.loads((ROOT / "public/text/manifest.json").read_text())
     except FileNotFoundError:
         manifest = {}
-    ocr_ids = {k for k, v in manifest.items() if v.get("source") == "ocr"}
+    # 'mixed' docs have both vision and tesseract pages — treat the doc-level
+    # source as 'ocr' so unmarked pages still pass the quality filter; vision
+    # pages override per-marker.
+    ocr_ids = {k for k, v in manifest.items() if v.get("source") in ("ocr", "mixed")}
     pdfjs_ids = {k for k, v in manifest.items() if v.get("source") == "pdfjs"}
+    vision_only_ids = {k for k, v in manifest.items() if v.get("source") == "vision"}
 
     events = load_events_meta()
     print(f"[embeddings] parsed {len(events)} events from events.js  ({len(pdfjs_ids)} clean / {len(ocr_ids)} OCR)")
@@ -173,21 +181,31 @@ def main():
         })
 
     # 2) Per-page chunks from extracted text
-    rejected_by_source = {"ocr": 0, "pdfjs": 0}
+    rejected_by_source = {"ocr": 0, "pdfjs": 0, "vision": 0}
     rejected_chunks = []  # save a few examples for the report
     for fp in sorted(TEXT_DIR.glob("*.txt")):
         eid = fp.stem
         if eid == "manifest":
             continue
-        source = "ocr" if eid in ocr_ids else ("pdfjs" if eid in pdfjs_ids else "unknown")
+        # Doc-level source (manifest); per-page marker_src may override.
+        doc_source = (
+            "vision" if eid in vision_only_ids
+            else "ocr" if eid in ocr_ids
+            else "pdfjs" if eid in pdfjs_ids
+            else "unknown"
+        )
         raw = fp.read_text(encoding="utf-8", errors="ignore")
         body_full = raw.split("\n---\n", 1)[1] if "\n---\n" in raw else raw
-        for page, body in page_chunks_of(body_full):
+        for page, body, marker_src in page_chunks_of(body_full):
+            source = marker_src or doc_source  # vision marker wins
             for piece in slice_long(body):
                 if len(piece) < MIN_CHUNK_CHARS:
                     continue
                 q = text_quality(piece, words)
-                if q < MIN_QUALITY:
+                # Vision-OCR text is high-quality by construction (GPT
+                # outputs readable English). Don't quality-filter it —
+                # we'd false-reject genuine '(blank)' or short pages.
+                if source != "vision" and q < MIN_QUALITY:
                     rejected_by_source[source] = rejected_by_source.get(source, 0) + 1
                     if len(rejected_chunks) < 5:
                         rejected_chunks.append((eid, page, q, piece[:120].replace("\n"," ")))
