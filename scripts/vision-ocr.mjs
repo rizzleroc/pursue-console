@@ -111,13 +111,17 @@ async function renderPagePng(doc, pageNum, scale) {
 }
 
 // ---- discover targets: scanned docs whose OCR output is below threshold ----
+// Returns ids sorted by ascending page count so a kill-and-restart doesn't
+// leave the user staring at a 200-page giant before any small doc completes.
 async function discoverTargets() {
   const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
-  // For now: every OCR-derived doc is a candidate (their tesseract output is what we want to replace).
   const candidates = Object.entries(manifest)
     .filter(([id, v]) => v.source === "ocr")
-    .map(([id]) => id);
-  return candidates.filter(id => !SKIP.has(id)).filter(id => ONLY.size === 0 || ONLY.has(id));
+    .map(([id, v]) => ({ id, pages: v.pages || Infinity }))
+    .filter(({ id }) => !SKIP.has(id))
+    .filter(({ id }) => ONLY.size === 0 || ONLY.has(id));
+  candidates.sort((a, b) => a.pages - b.pages);
+  return candidates.map(c => c.id);
 }
 
 // ---- main loop ----
