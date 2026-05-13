@@ -1,1 +1,25 @@
-{"model": "sentence-transformers/all-MiniLM-L6-v2", "dim": 384, "count": 1057, "generatedAt": "2026-05-12T23:10:53Z"}
+{
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "dim": 384,
+  "count": 866,
+  "minQuality": 0.25,
+  "rejectedByQuality": {
+    "ocr": 188,
+    "pdfjs": 3
+  },
+  "bySource": {
+    "curated": {
+      "count": 52,
+      "meanQuality": 1.0
+    },
+    "ocr": {
+      "count": 660,
+      "meanQuality": 0.543
+    },
+    "pdfjs": {
+      "count": 154,
+      "meanQuality": 0.492
+    }
+  },
+  "generatedAt": "2026-05-13T16:01:31Z"
+}

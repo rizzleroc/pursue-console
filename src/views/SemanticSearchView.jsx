@@ -208,7 +208,7 @@ export default function SemanticSearchView({ onSelect }) {
         if (!groups.has(key)) groups.set(key, { kind: "official", event: ev, best: h.score, hits: [] });
         const g = groups.get(key);
         if (h.score > g.best) g.best = h.score;
-        g.hits.push({ ...h, page: m.page, snippet: m.snippet, chunkKind: m.kind });
+        g.hits.push({ ...h, page: m.page, snippet: m.snippet, chunkKind: m.kind, chunkSource: m.source, chunkQuality: m.quality });
       }
       for (const h of droppedHits) {
         const m = droppedVecs.meta[h.idx];
@@ -342,6 +342,27 @@ export default function SemanticSearchView({ onSelect }) {
             <div className="text-[9px] text-emerald-600">not yet searchable</div>
           </div>
         </div>
+        {/* OCR quality summary */}
+        {vecState?.info?.rejectedByQuality && (
+          <div className="mt-2 pt-2 border-t border-emerald-700/20 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] text-emerald-600">
+            <div>
+              <span className="text-emerald-700 tracking-widest text-[9px]">OCR DOCS </span>
+              {vecState.info.bySource?.ocr
+                ? <>{vecState.info.bySource.ocr.count} chunks · mean q={vecState.info.bySource.ocr.meanQuality}</>
+                : "—"}
+            </div>
+            <div>
+              <span className="text-emerald-700 tracking-widest text-[9px]">PDFjs DOCS </span>
+              {vecState.info.bySource?.pdfjs
+                ? <>{vecState.info.bySource.pdfjs.count} chunks · mean q={vecState.info.bySource.pdfjs.meanQuality}</>
+                : "—"}
+            </div>
+            <div>
+              <span className="text-rose-400 tracking-widest text-[9px]">REJECTED </span>
+              {(vecState.info.rejectedByQuality.ocr || 0) + (vecState.info.rejectedByQuality.pdfjs || 0)} chunks (q&lt;{vecState.info.minQuality}) — OCR garbage filtered to keep precision
+            </div>
+          </div>
+        )}
       </div>
 
       {/* DROP ZONE */}
@@ -536,15 +557,27 @@ export default function SemanticSearchView({ onSelect }) {
                   </button>
                   {pageHits.length > 0 && (
                     <div className="mt-2 space-y-1.5">
-                      {pageHits.map((h, i) => (
-                        <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
-                          <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
-                            {h.chunkKind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
-                            <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
-                          </span>
-                          {highlightQuery(h.snippet, qTerms)}
-                        </div>
-                      ))}
+                      {pageHits.map((h, i) => {
+                        // OCR-quality color: green for curated/clean, amber for mid OCR, dim for low-q
+                        const qColor = h.chunkKind === "meta" || h.chunkSource === "curated" ? "text-emerald-400"
+                          : h.chunkSource === "pdfjs" ? "text-emerald-400"
+                          : (h.chunkQuality ?? 1) >= 0.55 ? "text-amber-300"
+                          : "text-amber-600";
+                        const qLabel = h.chunkKind === "meta" ? "CURATED"
+                          : h.chunkSource === "pdfjs" ? "TEXT-LAYER"
+                          : h.chunkSource === "ocr" ? `OCR q${(h.chunkQuality ?? 0).toFixed(2)}`
+                          : "";
+                        return (
+                          <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
+                            <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
+                              {h.chunkKind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
+                              <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
+                              {qLabel && <span className={`ml-2 ${qColor}`}>{qLabel}</span>}
+                            </span>
+                            {highlightQuery(h.snippet, qTerms)}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

@@ -21,9 +21,11 @@ The browser doesn't need FAISS; with N ~ 900 chunks, brute-force cosine in JS
 runs in < 5 ms.
 """
 import json
+import os
 import re
 import time
 from pathlib import Path
+from urllib.request import urlretrieve
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -34,10 +36,35 @@ EVENTS_JS = ROOT / "src" / "data" / "events.js"
 OUT_BIN = ROOT / "public" / "embeddings.bin"
 OUT_META = ROOT / "public" / "embeddings-meta.json"
 OUT_INFO = ROOT / "public" / "embeddings-info.json"
+WORDLIST = ROOT / "scripts" / ".words.txt"
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 MIN_CHUNK_CHARS = 30
 MAX_CHUNK_CHARS = 2000  # split longer pages so dense models see coherent context
+
+# Quality threshold — OCR chunks below this score are dropped from the
+# index. They embed to near-random vectors and false-match unrelated
+# queries; better to lose recall on garbage than poison precision.
+# Tunable via env: MIN_QUALITY=0.30 python scripts/build-embeddings.py
+MIN_QUALITY = float(os.environ.get("MIN_QUALITY", "0.25"))
+
+
+def load_wordlist():
+    """Top ~10K English words for OCR quality scoring."""
+    if not WORDLIST.exists():
+        print(f"[embeddings] fetching wordlist for quality scoring…")
+        urlretrieve("https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english.txt", WORDLIST)
+    return {w.strip().lower() for w in WORDLIST.read_text().splitlines() if len(w.strip()) >= 3}
+
+
+def text_quality(text, words):
+    """Fraction of alphabetic tokens that are common English words.
+       Real English: 0.5–0.8. OCR garbage: 0.0–0.25."""
+    toks = re.findall(r"[A-Za-z']+", text)
+    if len(toks) < 5:
+        return 0.0
+    real = sum(1 for t in toks if 3 <= len(t) <= 20 and t.lower() in words)
+    return real / len(toks)
 
 
 def load_events_meta():
@@ -109,13 +136,27 @@ def main():
     model = SentenceTransformer(MODEL_NAME)
     print(f"[embeddings] model loaded in {time.time()-t0:.1f}s, dim={model.get_sentence_embedding_dimension()}")
 
+    words = load_wordlist()
+    print(f"[embeddings] quality wordlist: {len(words)} terms, threshold q≥{MIN_QUALITY}")
+
+    # Discover which docs were OCR'd vs pdfjs-clean — chunks from OCR
+    # docs are subject to the quality filter; clean text-layer chunks
+    # always pass.
+    try:
+        manifest = json.loads((ROOT / "public/text/manifest.json").read_text())
+    except FileNotFoundError:
+        manifest = {}
+    ocr_ids = {k for k, v in manifest.items() if v.get("source") == "ocr"}
+    pdfjs_ids = {k for k, v in manifest.items() if v.get("source") == "pdfjs"}
+
     events = load_events_meta()
-    print(f"[embeddings] parsed {len(events)} events from events.js")
+    print(f"[embeddings] parsed {len(events)} events from events.js  ({len(pdfjs_ids)} clean / {len(ocr_ids)} OCR)")
 
-    chunks = []  # list of dicts: { eventId, page, kind, body, snippet }
+    chunks = []  # { eventId, page, kind, body, snippet, source, quality }
 
-    # 1) Synthetic metadata chunks for every catalogued event (so even
-    #    event with no extracted text is still searchable by its summary)
+    # 1) Synthetic metadata chunks for every catalogued event — these are
+    #    hand-curated and always pass; they guarantee every event remains
+    #    findable even if all its body chunks fail the quality filter.
     for eid, meta in events.items():
         tags = " ".join(meta.get("tags", []))
         body = " · ".join([s for s in [meta["title"], meta["summary"], tags, meta["loc"], meta["agency"], meta["type"]] if s])
@@ -127,19 +168,29 @@ def main():
             "kind": "meta",
             "body": body,
             "snippet": meta["summary"][:200],
+            "source": "curated",
+            "quality": 1.0,
         })
 
     # 2) Per-page chunks from extracted text
+    rejected_by_source = {"ocr": 0, "pdfjs": 0}
+    rejected_chunks = []  # save a few examples for the report
     for fp in sorted(TEXT_DIR.glob("*.txt")):
         eid = fp.stem
         if eid == "manifest":
             continue
+        source = "ocr" if eid in ocr_ids else ("pdfjs" if eid in pdfjs_ids else "unknown")
         raw = fp.read_text(encoding="utf-8", errors="ignore")
-        # strip our header (everything before first \n---\n)
         body_full = raw.split("\n---\n", 1)[1] if "\n---\n" in raw else raw
         for page, body in page_chunks_of(body_full):
             for piece in slice_long(body):
                 if len(piece) < MIN_CHUNK_CHARS:
+                    continue
+                q = text_quality(piece, words)
+                if q < MIN_QUALITY:
+                    rejected_by_source[source] = rejected_by_source.get(source, 0) + 1
+                    if len(rejected_chunks) < 5:
+                        rejected_chunks.append((eid, page, q, piece[:120].replace("\n"," ")))
                     continue
                 chunks.append({
                     "eventId": eid,
@@ -147,9 +198,16 @@ def main():
                     "kind": "page",
                     "body": piece,
                     "snippet": piece[:240].replace("\n", " ").strip(),
+                    "source": source,
+                    "quality": round(q, 3),
                 })
 
-    print(f"[embeddings] {len(chunks)} chunks to embed")
+    print(f"[embeddings] kept {len(chunks)} chunks, rejected {sum(rejected_by_source.values())} below q≥{MIN_QUALITY} "
+          f"({rejected_by_source.get('ocr', 0)} OCR + {rejected_by_source.get('pdfjs', 0)} pdfjs)")
+    if rejected_chunks:
+        print("[embeddings] rejected samples:")
+        for eid, p, q, s in rejected_chunks:
+            print(f"   {eid}:p{p}  q={q:.2f}  {s[:100]}")
 
     texts = [c["body"] for c in chunks]
     t1 = time.time()
@@ -176,19 +234,36 @@ def main():
     OUT_BIN.write_bytes(vecs.tobytes(order="C"))
     print(f"[embeddings] wrote {OUT_BIN} — {OUT_BIN.stat().st_size/1024:.0f} KB")
 
-    # Meta (drop body; keep snippet)
-    meta_out = [{"eventId": c["eventId"], "page": c["page"], "kind": c["kind"], "snippet": c["snippet"]} for c in chunks]
+    # Meta (drop body; keep snippet + quality + source)
+    meta_out = [
+        {"eventId": c["eventId"], "page": c["page"], "kind": c["kind"],
+         "source": c["source"], "quality": c["quality"], "snippet": c["snippet"]}
+        for c in chunks
+    ]
     OUT_META.write_text(json.dumps(meta_out), encoding="utf-8")
     print(f"[embeddings] wrote {OUT_META} — {OUT_META.stat().st_size/1024:.0f} KB")
+
+    # Coverage stats by source
+    by_source = {}
+    for c in chunks:
+        s = c["source"]
+        by_source.setdefault(s, {"count": 0, "qSum": 0.0})
+        by_source[s]["count"] += 1
+        by_source[s]["qSum"] += c["quality"]
+    by_source_out = {s: {"count": v["count"], "meanQuality": round(v["qSum"]/v["count"], 3)} for s, v in by_source.items()}
 
     info = {
         "model": MODEL_NAME,
         "dim": int(vecs.shape[1]),
         "count": int(vecs.shape[0]),
+        "minQuality": MIN_QUALITY,
+        "rejectedByQuality": rejected_by_source,
+        "bySource": by_source_out,
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    OUT_INFO.write_text(json.dumps(info), encoding="utf-8")
+    OUT_INFO.write_text(json.dumps(info, indent=2), encoding="utf-8")
     print(f"[embeddings] wrote {OUT_INFO}")
+    print(f"[embeddings] coverage by source: {by_source_out}")
 
 
 if __name__ == "__main__":
