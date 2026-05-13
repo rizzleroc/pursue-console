@@ -14,6 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data-raw");
 const CACHE_DIR = path.join(RAW_DIR, ".ocr-cache");
+const VISION_DIR = path.join(RAW_DIR, ".vision-cache");
 const OUT_DIR = path.join(ROOT, "public/text");
 
 const { EVENTS } = await import("../src/data/events.js");
@@ -23,19 +24,52 @@ const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/sta
 
 await mkdir(OUT_DIR, { recursive: true });
 
-async function fromOcrCache(id) {
-  const dir = path.join(CACHE_DIR, id);
-  if (!existsSync(dir)) return null;
-  const files = (await readdir(dir)).filter(f => /^p\d+\.txt$/.test(f)).sort();
-  if (!files.length) return null;
-  const parts = [];
-  for (const f of files) {
-    const t = await readFile(path.join(dir, f), "utf8");
-    const pageNum = Number(f.match(/^p(\d+)/)[1]);
-    parts.push(`\n\n=== Page ${pageNum} ===\n\n${t.trim()}`);
+// Vision OCR cache wins over tesseract cache wins over pdfjs text layer.
+// Pages can be merged: where vision-cache has a page, use it; else fall
+// back to OCR-cache for that page. This way a partial vision run still
+// improves the doc without losing the noisier-but-present OCR pages.
+async function fromCaches(id) {
+  const ocrDir = path.join(CACHE_DIR, id);
+  const visDir = path.join(VISION_DIR, id);
+  const hasOcr = existsSync(ocrDir);
+  const hasVis = existsSync(visDir);
+  if (!hasOcr && !hasVis) return null;
+
+  const pageMap = new Map(); // page -> { text, source }
+
+  if (hasOcr) {
+    const files = (await readdir(ocrDir)).filter(f => /^p\d+\.txt$/.test(f));
+    for (const f of files) {
+      const pageNum = Number(f.match(/^p(\d+)/)[1]);
+      const text = (await readFile(path.join(ocrDir, f), "utf8")).trim();
+      if (text) pageMap.set(pageNum, { text, source: "ocr" });
+    }
   }
-  return { text: parts.join("\n"), source: "ocr", pages: files.length };
+  if (hasVis) {
+    const files = (await readdir(visDir)).filter(f => /^p\d+\.txt$/.test(f));
+    for (const f of files) {
+      const pageNum = Number(f.match(/^p(\d+)/)[1]);
+      const text = (await readFile(path.join(visDir, f), "utf8")).trim();
+      if (text) pageMap.set(pageNum, { text, source: "vision" }); // overwrite OCR
+    }
+  }
+  if (!pageMap.size) return null;
+
+  const pages = [...pageMap.keys()].sort((a, b) => a - b);
+  const parts = [];
+  let visionCount = 0;
+  for (const pageNum of pages) {
+    const e = pageMap.get(pageNum);
+    if (e.source === "vision") visionCount++;
+    const marker = e.source === "vision" ? `=== Page ${pageNum} (vision) ===` : `=== Page ${pageNum} ===`;
+    parts.push(`\n\n${marker}\n\n${e.text}`);
+  }
+  // Source label: 'vision' if all pages from vision, 'mixed' if both, 'ocr' otherwise
+  const source = visionCount === pages.length ? "vision" : (visionCount > 0 ? "mixed" : "ocr");
+  return { text: parts.join("\n"), source, pages: pages.length };
 }
+// Keep the old name working for any external callers.
+const fromOcrCache = fromCaches;
 
 async function fromPdfText(id) {
   const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
