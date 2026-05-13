@@ -1,7 +1,12 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { pipeline, env } from "@huggingface/transformers";
 import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
+import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
+
+// Hard-coded inventory size from the official war.gov/UFO/ landing page.
+// Update when subsequent tranches drop.
+const INVENTORY_TOTAL = 162;
 
 // =====================================================================
 // SEMANTIC SEARCH — dense-vector search over the corpus.
@@ -134,6 +139,21 @@ export default function SemanticSearchView({ onSelect }) {
   const [searching, setSearching] = useState(false);
   const embedderRef = useRef(null);
 
+  // User-dropped corpus (IndexedDB-backed, ephemeral to this browser)
+  const [droppedDocs, setDroppedDocs] = useState([]);
+  const [droppedVecs, setDroppedVecs] = useState({ vectors: new Float32Array(0), meta: [], dim: 384 });
+  const [ingestProgress, setIngestProgress] = useState(null);
+  const [ingestQueue, setIngestQueue] = useState([]);   // [{ name, status, chunks }]
+  const [dragOver, setDragOver] = useState(false);
+
+  // First-load: list dropped docs + load their vectors
+  const refreshDropped = useCallback(async () => {
+    const [docs, packed] = await Promise.all([listDocs(), loadAllChunks()]);
+    setDroppedDocs(docs);
+    setDroppedVecs(packed);
+  }, []);
+  useEffect(() => { refreshDropped(); }, [refreshDropped]);
+
   // Load vectors immediately (small)
   useEffect(() => {
     loadVectors()
@@ -166,22 +186,41 @@ export default function SemanticSearchView({ onSelect }) {
       const output = await pipe(q, { pooling: "mean", normalize: true });
       const qVec = output.data; // Float32Array
       const t0 = performance.now();
-      const hits = topK(qVec, vecState.vectors, vecState.info.dim, vecState.info.count, 40);
+      const dim = vecState.info.dim;
+
+      // Score static + dropped vectors against the same query
+      const staticHits = topK(qVec, vecState.vectors, dim, vecState.info.count, 40)
+        .map(h => ({ ...h, source: "official" }));
+      const droppedHits = droppedVecs.meta.length
+        ? topK(qVec, droppedVecs.vectors, dim, droppedVecs.meta.length, 40)
+            .map(h => ({ ...h, source: "dropped" }))
+        : [];
       const elapsedMs = performance.now() - t0;
-      // Group by eventId, keep best hit per event but remember all pages
+
+      // Group by record (event id for static, docId for dropped)
       const groups = new Map();
-      for (const h of hits) {
+      for (const h of staticHits) {
         const m = vecState.meta[h.idx];
         if (!m) continue;
         const ev = eventById[m.eventId];
         if (!ev) continue;
-        if (!groups.has(m.eventId)) groups.set(m.eventId, { event: ev, best: h.score, hits: [] });
-        const g = groups.get(m.eventId);
+        const key = `official:${m.eventId}`;
+        if (!groups.has(key)) groups.set(key, { kind: "official", event: ev, best: h.score, hits: [] });
+        const g = groups.get(key);
         if (h.score > g.best) g.best = h.score;
-        g.hits.push({ ...h, page: m.page, kind: m.kind, snippet: m.snippet });
+        g.hits.push({ ...h, page: m.page, snippet: m.snippet, chunkKind: m.kind });
       }
-      const grouped = Array.from(groups.values()).sort((a, b) => b.best - a.best).slice(0, 12);
-      setResults({ grouped, elapsedMs });
+      for (const h of droppedHits) {
+        const m = droppedVecs.meta[h.idx];
+        if (!m) continue;
+        const key = `dropped:${m.docId}`;
+        if (!groups.has(key)) groups.set(key, { kind: "dropped", docName: m.docName, docId: m.docId, best: h.score, hits: [] });
+        const g = groups.get(key);
+        if (h.score > g.best) g.best = h.score;
+        g.hits.push({ ...h, page: m.page, snippet: m.snippet });
+      }
+      const grouped = Array.from(groups.values()).sort((a, b) => b.best - a.best).slice(0, 16);
+      setResults({ grouped, elapsedMs, staticChunks: vecState.info.count, droppedChunks: droppedVecs.meta.length });
     } catch (e) {
       console.error("[semantic] search failed:", e);
       setError({
@@ -197,13 +236,174 @@ export default function SemanticSearchView({ onSelect }) {
 
   const onSubmit = (e) => { e?.preventDefault?.(); runSearch(query); };
 
+  // ---- drag + drop ingestion ----
+  async function handleFiles(fileList) {
+    const files = Array.from(fileList).filter(f => /\.(pdf|txt|md)$/i.test(f.name));
+    if (!files.length) { setError({ msg: "Drop PDF or .txt files only.", stack: null }); return; }
+    setError(null);
+    let pipe;
+    try { pipe = await ensureModel(); }
+    catch (e) { setError({ msg: "Model load failed before ingest: " + (e.message || e), stack: e.stack?.split("\n").slice(0,3).join("\n") }); return; }
+
+    const queue = files.map(f => ({ name: f.name, status: "queued", chunks: 0 }));
+    setIngestQueue(queue);
+
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      setIngestQueue(q => q.map((r, j) => j === i ? { ...r, status: "running" } : r));
+      try {
+        const res = await ingestFile(f, pipe, p => setIngestProgress({ idx: i, ...p }));
+        setIngestQueue(q => q.map((r, j) => j === i ? { ...r, status: res.skipped ? "exists" : "done", chunks: res.chunkCount } : r));
+      } catch (e) {
+        console.error("[ingest]", f.name, e);
+        setIngestQueue(q => q.map((r, j) => j === i ? { ...r, status: "error", error: e.message || String(e) } : r));
+      }
+    }
+    setIngestProgress(null);
+    await refreshDropped();
+  }
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
+  };
+  const onDragOver = (e) => { e.preventDefault(); setDragOver(true); };
+  const onDragLeave = (e) => { e.preventDefault(); setDragOver(false); };
+
+  async function onRemoveDropped(docId) {
+    await deleteDoc(docId);
+    await refreshDropped();
+  }
+  async function onClearAllDropped() {
+    if (!confirm("Remove all dropped documents from your browser?")) return;
+    await clearAll();
+    await refreshDropped();
+  }
+
+  // Coverage numbers (static)
+  const coverage = useMemo(() => {
+    const catalogued = EVENTS.length;
+    const withText = vecState ? new Set(vecState.meta.map(m => m.eventId)).size : 0;
+    return {
+      inventoryTotal: INVENTORY_TOTAL,
+      catalogued,
+      withText,
+      missingFromCatalog: INVENTORY_TOTAL - catalogued,
+      droppedDocs: droppedDocs.length,
+      droppedChunks: droppedVecs.meta.length,
+      staticChunks: vecState?.info.count || 0,
+    };
+  }, [vecState, droppedDocs, droppedVecs]);
+
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ SEMANTIC</GlitchText></h2>
         <div className="font-mono text-[10px] text-emerald-700">
-          DENSE VECTORS · {vecState ? `${vecState.info.count} CHUNKS · ${vecState.info.dim}D · MINI-LM` : "LOADING…"}
+          DENSE VECTORS · {vecState ? `${(vecState.info.count + droppedVecs.meta.length).toLocaleString()} CHUNKS · ${vecState.info.dim}D · MINI-LM` : "LOADING…"}
         </div>
+      </div>
+
+      {/* COVERAGE STRIP — be honest about what is and isn't indexed */}
+      <div className="mb-4 border border-emerald-700/40 bg-black/40 rounded-sm p-3 font-mono text-[11px]">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="text-emerald-700 tracking-widest text-[9px]">▌ INDEX COVERAGE — RELEASE 01</div>
+          {coverage.droppedDocs > 0 && (
+            <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">CLEAR DROPPED ({coverage.droppedDocs})</button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-2 text-emerald-200">
+          <div>
+            <div className="text-[9px] text-emerald-700 tracking-widest">INVENTORY</div>
+            <div className="text-amber-300 text-base">{coverage.inventoryTotal}</div>
+            <div className="text-[9px] text-emerald-600">records on war.gov</div>
+          </div>
+          <div>
+            <div className="text-[9px] text-emerald-700 tracking-widest">CATALOGUED</div>
+            <div className="text-emerald-200 text-base">{coverage.catalogued}</div>
+            <div className="text-[9px] text-emerald-600">events in this repo</div>
+          </div>
+          <div>
+            <div className="text-[9px] text-emerald-700 tracking-widest">INDEXED</div>
+            <div className="text-emerald-200 text-base">{coverage.withText} <span className="text-[9px] text-emerald-700">→ {coverage.staticChunks.toLocaleString()} chunks</span></div>
+            <div className="text-[9px] text-emerald-600">with extracted text</div>
+          </div>
+          <div>
+            <div className="text-[9px] text-emerald-700 tracking-widest">YOU ADDED</div>
+            <div className={coverage.droppedDocs > 0 ? "text-amber-300 text-base" : "text-emerald-700 text-base"}>
+              {coverage.droppedDocs} <span className="text-[9px] text-emerald-700">→ {coverage.droppedChunks.toLocaleString()} chunks</span>
+            </div>
+            <div className="text-[9px] text-emerald-600">local-only, this browser</div>
+          </div>
+          <div>
+            <div className="text-[9px] text-emerald-700 tracking-widest">GAP</div>
+            <div className="text-rose-300 text-base">{Math.max(0, coverage.inventoryTotal - coverage.withText - coverage.droppedDocs)}</div>
+            <div className="text-[9px] text-emerald-600">not yet searchable</div>
+          </div>
+        </div>
+      </div>
+
+      {/* DROP ZONE */}
+      <div
+        onDrop={onDrop} onDragOver={onDragOver} onDragLeave={onDragLeave}
+        className={`mb-4 border-2 border-dashed rounded-sm p-4 transition-all ${dragOver
+          ? "border-amber-400 bg-amber-400/10"
+          : "border-emerald-700/40 bg-emerald-950/30 hover:border-emerald-500/60"}`}>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <div className="font-mono text-[11px] text-emerald-300 tracking-widest">▤ DROP PDFs OR .TXT FILES HERE</div>
+            <div className="font-mono text-[10px] text-emerald-600 mt-0.5">
+              Files stay in your browser — extracted with pdfjs, embedded with the same Mini-LM model, persisted to IndexedDB. Nothing leaves your machine.
+            </div>
+          </div>
+          <label className="cursor-pointer font-mono text-[10px] text-amber-300 hover:text-amber-100 px-3 py-1.5 border border-amber-400/50 rounded-sm tracking-widest">
+            CHOOSE FILES
+            <input type="file" multiple accept=".pdf,.txt,.md" className="hidden"
+              onChange={e => e.target.files && handleFiles(e.target.files)} />
+          </label>
+        </div>
+
+        {/* Ingestion progress */}
+        {ingestQueue.length > 0 && (
+          <div className="mt-3 space-y-1">
+            {ingestQueue.map((r, i) => (
+              <div key={i} className="flex items-center justify-between gap-2 font-mono text-[10px] border-t border-emerald-700/20 pt-1">
+                <span className={`tracking-wider ${r.status === "error" ? "text-rose-400" :
+                  r.status === "done" ? "text-emerald-400" :
+                  r.status === "exists" ? "text-emerald-700" :
+                  r.status === "running" ? "text-amber-300" : "text-emerald-600"}`}>
+                  {r.status === "done" ? "✓" : r.status === "error" ? "⊘" : r.status === "exists" ? "·" : r.status === "running" ? "◌" : "□"} {r.name}
+                </span>
+                <span className="text-emerald-600 text-right text-[9px]">
+                  {r.status === "running" && ingestProgress?.idx === i ? (
+                    ingestProgress.phase === "embedding" ? `embed ${ingestProgress.done}/${ingestProgress.total}` :
+                    ingestProgress.phase === "extracting" ? "extracting…" :
+                    ingestProgress.phase === "storing" ? "writing…" : ingestProgress.phase
+                  ) : r.status === "done" ? `${r.chunks} chunks indexed` :
+                     r.status === "exists" ? "already indexed" :
+                     r.status === "error" ? r.error : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Already-ingested docs */}
+        {droppedDocs.length > 0 && (
+          <div className="mt-3 pt-2 border-t border-emerald-700/20">
+            <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-1">▌ YOUR LIBRARY (PERSISTED, THIS BROWSER ONLY)</div>
+            <div className="flex flex-wrap gap-1.5">
+              {droppedDocs.map(d => (
+                <div key={d.id} className="group flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 bg-emerald-950/60 border border-emerald-700/30 rounded-sm">
+                  <span className="text-emerald-300 truncate max-w-[260px]">{d.name}</span>
+                  <span className="text-emerald-700">{d.pages}p · {d.chunkCount}c</span>
+                  <button onClick={() => onRemoveDropped(d.id)} className="text-rose-400/60 hover:text-rose-300 text-[10px] ml-0.5">×</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <form onSubmit={onSubmit} className="mb-3">
@@ -267,14 +467,51 @@ export default function SemanticSearchView({ onSelect }) {
 
       {results && results.grouped.length > 0 && (
         <div>
-          <div className="font-mono text-[10px] text-emerald-700 tracking-widest mb-3 flex items-center gap-3">
+          <div className="font-mono text-[10px] text-emerald-700 tracking-widest mb-3 flex items-center gap-3 flex-wrap">
             <span>▌ {results.grouped.length} RECORDS · TOP COSINE = {results.grouped[0].best.toFixed(3)} · {results.elapsedMs.toFixed(1)} MS</span>
+            <span className="text-emerald-600">scored against {results.staticChunks.toLocaleString()} official + {results.droppedChunks.toLocaleString()} dropped chunks</span>
           </div>
           <div className="space-y-3">
-            {results.grouped.map(({ event, best, hits }) => {
+            {results.grouped.map((g, gi) => {
+              const pageHits = [...new Map(g.hits.map(h => [`${h.page}-${h.snippet?.slice(0,40)}`, h])).values()]
+                .sort((a, b) => b.score - a.score).slice(0, 4);
+
+              if (g.kind === "dropped") {
+                return (
+                  <div key={`d-${g.docId}`}
+                    className="rounded-sm border border-amber-400/40 bg-amber-400/5 border-l-2 p-3"
+                    style={{ borderLeftColor: "#FFD93D" }}>
+                    <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] tracking-wider text-amber-300">YOUR LIBRARY</span>
+                        <span className="font-mono text-[9px] text-emerald-700 tracking-widest">LOCAL · NOT IN OFFICIAL CATALOG</span>
+                      </div>
+                      <div className="flex items-center gap-3 font-mono text-[10px]">
+                        <span className="text-emerald-500 tracking-widest">cos {g.best.toFixed(3)}</span>
+                      </div>
+                    </div>
+                    <div className="font-mono text-amber-100 text-[14px] mt-1 leading-snug break-all">
+                      {highlightQuery(g.docName, qTerms)}
+                    </div>
+                    {pageHits.length > 0 && (
+                      <div className="mt-2 space-y-1.5">
+                        {pageHits.map((h, i) => (
+                          <div key={i} className="border-l border-amber-400/30 pl-2.5 font-mono text-[11px] text-amber-100/90 leading-relaxed">
+                            <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
+                              PAGE {h.page}
+                              <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
+                            </span>
+                            {highlightQuery(h.snippet, qTerms)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              const event = g.event;
               const color = AGENCY_COLORS[event.agency] || "#7CFFB2";
-              // dedupe pages
-              const pageHits = [...new Map(hits.map(h => [h.page, h])).values()].sort((a, b) => b.score - a.score).slice(0, 4);
               return (
                 <div key={event.id}
                   className={`rounded-sm border-l-2 ${flagBg(event.flag)} border p-3`}
@@ -290,7 +527,7 @@ export default function SemanticSearchView({ onSelect }) {
                       </div>
                       <div className="flex items-center gap-3 font-mono text-[10px]">
                         <span className="text-amber-300">{event.date}</span>
-                        <span className="text-emerald-500 tracking-widest">cos {best.toFixed(3)}</span>
+                        <span className="text-emerald-500 tracking-widest">cos {g.best.toFixed(3)}</span>
                       </div>
                     </div>
                     <div className="font-mono text-emerald-100 text-[14px] mt-1 leading-snug">
@@ -302,7 +539,7 @@ export default function SemanticSearchView({ onSelect }) {
                       {pageHits.map((h, i) => (
                         <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
                           <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
-                            {h.kind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
+                            {h.chunkKind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
                             <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
                           </span>
                           {highlightQuery(h.snippet, qTerms)}
