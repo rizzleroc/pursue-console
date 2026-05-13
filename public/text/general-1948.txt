@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1948-06-15
 Location: United States
 Type: Memorandum
-Source extraction: OCR · 28 pages
+Source extraction: OCR · 26 pages
 
 ---
 
@@ -530,16 +530,6 @@ SURNAME OF fel Le
 COORDINATING =
 STR, t. Col. Garre 5 ERs 2% Si
 o—tosiaa  U. & COVERMNENT PRINTING OrFice,
-
-
-=== Page 16 ===
-
-
-
-
-=== Page 17 ===
-
-
 
 
 === Page 18 ===

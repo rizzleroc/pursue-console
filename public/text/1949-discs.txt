@@ -5,14 +5,9 @@ Agency: Department of War
 Date: 1950-01-09
 Location: Multiple (military and CAA)
 Type: Incident Reports
-Source extraction: OCR · 143 pages
+Source extraction: OCR · 53 pages
 
 ---
-
-=== Page 1 ===
-
-
-
 
 === Page 2 ===
 
@@ -22,31 +17,6 @@ a9 © 4-08 PH "50
 3 1 CENTER
 DEMAEE' COroBYDO
 FOMBA EFIGHL 2 BAICE : ULE
-
-
-=== Page 3 ===
-
-
-
-
-=== Page 4 ===
-
-
-
-
-=== Page 5 ===
-
-
-
-
-=== Page 6 ===
-
-
-
-
-=== Page 7 ===
-
-
 
 
 === Page 8 ===
@@ -361,26 +331,6 @@ dILINIG fy i> 114
 1314 Jd40HOOW
 
 
-=== Page 18 ===
-
-
-
-
-=== Page 19 ===
-
-
-
-
-=== Page 20 ===
-
-
-
-
-=== Page 21 ===
-
-
-
-
 === Page 22 ===
 
 rs
@@ -436,41 +386,6 @@ ES > pall, Lt lonel, A ED]
 
 "9 AUG 5 or 23
 i ° ¢
-
-
-=== Page 25 ===
-
-
-
-
-=== Page 26 ===
-
-
-
-
-=== Page 27 ===
-
-
-
-
-=== Page 28 ===
-
-
-
-
-=== Page 29 ===
-
-
-
-
-=== Page 30 ===
-
-
-
-
-=== Page 31 ===
-
-
 
 
 === Page 32 ===
@@ -530,126 +445,6 @@ ee
 J
 
 
-=== Page 34 ===
-
-
-
-
-=== Page 35 ===
-
-
-
-
-=== Page 36 ===
-
-
-
-
-=== Page 37 ===
-
-
-
-
-=== Page 38 ===
-
-
-
-
-=== Page 39 ===
-
-
-
-
-=== Page 40 ===
-
-
-
-
-=== Page 41 ===
-
-
-
-
-=== Page 42 ===
-
-
-
-
-=== Page 43 ===
-
-
-
-
-=== Page 44 ===
-
-
-
-
-=== Page 45 ===
-
-
-
-
-=== Page 46 ===
-
-
-
-
-=== Page 47 ===
-
-
-
-
-=== Page 48 ===
-
-
-
-
-=== Page 49 ===
-
-
-
-
-=== Page 50 ===
-
-
-
-
-=== Page 51 ===
-
-
-
-
-=== Page 52 ===
-
-
-
-
-=== Page 53 ===
-
-
-
-
-=== Page 54 ===
-
-
-
-
-=== Page 55 ===
-
-
-
-
-=== Page 56 ===
-
-
-
-
-=== Page 57 ===
-
-
-
-
 === Page 58 ===
 
 aX 2.7 Tha oud
@@ -705,31 +500,6 @@ of Intelligence Adjutant F 7
 
 ft RE RVICE hr
 » IS
-
-
-=== Page 60 ===
-
-
-
-
-=== Page 61 ===
-
-
-
-
-=== Page 62 ===
-
-
-
-
-=== Page 63 ===
-
-
-
-
-=== Page 64 ===
-
-
 
 
 === Page 65 ===
@@ -824,11 +594,6 @@ Si Hd ST | 7 Wy
 G3LLINSNVYL
 
 
-=== Page 69 ===
-
-
-
-
 === Page 70 ===
 
 Ee
@@ -841,26 +606,6 @@ a\ = 5 \
 Chance-Vought V-173 or XF5U-1
 U.S.Navy
 Incl. 1
-
-
-=== Page 71 ===
-
-
-
-
-=== Page 72 ===
-
-
-
-
-=== Page 73 ===
-
-
-
-
-=== Page 74 ===
-
-
 
 
 === Page 75 ===
@@ -979,31 +724,6 @@ Soy. Sats SR
 Ygg, Her
 %
 ARN 2g
-
-
-=== Page 79 ===
-
-
-
-
-=== Page 80 ===
-
-
-
-
-=== Page 81 ===
-
-
-
-
-=== Page 82 ===
-
-
-
-
-=== Page 83 ===
-
-
 
 
 === Page 84 ===
@@ -1278,136 +998,6 @@ EE Po Ls 2
 Zz Be 2 3 No Ids 7
 
 
-=== Page 90 ===
-
-
-
-
-=== Page 91 ===
-
-
-
-
-=== Page 92 ===
-
-
-
-
-=== Page 93 ===
-
-
-
-
-=== Page 94 ===
-
-
-
-
-=== Page 95 ===
-
-
-
-
-=== Page 96 ===
-
-
-
-
-=== Page 97 ===
-
-
-
-
-=== Page 98 ===
-
-
-
-
-=== Page 99 ===
-
-
-
-
-=== Page 100 ===
-
-
-
-
-=== Page 101 ===
-
-
-
-
-=== Page 102 ===
-
-
-
-
-=== Page 103 ===
-
-
-
-
-=== Page 104 ===
-
-
-
-
-=== Page 105 ===
-
-
-
-
-=== Page 106 ===
-
-
-
-
-=== Page 107 ===
-
-
-
-
-=== Page 108 ===
-
-
-
-
-=== Page 109 ===
-
-
-
-
-=== Page 110 ===
-
-
-
-
-=== Page 111 ===
-
-
-
-
-=== Page 112 ===
-
-
-
-
-=== Page 113 ===
-
-
-
-
-=== Page 114 ===
-
-
-
-
-=== Page 115 ===
-
-
-
-
 === Page 116 ===
 
 A
@@ -1538,11 +1128,6 @@ il ;
 £9
 ; = 7orc—1
 fear Uren
-
-
-=== Page 121 ===
-
-
 
 
 === Page 122 ===
@@ -1960,37 +1545,3 @@ Washington 25, D. CO,
 ATTH: A-2
 
 «Be
-
-
-=== Page 137 ===
-
-
-
-
-=== Page 138 ===
-
-
-
-
-=== Page 139 ===
-
-
-
-
-=== Page 140 ===
-
-
-
-
-=== Page 141 ===
-
-
-
-
-=== Page 142 ===
-
-
-
-
-=== Page 143 ===
-

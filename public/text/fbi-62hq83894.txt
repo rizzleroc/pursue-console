@@ -5,7 +5,7 @@ Agency: FBI
 Date: 1947-06
 Location: United States (multi-site)
 Type: Document Collection
-Source extraction: OCR · 185 pages
+Source extraction: OCR · 179 pages
 
 ---
 
@@ -4069,16 +4069,6 @@ hd oF S| MNEIDE I
 5 ett + THIN T7500
 
 
-=== Page 137 ===
-
-
-
-
-=== Page 138 ===
-
-
-
-
 === Page 139 ===
 
 3 v7
@@ -4367,16 +4357,6 @@ right" ATter Bis checked Bame has been tafistiady invoice should be placed in ad
 { |
 b some soma |
 idm beda baie fas EC
-
-
-=== Page 151 ===
-
-
-
-
-=== Page 152 ===
-
-
 
 
 === Page 153 ===
@@ -5032,22 +5012,12 @@ a : 5 NNT TIMTEAT RT AT E |
 Baller bo oA 0 od di HEATER By i ROS 05
 
 
-=== Page 174 ===
-
-
-
-
 === Page 175 ===
 
 i:
 :
 | Toma E T
 bod
-
-
-=== Page 176 ===
-
-
 
 
 === Page 177 ===

@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1950–1969
 Location: United States
 Type: Incident Summaries
-Source extraction: OCR · 209 pages
+Source extraction: OCR · 202 pages
 
 ---
 
@@ -494,11 +494,6 @@ REKRFOALTEN
 J 9 Mast FD gC it
 
 
-=== Page 18 ===
-
-
-
-
 === Page 19 ===
 
 K . 7 fi 27 ge : p > 7 AREA
@@ -799,11 +794,6 @@ i R @ BERT 6 Lad
 BRE SECS oo csc SRE 6 i a Sa
 
 
-=== Page 30 ===
-
-
-
-
 === Page 31 ===
 
 TTT TT EI Ta a
@@ -846,11 +836,6 @@ CO 18. Shape (lec |
 Pay Er Kap, fi i lid LY) 4 ae Ly p
 Fon ob 8 Les
 30’
-
-
-=== Page 32 ===
-
-
 
 
 === Page 33 ===
@@ -4110,11 +4095,6 @@ EERE A Ai )
 an Ae
 
 
-=== Page 131 ===
-
-
-
-
 === Page 132 ===
 
 2 0 FRI § =
@@ -4911,11 +4891,6 @@ BR
 SE SE
 
 
-=== Page 155 ===
-
-
-
-
 === Page 156 ===
 
 : ; 7 1I0Te"
@@ -5476,11 +5451,6 @@ oly, Skotohos or photographs CR Hoi ;
 . 26, Romarks: (over)
 BR : se
 > : Ao
-
-
-=== Page 172 ===
-
-
 
 
 === Page 173 ===
@@ -6727,7 +6697,3 @@ vi 18. Shapo N/S
 A pe A shining object was seen near Pieterssari 5th Jen wnich
 was observed 5th Jen for 10 seconds. It was going from north to south. }
 . Eyewitnesses state flames were ejected and grey streaks left in the sky a0
-
-
-=== Page 209 ===
-

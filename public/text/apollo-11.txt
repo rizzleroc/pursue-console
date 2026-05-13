@@ -5,14 +5,9 @@ Agency: NASA
 Date: 1969-07-31
 Location: Cislunar Space
 Type: Crew Debriefing
-Source extraction: OCR · 11 pages
+Source extraction: OCR · 10 pages
 
 ---
-
-=== Page 1 ===
-
-
-
 
 === Page 2 ===
 

@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1945-03-18
 Location: Germany
 Type: Intelligence Memo
-Source extraction: OCR · 17 pages
+Source extraction: OCR · 8 pages
 
 ---
 
@@ -81,26 +81,6 @@ hs 2355 pov E. D. M. Hopkins
 Group Captair
 
 
-=== Page 3 ===
-
-
-
-
-=== Page 4 ===
-
-
-
-
-=== Page 5 ===
-
-
-
-
-=== Page 6 ===
-
-
-
-
 === Page 7 ===
 
 RAF. Form 96. @® MESSAGE FOR! A Qc Oice Fite No, 95
@@ -143,11 +123,6 @@ il ] i bv all
 \ 724699 Wr. 49887/03734 497,000 Pads 3/44 MP 51-8336 » ¥ ¢ 3
 
 
-=== Page 8 ===
-
-
-
-
 === Page 9 ===
 
 v SHAEF
@@ -188,16 +163,6 @@ SECRET COPY NO. 8
 THE MAKING OF AN EXACT Cory OF THIS MESSAGE IS FORBIDDEN =u
 
 
-=== Page 10 ===
-
-
-
-
-=== Page 11 ===
-
-
-
-
 === Page 12 ===
 
 \ f od | ¥ Ho Tam) Py
@@ -227,11 +192,6 @@ ane Ee
 3 Air Commodore,
 A.C, of 8., A-2,
 [4 ~
-
-
-=== Page 13 ===
-
-
 
 
 === Page 14 ===
@@ -381,7 +341,3 @@ Nieht of 14-15 January 1945 - "Observed a large orange glow in sky approx.
 : _—
 ¥: 2407 §-E~C-R-E~-T
 u PEt
-
-
-=== Page 17 ===
-

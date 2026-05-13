@@ -5,92 +5,53 @@ Agency: NASA
 Date: 1969-11-19
 Location: Cislunar Space / Moon
 Type: Transcript + 5 Images
-Source extraction: OCR · 4 pages
+Source extraction: MIXED · 4 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
-Tape 90/3
-. Page Th2
-i 05 19 14 58 ce That's affirmative. We're ready for the E-MOD. -
-05 19 16 31 cc Intrepid, Houston.
-05 19 16 35 CDR-IM Go.
-. 05 19 16 37 cc If you will give us POO and ACCEPT, we'll give
-. you a CSM state vector and RLS update.
-05 19 16 ks CDR-IM You have POO and ACCEPT.
-05 19 20 05 CMP Hello, Houston; Yankee Clipper.
-05 19 20 09 cc Yankee Clipper, Houston. Loud and clear.
-05 19 20 1k CMP Well, hello there, stranger. How are you?
-05 19 20 22 cc Morning, Dick. We are fine. How are you?
-05 19 20 27 CMP Well, pretty good. I hope you would like to have
-. some company for a change.
-i 05 19 20 31 cc Roger. Got the house clean? #
-: 3
-y 05 19 20 36 CMP As a matter of fact, I just finished that. I -
-: sure do; got everything in order; ready to go Fi
-\ towards the ILM and bring back ... That's quite
-: a chore; keeping this thing clean.
-: 05 19 20 53 cc Roger. You got a couple of coal miners coming
-H up to see you.
-t
-‘ 05 19 20 59 MP That's okay. I'll be glad to see them.
-i
-! 0519 21 10 cc Intrepid, Houston. The computer is yours.
-i Break. Yankee Clipper, if you will go POO and
-i ACCEPT, we have an uplink.
-i 05 19 21 20 CMP All yours.
-i 05 19 23 14 "CDR-IM Houston, you got the lift-off time for me?
-; 05 19 23 20 cc Stand by.
-05 19 23 39 ce Intrepid, Houston. Your lift-off time is
-1L2:03:47.
-05 19 23 52 © CDR-LM I copy 142:03:47.00.
-05 19 23 57 cS Affirmative.
-) 05 19 2k 05 cc Clipper, Houston. Computer's yours. )
-}
+(?)
 
 
-=== Page 2 ===
+=== Page 2 (vision) ===
 
 Tape 90/4
-( ; Page T43
-J
-. . 0519 2h 11 CMP Okay. And Jerry, will you find out what they
-A want to do about this battery charge, because
-i I'm using the bus ties during the rendezvous?
-: 05 19 24 23 cc Roger.
-05 19 24 k3 cc Yankee Clipper, Houston. Why don't you figure
+Page 743
+05 19 24 11      CMP      Okay.  And Jerry, will you find out what they
+want to do about this battery charge, because
+I'm using the bus ties during the rendezvous?
+05 19 24 23      CC       Roger.
+05 19 24 43      CC       Yankee Clipper, Houston.  Why don't you figure
 on terminating the battery charge at LOS?
-05 19 2k 52 CMP © All right; I could let it go until I ... just
-before lift-off. That way it might take it
+05 19 24 52      CMP      All right; I could let it go until I ... just
+before lift-off.  That Way it might take it
 all the way up.
-05 19 25 33 cc Clipper, Houston. We prefer that you terminate
+05 19 25 33      CC       Clipper, Houston.  We prefer that you terminate
 at LOS on this pass.
-05 19 25 Lo CMP Roger.
-05 19 25 ki cc Roger. That would be one less thing for us to
+05 19 25 40      CMP      Roger.
+05 19 25 41      CC       Roger.  That would be one less thing for us to
 keep track of prior to lift-off.
-05 19 25 48 CMP Okay.
-) . 05 19 27 17 CDR-IM Say, Houston; Intrepid.
-Po 05 19 27 20 cc Intrepid, Houston. Go.
-: 05 19 27 25 IMP-ILM Roger. When you look out the AOT in the dark
-5 quadrant? You can see these lights - particles
-! of light, flashes of light just seem to come
-H from ~ in this case, I'm looking in quadrant 1
-; which is the left one, It's coming from behind
-H me, the left, and they're just sailing off in
-: . space. I was thinking they're dropping from my
-{ water boiler, but it looks like some of those
-i things are escaping the Moon. They really haul
-out of here and Just press off at the stars.
-j 05 19 27 56 cc Roger.
-! 05 19 28 25 CC Yankee Clipper, Houston with a P22 tracking PAD.
-i
-! © 0519 28 L2 cM Go ahead.
-: 05 19 28 4k cc Roger. Your target is IM; 7, is 139:57:39;
-: T, is 140:02:38; south 05; latitude is i
-: minus 3 - -
-0519 29 10 CMP Roger. T 112 ~
-}
+05 19 25 48      CMP      Okay.
+05 19 27 17      CDR-IM   Say, Houston; Intrepid.
+05 19 27 20      CC       Intrepid, Houston.  Go.
+05 19 27 25      IMP-LM   Roger.  When you look out the AOT in the dark
+quadrant?  You can see these lights - particles
+of light, flashes of light just seem to come
+from - in this case, I'm looking in quadrant 1
+which is the left one.  It's coming from behind
+me, the left, and they're just sailing off in
+space.  I was thinking they're dropping from my
+water boiler, but it looks like some of those
+things are escaping the Moon.  They really haul
+out of here and just press off at the stars.
+05 19 27 56      CC       Roger.
+05 19 28 25      CC       Yankee Clipper, Houston with a P22 tracking PAD.
+05 19 28 42      CMP      Go ahead.
+05 19 28 44      CC       Roger.  Your target is LM; T1 is 139:57:39;
+T2 is 140:02:38; south 05; latitude is
+minus 3 - -
+05 19 29 10      CMP      Roger.
 
 
 === Page 3 ===
@@ -135,49 +96,6 @@ i yaw.
 05 20 12 14 cc Roger, Pete. 3
 
 
-=== Page 4 ===
+=== Page 4 (vision) ===
 
-bl
-we Tape 93/8
-© Page T1718
-06 00 21 L2 CMP But I don't have you in the sextant, That's
-okay. Your blinking light's Just not blinking,
-' that's all.
-06 C0 21 51 CDR-IM Hey, Houston. It looks like our tracking
-. 1llght's burned out. Dick hasn't been able to
-find us in this sextant. And on the first
-nightside pass we had little bits and pieces
-floating along with us and we could tell that
-: the tracking light was flashing on them. And
-we still have, I've presumed to think, bits
-and pieces floating along and nothing's flashing
-: on them, so I'm pretty sure it burned out.
-06 00 22 11 cc Roger, Pete.
-i 06 00 22 22 IMP-IM Yes, sir. Okay.
-. 06 00 22 26 cc Hi, Intrepid.
-: 06 00 22 27 LMP-IM Okay.
-) { ) 06 00 22 28 cc This is Houston. How'd your sweepdown fore
-1 ( i and aft go?
-1
--
-t 06 00 22 33 CDR-LM It's getting much cleaner in here running this
-: way; end, also, Yankee Clipper informs me he
-: has the television all set up. When we come
-i around the hora, we'll come around with the
-; television on in VOX.
-1
-| 06 00 22 47 cc Roger. .
-| 06 00 22 53 CDR-IM Who knows, you may get to see the first
-{ whifferdill.
-06 00 22 59 cc Roger, Pete. Our electrical watchers say that
-| the current indicates that your tracking light
-; is on.
-| 06 00 23 11 CDR-IM Okay. Now we just turned it off. Now does the
-; current show that?
-i 06 00 23 19 cc It - I¢ sure does, Pete.
-1 06 00 23 26 cmp You're - they're - You're flying through the
-: eir bockvards, then, Pete, because I don't see
-. it.
-tod 06 00 23 33 CDR-LM Well, my ball tells me I'm pointed at you, Dick,
-) i # end so does my radar.
-Se a SE He PRE SR soa oe se a ee ise es S00 ea as
+(?)

@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1947-12-30
 Location: United States
 Type: Memorandum
-Source extraction: OCR · 28 pages
+Source extraction: OCR · 24 pages
 
 ---
 
@@ -51,11 +51,6 @@ cc 1tr to CG, AAF, dtd 2k Sept 47 i .
 subj "Flying Discs"
 ( fF ~ >
 BE Nl my ME U-53791
-
-
-=== Page 2 ===
-
-
 
 
 === Page 3 ===
@@ -154,11 +149,6 @@ n EALNEIRETEE 4 3
 Aras Clo Qs P. CABETLI
 choreizses [COT Garretty” Jp Geuy Usk
 OF 7 3 6202432 0. 8 GOVERNMENT PRINTING OFFICE.
-
-
-=== Page 5 ===
-
-
 
 
 === Page 6 ===
@@ -485,11 +475,6 @@ e. The apparent common description of the objects is am follows:
 ENE U-39552
 
 
-=== Page 13 ===
-
-
-
-
 === Page 14 ===
 
 ” CE NEG Ed ERLE RO TY [5 Cth -
@@ -785,11 +770,6 @@ i HONARD Ge BUNKER
 y ’ 4 Colonel, AC
 \
 fet #2 :
-
-
-=== Page 22 ===
-
-
 
 
 === Page 23 ===

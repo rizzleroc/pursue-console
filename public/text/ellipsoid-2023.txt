@@ -5,31 +5,10 @@ Agency: FBI
 Date: 2023-09-01
 Location: United States (test site)
 Type: Composite + 302 Interviews
-Source extraction: OCR · 1 pages
+Source extraction: VISION · 1 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
-1
-
-5
-
-y
-rh Ey pr 4 ’ i Ries i OEY | ; Rs rr won
-" = | LJ ol pai Ta a RL FL ) 4 ’ "4 PAR is
-- BY 1 Te
-7 Kr Th von VEE IE
-ad 3 [4 ~ fa Bah FS, = ay vr A a i A I" Lr i
-” A Eyal : Br EL ras enw id ba GE is sets dls FA es
-or! Haq ; 2 HA RT ha Ta oo Te Rr SEE
-- bb . ; aR lr rg EY GEE TU lh Sree SSR af
-og Tl wb ea OER ST RS RE Ih  R RRR eT
-Moh gr Ep VISE ly if AE BRN oe els TT HS TRE 1 TR) i Ti
-Rosh EI hh, Fttil i020 li oo & PR REA flere CR
-. Bier SRR Sa a IEE BO ERASER He eT RACY ARI [3
-* pie a [i HA i i FRE mal RE 2 heya AE ll RE)
-Bn fa aati CATR | i lie oy hid 3 Hi Jilite 0 m Ao ills gle HEN AY Fuh) iy a bs
-as od de ero Hi A will y Jr i Fe TP Aa het? Ki i SRA
-A aa tel Li SURI TIRE BILE SSeS pin fib LL TRUE ME or hl 8 RU ET
-Er i i 1 hr ii NF el 41 dd a1 TNO % Ere Fel #%, 4
+(blank)
