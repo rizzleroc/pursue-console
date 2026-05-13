@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-search-index.mjs && vite build",
+    "build": "node scripts/copy-ort-assets.mjs && node scripts/build-search-index.mjs && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",

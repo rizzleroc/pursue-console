@@ -28,12 +28,13 @@ const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-// ORT ships 8 wasm/mjs variants — Vite only bundles whichever one its static
-// analysis happens to resolve, so on GH Pages the loader 404s the others
-// (jsep, jspi, plain simd-threaded). Pin the WASM root to a CDN so every
-// variant is reachable. The actual model weights still come from HF Hub.
-const ORT_VERSION = "1.22.0";
-env.backends.onnx.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+// ORT ships 8 wasm/mjs variants — Vite only bundles whichever one its
+// static analysis happens to resolve at build time, so on GH Pages the
+// loader 404s the others (jsep, jspi, plain simd-threaded, asyncify…).
+// Self-host every variant from node_modules/onnxruntime-web/dist/ —
+// scripts/copy-ort-assets.mjs runs in npm `build` and drops them into
+// public/ort/, deployed alongside the app.
+env.backends.onnx.wasm.wasmPaths = `${import.meta.env.BASE_URL}ort/`;
 // Single-threaded keeps us away from cross-origin-isolation requirements
 // (GH Pages doesn't send COOP/COEP headers).
 env.backends.onnx.wasm.numThreads = 1;
