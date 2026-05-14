@@ -61,9 +61,13 @@ let _modelP = null;
 function loadModel(onProgress) {
   if (!_modelP) {
     _modelP = pipeline("feature-extraction", MODEL, {
-      // transformers.js v3+: `quantized: true` was replaced by `dtype`.
-      // q8 keeps the model small (~25 MB) and runs cleanly on CPU+wasm.
-      dtype: "q8",
+      // transformers.js v4 dtype → file mapping is { q8 → model_q8.onnx,
+      // int8 → model_int8.onnx, … }. Xenova/all-MiniLM-L6-v2 ships
+      // model_int8.onnx but NOT model_q8.onnx — so dtype:"q8" 404s the
+      // model file silently and the loader 'no available backend found'.
+      // int8 gets us the same ~25 MB quantized weights, just from a file
+      // that actually exists.
+      dtype: "int8",
       device: "wasm",
       progress_callback: onProgress,
     }).catch(err => {
