@@ -5,80 +5,93 @@ Agency: Department of War
 Date: 1945-03-18
 Location: Germany
 Type: Intelligence Memo
-Source extraction: OCR · 8 pages
+Source extraction: MIXED · 8 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
-3 DECLASSIFIED Sa) ® Val a in TR [ 2 SX LE fo, Gea
-J $i § oh #t El . EN mr
-: Authority: ALR Y p E = (7
-=== xsl 7
-kf ¥ ATR BTARF Wp ER
-Bo aR ! SUPRELE HEADQUAREIRS Bet. Hit
-Ne ALLIED BXPRDYTTOTALY. FORCE hf
-Goa A ! (Fomsi=D) ; i +
-LEAR - ARS EEN
-PLE ERS BIARR/AS, STL53/4,0, SE 16 Tlaroh 15,
-3 SET SUB¢~. dght Phonanera. “a : J SED sal ey
-LSE mie | FiretiTacticel Air Foros: (Brav,)s ATD 37, US ARAL 500
-Te ARE With reference to ruports Comerded Prom the rien hE
-Sa Tactical Alr Command through your Headoumriern on the sbject of 1X
-i +0000 night phenemema (foofijihter), ond furshey to this Headquarters t ¢ 3
-RE + letter of even reference dnfed 11 ‘February, a reply haa now been 3
-Le] g <i received Prom the Air llindgtyy. vio Bay’ that Bomior Commnd crews n 3
-A Re ¢ "Bhve for somes time boon reporting shailex phonanena, i + ’
-AE SR a LT rhe Air YiRiAay iow Lo, tink a few of tie d116ged i
-: 2 aireraft fay have been 71e,262'c and for the pat. £10k rockets SIE d
-5 $ are-cilggeeted as the ront likely explanations’ $ - 3, FE
-ia Se] » be ’ ‘ wu ¥
-ra] IR 3 36 TL. It is regretted that no further, or hore-definite, ;
-3 Bi infortation can be given. ; 3
-R 22 4 4 for the Deputy Suprens Comsendler,
-2 ar 3 CH: CRIIRSON. : foc 48
-; 3 ; 3 Adr Cormonpre o .
-; i A.C. of Sa A=2,
-MRR A i py
+DECLASSIFIED
+Authority:
+NND 947020
+SECRET
+FILE COPY!
+63A
+AIR STAFF
+SUPREME HEADQUARTERS
+ALLIED EXPEDITIONARY FORCE
+(FORWARD)
+REF:-- SHAEF/A/TS.37153/A.2.          18 March 1945.
+SUB:-- Night Phenomena.
+TO:-- First Tactical Air Force (Prov.) APO 374, US ARMY.
 
 
-=== Page 2 ===
+With reference to reports forwarded from the XIXth
 
-nr CRET
-| i mdr. Grierson, a
-A.C. of 8. A-2 | [= A
-Air Staff 8.H.A, 1
-h ‘/
-2. 1 Air Ministry, D.D.I:2.
-Date : 13th Marchi 1945. f I
-REG ; 111/45/DDE84 5 1045
-be A 5%
-BALLS CF FIRE - RED, El
-The papers dealing with
-~ the aboje subject which you en-
-closed With your memo SHAEF Air/
-T8,37153/A2 dated 11th February,
+
+Tactical Air Command through your Headquarters on the subject of
+night phenomena (foo-fighter), and further to this Headquarters'
+letter of even reference dated 11 February, a reply has now been
+received from the Air Ministry who say that Bomber Command crews
+have for some time been reporting similar phenomena.
+
+
+The Air Ministry view is that a few of the alleged
+
+
+aircraft may have been Me.262's and for the rest, flak rockets
+are suggested as the most likely explanation.
+
+
+It is regretted that no further, or more definite,
+
+
+information can be given.
+for the Deputy Supreme Commander,
+C.H. GRIERSON
+Air Commodore,
+A.C. of S., A-2.
+2354
+4336
+
+
+=== Page 2 (vision) ===
+
+SECRET
+To (?)            A/Cmdr. Grierson,
+A.C. of S. A-2
+Air Staff S.H.A.E.F. 64 M
+From :           Air Ministry, D.D.I.2.
+Date :           13th March, 1945.  SHAEF FD
+10 MAR 1945
+Ref :            111/45/DDI2
+6c 37153
+BALLS OF FIRE - RED.
+             The papers dealing with
+the above subject which you en-
+closed with your memo SHAEF Air/
+TS.37153/A2 dated 11th February,
 have been carefully examined and
 discussed with the various other
-Departments concerned,
-
-Bomber Command crews have
-for some time been repcrting simi-
-lar phenonema, A few of the
-alleged aircraft may have been He.
-262 and for the reat, flak rockets
+Departments concerned.
+             Bomber Command crews have
+for some time been reporting simi-
+lar phenomena.  A few of the
+alleged aircraft may have been Me.
+262 and for the rest, flak rockets
 are suggested as the most likely
-explanation,
-
-The whole affair is
+explanation.
+             The whole affair is
 still something of a mystery and
 the evidence is very sketchy and
 varied so that no definite and
 satisfactory explanation can yet
-be given, ; i A @
-hs 2355 pov E. D. M. Hopkins
+be given.
 
-Group Captair
+
+2355 4387 John Hopkins
+E. D. W. Hopkins
+Group Captain
 
 
 === Page 7 ===

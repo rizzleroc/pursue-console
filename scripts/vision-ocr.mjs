@@ -45,6 +45,11 @@ const MAX_PAGES = process.env.MAX_PAGES ? Number(process.env.MAX_PAGES) : Infini
 const DPI_SCALE = Number(process.env.DPI_SCALE || 2.0);
 const SKIP = new Set((process.env.SKIP || "").split(",").filter(Boolean));
 const ONLY = new Set((process.env.ONLY || "").split(",").filter(Boolean));
+// Throttle: minimum wall-clock seconds between successive ChatGPT calls.
+// ChatGPT Plus rate-limits per-window; pacing at 1 call per ~25-30s keeps
+// us comfortably below the 80-msg/3-hour ceiling on GPT-5 vision.
+const PACE_SECS = Number(process.env.PACE_SECS || 25);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function loadToken() {
   if (process.env.WHIPGEN_TOKEN) return process.env.WHIPGEN_TOKEN;
@@ -150,6 +155,30 @@ console.log(`[vision] MAX_PAGES=${MAX_PAGES === Infinity ? "ALL" : MAX_PAGES}  D
 await mkdir(CACHE_DIR, { recursive: true });
 let totalPages = 0, totalCached = 0, totalOcrd = 0, totalErr = 0;
 const tAll = Date.now();
+let lastCallEndedAt = 0;          // for pacing
+let consecutiveFetchFailures = 0; // for adaptive backoff
+
+async function pacedCall(fn) {
+  // Enforce minimum gap between successive ChatGPT calls.
+  const gap = Date.now() - lastCallEndedAt;
+  if (gap < PACE_SECS * 1000) await sleep(PACE_SECS * 1000 - gap);
+  try {
+    const out = await fn();
+    consecutiveFetchFailures = 0;
+    return out;
+  } catch (e) {
+    if (/fetch failed|ECONN|ETIMEDOUT/i.test(e.message || "")) {
+      consecutiveFetchFailures++;
+      // 60s, 120s, 240s, 480s — give the daemon/CDN time to recover.
+      const backoff = Math.min(60 * Math.pow(2, consecutiveFetchFailures - 1), 480);
+      console.log(`\n  ⏸  consecutive fetch fail #${consecutiveFetchFailures} — backing off ${backoff}s`);
+      await sleep(backoff * 1000);
+    }
+    throw e;
+  } finally {
+    lastCallEndedAt = Date.now();
+  }
+}
 
 for (const id of targets) {
   const pdfPath = path.join(RAW_DIR, `${id}.pdf`);
@@ -186,7 +215,7 @@ for (const id of targets) {
         const png = await renderPagePng(doc, p, DPI_SCALE);
         await writeFile(pngPath, png);
       }
-      const t = await visionTranscribe(pngPath, `${id}-p${p}`);
+      const t = await pacedCall(() => visionTranscribe(pngPath, `${id}-p${p}`));
       await writeFile(cachePath, (t || "").trim(), "utf8");
       nOk++;
       const dt = ((Date.now() - docT0) / 1000).toFixed(0);

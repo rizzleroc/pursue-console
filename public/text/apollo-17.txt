@@ -5,7 +5,7 @@ Agency: NASA
 Date: 1972-12-11
 Location: Cislunar Space / Moon
 Type: Documents + Imagery
-Source extraction: OCR · 16 pages
+Source extraction: MIXED · 16 pages
 
 ---
 
@@ -162,37 +162,31 @@ LMP ... two ARMED,
 LMP ... SECS LOGIC ...
 
 
-=== Page 4 ===
+=== Page 4 (vision) ===
 
 Tape 5/5
-00 03 40 01 CMP Okay. SECS LOGIC is CLOSED; SECS ARM are CLOSED;
+00 03 40 01   CMP      Okay.  SECS LOGIC is CLOSED; SECS ARM are CLOSED;
 LOGIC POWER is ON.
-LMP Okay.
-00 03 40 13 CC 17, Houston. You have a GO for T&D.
-CDR Okay. A GO for T&D.
-00 03 ko 38 cmp Okay. We'll ARM the PYROs. And we'll hit the GDC
+          LMP      Okay.
+00 03 40 13   CC       17, Houston.  You have a GO for T&D.
+          CDR      Okay.  A GO for T&D.
+00 03 40 38   CMP      Okay.  We'll ARM the PYROs.  And we'll hit the GDC
 ALIGN.
-00 03 L1 00 CMP And maneuver's complete. And 0180 and 0? On the
-GDC? No. It's just ... It's kind of diddling.
-00 03 41 19 cmp Okay. DELTA-V in NORMAL,
-00 03 41 Lk2 cmp S-IVB, okay. Okay, switches are all set.
-LMP Okay; 59:30.
-00 03 41 55 CMP Okay. Let's start the DET.
-00 03 41 59 CDR Tickity-tick-tickity, Houston. We're running
+00 03 41 00   CMP      And maneuver's complete.  And O180 and O?  On the
+GDC?  No.  It's just ... It's kind of diddling.
+00 03 41 19   CMP      Okay.  DELTA-V in NORMAL.
+00 03 41 42   CMP      S-IVB, okay.  Okay, switches are all set.
+          LMP      Okay; 59:30.
+00 03 41 55   CMP      Okay.  Let's start the DET.
+00 03 41 59   CDR      Tickity-tick-tickity, Houston.  We're running
 at 59:30.
-cc Roger.
-CMP Okay.
-00 03 k2 12 CMP Okay. That's LAUNCH VEHICLE SEP, push button.
-LMP Okay.
-00 03 42 19 CMP MC in AUTO.
-CMP Next?
-00 03 L2 29 CDR SEPARATION, Houston.
-CMP Okay, check the covers. Okay. And check the
-other ones off.
-LMP They're all ...
-CMP Okay, I'm going to start the - My gush, look at
-the junk! Okay; there's 15 seconds. Pitch her
-up. Okay, we'll PROCEED on the - -
+          CC       Roger.          CMP      Okay.
+00 03 42 12   CMP      Okay.  That's LAUNCH VEHICLE SEP, push button.
+          LMP      Okay.
+00 03 42 19   CMP      MC in AUTO.
+          CMP      Next?
+00 03 42 29   CDR      SEPARATION, Houston.
+          CMP      Okay, check the covers.  Okay.  And check the                   other ones off.          LMP      They're all ...          CMP      Okay, I'm going to start the - My gosh, look at                   the junk!  Okay; there's 15 seconds.  Pitch her                   up.  Okay, we'll PROCEED on the - -
 
 
 === Page 5 ===
@@ -432,55 +426,42 @@ some other particle out there.
 CDR Hey, Robert, what's the final Cowboy score?
 
 
-=== Page 10 ===
+=== Page 10 (vision) ===
 
 Tape 46/9
-cc Okay; I was Just going to update that. The Cowboys
-won it 34 to 24. And by winning it, they wrap up
-the wild-card slot in the NPC; and so both Wash-
+CC        Okay; I was just going to update that.  The Cowboys
+won it 34 to 24.  And by winning it, they wrap up
+the wild-card slot in the NFC; and so both Wash-
 ington and Dallas will be in the playoffs.
-
-02 18 56 53 CDR Sounds good.
-
-LMP Bob, that line of clouds I called a fir-tree pat-
+02 18 56 53 CDR     Sounds good.
+LMP       Bob, that line of clouds I called a fir-tree pat-
 tern that swings up towards Hawaii - Hawaii, if
-you will ~ has - also has a mushroom pattern on
-the top. It has the appearance as if two major
+you will - has - also has a mushroom pattern on
+the top.  It has the appearance as if two major
 air masses - one going from west to east and the
 other form east to west - have converged along
 that line, and the joint movement of air at the
-interface being south to north. And up in the
+interface being south to north.  And up in the
 area of Hawaii, I think, it tends to mushroom so
 that the pattern then goes back to flow from west
 to east on the east side and from east to west on
 the west side.
-
-cC Roger.
-
-02 18 58 27 IMP In a little while, we'll probably get a pretty
-good look at a - what looks like a very concen—
-trated intense storm that, I think, is Just - east -
-
-CMP #%% And then we'll put them. once we get updated a
-little bit. Yes, I'll get out of VOX in a minute.
-
-LMP I was looking for the Flight Plan and stuff. And
+CC        Roger.
+02 18 58 27 LMP     In a little while, we'll probably get a pretty
+good look at a - what looks like a very concen-
+trated intense storm that, I think, is just - east -
+CMP       *** And then we'll put them. once we get updated a
+little bit.  Yes, I'll get out of VOX in a minute.
+LMP       I was looking for the Flight Plan and stuff.  And
 the little books.
-
-IMP Say, Bob.
-
-cC Go ahead.
-
-IMP Houston, 17. How do you read?
-
-cc Go ahead, Jack. Read you loud and clear.
-
-CDR Okey, Bob, you want to update the LOI card and
+LMP       Say, Bob.
+CC        Go ahead.
+LMP       Houston, 17.  How do you read?
+CC        Go ahead, Jack.  Read you loud and clear.
+CDR       Okay, Bob, you want to update the LOI card and
 Flight Plan 3-82 and 3-81; is that right?
-
-cc That's affirmative.
-
-CDR Which one do you want to start on?
+CC        That's affirmative.
+CDR       Which one do you want to start on?
 
 
 === Page 11 ===
@@ -534,160 +515,95 @@ far to the left. Closer to the center window now.
 02 21 01 OT LMP Houston, 17.
 
 
-=== Page 12 ===
+=== Page 12 (vision) ===
 
 Tape 47/15
-cc Go ahead.
-
-LMP Yes, Bob, what is your - enalysis chart, if you
+CC        Go ahead.
+LMP       Yes, Bob, what is your - analysis chart, if you
 have it - surface terms analysis chart show for
-Hawaii todey?
-
-cc Stand by on that.
-
-CC Jack, according tc the - =
-
-LMP The reason I ask is that for using your term -
-
-Go shead.
-
-cC No, go shead on that, Jack.
-
-LMP I was going to say, using your terminator time as
+Hawaii today?
+CC        Stand by on that.
+CC        Jack, according to the - -
+LMP       The reason I ask is that for using your term -
+Go ahead.
+CC        No, go ahead on that, Jack.
+LMP       I was going to say, using your terminator time as
 a partial - mark for where Hawaii ought to be,
-Hawaii ought to be, it locks like that cyclonic
+Hawaii ought to be, it looks like that cyclonic
 circulation at the north end of the cloud bank I
-described, approaching that eres, would be just
-about on the Haws - Hawaiian Islands. I'm curious
+described, approaching that area, would be just
+about on the Hawe - Hawaiian Islands.  I'm curious
 if they're getting some weather down there now.
-
-cc Stand by right now; I've got my weatherman right
+CC        Stand by right now; I've got my weatherman right
 beside me here.
-
-LMP Also, that major front we talked about last night
+LMP       Also, that major front we talked about last night
 as being east and south of Japan has progressed
 even farther and is, oh, maybe 20 degrees longi-
 tude - about 20 degrees longitude from the Hawaiian
-Islands. And I'm making some guesses on exactly
+Islands.  And I'm making some guesses on exactly
 where Hawaii is.
-
-cc Roger, Jack. We've got nothing adverse in the
-Hawaiian area at all. Just a lot of winds, high
+CC        Roger, Jack.  We've got nothing adverse in the
+Hawaiian area at all.  Just a lot of winds, high
 winds and surface winds and surface roughness,
 but we don't have any bad cloud area in the
-Hawaiien area. I'll get the Hickam sequence re-
+Hawaiian area.  I'll get the Hickam sequence re-
 port here shortly, Jack.
-
-LMP Okay, ... a little bit. The - our zero-phase
+LMP       Okay, ... a little bit.  The - our zero-phase
 point is now centered just a little south of the
-disturbance near the Solomon Islands. And I see
+disturbance near the Solomon Islands.  And I see
 no distinct change in the intensity of that zero-
 phase point over what I had talked about a couple
 hours ago.
 
 
-=== Page 13 ===
+=== Page 13 (vision) ===
 
 Tape 47/16
-02 21 04k 23 CC Roger, Jack. The Solomon Islands disturbance
+02 21 04 23  CC        Roger, Jack.  The Solomon Islands disturbance
 and everything is confirmed on this chart that
-I've got. It's very definitely confirmed in there.
-LMP Okay. Well, it's a lot more obvious today than
-it was yesterday; but even then it was showing
-pretty strong circulation. It is starting to
-wrap up, look very much like Therese did yesterday.
-cc Roger. I'm sure of that. The one right off of
-Vietnam is also pretty tight, isn't it still?
-LMP Well, we can't see that one yet.
-cc Okay.
-LMP Australia in general is still very clear except
-in the northeastern portions where it looks like
-they have got scattered clouds; but it looks like
-e pretty night - over Australia.
-cc Roger. Looks that way from the satellite photo
-from the last couple days. Looks pretty nice
-down there.
-02 21 05 34 LMP Right.
-02 21 07 05 CC Jack, in looking at the sequence reports for
+I've got.  It's very definitely confirmed in there.
+          LMP     Okay.  Well, it's a lot more obvious today than                  it was yesterday; but even then it was showing                  pretty strong circulation.  It is starting to                  wrap up, look very much like Therese did yesterday.          CC      Roger.  I'm sure of that.  The one right off of                  Vietnam is also pretty tight, isn't it still?          LMP     Well, we can't see that one yet.          CC      Okay.          LMP     Australia in general is still very clear except                  in the northeastern portions where it looks like                  they have got scattered clouds; but it looks like                  a pretty night -- over Australia.          CC      Roger.  Looks that way from the satellite photo                  from the last couple days.  Looks pretty nice                  down there.
+02 21 05 34  LMP       Right.
+02 21 07 05  CC        Jack, in looking at the sequence reports for
 Hickam and Hilo and that area, it looks like they
-Just got their standard 3500 scattered, 4500 broken
-clouds, maybe a rain shower or two. But just
+just got their standard 3500 scattered, 4500 broken
+clouds, maybe a rain shower or two.  But just
 their standard tropical fluffy clouds.
-END OF TAPE
+                                END OF TAPE
 
 
-=== Page 14 ===
+=== Page 14 (vision) ===
 
-Tape 59/19
-mare. Still looking at Oceanus Procellarum. And
-now, out window 3, up to the northwest, Grimaldi
-
-“ is starting to show up - a very obvious dark area
-: within the highlands of that part of the Moon -
-and one of the darkest mare regions that we have
-seen on the - on the Moon. It's comparable, at
-least in the photographs, to that of Tsiolkovsky.
-cC Roger.
-
-03 15 33 25 IMP Normally, of course, we think of the dark mare as
+Tape 59/19           mare.  Still looking at Oceanus Procellarum.  And           now, out window 3, up to the northwest, Grimaldi           is starting to show up - a very obvious dark area           within the highlands of that part of the Moon -           and one of the darkest mare regions that we have           seen on the -- on the Moon.  It's comparable, at           least in the photographs, to that of Tsiolkovsky.      CC   Roger.
+03 15 33 25  LMP      Normally, of course, we think of the dark mare as
 being the younger basalt flows that - on the Moon,
 but in our case, of course, young means something
 on the order of 3 billion years or older.
+                     END OF TAPE
 
-END OF TAPE
 
-
-=== Page 15 ===
+=== Page 15 (vision) ===
 
 Tape 60/1
 APOLLO 17 AIR-TO-GROUND VOICE TRANSCRIPTION
-—
-03 15 33 44 cc Roger.
-
-LMP For our interp - If we can extrapolate from the
-samples returned by other missions.
-
-LMP Amezing how far over - now the highlands to the
-west of Procellarum are - still are bright, and the
-contrast between fresh craters and the normal high-
-land are very - are very obvious still in earthlight,
-particularly along the zero phase point with respect
-to the Earth. Rima Gamms now is - is coming a lit-
-tle bit closer to our oval track in the horseshoe
-in the - larger and more western end of it; the
-dark horseshoe is quite clear in this light. It's
-a west - or northwest-pointing horseshoe, as is the
-complete trend of that strange feature. I think
-Ron is going to have an excellent chance tc study
-these light-colored swirls within the mare and
-other parts of the Moon. We had some good views
-of them and Mare Marginis and to the east of
-Crisium - Mare Crisium, and he should - if there
-is anything to be seen, he should be able to see
-it for - during the next few days.
-
-cc Okeydoke.
-
-03 15 35 50 CDR Say, Gordo, something I Just noticed here in work-
-ing with the GDC what-have-you. I - looked at the
-Pc gage, and in the Pz -~ Pc position, there is a
-continuous bias on it now of about, oh, T percent,
-and if IT switch to ALPHA, it goes to zero. We never
+03 15 33 44   CC      Roger.
+          LMP     For our interp - If we can extrapolate from the                  samples returned by other missions.          LMP     Amazing how far over - 'now the highlands to the                  west of Procellarum are - still are bright, and the                  contrast between fresh craters and the normal high-                  land are very - are very obvious still in earthlight,                  particularly along the zero phase point with respect                  to the Earth.  Rima Gamma now is - is coming a lit-                  tle bit closer to our oval track in the horseshoe                  in the - larger and more western end of it; the                  dark horseshoe is quite clear in this light.  It's                  a west - or northwest-pointing horseshoe, as is the                  complete trend of that strange feature.  I think                  Ron is going to have an excellent chance to study                  these light-colored swirls within the mare and                  other parts of the Moon.  We had some good views                  of them and Mare Marginis and to the east of                  Crisium - Mare Crisium, and he should - if there                  is anything to be seen, he should be able to see                  it for - during the next few days.          CC      Okeydoke.
+03 15 35 50   CDR     Say, Gordo, something I just noticed here in work-
+ing with the GDC what-have-you.  I - looked at the
+Pc gage, and in the Pz - Pc position, there is a
+continuous bias on it now of about, oh, 7 percent,
+and if I switch to ALPHA, it goes to zero.  We never
 saw that bias before this last burn.
-
-cc Roger, Gene.
-
-03 15 36 35 IMP Hey, Gordy, I'm locking right up the western edge
+          CC      Roger, Gene.
+03 15 36 35   LMP     Hey, Gordy, I'm looking right up the western edge
 of the Procellarum mare where it contacts the -
-the ~ the high - western highlands of the Moon, and
-we're Just about to fly a little bit south of
-
-. Grimaldi. That edge is very irregular. There is
-
-no cbvious indications that it - there are large
+the - the high - western highlands of the Moon, and
+we're just about to fly a little bit south of
+Grimaldi.  That edge is very irregular.  There is
+no obvious indications that it - there are large
 basins that have been flooded by mare that have
-formed that edge, but, again, the topogrephic dis=-
-tinction's possible in this lighter small. Now I'm
+formed that edge, but, again, the topographic dis-
+tinction's possible in this lighter small.  Now I'm
 starting to see that there are shadows in the craters.
 
 
