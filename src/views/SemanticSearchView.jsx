@@ -106,6 +106,58 @@ function topK(qVec, vectors, dim, count, K = 30) {
   return out;
 }
 
+// HYBRID SCORING.
+//
+// MiniLM cosine top-outs around 0.5 for short keyword queries ('area 51')
+// because the model needs sentence-level context to differentiate. Pure
+// cosine therefore can't separate a real literal match from any other
+// thematically-adjacent chunk — they all land in the 0.4-0.5 band.
+//
+// Solution: combine cosine with a literal-match boost.
+//   • exact phrase substring  → +0.50  (essentially marks the result EXACT)
+//   • all-query-tokens present → +0.20 (probably-relevant)
+//   • any-token present        → +0.05 per token, capped at +0.15
+//
+// Boost is computed against snippet + title + agency string when available.
+// The numbers are chosen so a true literal hit beats a thematic-only hit at
+// any reasonable cosine value, but a strong cosine match without literal
+// support still appears for genuinely semantic queries.
+function literalBoost(query, hayText) {
+  if (!query || !hayText) return 0;
+  const q = query.toLowerCase().trim();
+  const h = hayText.toLowerCase();
+  const tokens = q.split(/\s+/).filter(t => t.length >= 2);
+  let boost = 0;
+  // exact substring of the whole query
+  if (q.length >= 3 && h.includes(q)) boost += 0.50;
+  // word-boundary match of the whole query as a phrase
+  else {
+    try {
+      const safe = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\b${safe}\\b`).test(h)) boost += 0.40;
+    } catch {}
+  }
+  if (boost > 0) return Math.min(boost, 0.55);
+  // partial credit: token coverage
+  let hits = 0;
+  for (const t of tokens) {
+    if (t.length < 2) continue;
+    if (h.includes(t)) hits++;
+  }
+  if (tokens.length && hits === tokens.length) boost += 0.20;
+  else if (hits > 0) boost += Math.min(0.05 * hits, 0.15);
+  return boost;
+}
+
+// Strength bands map a hybrid score to a visible quality label.
+function strengthBand(final) {
+  if (final >= 0.85) return { label: "EXACT",  pct: 100, color: "#7CFFB2", glyph: "●●●●" };
+  if (final >= 0.65) return { label: "STRONG", pct: 80,  color: "#FFD93D", glyph: "●●●○" };
+  if (final >= 0.50) return { label: "MEDIUM", pct: 60,  color: "#82B6FF", glyph: "●●○○" };
+  if (final >= 0.40) return { label: "WEAK",   pct: 40,  color: "#B794F4", glyph: "●○○○" };
+  return                    { label: "NOISE",  pct: 20,  color: "#FF6B9D", glyph: "○○○○" };
+}
+
 function highlightQuery(text, qTerms) {
   if (!qTerms.length) return text;
   try {
@@ -150,6 +202,9 @@ export default function SemanticSearchView({ onSelect }) {
   const [ingestProgress, setIngestProgress] = useState(null);
   const [ingestQueue, setIngestQueue] = useState([]);   // [{ name, status, chunks }]
   const [dragOver, setDragOver] = useState(false);
+  // Hide WEAK / NOISE matches by default — they're the bulk of the "why is
+  // this in my results?" noise on keyword queries.
+  const [showWeak, setShowWeak] = useState(false);
 
   // First-load: list dropped docs + load their vectors
   const refreshDropped = useCallback(async () => {
@@ -202,6 +257,13 @@ export default function SemanticSearchView({ onSelect }) {
         : [];
       const elapsedMs = performance.now() - t0;
 
+      // Apply hybrid literal-boost to each hit.
+      // Haystack = snippet + (for official) event title + agency.
+      const scoreHit = (hit, hay) => {
+        const boost = literalBoost(q, hay);
+        return { ...hit, cos: hit.score, boost, final: hit.score + boost };
+      };
+
       // Group by record (event id for static, docId for dropped)
       const groups = new Map();
       for (const h of staticHits) {
@@ -209,23 +271,40 @@ export default function SemanticSearchView({ onSelect }) {
         if (!m) continue;
         const ev = eventById[m.eventId];
         if (!ev) continue;
+        const hay = `${m.snippet || ""} ${ev.title} ${ev.agency || ""} ${(ev.tags || []).join(" ")}`;
+        const sh = scoreHit(h, hay);
         const key = `official:${m.eventId}`;
-        if (!groups.has(key)) groups.set(key, { kind: "official", event: ev, best: h.score, hits: [] });
+        if (!groups.has(key)) groups.set(key, { kind: "official", event: ev, best: sh.final, bestCos: sh.cos, hits: [] });
         const g = groups.get(key);
-        if (h.score > g.best) g.best = h.score;
-        g.hits.push({ ...h, page: m.page, snippet: m.snippet, chunkKind: m.kind, chunkSource: m.source, chunkQuality: m.quality });
+        if (sh.final > g.best) { g.best = sh.final; g.bestCos = sh.cos; }
+        g.hits.push({ ...sh, page: m.page, snippet: m.snippet, chunkKind: m.kind, chunkSource: m.source, chunkQuality: m.quality });
       }
       for (const h of droppedHits) {
         const m = droppedVecs.meta[h.idx];
         if (!m) continue;
+        const sh = scoreHit(h, `${m.snippet || ""} ${m.docName || ""}`);
         const key = `dropped:${m.docId}`;
-        if (!groups.has(key)) groups.set(key, { kind: "dropped", docName: m.docName, docId: m.docId, best: h.score, hits: [] });
+        if (!groups.has(key)) groups.set(key, { kind: "dropped", docName: m.docName, docId: m.docId, best: sh.final, bestCos: sh.cos, hits: [] });
         const g = groups.get(key);
-        if (h.score > g.best) g.best = h.score;
-        g.hits.push({ ...h, page: m.page, snippet: m.snippet });
+        if (sh.final > g.best) { g.best = sh.final; g.bestCos = sh.cos; }
+        g.hits.push({ ...sh, page: m.page, snippet: m.snippet });
       }
-      const grouped = Array.from(groups.values()).sort((a, b) => b.best - a.best).slice(0, 16);
-      setResults({ grouped, elapsedMs, staticChunks: vecState.info.count, droppedChunks: droppedVecs.meta.length });
+      // Within each group: drop curated meta-chunks if there's any body-chunk
+      // hit that beats them — meta-only matches are noisy on keyword queries.
+      for (const g of groups.values()) {
+        const hasBodyHit = g.hits.some(h => h.chunkKind !== "meta");
+        if (hasBodyHit) g.hits = g.hits.filter(h => h.chunkKind !== "meta");
+        g.hits.sort((a, b) => b.final - a.final);
+      }
+      // Filter: hide groups whose best final score is below the WEAK floor.
+      // (the UI still has a toggle to surface them when the user wants noise.)
+      const allGroups = Array.from(groups.values()).sort((a, b) => b.best - a.best);
+      setResults({
+        grouped: allGroups,
+        elapsedMs,
+        staticChunks: vecState.info.count,
+        droppedChunks: droppedVecs.meta.length,
+      });
     } catch (e) {
       console.error("[semantic] search failed:", e);
       setError({
@@ -493,20 +572,48 @@ export default function SemanticSearchView({ onSelect }) {
         <div className="font-mono text-[11px] text-emerald-500 mb-3">⏳ embedding query and ranking 1,057 chunks…</div>
       )}
 
-      {results && results.grouped.length === 0 && (
-        <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">No semantically similar passages found.</div>
-      )}
+      {results && (() => {
+        // Filter by strength bands. WEAK shown only on toggle, NOISE never.
+        const strong = results.grouped.filter(g => g.best >= 0.50);
+        const weak   = results.grouped.filter(g => g.best >= 0.40 && g.best < 0.50);
+        const visible = showWeak ? [...strong, ...weak] : strong;
 
-      {results && results.grouped.length > 0 && (
+        if (results.grouped.length === 0) {
+          return <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">No semantically similar passages found.</div>;
+        }
+        if (visible.length === 0) {
+          return (
+            <div className="font-mono text-[11px] text-emerald-700 py-8 text-center space-y-2">
+              <div>No high-confidence matches.</div>
+              <div className="text-[10px]">Best score was <span className="text-amber-400">{results.grouped[0].best.toFixed(3)}</span> ({strengthBand(results.grouped[0].best).label}) — below the relevance floor.</div>
+              {weak.length > 0 && (
+                <button onClick={() => setShowWeak(true)}
+                  className="mt-2 px-3 py-1 rounded-sm border border-purple-400/50 text-purple-300 hover:bg-purple-400/10 tracking-widest text-[10px]">
+                  show {weak.length} weak match{weak.length === 1 ? "" : "es"}
+                </button>
+              )}
+            </div>
+          );
+        }
+        return (
         <div>
           <div className="font-mono text-[10px] text-emerald-700 tracking-widest mb-3 flex items-center gap-3 flex-wrap">
-            <span>▌ {results.grouped.length} RECORDS · TOP COSINE = {results.grouped[0].best.toFixed(3)} · {results.elapsedMs.toFixed(1)} MS</span>
+            <span>▌ {visible.length} RECORDS · TOP {strengthBand(results.grouped[0].best).label} = {results.grouped[0].best.toFixed(3)} · {results.elapsedMs.toFixed(1)} MS</span>
             <span className="text-emerald-600">scored against {results.staticChunks.toLocaleString()} official + {results.droppedChunks.toLocaleString()} dropped chunks</span>
+            {weak.length > 0 && (
+              <button onClick={() => setShowWeak(v => !v)}
+                className={`ml-auto px-2 py-0.5 rounded-sm border tracking-widest transition-all ${
+                  showWeak ? "border-purple-400/70 text-purple-200 bg-purple-400/10"
+                  : "border-emerald-700/50 text-emerald-500 hover:border-purple-400/50 hover:text-purple-300"}`}>
+                {showWeak ? `▼ HIDING NOISE` : `▸ SHOW ${weak.length} WEAK`}
+              </button>
+            )}
           </div>
           <div className="space-y-3">
-            {results.grouped.map((g, gi) => {
+            {visible.map((g, gi) => {
               const pageHits = [...new Map(g.hits.map(h => [`${h.page}-${h.snippet?.slice(0,40)}`, h])).values()]
-                .sort((a, b) => b.score - a.score).slice(0, 4);
+                .sort((a, b) => b.final - a.final).slice(0, 4);
+              const band = strengthBand(g.best);
 
               if (g.kind === "dropped") {
                 return (
@@ -519,7 +626,9 @@ export default function SemanticSearchView({ onSelect }) {
                         <span className="font-mono text-[9px] text-emerald-700 tracking-widest">LOCAL · NOT IN OFFICIAL CATALOG</span>
                       </div>
                       <div className="flex items-center gap-3 font-mono text-[10px]">
-                        <span className="text-emerald-500 tracking-widest">cos {g.best.toFixed(3)}</span>
+                        <span style={{ color: band.color }} className="tracking-widest" title={`final ${g.best.toFixed(3)} (cos ${g.bestCos.toFixed(3)})`}>
+                          {band.glyph} {band.label} {Math.round(g.best * 100)}%
+                        </span>
                       </div>
                     </div>
                     <div className="font-mono text-amber-100 text-[14px] mt-1 leading-snug break-all">
@@ -531,7 +640,9 @@ export default function SemanticSearchView({ onSelect }) {
                           <div key={i} className="border-l border-amber-400/30 pl-2.5 font-mono text-[11px] text-amber-100/90 leading-relaxed">
                             <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
                               PAGE {h.page}
-                              <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
+                              <span className="ml-2 text-emerald-700">
+                                cos {h.cos.toFixed(3)}{h.boost > 0 ? ` +${h.boost.toFixed(2)} match` : ""}
+                              </span>
                             </span>
                             {highlightQuery(h.snippet, qTerms)}
                           </div>
@@ -559,7 +670,9 @@ export default function SemanticSearchView({ onSelect }) {
                       </div>
                       <div className="flex items-center gap-3 font-mono text-[10px]">
                         <span className="text-amber-300">{event.date}</span>
-                        <span className="text-emerald-500 tracking-widest">cos {g.best.toFixed(3)}</span>
+                        <span style={{ color: band.color }} className="tracking-widest" title={`final ${g.best.toFixed(3)}  cos ${g.bestCos.toFixed(3)}`}>
+                          {band.glyph} {band.label} {Math.round(g.best * 100)}%
+                        </span>
                       </div>
                     </div>
                     <div className="font-mono text-emerald-100 text-[14px] mt-1 leading-snug">
@@ -585,7 +698,9 @@ export default function SemanticSearchView({ onSelect }) {
                           <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
                             <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
                               {h.chunkKind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
-                              <span className="ml-2 text-emerald-700">cos {h.score.toFixed(3)}</span>
+                              <span className="ml-2 text-emerald-700">
+                                cos {h.cos.toFixed(3)}{h.boost > 0 ? ` +${h.boost.toFixed(2)} match` : ""}
+                              </span>
                               {qLabel && <span className={`ml-2 ${qColor}`}>{qLabel}</span>}
                             </span>
                             {highlightQuery(h.snippet, qTerms)}
@@ -599,7 +714,8 @@ export default function SemanticSearchView({ onSelect }) {
             })}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
