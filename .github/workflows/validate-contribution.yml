@@ -1,0 +1,53 @@
+name: Validate corpus contributions
+
+on:
+  pull_request:
+    paths:
+      - 'contributions/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      # The wordlist is committed at scripts/.words.txt; if missing for any
+      # reason, fetch it inline so the validator can score quality.
+      - name: Ensure wordlist
+        run: |
+          if [ ! -f scripts/.words.txt ]; then
+            curl -sL -o scripts/.words.txt \
+              https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english.txt
+          fi
+      - name: Run validator
+        id: validate
+        run: |
+          set +e
+          node scripts/validate-contribution.mjs | tee /tmp/validate.log
+          echo "exit=$?" >> $GITHUB_OUTPUT
+      - name: Post report on PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let log = '';
+            try { log = fs.readFileSync('/tmp/validate.log','utf8'); }
+            catch { log = '(no validator output captured)'; }
+            const body = '## Corpus contribution validator\n\n```\n' + log.slice(-6000) + '\n```\n';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
+      - name: Fail if reject
+        run: exit ${{ steps.validate.outputs.exit }}

@@ -10,6 +10,7 @@ import PatternsView from "./views/PatternsView.jsx";
 import ThreadsView from "./views/ThreadsView.jsx";
 import ConstellationView from "./views/ConstellationView.jsx";
 import SearchView from "./views/SearchView.jsx";
+import LiveFeedView from "./views/LiveFeedView.jsx";
 import DossierView from "./views/DossierView.jsx";
 
 // Semantic search pulls in transformers.js (~25MB INT8 model + ORT wasm) —
@@ -102,6 +103,7 @@ export default function App() {
           {view === "threads" && <ThreadsView events={filtered} onSelect={handleSelect} />}
           {view === "constellation" && <ConstellationView events={filtered} onSelect={handleSelect} />}
           {view === "search" && <SearchView onSelect={handleSelect} />}
+          {view === "live" && <LiveFeedView onSelect={handleSelect} />}
           {view === "semantic" && (
             <Suspense fallback={
               <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest">

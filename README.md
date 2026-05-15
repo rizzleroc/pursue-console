@@ -30,6 +30,14 @@ Currently **51 of 162** records are catalogued. Help us get to 162.
 
 ---
 
+## 📡 Live feed of new transcriptions
+
+The corpus grows page by page. Every time a vision-OCR batch runs the **LIVE** view shows the latest transcribed pages with timestamps, quality, and source (ChatGPT vision vs. tesseract). See `public/live-feed.json` or open the LIVE tab in the app.
+
+**Anyone who clones can contribute transcriptions** — see [CONTRIBUTING-CORPUS.md](./CONTRIBUTING-CORPUS.md). PRs touching `contributions/` are auto-validated for quality + safety before merge.
+
+---
+
 ## 🌍 Open project — contributions welcome
 
 **You don't need to be a developer.** The highest-value contributions are reading the actual primary documents and improving the data:

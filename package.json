@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/copy-ort-assets.mjs && node scripts/build-search-index.mjs && vite build",
+    "build": "node scripts/copy-ort-assets.mjs && node scripts/build-search-index.mjs && node scripts/build-live-feed.mjs && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
@@ -13,7 +13,10 @@
     "corpus:fetch": "node scripts/fetch-pdfs.mjs",
     "corpus:extract": "node scripts/extract-text.mjs",
     "corpus:ocr": "node scripts/ocr-scanned.mjs",
-    "corpus": "npm run corpus:fetch && npm run corpus:extract"
+    "corpus:vision": "node scripts/vision-ocr.mjs",
+    "corpus:feed": "node scripts/build-live-feed.mjs",
+    "corpus": "npm run corpus:fetch && npm run corpus:extract",
+    "contrib:validate": "node scripts/validate-contribution.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
