@@ -19,6 +19,14 @@ const VIS = path.join(ROOT, "data-raw/.vision-cache");
 const OCR = path.join(ROOT, "data-raw/.ocr-cache");
 const OUT = path.join(ROOT, "public/live-feed.json");
 
+// Bail out if neither cache exists — preserves the committed JSON during
+// CI builds, since data-raw/ is gitignored. The local maintainer regenerates
+// it after each OCR batch and commits the refreshed file.
+if (!existsSync(VIS) && !existsSync(OCR)) {
+  console.log("[live-feed] no .vision-cache or .ocr-cache locally — leaving public/live-feed.json untouched.");
+  process.exit(0);
+}
+
 const MAX_ENTRIES = Number(process.env.MAX_FEED || 200);
 const MIN_CHARS   = Number(process.env.MIN_CHARS || 30);
 
