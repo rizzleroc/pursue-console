@@ -445,70 +445,121 @@ export default function SemanticSearchView({ onSelect }) {
         </div>
       </div>
 
-      {/* COVERAGE STRIP — be honest about what is and isn't indexed */}
-      <div className="mb-4 border border-emerald-700/40 bg-black/40 rounded-sm p-3 font-mono text-[11px]">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="text-emerald-700 tracking-widest text-[9px]">▌ INDEX COVERAGE — RELEASE 01</div>
-          {coverage.droppedDocs > 0 && (
-            <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">CLEAR DROPPED ({coverage.droppedDocs})</button>
-          )}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-2 text-emerald-200">
-          <div>
-            <div className="text-[9px] text-emerald-700 tracking-widest">INVENTORY</div>
-            <div className="text-amber-300 text-base">{coverage.inventoryTotal}</div>
-            <div className="text-[9px] text-emerald-600">records on war.gov</div>
-          </div>
-          <div>
-            <div className="text-[9px] text-emerald-700 tracking-widest">CATALOGUED</div>
-            <div className="text-emerald-200 text-base">{coverage.catalogued}</div>
-            <div className="text-[9px] text-emerald-600">events in this repo</div>
-          </div>
-          <div>
-            <div className="text-[9px] text-emerald-700 tracking-widest">INDEXED</div>
-            <div className="text-emerald-200 text-base">{coverage.withText} <span className="text-[9px] text-emerald-700">→ {coverage.staticChunks.toLocaleString()} chunks</span></div>
-            <div className="text-[9px] text-emerald-600">with extracted text</div>
-          </div>
-          <div>
-            <div className="text-[9px] text-emerald-700 tracking-widest">YOU ADDED</div>
-            <div className={coverage.droppedDocs > 0 ? "text-amber-300 text-base" : "text-emerald-700 text-base"}>
-              {coverage.droppedDocs} <span className="text-[9px] text-emerald-700">→ {coverage.droppedChunks.toLocaleString()} chunks</span>
-            </div>
-            <div className="text-[9px] text-emerald-600">local-only, this browser</div>
-          </div>
-          <div>
-            <div className="text-[9px] text-emerald-700 tracking-widest">GAP</div>
-            <div className="text-rose-300 text-base">{Math.max(0, coverage.inventoryTotal - coverage.withText - coverage.droppedDocs)}</div>
-            <div className="text-[9px] text-emerald-600">not yet searchable</div>
-          </div>
-        </div>
-        {/* Source quality summary */}
-        {vecState?.info?.rejectedByQuality && (
-          <div className="mt-2 pt-2 border-t border-emerald-700/20 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] text-emerald-600">
-            {vecState.info.bySource?.vision && (
-              <div>
-                <span className="text-cyan-300 tracking-widest text-[9px]">VISION </span>
-                {vecState.info.bySource.vision.count} chunks · q={vecState.info.bySource.vision.meanQuality} <span className="text-emerald-700">(GPT)</span>
-              </div>
+      {/* COVERAGE STRIPS — two halves: repo scope above, FAISS scope below */}
+      <div className="mb-4 space-y-3">
+        {/* REPO SCOPE */}
+        <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 font-mono text-[11px]">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
+            <div className="text-emerald-700 tracking-widest text-[9px]">▌ REPOSITORY SCOPE — RELEASE 01</div>
+            {coverage.droppedDocs > 0 && (
+              <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">CLEAR DROPPED ({coverage.droppedDocs})</button>
             )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-emerald-200">
             <div>
-              <span className="text-emerald-400 tracking-widest text-[9px]">TEXT-LAYER </span>
-              {vecState.info.bySource?.pdfjs
-                ? <>{vecState.info.bySource.pdfjs.count} chunks · q={vecState.info.bySource.pdfjs.meanQuality}</>
-                : "—"}
+              <div className="text-[9px] text-emerald-700 tracking-widest">INVENTORY</div>
+              <div className="text-amber-300 text-base">{coverage.inventoryTotal}</div>
+              <div className="text-[9px] text-emerald-600">records on war.gov</div>
             </div>
             <div>
-              <span className="text-amber-300 tracking-widest text-[9px]">OCR </span>
-              {vecState.info.bySource?.ocr
-                ? <>{vecState.info.bySource.ocr.count} chunks · q={vecState.info.bySource.ocr.meanQuality} <span className="text-emerald-700">(tesseract)</span></>
-                : "—"}
+              <div className="text-[9px] text-emerald-700 tracking-widest">CATALOGUED</div>
+              <div className="text-emerald-200 text-base">{coverage.catalogued}</div>
+              <div className="text-[9px] text-emerald-600">events in this repo</div>
             </div>
             <div>
-              <span className="text-rose-400 tracking-widest text-[9px]">REJECTED </span>
-              {(vecState.info.rejectedByQuality.ocr || 0) + (vecState.info.rejectedByQuality.pdfjs || 0)} chunks (q&lt;{vecState.info.minQuality})
+              <div className="text-[9px] text-emerald-700 tracking-widest">INDEXED</div>
+              <div className="text-emerald-200 text-base">{coverage.withText} <span className="text-[9px] text-emerald-700">events</span></div>
+              <div className="text-[9px] text-emerald-600">have searchable text</div>
+            </div>
+            <div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">YOU ADDED</div>
+              <div className={coverage.droppedDocs > 0 ? "text-amber-300 text-base" : "text-emerald-700 text-base"}>
+                {coverage.droppedDocs} <span className="text-[9px] text-emerald-700">→ {coverage.droppedChunks.toLocaleString()} chunks</span>
+              </div>
+              <div className="text-[9px] text-emerald-600">local-only, this browser</div>
+            </div>
+            <div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">AWAITING</div>
+              <div className="text-rose-300 text-base">{Math.max(0, coverage.inventoryTotal - coverage.catalogued)}</div>
+              <div className="text-[9px] text-emerald-600">records to catalogue</div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* FAISS INDEX SCOPE — what's actually queryable, broken down by source */}
+        {vecState && (() => {
+          const total = vecState.info.count + droppedVecs.meta.length;
+          const bs = vecState.info.bySource || {};
+          const rejected = (vecState.info.rejectedByQuality?.ocr || 0) + (vecState.info.rejectedByQuality?.pdfjs || 0);
+          const gen = vecState.info.generatedAt ? new Date(vecState.info.generatedAt) : null;
+          const ago = gen ? Math.max(0, (Date.now() - gen.getTime()) / 1000) : null;
+          const agoStr = ago == null ? "—"
+            : ago < 60 ? `${Math.round(ago)}s ago`
+            : ago < 3600 ? `${Math.round(ago/60)}m ago`
+            : ago < 86400 ? `${Math.round(ago/3600)}h ago`
+            : `${Math.round(ago/86400)}d ago`;
+          // Build the per-source bar visualization
+          const bars = [
+            { key: "vision",  label: "VISION",     color: "#82B6FF", note: "GPT-transcribed" },
+            { key: "pdfjs",   label: "TEXT-LAYER", color: "#7CFFB2", note: "pdfjs clean" },
+            { key: "ocr",     label: "TESSERACT",  color: "#FFD93D", note: "noisier, queued for vision" },
+            { key: "curated", label: "CURATED",    color: "#B794F4", note: "hand-written summaries" },
+          ].map(b => ({ ...b, count: bs[b.key]?.count || 0, q: bs[b.key]?.meanQuality }));
+          const sumChunks = bars.reduce((s, b) => s + b.count, 0) || 1;
+          return (
+            <div className="border border-cyan-700/40 bg-cyan-950/10 rounded-sm p-3 font-mono text-[11px]">
+              <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+                <div className="text-cyan-400/80 tracking-widest text-[9px]">▌ FAISS INDEX · {total.toLocaleString()} chunks · {vecState.info.dim}D Mini-LM</div>
+                <div className="flex items-center gap-3">
+                  <span className="text-emerald-700 text-[9px] tracking-widest">{agoStr}</span>
+                  <button onClick={async () => {
+                    setVecLoaded(false); setVecState(null);
+                    _vectorsP = null;
+                    try { const next = await loadVectors(true); setVecState(next); setVecLoaded(true); }
+                    catch (e) { setError({ msg: e.message, stack: null }); }
+                  }}
+                    style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)" }}
+                    className="px-2 py-0.5 rounded-sm border border-cyan-700/50 text-cyan-300 hover:border-amber-400 hover:text-amber-300 tracking-widest text-[10px] active:scale-[0.97]">
+                    ↻ REFRESH FAISS
+                  </button>
+                </div>
+              </div>
+
+              {/* Stacked horizontal bar */}
+              <div className="h-2 flex rounded-sm overflow-hidden mb-3 bg-emerald-950">
+                {bars.map(b => b.count > 0 && (
+                  <div key={b.key}
+                    title={`${b.label} · ${b.count} chunks · ${Math.round(b.count/sumChunks*100)}%`}
+                    style={{ width: `${(b.count / sumChunks) * 100}%`, backgroundColor: b.color }} />
+                ))}
+              </div>
+
+              {/* Per-source legend */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {bars.map(b => (
+                  <div key={b.key} className="flex items-baseline gap-2">
+                    <span className="inline-block w-2 h-2 rounded-sm shrink-0" style={{ backgroundColor: b.color }} />
+                    <div className="min-w-0">
+                      <div className="tracking-widest text-[9px]" style={{ color: b.color }}>{b.label}</div>
+                      <div className="text-emerald-200 text-[11px] tabular-nums">
+                        {b.count.toLocaleString()}
+                        {b.q != null && <span className="text-emerald-700 ml-1 text-[9px]">q {b.q.toFixed(2)}</span>}
+                      </div>
+                      <div className="text-[9px] text-emerald-600">{b.note}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {rejected > 0 && (
+                <div className="mt-3 pt-2 border-t border-emerald-700/20 text-[10px] text-emerald-600">
+                  <span className="text-rose-400 tracking-widest text-[9px] mr-2">QUALITY-FILTERED</span>
+                  {rejected} chunks dropped below q≥{vecState.info.minQuality} (the tesseract noise band) before reaching the index.
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* DROP ZONE */}
