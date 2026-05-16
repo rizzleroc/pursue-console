@@ -249,12 +249,45 @@ export default function SemanticSearchView({ onSelect }) {
       const dim = vecState.info.dim;
 
       // Score static + dropped vectors against the same query
-      const staticHits = topK(qVec, vecState.vectors, dim, vecState.info.count, 40)
-        .map(h => ({ ...h, source: "official" }));
-      const droppedHits = droppedVecs.meta.length
+      const staticHitsByCos = topK(qVec, vecState.vectors, dim, vecState.info.count, 40);
+      const droppedHitsByCos = droppedVecs.meta.length
         ? topK(qVec, droppedVecs.vectors, dim, droppedVecs.meta.length, 40)
-            .map(h => ({ ...h, source: "dropped" }))
         : [];
+
+      // ALSO: full-corpus literal scan. MiniLM's cosine doesn't reliably
+      // rank short keyword queries (e.g. 'john lear') because 2 tokens
+      // give little context to embed against. Without a separate literal
+      // pass, a chunk whose snippet literally contains 'john lear' never
+      // shows up unless it happens to land in the top-40 cosine slots,
+      // which it usually doesn't. So we scan every snippet for literal
+      // substring / word matches, score those with cos=0 + boost, then
+      // union with the cosine candidates. This is the proper hybrid
+      // retrieval pattern; the previous version only boosted cosine hits.
+      const ql = q.toLowerCase().trim();
+      const literalStatic = [];
+      if (ql.length >= 3) {
+        const cosIdxSet = new Set(staticHitsByCos.map(h => h.idx));
+        for (let i = 0; i < vecState.meta.length; i++) {
+          if (cosIdxSet.has(i)) continue;
+          const m = vecState.meta[i];
+          const hay = (m.snippet || "").toLowerCase();
+          if (hay.includes(ql)) literalStatic.push({ idx: i, score: 0 });
+          if (literalStatic.length >= 80) break;
+        }
+      }
+      const literalDropped = [];
+      if (ql.length >= 3 && droppedVecs.meta.length) {
+        const cosIdxSet = new Set(droppedHitsByCos.map(h => h.idx));
+        for (let i = 0; i < droppedVecs.meta.length; i++) {
+          if (cosIdxSet.has(i)) continue;
+          const m = droppedVecs.meta[i];
+          const hay = (m.snippet || "").toLowerCase();
+          if (hay.includes(ql)) literalDropped.push({ idx: i, score: 0 });
+          if (literalDropped.length >= 40) break;
+        }
+      }
+      const staticHits  = [...staticHitsByCos,  ...literalStatic ].map(h => ({ ...h, source: "official" }));
+      const droppedHits = [...droppedHitsByCos, ...literalDropped].map(h => ({ ...h, source: "dropped" }));
       const elapsedMs = performance.now() - t0;
 
       // Apply hybrid literal-boost to each hit.
