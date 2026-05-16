@@ -1,12 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AGENCY_COLORS, FLAG_LABEL } from "../data/events.js";
 import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
 import { THREADS } from "../data/threads.js";
 import { GlitchText, MiniChip, DocTypeBadge, DOC_TYPE_BADGE } from "../components/Primitives.jsx";
 import ReadingMode from "../components/ReadingMode.jsx";
 
+// Lazy-load the per-doc extracts JSON once. The DossierView renders excerpts
+// + document profile sections when the entry for this event id exists.
+let _extractsP = null;
+function useExtracts(eid) {
+  const [state, setState] = useState({ loading: true, data: null });
+  useEffect(() => {
+    if (!_extractsP) {
+      _extractsP = fetch(`${import.meta.env.BASE_URL}dossier-extracts.json`)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+        .catch(() => ({}));
+    }
+    let cancelled = false;
+    setState({ loading: true, data: null });
+    _extractsP.then(all => { if (!cancelled) setState({ loading: false, data: all?.[eid] || null }); });
+    return () => { cancelled = true; };
+  }, [eid]);
+  return state;
+}
+
+// Source-color mapping for the per-page excerpt badges
+const SOURCE_COLOR = { vision: "#82B6FF", pdfjs: "#7CFFB2", ocr: "#FFD93D" };
+const FLAG_COLOR = {
+  date: "#FFD93D", clock: "#FFD93D", entity: "#82B6FF",
+  shape: "#7CFFB2", behavior: "#FF6B9D", sensor: "#B794F4", number: "#A0E8AF",
+};
+const FLAG_LABELS = { date: "DATE", clock: "TIME", entity: "ENTITY", shape: "SHAPE", behavior: "BEHAVIOR", sensor: "SENSOR", number: "NUMBER" };
+
 export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents }) {
   const [reading, setReading] = useState(false);
+  const [expandedPages, setExpandedPages] = useState(new Set());
+  const { data: extracts, loading: extractsLoading } = useExtracts(event?.id || "");
   if (!event) {
     return (
       <div className="px-3 sm:px-8 py-12 text-center">
@@ -89,6 +118,161 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
           <div className="mt-3 pt-3 border-t border-emerald-700/30 font-mono text-[11px] text-amber-300">◇ {event.note}</div>
         )}
       </div>
+
+      {/* DOCUMENT PROFILE — auto-derived from the full text */}
+      {extracts?.profile && (() => {
+        const p = extracts.profile;
+        const srcColor = SOURCE_COLOR[p.source] || "#7CFFB2";
+        const sigEntries = Object.entries(p.signatures || {}).filter(([, v]) => Object.keys(v).length > 0);
+        return (
+          <div className="border border-emerald-700/30 bg-black/30 rounded-sm p-4 sm:p-6 mb-5">
+            <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">▌ DOCUMENT PROFILE</div>
+              <div className="font-mono text-[9px] tracking-widest" style={{ color: srcColor }}>
+                {p.source?.toUpperCase()} · {p.pages}p · {p.chars?.toLocaleString()} chars
+              </div>
+            </div>
+
+            {/* Signatures (shape / behavior / sensor) */}
+            {sigEntries.length > 0 && (
+              <div className="mb-4">
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ SIGHTING SIGNATURES (from extracted text)</div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {sigEntries.map(([cat, vals]) => (
+                    <div key={cat}>
+                      <div className="font-mono text-[9px] text-emerald-600 tracking-widest mb-1">{cat.toUpperCase()}</div>
+                      <div className="flex flex-wrap gap-1">
+                        {Object.entries(vals).sort((a,b) => b[1]-a[1]).map(([term, n]) => (
+                          <span key={term} className="font-mono text-[10px] px-1.5 py-0.5 rounded-sm bg-emerald-950/60 border border-emerald-700/30 text-emerald-200">
+                            {term} <span className="text-emerald-700">×{n}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Entities mined from text */}
+            {p.entities?.length > 0 && (
+              <div className="mb-4">
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ ENTITIES MENTIONED (proper nouns, agencies)</div>
+                <div className="flex flex-wrap gap-1">
+                  {p.entities.slice(0, 18).map(en => (
+                    <span key={en.name} className="font-mono text-[10px] px-1.5 py-0.5 rounded-sm bg-blue-950/40 border border-blue-700/40 text-blue-200"
+                      title={`${en.count} mentions`}>
+                      {en.name} <span className="text-blue-500">×{en.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Dates referenced */}
+            {p.dates?.length > 0 && (
+              <div className="mb-4">
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ DATES REFERENCED</div>
+                <div className="flex flex-wrap gap-1">
+                  {p.dates.slice(0, 14).map((d, i) => (
+                    <span key={i} className="font-mono text-[10px] px-1.5 py-0.5 rounded-sm bg-amber-950/40 border border-amber-700/40 text-amber-200">
+                      {d}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Distinctive terms */}
+            {p.distinctive?.length > 0 && (
+              <div>
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TOP TERMS (by frequency)</div>
+                <div className="flex flex-wrap gap-1">
+                  {p.distinctive.slice(0, 14).map(t => (
+                    <span key={t.term} className="font-mono text-[10px] text-emerald-400"
+                      style={{ fontSize: `${10 + Math.min(6, t.count / 8)}px` }}
+                      title={`${t.count} occurrences`}>
+                      {t.term}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* EXCERPTS BY PAGE — the most information-dense sentences from each page */}
+      {extracts?.excerptsByPage && Object.keys(extracts.excerptsByPage).length > 0 && (() => {
+        const pageNums = Object.keys(extracts.excerptsByPage).map(Number).sort((a, b) => a - b);
+        const allExpanded = expandedPages.size === pageNums.length;
+        return (
+          <div className="border border-emerald-700/30 bg-black/30 rounded-sm p-4 sm:p-6 mb-5">
+            <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">▌ EXCERPTS BY PAGE  <span className="text-emerald-500 ml-1">({pageNums.length} pages with extractable content)</span></div>
+              <button onClick={() => setExpandedPages(allExpanded ? new Set() : new Set(pageNums))}
+                className="font-mono text-[10px] text-emerald-500 hover:text-amber-300 tracking-widest">
+                {allExpanded ? "▽ COLLAPSE ALL" : "▷ EXPAND ALL"}
+              </button>
+            </div>
+            <div className="space-y-1.5">
+              {pageNums.map(pn => {
+                const entry = extracts.excerptsByPage[pn];
+                const open = expandedPages.has(pn);
+                const sourceColor = SOURCE_COLOR[entry.source] || "#7CFFB2";
+                const preview = entry.top[0]?.text?.slice(0, 100);
+                return (
+                  <div key={pn} className="border-l border-emerald-700/40 bg-black/20">
+                    <button onClick={() => {
+                      const next = new Set(expandedPages);
+                      next.has(pn) ? next.delete(pn) : next.add(pn);
+                      setExpandedPages(next);
+                    }}
+                      className="w-full px-3 py-1.5 text-left flex items-baseline gap-3 hover:bg-emerald-900/20">
+                      <span className="font-mono text-[9px] tracking-widest text-emerald-700 w-12 shrink-0">
+                        PAGE {String(pn).padStart(3)}
+                      </span>
+                      {entry.source && (
+                        <span className="font-mono text-[8px] tracking-widest" style={{ color: sourceColor }}>
+                          {entry.source.toUpperCase()}
+                        </span>
+                      )}
+                      <span className="font-mono text-[10px] text-emerald-400/80 truncate flex-1 italic">
+                        {open ? "" : `"${preview}…"`}
+                      </span>
+                      <span className="font-mono text-[10px] text-emerald-700 shrink-0">
+                        {open ? "▽" : "▷"} {entry.top.length}
+                      </span>
+                    </button>
+                    {open && (
+                      <div className="px-3 py-2 space-y-2 bg-emerald-950/20">
+                        {entry.top.map((ex, i) => (
+                          <div key={i} className="font-mono text-[12px] text-emerald-100 leading-relaxed">
+                            <div className="flex flex-wrap gap-1 mb-1">
+                              {Object.keys(ex.flags || {}).filter(k => FLAG_LABELS[k] && ex.flags[k] === true).slice(0, 4).map(k => (
+                                <span key={k} className="text-[8px] tracking-widest px-1 rounded-sm"
+                                  style={{ color: FLAG_COLOR[k] || "#7CFFB2", backgroundColor: (FLAG_COLOR[k] || "#7CFFB2") + "15" }}>
+                                  {FLAG_LABELS[k]}
+                                </span>
+                              ))}
+                              <span className="text-[8px] text-emerald-700 ml-auto">score {ex.score}</span>
+                            </div>
+                            <div className="pl-2 border-l-2 border-amber-400/30 italic">"{ex.text}"</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
+      {extractsLoading && (
+        <div className="font-mono text-[10px] text-emerald-700 mb-5 text-center">◌ loading per-page excerpts…</div>
+      )}
 
       {reading && <ReadingMode event={event} onClose={() => setReading(false)} />}
 
