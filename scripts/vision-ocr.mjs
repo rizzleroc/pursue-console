@@ -45,11 +45,35 @@ const MAX_PAGES = process.env.MAX_PAGES ? Number(process.env.MAX_PAGES) : Infini
 const DPI_SCALE = Number(process.env.DPI_SCALE || 2.0);
 const SKIP = new Set((process.env.SKIP || "").split(",").filter(Boolean));
 const ONLY = new Set((process.env.ONLY || "").split(",").filter(Boolean));
-// Throttle: minimum wall-clock seconds between successive ChatGPT calls.
-// ChatGPT Plus rate-limits per-window; pacing at 1 call per ~25-30s keeps
-// us comfortably below the 80-msg/3-hour ceiling on GPT-5 vision.
-const PACE_SECS = Number(process.env.PACE_SECS || 25);
+// Humanized pacing. Fixed-interval calls are an automation tell — even
+// rate-limit-respecting ones. We jitter every interval and insert micro
+// breaks (a couple of minutes, every 5-11 pages) and macro breaks
+// (8-15 minutes, every 25-40 pages) to look like a real human reading,
+// transcribing, and stepping away for coffee / lunch.
+//
+// Env tunables:
+//   PACE_SECS                  base seconds between calls (default 25)
+//   JITTER                     ±fraction of base, default 0.6 → 10-40s gaps
+//   PAGES_PER_MICRO_BREAK      avg pages before a coffee break (default 8)
+//   MICRO_BREAK_MIN_SECS / MAX micro break duration range (default 90-240)
+//   PAGES_PER_MACRO_BREAK      avg pages before a meal break (default 32)
+//   MACRO_BREAK_MIN_SECS / MAX macro break duration range (default 480-900)
+const PACE_SECS                = Number(process.env.PACE_SECS || 25);
+const JITTER                   = Number(process.env.JITTER || 0.6);
+const PAGES_PER_MICRO_BREAK    = Number(process.env.PAGES_PER_MICRO_BREAK || 8);
+const MICRO_BREAK_MIN_SECS     = Number(process.env.MICRO_BREAK_MIN_SECS || 90);
+const MICRO_BREAK_MAX_SECS     = Number(process.env.MICRO_BREAK_MAX_SECS || 240);
+const PAGES_PER_MACRO_BREAK    = Number(process.env.PAGES_PER_MACRO_BREAK || 32);
+const MACRO_BREAK_MIN_SECS     = Number(process.env.MACRO_BREAK_MIN_SECS || 480);
+const MACRO_BREAK_MAX_SECS     = Number(process.env.MACRO_BREAK_MAX_SECS || 900);
+
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const rand  = (min, max) => min + Math.random() * (max - min);
+// Jittered gap target: ±JITTER around base, floored at 8s for sanity.
+const nextGapSecs = () => Math.max(8, rand(PACE_SECS * (1 - JITTER), PACE_SECS * (1 + JITTER)));
+// Drift the break thresholds by ±3 / ±6 so they don't fire on the same modulus
+let microThreshold = Math.round(PAGES_PER_MICRO_BREAK + rand(-3, 3));
+let macroThreshold = Math.round(PAGES_PER_MACRO_BREAK + rand(-6, 6));
 
 async function loadToken() {
   if (process.env.WHIPGEN_TOKEN) return process.env.WHIPGEN_TOKEN;
@@ -157,14 +181,37 @@ let totalPages = 0, totalCached = 0, totalOcrd = 0, totalErr = 0;
 const tAll = Date.now();
 let lastCallEndedAt = 0;          // for pacing
 let consecutiveFetchFailures = 0; // for adaptive backoff
+let callsSinceMicro = 0;          // counter toward next coffee break
+let callsSinceMacro = 0;          // counter toward next meal break
 
 async function pacedCall(fn) {
-  // Enforce minimum gap between successive ChatGPT calls.
+  // Macro break first (rarer, longer — like stepping away for lunch)
+  if (callsSinceMacro >= macroThreshold) {
+    const secs = rand(MACRO_BREAK_MIN_SECS, MACRO_BREAK_MAX_SECS);
+    console.log(`\n  ☕☕ macro break — ${(secs/60).toFixed(1)} min (after ${callsSinceMacro} calls)`);
+    await sleep(secs * 1000);
+    callsSinceMacro = 0; callsSinceMicro = 0;
+    macroThreshold = Math.round(PAGES_PER_MACRO_BREAK + rand(-6, 6));
+    microThreshold = Math.round(PAGES_PER_MICRO_BREAK + rand(-3, 3));
+  } else if (callsSinceMicro >= microThreshold) {
+    // Micro break (more frequent, shorter — coffee, restroom, distraction)
+    const secs = rand(MICRO_BREAK_MIN_SECS, MICRO_BREAK_MAX_SECS);
+    console.log(`\n  ☕  micro break — ${(secs/60).toFixed(1)} min (after ${callsSinceMicro} calls)`);
+    await sleep(secs * 1000);
+    callsSinceMicro = 0;
+    microThreshold = Math.round(PAGES_PER_MICRO_BREAK + rand(-3, 3));
+  }
+
+  // Jittered gap between successive calls so cadence isn't fixed-period
   const gap = Date.now() - lastCallEndedAt;
-  if (gap < PACE_SECS * 1000) await sleep(PACE_SECS * 1000 - gap);
+  const targetMs = nextGapSecs() * 1000;
+  if (gap < targetMs) await sleep(targetMs - gap);
+
   try {
     const out = await fn();
     consecutiveFetchFailures = 0;
+    callsSinceMicro++;
+    callsSinceMacro++;
     return out;
   } catch (e) {
     if (/fetch failed|ECONN|ETIMEDOUT/i.test(e.message || "")) {
