@@ -16,7 +16,11 @@
     "corpus:vision": "node scripts/vision-ocr.mjs",
     "corpus:visuals": "node scripts/vision-visuals-augment.mjs",
     "corpus:feed": "node scripts/build-live-feed.mjs",
+    "corpus:embed": "python scripts/build-embeddings.py",
+    "corpus:extracts": "node scripts/build-dossier-extracts.mjs",
+    "corpus:texts": "node scripts/build-text-files.mjs",
     "corpus": "npm run corpus:fetch && npm run corpus:extract",
+    "corpus:rebuild": "npm run corpus:texts && npm run corpus:embed && npm run corpus:extracts && npm run corpus:feed",
     "contrib:validate": "node scripts/validate-contribution.mjs",
     "contrib:validate:semantic": "python scripts/validate-contribution-semantic.py",
     "contrib:validate:all": "npm run contrib:validate && npm run contrib:validate:semantic"
