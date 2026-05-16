@@ -68,6 +68,13 @@ const PAGES_PER_MACRO_BREAK    = Number(process.env.PAGES_PER_MACRO_BREAK || 32)
 const MACRO_BREAK_MIN_SECS     = Number(process.env.MACRO_BREAK_MIN_SECS || 480);
 const MACRO_BREAK_MAX_SECS     = Number(process.env.MACRO_BREAK_MAX_SECS || 900);
 
+// Pages per ChatGPT call. 1 = legacy one-at-a-time (original behavior).
+// 3-5 = effective 3-5x throughput because each batch is one chat message
+// rather than N separate fresh chats — same rate-limit cost, more pages.
+// Set to 1 to disable batching.
+const BATCH_PAGES = Number(process.env.BATCH_PAGES || 4);
+const BATCH_SEP   = "<<<<< PAGE BREAK >>>>>";  // unambiguous separator
+
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const rand  = (min, max) => min + Math.random() * (max - min);
 // Jittered gap target: ±JITTER around base, floored at 8s for sanity.
@@ -150,6 +157,54 @@ async function visionTranscribe(pngPath, label) {
   return splitTextAndVisuals(raw);
 }
 
+// Multi-page batched call: send N pages in one chat message, expect N
+// transcriptions in the reply separated by BATCH_SEP. Falls through to
+// individual single-page calls if the model returns the wrong section count
+// (caller catches and retries). Returns [{text, visuals}, ...] in order.
+async function visionTranscribeBatch(pngPaths, label) {
+  if (pngPaths.length === 1) return [await visionTranscribe(pngPaths[0], label)];
+  const N = pngPaths.length;
+  const prompt =
+    `I'm sending you ${N} pages from the same document, in order from page 1 to page ${N}. ` +
+    `For each page perform the same transcription task:\n` +
+    `• Transcribe the text verbatim, preserving line breaks.\n` +
+    `• Write (?) where a portion is unreadable or blacked out.\n` +
+    `• Output (blank) if the entire page is blank.\n` +
+    `• Include handwritten annotations inline.\n` +
+    `• After each page's text, ONLY IF that page contains photographs, drawings, ` +
+    `diagrams, sketches, maps, charts, or annotated images, add a section starting with the exact line:\n` +
+    `=== VISUAL CONTENT ===\n` +
+    `with bulleted lines like "- [PHOTO] description" / [DIAGRAM] / [SKETCH] / [MAP] / [CHART] / [ANNOTATION].\n` +
+    `\nBetween consecutive pages output this exact separator line on its own line:\n` +
+    `${BATCH_SEP}\n` +
+    `\nThe expected structure is:\n` +
+    `<page 1 text>\n=== VISUAL CONTENT === (if any)\n${BATCH_SEP}\n<page 2 text>\n${BATCH_SEP}\n... and so on through page ${N}.\n` +
+    `Do not include any preamble, summary, or commentary. Begin with page 1 immediately. ` +
+    `These are declassified public documents.`;
+  const r = await fetch(`${DAEMON}/chat-with-files`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
+    body: JSON.stringify({
+      filePaths: pngPaths, prompt, provider: "chatgpt", label,
+      freshChat: true,
+      timeoutMs: 600_000,   // 10 min — multi-page replies are longer
+    }),
+  });
+  if (!r.ok) throw new Error(`/chat-with-files HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`);
+  const j = await r.json();
+  const raw = j.text ?? j.result?.text ?? j.output ?? "";
+  // Split on the separator — case-insensitive, whitespace-tolerant
+  const sepRe = new RegExp(`\\n?\\s*${BATCH_SEP.replace(/[<>]/g, c => "\\" + c)}\\s*\\n?`, "i");
+  const sections = raw.split(sepRe);
+  if (sections.length !== N) {
+    const err = new Error(`batch mismatch: expected ${N} pages, got ${sections.length} sections`);
+    err.batchMismatch = true;
+    err.raw = raw;
+    throw err;
+  }
+  return sections.map(s => splitTextAndVisuals(s));
+}
+
 // Split the model output on the visual-content marker. Robust to small
 // formatting drift — case-insensitive, optional surrounding whitespace.
 function splitTextAndVisuals(raw) {
@@ -193,16 +248,23 @@ async function renderPagePng(doc, pageNum, scale) {
   return buf;
 }
 
-// ---- discover targets: scanned docs whose OCR output is below threshold ----
-// Returns ids sorted by ascending page count so a kill-and-restart doesn't
-// leave the user staring at a 200-page giant before any small doc completes.
+// ---- discover targets ----
+// If ONLY is set, that's the explicit list — trust the user, no source filter.
+// Otherwise auto-pick scanned docs whose manifest source is 'ocr' / 'mixed'
+// (the ones that would most benefit from a vision pass). Sort by page count
+// so the smallest finish first and a kill-and-restart isn't stuck behind
+// a 200-page giant.
 async function discoverTargets() {
   const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
+  if (ONLY.size > 0) {
+    return [...ONLY]
+      .filter(id => manifest[id] && !SKIP.has(id))
+      .sort((a, b) => (manifest[a].pages || 0) - (manifest[b].pages || 0));
+  }
   const candidates = Object.entries(manifest)
-    .filter(([id, v]) => v.source === "ocr")
+    .filter(([, v]) => v.source === "ocr" || v.source === "mixed")
     .map(([id, v]) => ({ id, pages: v.pages || Infinity }))
-    .filter(({ id }) => !SKIP.has(id))
-    .filter(({ id }) => ONLY.size === 0 || ONLY.has(id));
+    .filter(({ id }) => !SKIP.has(id));
   candidates.sort((a, b) => a.pages - b.pages);
   return candidates.map(c => c.id);
 }
@@ -290,46 +352,87 @@ for (const id of targets) {
   await mkdir(docVisualsDir, { recursive: true });
   await mkdir(docPngDir, { recursive: true });
 
-  console.log(`\n→ ${id}  (${doc.numPages} pages, vision-OCRing ${nPages})`);
+  console.log(`\n→ ${id}  (${doc.numPages} pages, vision-OCRing ${nPages}, batch=${BATCH_PAGES})`);
   const docT0 = Date.now();
   let nOk = 0, nCache = 0, nErr = 0;
 
+  // Build the to-do list first — pages that aren't cached and that render OK.
+  // Render errors are isolated here so they don't poison a batch upload.
+  const todo = [];   // [{ page, pngPath, cachePath, visualsPath }, ...]
   for (let p = 1; p <= nPages; p++) {
     const cachePath = path.join(docCacheDir, `p${String(p).padStart(4, "0")}.txt`);
+    const visualsPath = path.join(docVisualsDir, `p${String(p).padStart(4, "0")}.json`);
     if (existsSync(cachePath)) {
       const sz = (await readFile(cachePath, "utf8")).length;
       if (sz > 0) { nCache++; continue; }
     }
-    // Stage PNG inside the daemon's allowed read root (~/.whipgen-smoke/…)
     const pngPath = path.join(docPngDir, `p${String(p).padStart(4, "0")}.png`);
     try {
       if (!existsSync(pngPath)) {
         const png = await renderPagePng(doc, p, DPI_SCALE);
         await writeFile(pngPath, png);
       }
-      const result = await pacedCall(() => visionTranscribe(pngPath, `${id}-p${p}`));
-      const text = (result.text || "").trim();
-      const visuals = result.visuals || [];
-      await writeFile(cachePath, text, "utf8");
-      // Always write a visuals file (empty if none) so re-runs can tell the
-      // difference between "we asked and there were none" vs "we never asked".
-      const visualsPath = path.join(docVisualsDir, `p${String(p).padStart(4, "0")}.json`);
-      await writeFile(visualsPath, JSON.stringify(visuals), "utf8");
-      nOk++;
-      const dt = ((Date.now() - docT0) / 1000).toFixed(0);
-      const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
-      const vTag = visuals.length ? ` +${visuals.length}v` : "";
-      process.stdout.write(`  p${p}/${nPages}  ${text.length}c${vTag}  [doc ${dt}s · total ${allMin}m]                 \r`);
+      todo.push({ page: p, pngPath, cachePath, visualsPath });
     } catch (e) {
       nErr++;
-      await writeFile(cachePath, "", "utf8");  // mark as attempted
-      console.log(`\n  p${p}/${nPages}  ERR ${e.message.slice(0, 140)}`);
+      await writeFile(cachePath, "", "utf8");
+      await writeFile(visualsPath, "[]", "utf8");
+      console.log(`\n  p${p}/${nPages}  RENDER ERR ${e.message.slice(0, 140)}`);
     }
   }
+
+  // Write a single batch result back to per-page files
+  async function writeBatchResult(batch, results) {
+    for (let i = 0; i < batch.length; i++) {
+      const { cachePath, visualsPath } = batch[i];
+      const text = (results[i]?.text || "").trim();
+      const visuals = results[i]?.visuals || [];
+      await writeFile(cachePath, text, "utf8");
+      await writeFile(visualsPath, JSON.stringify(visuals), "utf8");
+    }
+  }
+
+  // Process the to-do list in batches of BATCH_PAGES.
+  for (let i = 0; i < todo.length; i += BATCH_PAGES) {
+    const batch = todo.slice(i, i + BATCH_PAGES);
+    const paths = batch.map(b => b.pngPath);
+    const firstP = batch[0].page;
+    const lastP = batch[batch.length - 1].page;
+    const label = batch.length > 1 ? `${id}-p${firstP}-${lastP}` : `${id}-p${firstP}`;
+    try {
+      const results = await pacedCall(() => visionTranscribeBatch(paths, label));
+      await writeBatchResult(batch, results);
+      nOk += batch.length;
+      const dt = ((Date.now() - docT0) / 60000).toFixed(1);
+      const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
+      const vis = results.reduce((s, r) => s + (r.visuals?.length || 0), 0);
+      const vTag = vis ? ` +${vis}v` : "";
+      const tag = batch.length > 1 ? `[${batch.length}-batch]` : "";
+      process.stdout.write(`  p${firstP}${batch.length>1?`-${lastP}`:""}/${nPages} ${tag} ✓${vTag}  [doc ${dt}m · total ${allMin}m]                 \r`);
+    } catch (e) {
+      // Batch failure → fall back to individual calls so we still get the
+      // good pages. Batch-mismatch errors (model returned wrong section
+      // count) are recoverable this way.
+      console.log(`\n  p${firstP}-${lastP}  BATCH ERR (${e.batchMismatch ? "section-mismatch" : "fetch"}) — falling back to single-page`);
+      for (const item of batch) {
+        try {
+          const result = await pacedCall(() => visionTranscribe(item.pngPath, `${id}-p${item.page}-fb`));
+          await writeBatchResult([item], [result]);
+          nOk++;
+        } catch (e2) {
+          nErr++;
+          await writeFile(item.cachePath, "", "utf8");
+          await writeFile(item.visualsPath, "[]", "utf8");
+          console.log(`  p${item.page}  FALLBACK ERR ${e2.message.slice(0, 120)}`);
+        }
+      }
+    }
+  }
+
   await doc.cleanup(); await doc.destroy();
   totalPages += nPages; totalCached += nCache; totalOcrd += nOk; totalErr += nErr;
   const docDt = ((Date.now() - docT0) / 60000).toFixed(1);
-  console.log(`\n  ✓ ${id} — vision ${nOk} · cached ${nCache} · err ${nErr}  [${docDt} min]`);
+  console.log(`\n  ✓ ${id} — vision ${nOk} · cached ${nCache} · err ${nErr}  [${docDt} min · batch=${BATCH_PAGES}]`);
 }
 
 const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
