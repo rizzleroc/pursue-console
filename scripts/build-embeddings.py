@@ -198,6 +198,11 @@ def main():
         body_full = raw.split("\n---\n", 1)[1] if "\n---\n" in raw else raw
         for page, body, marker_src in page_chunks_of(body_full):
             source = marker_src or doc_source  # vision marker wins
+            # === Page N (visual) === blocks describe images/diagrams/sketches.
+            # They are vision-quality by construction and should always pass
+            # the filter; we tag kind='visual' so the UI and search can
+            # display them distinctly from prose pages.
+            is_visual = marker_src == "visual"
             for piece in slice_long(body):
                 if len(piece) < MIN_CHUNK_CHARS:
                     continue
@@ -205,7 +210,8 @@ def main():
                 # Vision-OCR text is high-quality by construction (GPT
                 # outputs readable English). Don't quality-filter it —
                 # we'd false-reject genuine '(blank)' or short pages.
-                if source != "vision" and q < MIN_QUALITY:
+                # Visual descriptions also always pass.
+                if not is_visual and source != "vision" and q < MIN_QUALITY:
                     rejected_by_source[source] = rejected_by_source.get(source, 0) + 1
                     if len(rejected_chunks) < 5:
                         rejected_chunks.append((eid, page, q, piece[:120].replace("\n"," ")))
@@ -213,11 +219,11 @@ def main():
                 chunks.append({
                     "eventId": eid,
                     "page": page,
-                    "kind": "page",
+                    "kind": "visual" if is_visual else "page",
                     "body": piece,
                     "snippet": piece[:240].replace("\n", " ").strip(),
-                    "source": source,
-                    "quality": round(q, 3),
+                    "source": "vision-visual" if is_visual else source,
+                    "quality": 1.0 if is_visual else round(q, 3),
                 })
 
     print(f"[embeddings] kept {len(chunks)} chunks, rejected {sum(rejected_by_source.values())} below q≥{MIN_QUALITY} "

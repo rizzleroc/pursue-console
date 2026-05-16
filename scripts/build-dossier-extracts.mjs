@@ -228,6 +228,12 @@ function distinctiveTerms(allText) {
 // ----- main -----
 const manifest = JSON.parse(await readFile(path.join(TEXT_DIR, "manifest.json"), "utf8"));
 const files = (await readdir(TEXT_DIR)).filter(f => f.endsWith(".txt"));
+// Visual descriptions, if any, were written alongside the manifest by
+// scripts/build-text-files.mjs. Keyed by eventId → { page: [{kind, description}] }.
+let visualsByEvent = {};
+try {
+  visualsByEvent = JSON.parse(await readFile(path.join(ROOT, "public/visuals.json"), "utf8"));
+} catch {}
 
 const out = {};
 let totalExcerpts = 0, totalDocs = 0;
@@ -243,6 +249,16 @@ for (const f of files) {
   // per-page excerpts
   const excerptsByPage = {};
   for (const p of pages) {
+    // Visual-content pages produce their own listing instead of running
+    // through the prose-sentence heuristic — every bullet is intentional.
+    if (p.source === "visual") {
+      const items = p.body.split(/\n+/).map(s => s.trim()).filter(s => /^[-•*]\s*\[/.test(s)).map(s => ({ text: s.replace(/^[-•*]\s*/, ""), score: 5, flags: { visual: true } }));
+      if (items.length) {
+        excerptsByPage[p.page] = { source: "visual", top: items.slice(0, 6) };
+        totalExcerpts += items.length;
+      }
+      continue;
+    }
     const top = pageExcerpts(p.body, 3);
     if (top.length) {
       excerptsByPage[p.page] = { source: p.source || null, top };
@@ -251,6 +267,13 @@ for (const f of files) {
   }
 
   // doc profile
+  const pageVisuals = visualsByEvent[eid] || {};
+  const allVisuals = Object.values(pageVisuals).flat();
+  const visualKinds = {};
+  for (const v of allVisuals) {
+    const k = (v.kind || "image").toLowerCase();
+    visualKinds[k] = (visualKinds[k] || 0) + 1;
+  }
   const profile = {
     source: manifest[eid]?.source || "unknown",
     pages: manifest[eid]?.pages || pages.length,
@@ -259,9 +282,12 @@ for (const f of files) {
     dates: mineDates(allBody),
     signatures: aggregateSignatures(allBody),
     distinctive: distinctiveTerms(allBody),
+    visualKinds,                              // { photo: 3, diagram: 1, ... }
+    visualCount: allVisuals.length,           // total visual elements
+    visualPages: Object.keys(pageVisuals).length, // pages with at least one visual
   };
 
-  out[eid] = { profile, excerptsByPage };
+  out[eid] = { profile, excerptsByPage, visuals: pageVisuals };
   totalDocs++;
 }
 

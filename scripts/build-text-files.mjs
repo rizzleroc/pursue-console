@@ -15,7 +15,12 @@ const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data-raw");
 const CACHE_DIR = path.join(RAW_DIR, ".ocr-cache");
 const VISION_DIR = path.join(RAW_DIR, ".vision-cache");
+const VISUALS_DIR = path.join(RAW_DIR, ".vision-visuals-cache");
 const OUT_DIR = path.join(ROOT, "public/text");
+// Sidecar JSON: per-event { page: [{kind, description}, ...] } map of visual
+// elements detected on each page. Consumed by build-embeddings, build-dossier-
+// extracts, and the DossierView "VISUAL CONTENT" panel.
+const VISUALS_OUT = path.join(ROOT, "public/visuals.json");
 
 const { EVENTS } = await import("../src/data/events.js");
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
@@ -53,7 +58,22 @@ async function fromCaches(id) {
       if (text) pageMap.set(pageNum, { text, source: "vision" }); // overwrite OCR
     }
   }
-  if (!pageMap.size) return null;
+  // Optional visuals sidecar — vision pages may have associated
+  // [PHOTO]/[DIAGRAM]/etc descriptions stored as JSON.
+  const visualsDocDir = path.join(VISUALS_DIR, id);
+  const pageVisuals = {};   // pageNum -> [{kind, description}]
+  if (existsSync(visualsDocDir)) {
+    for (const f of await readdir(visualsDocDir)) {
+      if (!/^p\d+\.json$/.test(f)) continue;
+      const pageNum = Number(f.match(/^p(\d+)/)[1]);
+      try {
+        const arr = JSON.parse(await readFile(path.join(visualsDocDir, f), "utf8"));
+        if (Array.isArray(arr) && arr.length) pageVisuals[pageNum] = arr;
+      } catch {}
+    }
+  }
+
+  if (!pageMap.size) return { pageVisuals };  // unusual: visuals exist but no text
 
   const pages = [...pageMap.keys()].sort((a, b) => a - b);
   const parts = [];
@@ -63,10 +83,17 @@ async function fromCaches(id) {
     if (e.source === "vision") visionCount++;
     const marker = e.source === "vision" ? `=== Page ${pageNum} (vision) ===` : `=== Page ${pageNum} ===`;
     parts.push(`\n\n${marker}\n\n${e.text}`);
+    // If this page has visuals, append them as a clearly-marked block so the
+    // build-embeddings tokenizer + build-dossier-extracts can find them too.
+    const v = pageVisuals[pageNum];
+    if (v && v.length) {
+      const lines = v.map(x => `- [${(x.kind || "image").toUpperCase()}] ${x.description}`).join("\n");
+      parts.push(`\n=== Page ${pageNum} (visual) ===\n\n${lines}`);
+    }
   }
   // Source label: 'vision' if all pages from vision, 'mixed' if both, 'ocr' otherwise
   const source = visionCount === pages.length ? "vision" : (visionCount > 0 ? "mixed" : "ocr");
-  return { text: parts.join("\n"), source, pages: pages.length };
+  return { text: parts.join("\n"), source, pages: pages.length, pageVisuals };
 }
 // Keep the old name working for any external callers.
 const fromOcrCache = fromCaches;
@@ -99,16 +126,28 @@ async function fromPdfText(id) {
 }
 
 const manifest = {};
-let wrote = 0, skipped = 0;
+const allVisuals = {};   // eid -> { page -> [{kind, description}] }
+let wrote = 0, skipped = 0, visualPages = 0, totalVisuals = 0;
 
 for (const ev of EVENTS) {
   let result = null;
   // Prefer OCR cache when present (only exists if PDF was scanned and OCR'd)
   result = await fromOcrCache(ev.id);
   // Fall back to PDF text layer
-  if (!result) result = await fromPdfText(ev.id);
+  if (!result || !result.text) {
+    const pdf = await fromPdfText(ev.id);
+    if (pdf) result = { ...pdf, pageVisuals: result?.pageVisuals || {} };
+  }
 
-  if (!result) {
+  if (!result) { skipped++; continue; }
+
+  // Capture visuals sidecar regardless of text source.
+  if (result.pageVisuals && Object.keys(result.pageVisuals).length) {
+    allVisuals[ev.id] = result.pageVisuals;
+    visualPages += Object.keys(result.pageVisuals).length;
+    totalVisuals += Object.values(result.pageVisuals).reduce((s, arr) => s + arr.length, 0);
+  }
+  if (!result.text) {
     skipped++;
     continue;
   }
@@ -117,8 +156,11 @@ for (const ev of EVENTS) {
   await writeFile(path.join(OUT_DIR, `${ev.id}.txt`), full, "utf8");
   manifest[ev.id] = { source: result.source, pages: result.pages, chars: full.length };
   wrote++;
-  console.log(`  ✓ ${ev.id.padEnd(28)} ${result.source.padEnd(6)} ${result.pages}p ${full.length}c`);
+  const vTag = result.pageVisuals && Object.keys(result.pageVisuals).length
+    ? ` (+${Object.keys(result.pageVisuals).length}p visuals)` : "";
+  console.log(`  ✓ ${ev.id.padEnd(28)} ${result.source.padEnd(6)} ${result.pages}p ${full.length}c${vTag}`);
 }
 
 await writeFile(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 0), "utf8");
-console.log(`\n[text-files] wrote ${wrote}, skipped ${skipped} (no PDF or unparseable).`);
+await writeFile(VISUALS_OUT, JSON.stringify(allVisuals), "utf8");
+console.log(`\n[text-files] wrote ${wrote}, skipped ${skipped}.  visuals: ${totalVisuals} elements across ${visualPages} pages.`);

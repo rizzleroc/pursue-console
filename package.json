@@ -14,6 +14,7 @@
     "corpus:extract": "node scripts/extract-text.mjs",
     "corpus:ocr": "node scripts/ocr-scanned.mjs",
     "corpus:vision": "node scripts/vision-ocr.mjs",
+    "corpus:visuals": "node scripts/vision-visuals-augment.mjs",
     "corpus:feed": "node scripts/build-live-feed.mjs",
     "corpus": "npm run corpus:fetch && npm run corpus:extract",
     "contrib:validate": "node scripts/validate-contribution.mjs",

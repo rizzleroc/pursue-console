@@ -202,6 +202,56 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
         );
       })()}
 
+      {/* VISUAL CONTENT — photos / diagrams / sketches / annotations
+          identified on each page by the vision pass. Surfaces non-text
+          content that the search index would otherwise underweight. */}
+      {extracts?.visuals && Object.keys(extracts.visuals).length > 0 && (() => {
+        const pages = Object.keys(extracts.visuals).map(Number).sort((a, b) => a - b);
+        const kindColors = { photo: "#82B6FF", diagram: "#7CFFB2", sketch: "#FFD93D", map: "#B794F4", chart: "#FF9F45", annotation: "#FF6B9D" };
+        return (
+          <div className="border border-cyan-700/30 bg-cyan-950/10 rounded-sm p-4 sm:p-6 mb-5">
+            <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
+              <div className="font-mono text-[9px] text-cyan-400 tracking-widest">
+                ▌ VISUAL CONTENT  <span className="text-emerald-600 ml-1">
+                  ({extracts.profile?.visualCount || 0} elements across {pages.length} page{pages.length===1?"":"s"})
+                </span>
+              </div>
+              {extracts.profile?.visualKinds && (
+                <div className="flex flex-wrap gap-1">
+                  {Object.entries(extracts.profile.visualKinds).sort((a,b)=>b[1]-a[1]).map(([k, n]) => (
+                    <span key={k} className="font-mono text-[9px] tracking-widest px-1.5 py-0.5 rounded-sm"
+                      style={{ color: kindColors[k] || "#7CFFB2", backgroundColor: (kindColors[k] || "#7CFFB2") + "15", border: `1px solid ${(kindColors[k] || "#7CFFB2")}40` }}>
+                      {k.toUpperCase()} ×{n}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              {pages.map(pn => (
+                <div key={pn} className="border-l border-cyan-700/40 pl-3">
+                  <div className="font-mono text-[9px] tracking-widest text-cyan-700 mb-1">PAGE {pn}</div>
+                  <ul className="space-y-1">
+                    {extracts.visuals[pn].map((v, i) => {
+                      const k = (v.kind || "image").toLowerCase();
+                      return (
+                        <li key={i} className="font-mono text-[11px] text-cyan-100/90 leading-relaxed">
+                          <span className="text-[9px] tracking-widest mr-2 px-1 py-0.5 rounded-sm"
+                            style={{ color: kindColors[k] || "#7CFFB2", backgroundColor: (kindColors[k] || "#7CFFB2") + "20" }}>
+                            {k.toUpperCase()}
+                          </span>
+                          {v.description}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* EXCERPTS BY PAGE — the most information-dense sentences from each page */}
       {extracts?.excerptsByPage && Object.keys(extracts.excerptsByPage).length > 0 && (() => {
         const pageNums = Object.keys(extracts.excerptsByPage).map(Number).sort((a, b) => a - b);

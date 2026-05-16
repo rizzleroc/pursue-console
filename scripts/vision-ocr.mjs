@@ -36,6 +36,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data-raw");
 const CACHE_DIR = path.join(RAW_DIR, ".vision-cache");
+const VISUALS_DIR = path.join(RAW_DIR, ".vision-visuals-cache");
 // PNG staging area inside the daemon's allowed read root (homedir).
 // The daemon won't accept paths outside ALLOWED_READ_ROOTS (defaults to ~).
 const PNG_STAGE = path.join(os.homedir(), ".whipgen-smoke", "pursue-console");
@@ -97,13 +98,35 @@ async function daemonStatus() {
 // bracket-keywords prompt with the explicit "declassified public
 // document" disclaimer produces faithful verbatim transcription with
 // (?) for genuinely unreadable spans. Don't regress this.
+// Returns { text, visuals } where:
+//   text    — verbatim text transcription (what previous prompt produced)
+//   visuals — array of { kind, description } if the page contains photos,
+//             diagrams, sketches, maps, or annotated images; empty otherwise.
+//
+// Both parts come back from a single ChatGPT-vision call. We split on a
+// known marker so legacy text-only cache files remain valid.
 async function visionTranscribe(pngPath, label) {
   const prompt =
     "Please transcribe the text shown in this image so I can search the content. " +
     "Output only the text exactly as written, preserving line breaks. " +
     "If a portion is unreadable or has been blacked out, write (?) in its place. " +
     "If the page is entirely blank, output: (blank). " +
-    "If you can read handwritten annotations, include them inline. " +
+    "If you can read handwritten annotations, include them inline.\n\n" +
+    "After the transcribed text, if and only if the page contains any " +
+    "photographs, drawings, diagrams, sketches, maps, charts, or annotated " +
+    "images, add a section beginning with the exact line:\n" +
+    "=== VISUAL CONTENT ===\n" +
+    "and under it one bulleted line per visual element, prefixed with the " +
+    "kind in brackets. Use these kinds: [PHOTO], [DIAGRAM], [SKETCH], " +
+    "[MAP], [CHART], [ANNOTATION]. Describe what is shown — subjects, " +
+    "context, captions, arrows, circled regions, scale, anything that " +
+    "would help someone searching for the visual content. Example:\n" +
+    "- [PHOTO] black-and-white aerial photograph of a desert airstrip with " +
+    "two parked aircraft, no caption visible.\n" +
+    "- [ANNOTATION] red ink circle and arrow drawn over a small dot in the " +
+    "upper-right quadrant of the photo.\n" +
+    "If there are no visual elements at all, omit the VISUAL CONTENT " +
+    "section entirely — do not include the marker.\n\n" +
     "This is a declassified public document.";
   const r = await fetch(`${DAEMON}/analyze`, {
     method: "POST",
@@ -123,7 +146,27 @@ async function visionTranscribe(pngPath, label) {
   }
   const j = await r.json();
   // Daemon returns { text, jobId, durationMs, ... }
-  return j.text ?? j.result?.text ?? j.output ?? "";
+  const raw = j.text ?? j.result?.text ?? j.output ?? "";
+  return splitTextAndVisuals(raw);
+}
+
+// Split the model output on the visual-content marker. Robust to small
+// formatting drift — case-insensitive, optional surrounding whitespace.
+function splitTextAndVisuals(raw) {
+  const re = /\n?\s*===\s*VISUAL\s+CONTENT\s*===\s*\n?/i;
+  const m = raw.match(re);
+  if (!m) return { text: raw.trim(), visuals: [] };
+  const text = raw.slice(0, m.index).trim();
+  const tail = raw.slice(m.index + m[0].length).trim();
+  // Parse bulleted lines: `- [KIND] description`
+  const visuals = [];
+  for (const line of tail.split(/\n+/)) {
+    const lm = line.trim().match(/^[-•*]\s*\[([A-Z]+)\]\s*(.+)$/);
+    if (lm) {
+      visuals.push({ kind: lm[1].toLowerCase(), description: lm[2].trim() });
+    }
+  }
+  return { text, visuals };
 }
 
 // ---- pdf → png rendering (same factory as ocr-scanned.mjs) ----
@@ -240,9 +283,11 @@ for (const id of targets) {
     standardFontDataUrl: PDFJS_FONTS_URL,
   }).promise;
   const nPages = Math.min(doc.numPages, MAX_PAGES);
-  const docCacheDir = path.join(CACHE_DIR, id);
-  const docPngDir = path.join(PNG_STAGE, id);
+  const docCacheDir   = path.join(CACHE_DIR, id);
+  const docVisualsDir = path.join(VISUALS_DIR, id);
+  const docPngDir     = path.join(PNG_STAGE, id);
   await mkdir(docCacheDir, { recursive: true });
+  await mkdir(docVisualsDir, { recursive: true });
   await mkdir(docPngDir, { recursive: true });
 
   console.log(`\n→ ${id}  (${doc.numPages} pages, vision-OCRing ${nPages})`);
@@ -262,13 +307,19 @@ for (const id of targets) {
         const png = await renderPagePng(doc, p, DPI_SCALE);
         await writeFile(pngPath, png);
       }
-      const t = await pacedCall(() => visionTranscribe(pngPath, `${id}-p${p}`));
-      await writeFile(cachePath, (t || "").trim(), "utf8");
+      const result = await pacedCall(() => visionTranscribe(pngPath, `${id}-p${p}`));
+      const text = (result.text || "").trim();
+      const visuals = result.visuals || [];
+      await writeFile(cachePath, text, "utf8");
+      // Always write a visuals file (empty if none) so re-runs can tell the
+      // difference between "we asked and there were none" vs "we never asked".
+      const visualsPath = path.join(docVisualsDir, `p${String(p).padStart(4, "0")}.json`);
+      await writeFile(visualsPath, JSON.stringify(visuals), "utf8");
       nOk++;
       const dt = ((Date.now() - docT0) / 1000).toFixed(0);
       const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
-      const tlen = (t || "").length;
-      process.stdout.write(`  p${p}/${nPages}  ${tlen}c  [doc ${dt}s · total ${allMin}m]                 \r`);
+      const vTag = visuals.length ? ` +${visuals.length}v` : "";
+      process.stdout.write(`  p${p}/${nPages}  ${text.length}c${vTag}  [doc ${dt}s · total ${allMin}m]                 \r`);
     } catch (e) {
       nErr++;
       await writeFile(cachePath, "", "utf8");  // mark as attempted
