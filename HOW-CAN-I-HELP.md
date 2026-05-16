@@ -4,15 +4,39 @@ A SETI@home-style distributed contribution model for the PURSUE corpus. Anyone w
 
 This document is the **architecture spec + quick-start.** If you just want to volunteer:
 
+### One-command setup (lean, ~10 MB instead of the full ~1 GB repo)
+
+**macOS / Linux**
+```bash
+curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash
+```
+
+**Windows PowerShell**
+```powershell
+iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex
+```
+
+That sparse-checkouts only the directories a helper needs (`pursue-vision-mcp/` + `scripts/volunteer.mjs` + the events catalog + the docs you're reading) and installs the daemon. Skips the static assets (90 MB of ORT WASM, the corpus text, embeddings) that helpers never need.
+
+Then:
+
+```bash
+cd pursue-helper
+npm start --prefix pursue-vision-mcp                 # launches Chrome + daemon
+# in another terminal:
+node scripts/volunteer.mjs --my-handle=YOU --slice=20
+```
+
+### Manual setup (if you want the full repo)
+
 ```bash
 git clone https://github.com/rizzleroc/pursue-console
 cd pursue-console/pursue-vision-mcp
 npm install
-npm start                       # launches Chrome, starts the daemon
-
-# In another terminal, ask the daemon to pick up work:
+npm start
+# in another terminal:
 cd ..
-node pursue-vision-mcp/volunteer.mjs --my-handle=<your-github-handle> --slice=20
+node scripts/volunteer.mjs --my-handle=YOU --slice=20
 ```
 
 That's it. The script:

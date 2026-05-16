@@ -42,11 +42,17 @@ The repo includes a minimal open-source vision-OCR daemon at [`pursue-vision-mcp
 
 We publish a live work queue at `public/work-available.json`. Run the volunteer script and your machine pulls a slice from the queue, OCRs it through your own ChatGPT session, and opens a PR back. The maintainer's one ChatGPT Plus account stops being the bottleneck.
 
+**One-command setup (only ~10 MB instead of cloning the full repo):**
+
 ```bash
-git clone https://github.com/rizzleroc/pursue-console
-cd pursue-console/pursue-vision-mcp && npm install && npm start
-cd .. && npm run volunteer -- --my-handle=YOU --slice=20
+# macOS / Linux
+curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash
+
+# Windows PowerShell
+iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex
 ```
+
+Then `npm start --prefix pursue-vision-mcp` and `node scripts/volunteer.mjs --my-handle=YOU --slice=20`. Open the **HELP** tab in the live app to see the queue, top needs, and per-doc progress.
 
 ---
 
