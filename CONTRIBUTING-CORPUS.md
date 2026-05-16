@@ -79,7 +79,12 @@ cp data-raw/.vision-cache/fbi-62hq83894/p*.txt contributions/yourname/fbi-62hq83
 ### 5. Validate locally before pushing
 
 ```bash
+# Fast lexical + safety + schema (Gates 1-3, Node)
 npm run contrib:validate
+
+# Full standard including FAISS Gate 4 (needs Python + faiss-cpu)
+pip install faiss-cpu sentence-transformers
+npm run contrib:validate:all
 ```
 
 You'll see per-file output like:
@@ -110,17 +115,26 @@ The GH Actions workflow `validate-contribution.yml` re-runs the validator on you
 
 ---
 
-## Validation rules in detail
+## Validation: the JUDGE STANDARD
 
-The validator (`scripts/validate-contribution.mjs`) checks five things:
+**The full standard is in [JUDGE-STANDARD.md](./JUDGE-STANDARD.md) — read that for the authoritative rules.** Quick recap:
 
-| Check | What | Floor |
+Five gates run on every PR (CI workflow `.github/workflows/validate-contribution.yml`):
+
+| Gate | What | Tool |
 |---|---|---|
-| **SCHEMA** | File path `contributions/<handle>/<eid>/p<NNNN>.txt`, encoding UTF-8 | mandatory |
-| **CORPUS** | `<eid>` exists in `src/data/events.js` | mandatory |
-| **QUALITY** | Fraction of real English words (vs. wordlist of top 10K). | q ≥ 0.40 pass · 0.25–0.40 review · <0.25 reject |
-| **AGREEMENT** | If the canonical `.vision-cache` already has this page, Jaccard similarity vs canonical | reported; not auto-rejected |
-| **SAFETY** | No embedded `<script>`/`<iframe>`, no LLM-commentary leakage (`as an AI…`), no oversized tokens (URL/base64 spam), ≤ 256 KB per file | mandatory |
+| **1 — Schema** | path layout, filename, UTF-8, ≤256 KB, eid exists | Node |
+| **2 — Safety** | no XSS markers, no LLM commentary leakage, no URL/base64 dumps | Node |
+| **3 — Lexical quality** | fraction of real English words. q≥0.40 pass · 0.25–0.40 review · <0.25 reject | Node |
+| **4 — Semantic authenticity** | FAISS top-5 should hit same eid · cos to canonical (if any) banded · cos to neighbor pages banded | **Python + FAISS** |
+| **5 — Provenance** | source PDF, model used, prompt (PR body) | informational |
+
+Gate 4 is the FAISS-based judgment. It loads `public/embeddings.bin` into a real `faiss.IndexFlatIP`, embeds your contribution with the same `sentence-transformers/all-MiniLM-L6-v2` the search uses, and refuses content that:
+- semantically belongs to a different event than you claimed,
+- substantively contradicts a canonical transcription we already have,
+- doesn't fit between its neighbour pages.
+
+The CI workflow posts the per-file matrix as a PR comment. Read [JUDGE-STANDARD.md](./JUDGE-STANDARD.md) for the exact thresholds and how to fix each kind of rejection.
 
 **Why we don't auto-accept everything:** the index is small enough (~900 vector chunks today) that one polluting contribution measurably degrades semantic search. Better to gate than to apologize.
 

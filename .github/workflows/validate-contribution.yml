@@ -18,36 +18,73 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
       - run: npm install --no-audit --no-fund
-      # The wordlist is committed at scripts/.words.txt; if missing for any
-      # reason, fetch it inline so the validator can score quality.
-      - name: Ensure wordlist
+
+      - name: Ensure wordlist (Gate 3)
         run: |
           if [ ! -f scripts/.words.txt ]; then
             curl -sL -o scripts/.words.txt \
               https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english.txt
           fi
-      - name: Run validator
-        id: validate
+
+      - name: Gate 1-3 + 5 — Schema · Safety · Lexical (Node validator)
+        id: lexical
         run: |
           set +e
-          node scripts/validate-contribution.mjs | tee /tmp/validate.log
+          node scripts/validate-contribution.mjs | tee /tmp/lexical.log
           echo "exit=$?" >> $GITHUB_OUTPUT
-      - name: Post report on PR
+
+      - name: Install Python deps for Gate 4 (FAISS semantic)
+        run: |
+          pip install --quiet faiss-cpu sentence-transformers
+          # torchcodec has a broken Windows DLL dep on linux too sometimes;
+          # we never call it for text embedding so it's safe to drop.
+          pip uninstall -y --quiet torchcodec || true
+
+      - name: Gate 4 — Semantic authenticity (FAISS-based)
+        id: semantic
+        run: |
+          set +e
+          VERDICT_OUT=/tmp/semantic-verdict.json \
+            python scripts/validate-contribution-semantic.py | tee /tmp/semantic.log
+          echo "exit=$?" >> $GITHUB_OUTPUT
+
+      - name: Post combined report on PR
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            let log = '';
-            try { log = fs.readFileSync('/tmp/validate.log','utf8'); }
-            catch { log = '(no validator output captured)'; }
-            const body = '## Corpus contribution validator\n\n```\n' + log.slice(-6000) + '\n```\n';
+            const read = (p) => { try { return fs.readFileSync(p, 'utf8'); } catch { return '(no output)'; } };
+            const lex = read('/tmp/lexical.log');
+            const sem = read('/tmp/semantic.log');
+            const body = [
+              '## Corpus contribution validator — per JUDGE-STANDARD.md',
+              '',
+              '### Gates 1-3 · Schema · Safety · Lexical quality',
+              '```', lex.slice(-3000), '```',
+              '',
+              '### Gate 4 · Semantic authenticity (FAISS-based)',
+              '```', sem.slice(-3500), '```',
+              '',
+              'See [JUDGE-STANDARD.md](../blob/main/JUDGE-STANDARD.md) for what each verdict means.',
+            ].join('\n');
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body,
             });
-      - name: Fail if reject
-        run: exit ${{ steps.validate.outputs.exit }}
+
+      - name: Combined verdict
+        run: |
+          LEX=${{ steps.lexical.outputs.exit }}
+          SEM=${{ steps.semantic.outputs.exit }}
+          if [ "$LEX" != "0" ] || [ "$SEM" != "0" ]; then
+            echo "::error::Submission rejected by JUDGE-STANDARD.md (lex=$LEX sem=$SEM)"
+            exit 1
+          fi
