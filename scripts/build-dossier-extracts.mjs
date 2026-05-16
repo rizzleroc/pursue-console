@@ -71,6 +71,20 @@ const BEHAVIOR_RX = /\b(hover|stationary|motionless|silent|noiseless|vertical|as
 const SENSOR_RX   = /\b(radar|infrared|\bir\b|flir|thermal|telescope|camera|skin paint|electro.optical|eo|optical)\b/i;
 const AGENCY_PROPER = /\b(NORAD|NASA|FBI|CIA|DIA|USAF|USCENTCOM|INDOPACOM|EUCOM|CENTCOM|AAR[OB]|AATIP|UAP TASK FORCE|UAPTF|DOD|DoD|DOE|FAA|JCS|NRO|NSA|R&E)\b/;
 
+// UAP-relevance markers — the strongest signal. A sentence with any of
+// these is almost certainly worth surfacing on a UAP corpus regardless of
+// what else it contains.
+const UAP_RX = /\b(unidentified|UAP|UFO|unknown object|anomal\w+|saucer|flying disc|flying disk|disk-shaped|disc-shaped|disk shaped|flying object|unknown craft|unknown aircraft|bright object|strange object|odd object|object in the sky|metallic object|aerial phenomen\w*|cigar-shaped|triangle-shaped|something glowing|something hovering|something descending|appeared (?:to be |out of )|materializ\w+ (?:out|from|in)|vanished|instantaneous(?:ly)?|hovered (?:then|over|for|silently)|red satellite|bogey|orb(?:s)? in (?:the )?(?:sky|formation))\b/i;
+
+// Witness / observational phrasing — first-person or eyewitness tone.
+const WITNESS_RX = /\b(I saw|we saw|I observed|we observed|witness(?:es|ed)? (?:saw|observed|reported)|looked like|appeared to be|appeared like|seemed to be|moved like|the object|the craft|the light(?:s)?|that thing|saw an?|sighted an?|observed an?|reported (?:seeing|observing))\b/i;
+
+// Routine chatter / mission logistics — penalize hard. These dominate
+// space-mission transcripts and FBI cover-letter pages but contribute
+// nothing to the UAP signal.
+const CHATTER_RX = /\b(Flight Plan|LOI card|tape \d+|tape [A-Z]{1,3}\/?\d+|tape \d+[A-Z]\/\d+|frame \d+|frame number|standby|stand by|copy that|copy all|copy you|Roger that|Roger\.|that's affirmative|that's affirm|over and out|standing by|will do|press on|all systems|nominal|telemetry check|circuit breaker|update the|verify the|confirm the|FROM\s*:|SUBJECT\s*:|page \d+ of \d+|continued on|cont'd|see attached|please find|please advise|please respond|cc:|enclosure|attachment|fax to|wire to)\b/i;
+const HEADER_RX = /^\s*(?:DECLASSIFIED|CONFIDENTIAL|SECRET|UNCLASSIFIED|FOR OFFICIAL USE|UNITED STATES|DEPARTMENT OF|MEMORANDUM)\b/i;
+
 // ----- sentence splitter -----
 function splitSentences(text) {
   // Page-marker safe: caller passes one page's body without === markers.
@@ -83,26 +97,51 @@ function splitSentences(text) {
 }
 
 // ----- per-sentence interestingness score -----
+// Scoring philosophy: this is a UAP corpus. Sentences earn points by being
+// observational, phenomenological, or descriptive of the actual subject.
+// Generic high-info sentences (dates, proper nouns, numbers) get a small
+// nudge but cannot dominate. Routine mission/cover-letter chatter is
+// heavily penalized so it falls below the cutoff.
 function scoreSentence(s) {
   let score = 0;
   const flags = {};
-  if (PATTERNS.clock.test(s))     { score += 2; flags.clock = true; }
-  if (PATTERNS.dateLong.test(s) || PATTERNS.dateYear.test(s)) { score += 2; flags.date = true; }
-  if (PATTERNS.properNoun.test(s) || AGENCY_PROPER.test(s))   { score += 2; flags.entity = true; }
-  if (SHAPE_RX.test(s))           { score += 2; flags.shape = true; }
-  if (BEHAVIOR_RX.test(s))        { score += 2; flags.behavior = true; }
+
+  // Strong primary signals — these are why a sentence is worth surfacing
+  if (UAP_RX.test(s))             { score += 6; flags.uap = true; }
+  if (WITNESS_RX.test(s))         { score += 4; flags.witness = true; }
+  if (SHAPE_RX.test(s))           { score += 3; flags.shape = true; }
+  if (BEHAVIOR_RX.test(s))        { score += 3; flags.behavior = true; }
   if (SENSOR_RX.test(s))          { score += 2; flags.sensor = true; }
-  if (PATTERNS.bigNumber.test(s)) { score += 1; flags.number = true; }
+
+  // Secondary signals — useful but small
+  if (PATTERNS.clock.test(s))     { score += 1; flags.clock = true; }
+  if (PATTERNS.dateLong.test(s))  { score += 1; flags.date = true; }
+  if (PATTERNS.bigNumber.test(s)) { score += 0.5; flags.number = true; }
+  const propNoun = PATTERNS.properNoun.test(s) || AGENCY_PROPER.test(s);
+  if (propNoun)                   { score += 0.5; flags.entity = true; }
   const wc = s.split(/\s+/).length;
-  if (wc >= 8 && wc <= 30)        { score += 1; flags.goodlen = true; }
-  // Reject sentences that look like OCR junk
+  if (wc >= 8 && wc <= 30)        { score += 0.5; flags.goodlen = true; }
+
+  // Penalties — routine chatter, headers, junk OCR
+  if (CHATTER_RX.test(s))         { score -= 6; flags.chatter = true; }
+  if (HEADER_RX.test(s))          { score -= 4; flags.header = true; }
   const alpha = (s.match(/[A-Za-z]/g) || []).length;
-  if (alpha / s.length < 0.4) { score -= 8; flags.junk = true; }
-  // Stricter: at least 50% of tokens must be real English. This kills
-  // tesseract garbage like "FET Mie TRAFAC Cope UER AT MEL Crrey..."
-  // that otherwise scored well on the caps/proper-noun heuristic.
+  if (alpha / s.length < 0.4)     { score -= 8; flags.junk = true; }
+  // wordRatio quality filter: skip the penalty when a strong observational
+  // signal is present, since first-person UAP descriptions are often built
+  // out of short common words ('it is a bright object, and it's flashing').
+  // Pure-junk OCR text doesn't trigger UAP_RX/WITNESS_RX so still gets
+  // caught — this only spares legitimate eyewitness dialogue.
   const wordRatio = realWordRatio(s);
-  if (wordRatio < 0.5) { score -= 8; flags.junk = true; }
+  const strongSignal = flags.uap || flags.witness || flags.shape || flags.behavior;
+  if (wordRatio < 0.35 || (wordRatio < 0.5 && !strongSignal)) {
+    score -= 8; flags.junk = true;
+  }
+  // Sentences that are entity-name dumps without verbs are usually
+  // metadata rows / table headers — punish.
+  if (propNoun && !strongSignal && !/\b(is|was|were|are|saw|observed|appeared|moved|hovered|tracked|reported|seen|noted|sighted|approached|departed|disappeared)\b/i.test(s)) {
+    score -= 2; flags.metaonly = true;
+  }
   flags.wordRatio = Math.round(wordRatio * 100) / 100;
   return { score, flags };
 }
@@ -125,19 +164,23 @@ function splitByPage(text) {
 }
 
 // ----- top excerpts per page -----
-function pageExcerpts(body, n = 3) {
+// Bias toward fewer-but-better. Default n=2 since most pages don't have
+// 3 genuinely UAP-relevant sentences; padding to 3 forces in chatter.
+// Threshold raised — sentences need at least one strong UAP/witness signal
+// (score ≥ 5) to make the cut. Pages with no qualifying sentences are
+// omitted entirely (better to show nothing than mislead the reader).
+function pageExcerpts(body, n = 2, minScore = 5) {
   const sentences = splitSentences(body);
   const scored = sentences.map(s => ({ s, ...scoreSentence(s) }))
-                          .filter(x => x.score >= 3);
+                          .filter(x => x.score >= minScore);
   scored.sort((a, b) => b.score - a.score);
-  // dedup by 30-char prefix
   const seen = new Set();
   const out = [];
   for (const x of scored) {
     const key = x.s.slice(0, 30).toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ text: x.s, score: x.score, flags: x.flags });
+    out.push({ text: x.s, score: Number(x.score.toFixed(1)), flags: x.flags });
     if (out.length >= n) break;
   }
   return out;
