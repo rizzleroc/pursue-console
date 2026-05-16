@@ -1,10 +1,10 @@
 {
   "model": "sentence-transformers/all-MiniLM-L6-v2",
   "dim": 384,
-  "count": 903,
+  "count": 910,
   "minQuality": 0.25,
   "rejectedByQuality": {
-    "ocr": 148,
+    "ocr": 147,
     "pdfjs": 3,
     "vision": 0
   },
@@ -14,17 +14,17 @@
       "meanQuality": 1.0
     },
     "vision": {
-      "count": 166,
-      "meanQuality": 0.587
+      "count": 283,
+      "meanQuality": 0.622
     },
     "ocr": {
-      "count": 531,
-      "meanQuality": 0.542
+      "count": 421,
+      "meanQuality": 0.512
     },
     "pdfjs": {
       "count": 154,
       "meanQuality": 0.492
     }
   },
-  "generatedAt": "2026-05-16T05:29:30Z"
+  "generatedAt": "2026-05-16T15:59:13Z"
 }
