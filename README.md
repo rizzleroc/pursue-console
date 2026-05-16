@@ -38,6 +38,16 @@ The corpus grows page by page. Every time a vision-OCR batch runs the **LIVE** v
 
 The repo includes a minimal open-source vision-OCR daemon at [`pursue-vision-mcp/`](./pursue-vision-mcp/) (~600 lines, MIT). If you have ChatGPT Plus and a Chrome profile signed in, that's all you need to run vision OCR locally — no API keys required.
 
+### 📡 SETI-style distributed contributions — [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md)
+
+We publish a live work queue at `public/work-available.json`. Run the volunteer script and your machine pulls a slice from the queue, OCRs it through your own ChatGPT session, and opens a PR back. The maintainer's one ChatGPT Plus account stops being the bottleneck.
+
+```bash
+git clone https://github.com/rizzleroc/pursue-console
+cd pursue-console/pursue-vision-mcp && npm install && npm start
+cd .. && npm run volunteer -- --my-handle=YOU --slice=20
+```
+
 ---
 
 ## 🌍 Open project — contributions welcome

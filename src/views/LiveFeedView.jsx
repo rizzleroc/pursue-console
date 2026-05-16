@@ -662,12 +662,7 @@ export default function LiveFeedView({ onSelect }) {
             <Panel title="GEOSPATIAL BEARING" sub="last 7 days · by event coordinates">
               <BearingDial entries={feed?.entries || []} />
             </Panel>
-            <a href="https://github.com/rizzleroc/pursue-console/blob/main/CONTRIBUTING-CORPUS.md"
-              target="_blank" rel="noopener noreferrer"
-              style={{ transition: `all 150ms ${EASE_OUT}` }}
-              className="block text-center font-mono text-[10px] tracking-widest px-3 py-2 border border-amber-700/40 text-amber-300/90 hover:bg-amber-400/10 hover:border-amber-400/70 rounded-sm active:scale-[0.97]">
-              ＋ &nbsp; C O N T R I B U T E &nbsp; T R A N S C R I P T I O N S
-            </a>
+            <HelpWantedPanel />
           </aside>
         </div>
 
@@ -708,6 +703,61 @@ function Axis({ labels, accentRight }) {
           {l}
         </span>
       ))}
+    </div>
+  );
+}
+
+// HELP-WANTED — fetches the public work queue and shows volunteers what's open.
+function HelpWantedPanel() {
+  const [queue, setQueue] = useState(null);
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}work-available.json?t=${Date.now()}`)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .then(setQueue)
+      .catch(() => setQueue(null));
+  }, []);
+  // Show top 5 docs by pages-needed
+  const top = queue ? Object.entries(queue.byEvent)
+    .sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded)
+    .slice(0, 5) : [];
+  return (
+    <div className="border-2 border-dashed border-amber-700/50 bg-amber-950/20 rounded-sm p-3">
+      <div className="flex items-baseline justify-between mb-2">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300">▌ H O W &nbsp; C A N &nbsp; I &nbsp; H E L P ?</div>
+        {queue && (
+          <div className="font-mono text-[9px] text-amber-700">
+            <span className="text-amber-300 tabular-nums text-base mr-1">{queue.totalPagesNeeded}</span>
+            pages need volunteers
+          </div>
+        )}
+      </div>
+      <div className="font-mono text-[10px] text-emerald-400/90 leading-relaxed mb-3">
+        Run the pursue-vision-mcp daemon on your own machine with your own ChatGPT Plus account. The volunteer script picks pages from this queue, OCRs them, and opens a PR with your transcriptions. <span className="text-amber-300">No API keys, no credentials shared.</span>
+      </div>
+      {top.length > 0 && (
+        <div className="mb-3">
+          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">▌ TOP NEEDS</div>
+          <div className="space-y-1">
+            {top.map(([eid, d]) => (
+              <div key={eid} className="font-mono text-[10px] text-emerald-300 flex justify-between gap-2">
+                <span className="truncate">{eid}</span>
+                <span className="text-amber-300 tabular-nums shrink-0">{d.pagesNeeded}p</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="font-mono text-[10px] mb-2 p-2 bg-black/40 rounded-sm text-emerald-300 break-all">
+        npm install --prefix pursue-vision-mcp<br/>
+        npm start --prefix pursue-vision-mcp<br/>
+        npm run volunteer -- --my-handle=YOU --slice=20
+      </div>
+      <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md"
+        target="_blank" rel="noopener noreferrer"
+        style={{ transition: "all 150ms cubic-bezier(0.23, 1, 0.32, 1)" }}
+        className="block text-center font-mono text-[10px] tracking-widest px-3 py-2 border border-amber-400/60 bg-amber-400/5 text-amber-200 hover:bg-amber-400/15 hover:border-amber-400 rounded-sm active:scale-[0.97]">
+        ＋ &nbsp; R E A D &nbsp; T H E &nbsp; F U L L &nbsp; G U I D E
+      </a>
     </div>
   );
 }
