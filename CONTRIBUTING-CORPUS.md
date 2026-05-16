@@ -49,15 +49,21 @@ You need the original PDFs locally. Two ways:
 
 You have three options for the vision model:
 
-**a) ChatGPT-Plus via the whipgen MCP daemon (what the maintainer uses)**
+**a) The bundled `pursue-vision-mcp` daemon (recommended — no API keys needed)**
 
-If you have ChatGPT Plus and a Chrome profile signed in, [whipgen-mcp](https://github.com/rizzleroc/whipgen-mcp) drives your browser to do GPT-vision OCR with no API keys.
+This repo ships a minimal open-source daemon at [`pursue-vision-mcp/`](./pursue-vision-mcp/) that drives a logged-in ChatGPT browser tab. If you have ChatGPT Plus and a Chrome profile already signed in, this is enough — no API keys, no separate service:
 
 ```bash
-cd ../whipgen-mcp && npm start
-cd ../pursue-console
-PACE_SECS=25 ONLY=fbi-62hq83894 node scripts/vision-ocr.mjs
+cd pursue-vision-mcp
+npm install
+npm start                # launches Chrome on CDP port + starts the daemon
+
+# In a separate terminal, back in the project root:
+PURSUE_VISION_TOKEN=$(cat ~/.pursue-vision-token) \
+  ONLY=fbi-62hq83894 BATCH_PAGES=4 node scripts/vision-ocr.mjs
 ```
+
+See [`pursue-vision-mcp/README.md`](./pursue-vision-mcp/README.md) for details on the daemon, its API, and security posture.
 
 **b) Bring your own vision API**
 

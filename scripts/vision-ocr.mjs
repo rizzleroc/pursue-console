@@ -84,9 +84,14 @@ let microThreshold = Math.round(PAGES_PER_MICRO_BREAK + rand(-3, 3));
 let macroThreshold = Math.round(PAGES_PER_MACRO_BREAK + rand(-6, 6));
 
 async function loadToken() {
-  if (process.env.WHIPGEN_TOKEN) return process.env.WHIPGEN_TOKEN;
-  const tokPath = path.join(os.homedir(), ".whipgen-token");
-  return (await readFile(tokPath, "utf8")).trim();
+  // Env wins. Then check the bundled pursue-vision-mcp token, then whipgen.
+  if (process.env.PURSUE_VISION_TOKEN) return process.env.PURSUE_VISION_TOKEN;
+  if (process.env.WHIPGEN_TOKEN)       return process.env.WHIPGEN_TOKEN;
+  for (const name of [".pursue-vision-token", ".whipgen-token"]) {
+    const p = path.join(os.homedir(), name);
+    try { return (await readFile(p, "utf8")).trim(); } catch {}
+  }
+  throw new Error("no daemon token — set PURSUE_VISION_TOKEN or run a daemon that writes ~/.pursue-vision-token");
 }
 const TOKEN = await loadToken();
 

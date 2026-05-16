@@ -36,6 +36,8 @@ The corpus grows page by page. Every time a vision-OCR batch runs the **LIVE** v
 
 **Anyone who clones can contribute transcriptions** — see [CONTRIBUTING-CORPUS.md](./CONTRIBUTING-CORPUS.md). PRs touching `contributions/` are auto-validated for quality + safety before merge.
 
+The repo includes a minimal open-source vision-OCR daemon at [`pursue-vision-mcp/`](./pursue-vision-mcp/) (~600 lines, MIT). If you have ChatGPT Plus and a Chrome profile signed in, that's all you need to run vision OCR locally — no API keys required.
+
 ---
 
 ## 🌍 Open project — contributions welcome
