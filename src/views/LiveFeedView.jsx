@@ -259,6 +259,41 @@ export default function LiveFeedView({ onSelect }) {
       .sort((a, b) => b.n - a.n).slice(0, 7);
   }, [feed]);
 
+  // Per-doc progress — classify each catalogued event by source mix in the feed.
+  // Categories:
+  //   ready    — fully pdfjs-clean OR every page is vision (high-quality, queryable)
+  //   improving — has some vision pages AND some tesseract/missing pages (partial coverage)
+  //   queued    — has only tesseract pages indexed (or just curated meta, no body text)
+  //   missing   — no body chunks at all (not yet OCR'd / not yet downloaded)
+  //   uncatalogued — beyond our 52 (the 110 records still on war.gov we haven't catalogued)
+  const docProgress = useMemo(() => {
+    if (!feed) return null;
+    // Tally per-event source counts from the feed entries
+    const perEvent = new Map();
+    for (const e of feed.entries) {
+      const row = perEvent.get(e.eventId) || { vision: 0, ocr: 0 };
+      row[e.source] = (row[e.source] || 0) + 1;
+      perEvent.set(e.eventId, row);
+    }
+    let ready = 0, improving = 0, queued = 0, missing = 0;
+    for (const ev of EVENTS) {
+      const row = perEvent.get(ev.id);
+      if (!row) { missing++; continue; }
+      if (row.vision > 0 && row.ocr > 0) improving++;
+      else if (row.vision > 0) ready++;
+      else if (row.ocr > 0) queued++;
+      else missing++;
+    }
+    // pdfjs-clean docs don't appear in the feed (live-feed only lists OCR/vision pages),
+    // but their text was extracted at build time. Detect by looking at corpus stats:
+    // for now, assume any event NOT in the feed is either pdfjs-clean (build-time text)
+    // or genuinely missing. Without manifest access here we group them as "missing"
+    // — close enough; the LIVE feed is about the OCR pipeline anyway.
+    const cataloguedTotal = EVENTS.length;
+    const uncatalogued = Math.max(0, 162 - cataloguedTotal);
+    return { ready, improving, queued, missing, cataloguedTotal, uncatalogued, totalInventory: 162 };
+  }, [feed]);
+
   // Source counters
   const sourceRates = useMemo(() => {
     if (!feed) return { vision: 0, ocr: 0 };
@@ -348,6 +383,71 @@ export default function LiveFeedView({ onSelect }) {
         )}
 
         <div className="h-px bg-emerald-900/60 mt-10 mb-6" />
+
+        {/* ============ DOCUMENT PROGRESS STRIP ============ */}
+        {docProgress && (() => {
+          const dp = docProgress;
+          const segs = [
+            { key: "ready",        label: "READY",       value: dp.ready,        color: COLORS.cyan,     sub: "fully vision-OCR'd" },
+            { key: "improving",    label: "IMPROVING",   value: dp.improving,    color: COLORS.green,    sub: "partial vision · in-flight" },
+            { key: "queued",       label: "QUEUED",      value: dp.queued,       color: COLORS.amber,    sub: "tesseract-only · awaiting vision" },
+            { key: "missing",      label: "MISSING",     value: dp.missing,      color: COLORS.greenDim, sub: "no body text yet (or pdfjs-clean)" },
+            { key: "uncatalogued", label: "UNCATALOGUED",value: dp.uncatalogued, color: COLORS.rose,     sub: "records to catalogue" },
+          ];
+          const totalSegs = segs.reduce((s, x) => s + x.value, 0) || 1;
+          const indexed = dp.ready + dp.improving + dp.queued;
+          const pctReady = Math.round(((dp.ready + dp.improving * 0.5) / dp.totalInventory) * 100);
+          return (
+            <div className="mb-8 border border-emerald-900/60 bg-black/40 rounded-sm p-4">
+              <div className="flex items-baseline justify-between flex-wrap gap-3 mb-3">
+                <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-300">
+                  ▌ D O C U M E N T &nbsp; P R O G R E S S
+                  <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">RELEASE 01 · {dp.totalInventory} INVENTORY</span>
+                </div>
+                <div className="font-mono text-[10px] tracking-widest text-emerald-700">
+                  <span className="text-cyan-300 text-base mr-1 tabular-nums">{pctReady}%</span>
+                  toward fully search-ready
+                </div>
+              </div>
+
+              {/* Stacked horizontal bar */}
+              <div className="h-3 flex rounded-sm overflow-hidden mb-3 bg-emerald-950 border border-emerald-950">
+                {segs.map(seg => seg.value > 0 && (
+                  <div key={seg.key}
+                    title={`${seg.label} · ${seg.value} docs · ${Math.round((seg.value/totalSegs)*100)}%`}
+                    style={{ width: `${(seg.value / totalSegs) * 100}%`, backgroundColor: seg.color }} />
+                ))}
+              </div>
+
+              {/* Per-segment counts */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {segs.map(seg => (
+                  <div key={seg.key} className="flex items-baseline gap-2">
+                    <span className="inline-block w-2 h-2 rounded-sm shrink-0 mt-1" style={{ backgroundColor: seg.color }} />
+                    <div className="min-w-0">
+                      <div className="font-mono text-[9px] tracking-widest" style={{ color: seg.color }}>{seg.label}</div>
+                      <div className="font-mono text-emerald-100 text-lg tabular-nums leading-none mt-0.5">
+                        {seg.value}
+                        <span className="text-emerald-700 ml-1 text-[10px]">of {dp.totalInventory}</span>
+                      </div>
+                      <div className="font-mono text-[9px] text-emerald-600 mt-1 leading-tight">{seg.sub}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Sub-line: how many of catalogued have any indexed text */}
+              <div className="mt-3 pt-2 border-t border-emerald-950 font-mono text-[10px] text-emerald-700 tracking-widest">
+                <span className="text-emerald-300">{dp.cataloguedTotal}</span> docs catalogued ·
+                <span className="text-emerald-300 ml-1">{indexed}</span> with body text indexed ·
+                <span className="text-cyan-300 ml-1">{dp.ready}</span> at vision quality ·
+                <span className="text-amber-300 ml-1">{dp.queued}</span> still tesseract-only
+              </div>
+            </div>
+          );
+        })()}
+
+        <div className="h-px bg-emerald-900/60 mb-6" />
 
         {/* ============ THREE-COLUMN BODY ============ */}
         <div className="grid grid-cols-12 gap-6">
