@@ -115,6 +115,40 @@ const total = claims.reduce((s, c) => s + c.pages.length, 0);
 console.log(`[volunteer] claiming ${total} page(s) across ${claims.length} doc(s):`);
 for (const c of claims) console.log(`    ${c.eid.padEnd(28)} pages ${c.pages.join(",")}`);
 
+// ---- progress reporter → daemon /progress ----
+// Best-effort. The dashboard polls /progress; if our POST fails the
+// dashboard just shows the previous state. Never fatal.
+const SHIFT_START = Date.now();
+const sessionRecent = [];
+async function reportProgress(patch = {}) {
+  try {
+    await fetch(`${DAEMON}/progress`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({
+        handle: HANDLE,
+        shiftStart: SHIFT_START,
+        idle: false,
+        ...patch,
+      }),
+      signal: AbortSignal.timeout(2000),
+    });
+  } catch {}
+}
+function recordCompletion(page, state, note) {
+  sessionRecent.push({ page, state, note, ts: Date.now() });
+  while (sessionRecent.length > 6) sessionRecent.shift();
+}
+
+// Best-effort initial broadcast so the dashboard reflects the claim
+await reportProgress({
+  now: { phase: "rendering pending pages…", eid: claims[0]?.eid, page: claims[0]?.pages[0] },
+  slice: { done: 0, total },
+  corpus: { done: queue.totalDocsRemaining ? (queue.inventoryTotal || 162) - queue.totalPagesNeeded : 0, target: queue.inventoryTotal || 162 },
+  recent: [],
+  session: { pagesOk: 0, pagesErr: 0 },
+});
+
 if (DRY) { console.log("[volunteer] --dry-run set, exiting before any work."); process.exit(0); }
 
 // ----- step 3: download PDFs -----
@@ -242,6 +276,12 @@ for (const c of live) {
       await writeFile(txt, "", "utf8");
       await writeFile(jsn, "[]", "utf8");
       console.log(`  ✗ ${c.eid} p${p}  RENDER  ${e.message.slice(0,120)}`);
+      recordCompletion(p, "render_err", e.message.slice(0, 60));
+      reportProgress({
+        slice: { done: pagesOK, total },
+        session: { pagesOk: pagesOK, pagesErr },
+        recent: sessionRecent.slice(),
+      });
     }
   }
 
@@ -249,35 +289,82 @@ for (const c of live) {
   for (let i = 0; i < ready.length; i += BATCH_PAGES) {
     const batch = ready.slice(i, i + BATCH_PAGES);
     const pages = batch.map(b => b.p).join(",");
+    const firstP = batch[0].p;
+
+    // Tell the dashboard what we're focused on RIGHT NOW
+    const previewB64 = Buffer.from(batch[0].png, "utf8").toString("base64url");
+    reportProgress({
+      now: {
+        eid: c.eid,
+        page: firstP,
+        docMeta: c.doc.title + (c.doc.agency ? "  ·  " + c.doc.agency : ""),
+        phase: batch.length > 1 ? `batched ${batch.length} pages · awaiting ChatGPT` : "single page · awaiting ChatGPT",
+        metaLine: `BATCH ${Math.floor(i / BATCH_PAGES) + 1} / ${Math.ceil(ready.length / BATCH_PAGES)}     ·     PAGES ${pages}     ·     SLICE ${pagesOK}/${total}`,
+        previewUrl: `/preview/${previewB64}`,
+      },
+    });
+
     try {
       const out = await callDaemon(batch.map(b => b.png));
       for (let j = 0; j < batch.length; j++) {
         const { text, visuals } = out[j];
         await writeFile(batch[j].txt, (text || "").trim(), "utf8");
         await writeFile(batch[j].jsn, JSON.stringify(visuals), "utf8");
+        recordCompletion(batch[j].p, "ok", batch.length > 1 ? "batched" : "single");
       }
       pagesOK += batch.length;
       console.log(`  ✓ ${c.eid} p${pages}  batched`);
+      reportProgress({
+        slice: { done: pagesOK, total },
+        session: { pagesOk: pagesOK, pagesErr },
+        recent: sessionRecent.slice(),
+      });
     } catch (e) {
-      // Fall back to single-page on batch mismatch / fetch error
       console.log(`  ⚠ ${c.eid} p${pages} batch failed (${e.message.slice(0,80)}) — falling back to single-page`);
       for (const b of batch) {
+        // Reflect the fallback in the focal frame
+        const fbb64 = Buffer.from(b.png, "utf8").toString("base64url");
+        reportProgress({
+          now: {
+            eid: c.eid, page: b.p,
+            docMeta: c.doc.title,
+            phase: "BATCH FELL BACK · single page",
+            metaLine: `FALLBACK after fetch retry · PAGE ${b.p} · SLICE ${pagesOK}/${total}`,
+            previewUrl: `/preview/${fbb64}`,
+          },
+        });
         try {
           const [out] = await callDaemon([b.png]);
           await writeFile(b.txt, (out.text || "").trim(), "utf8");
           await writeFile(b.jsn, JSON.stringify(out.visuals), "utf8");
           pagesOK++;
+          recordCompletion(b.p, "fallback", "single after fetch retry");
         } catch (e2) {
           pagesErr++;
           await writeFile(b.txt, "", "utf8");
           await writeFile(b.jsn, "[]", "utf8");
           console.log(`  ✗ ${c.eid} p${b.p}  ${e2.message.slice(0,120)}`);
+          recordCompletion(b.p, "err", e2.message.slice(0, 50));
         }
+        reportProgress({
+          slice: { done: pagesOK, total },
+          session: { pagesOk: pagesOK, pagesErr },
+          recent: sessionRecent.slice(),
+        });
       }
     }
   }
   await doc.cleanup(); await doc.destroy();
 }
+
+// Final: mark daemon as idle so the dashboard's status dot calms down
+await reportProgress({
+  now: null,
+  idle: true,
+  slice: { done: pagesOK, total },
+  session: { pagesOk: pagesOK, pagesErr },
+  recent: sessionRecent.slice(),
+});
 
 const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);

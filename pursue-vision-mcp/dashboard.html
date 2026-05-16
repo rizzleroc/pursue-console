@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PURSUE · Volunteer Instrument</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* HELMSMAN PHOSPHOR — see design/HELMSMAN-PHOSPHOR.md */
+  :root {
+    --bg:           #030907;
+    --bg-deep:      #010504;
+    --green:        #7CFFB2;
+    --green-dim:    #36764e;
+    --hair:         #16382a;
+    --ghost:        #0c2018;
+    --cyan:         #82B6FF;
+    --amber:        #FFD93D;
+    --amber-dim:    #76601a;
+    --rose:         #FF6B9D;
+    --whisper:      #549a76;
+    --ease-out:     cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--green);
+    font-family: 'Geist Mono', 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 13px; line-height: 1.4;
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body { padding: 70px 110px 70px; position: relative; }
+
+  /* CRT scanlines — barely-there horizontal stripes every 2px */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 2px);
+  }
+  /* Radial vignette */
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 99;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+  }
+  /* Animated phosphor sustain for the live elements */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+  }
+  @keyframes ping {
+    0%   { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(3); opacity: 0; }
+  }
+  .pulse-dot {
+    position: relative; display: inline-block; width: 10px; height: 10px;
+  }
+  .pulse-dot::before {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: var(--green); animation: ping 1.4s ease-out infinite;
+  }
+  .pulse-dot::after {
+    content: ''; position: absolute; inset: 1px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 8px var(--green);
+  }
+
+  /* TOP RAIL */
+  .top-rail { display: grid; grid-template-columns: 1fr auto; gap: 24px; margin-bottom: 12px; }
+  .id-block { font-size: 13px; letter-spacing: 0.3em; color: var(--green); }
+  .id-block .sub { display: block; font-size: 10px; letter-spacing: 0.4em; color: var(--green-dim); margin-top: 4px; }
+  .clock-block { text-align: right; }
+  .clock { font-size: 22px; font-weight: 700; color: var(--green); letter-spacing: 0.05em; }
+  .status-line {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    font-size: 10px; letter-spacing: 0.4em; color: var(--green-dim); margin-top: 4px;
+  }
+  .top-rule { height: 1px; background: var(--hair); margin: 14px 0 32px; }
+
+  /* MAIN GRID — focal frame (left) + right cluster */
+  .main-grid {
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px;
+    min-height: 520px;
+  }
+
+  /* FOCAL FRAME — cyan corner brackets */
+  .focal {
+    position: relative; padding: 28px 32px 56px;
+    min-height: 480px;
+  }
+  .focal::before, .focal::after,
+  .focal > .bracket-tr, .focal > .bracket-bl {
+    content: ''; position: absolute; width: 36px; height: 36px;
+    border: 0 solid var(--cyan); border-width: 0;
+  }
+  .focal::before  { top: 0; left: 0;     border-top-width: 2px; border-left-width:  2px; }
+  .focal::after   { bottom: 0; right: 0; border-bottom-width: 2px; border-right-width: 2px; }
+  .focal .bracket-tr { top: 0; right: 0;    border-top-width: 2px; border-right-width: 2px; }
+  .focal .bracket-bl { bottom: 0; left: 0;  border-bottom-width: 2px; border-left-width:  2px; }
+
+  .focal .now-label  { font-size: 13px; letter-spacing: 0.3em; color: var(--cyan); }
+  .focal .now-sub    { font-size: 10px; letter-spacing: 0.05em; color: var(--green-dim); margin-top: 4px; }
+  .focal .doc-row    { display: grid; grid-template-columns: 1fr 200px; gap: 32px; margin-top: 40px; }
+  .focal .doc-title  { font-size: 28px; font-weight: 700; color: var(--green); letter-spacing: 0.04em; line-height: 1.1; word-break: break-all; }
+  .focal .doc-meta   { font-size: 10px; color: var(--green-dim); margin-top: 8px; letter-spacing: 0.05em; }
+  .focal .page-label { font-size: 11px; color: var(--green-dim); letter-spacing: 0.3em; margin-top: 28px; }
+  .focal .page-num {
+    font-size: 156px; font-weight: 700; color: var(--cyan); line-height: 1;
+    margin-top: 8px; font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 28px rgba(130, 182, 255, 0.4);
+  }
+  .focal .meta-strip {
+    position: absolute; bottom: 22px; left: 32px; right: 32px;
+    font-size: 11px; letter-spacing: 0.18em; color: var(--green-dim);
+  }
+  /* Thumbnail box (right side of focal grid) */
+  .thumb {
+    position: relative;
+    border: 1px solid var(--green-dim);
+    width: 100%; aspect-ratio: 168 / 220;
+    background: rgba(12, 32, 24, 0.4);
+    overflow: hidden;
+  }
+  .thumb-label { font-size: 10px; color: var(--green-dim); letter-spacing: 0.3em; margin-bottom: 8px; }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  .thumb .placeholder { padding: 14px; font-size: 9px; line-height: 1.5; color: var(--ghost); }
+  .thumb .placeholder div { background: var(--ghost); height: 1px; margin-bottom: 9px; }
+
+  /* RIGHT INSTRUMENT CLUSTER */
+  .right-cluster { display: flex; flex-direction: column; gap: 26px; }
+  .gauge { padding-top: 4px; }
+  .gauge .cap { font-size: 11px; letter-spacing: 0.3em; color: var(--green-dim); margin-bottom: 4px; }
+  .gauge .big { font-size: 52px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .gauge .sub { font-size: 10px; color: var(--green-dim); margin-top: 8px; letter-spacing: 0.05em; }
+  .gauge .row { display: flex; align-items: baseline; gap: 8px; }
+  .gauge .row .frac { font-size: 11px; color: var(--green-dim); }
+  .gauge .bar { height: 6px; background: var(--ghost); margin-top: 14px; position: relative; overflow: hidden; }
+  .gauge .bar .fill { height: 100%; transition: width 600ms var(--ease-out); }
+  .gauge .pct { font-size: 9px; color: var(--green-dim); margin-top: 6px; letter-spacing: 0.05em; }
+  .divider { height: 1px; background: var(--hair); }
+
+  /* BOTTOM RAIL */
+  .bottom-rail { margin-top: 64px; }
+  .bottom-rule { height: 1px; background: var(--hair); }
+  .bottom-cap { font-size: 11px; letter-spacing: 0.3em; color: var(--green-dim); margin: 18px 0 24px; }
+  .completions { display: grid; grid-template-columns: repeat(6, 1fr); gap: 28px; }
+  .completion {
+    border-left: 1px solid var(--ghost); padding-left: 18px; min-height: 110px;
+  }
+  .completion:first-child { border-left: none; padding-left: 0; }
+  .completion .page  { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  .completion .stat  { font-size: 11px; letter-spacing: 0.3em; margin-top: 12px; }
+  .completion .sub   { font-size: 9px; color: var(--green-dim); margin-top: 6px; letter-spacing: 0.05em; }
+
+  /* FOOTER */
+  .footer { margin-top: 48px; }
+  .footer-line { font-size: 11px; letter-spacing: 0.3em; color: var(--amber-dim); text-align: center; padding: 20px 0 4px; }
+  .footer-rule { height: 1px; background: var(--hair); margin-bottom: 24px; }
+  .help-msg { font-size: 10px; color: var(--green-dim); text-align: center; letter-spacing: 0.05em; }
+  .help-msg a { color: var(--amber-dim); text-decoration: none; }
+  .help-msg a:hover { color: var(--amber); }
+
+  /* Idle state */
+  .idle .focal { opacity: 0.4; }
+  .idle .clock { color: var(--green-dim); }
+</style>
+</head>
+<body>
+
+<div class="top-rail">
+  <div class="id-block">
+    P U R S U E &nbsp; / / &nbsp; V O L U N T E E R &nbsp; I N S T R U M E N T
+    <span class="sub" id="sub-line">S E S S I O N &nbsp;·&nbsp; O P E R A T O R &nbsp;@<span id="handle">—</span></span>
+  </div>
+  <div class="clock-block">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="status-line">
+      <span class="pulse-dot" id="status-dot"></span>
+      <span id="status-text">CONNECTING</span>
+    </div>
+  </div>
+</div>
+<div class="top-rule"></div>
+
+<div class="main-grid">
+  <!-- FOCAL FRAME -->
+  <section class="focal" id="focal">
+    <div class="bracket-tr"></div>
+    <div class="bracket-bl"></div>
+    <div class="now-label">N O W &nbsp; P R O C E S S I N G</div>
+    <div class="now-sub" id="now-sub">awaiting first batch…</div>
+
+    <div class="doc-row">
+      <div>
+        <div class="doc-title" id="doc-title">—</div>
+        <div class="doc-meta"  id="doc-meta">no document yet</div>
+        <div class="page-label">PAGE</div>
+        <div class="page-num"  id="page-num">—</div>
+      </div>
+      <div>
+        <div class="thumb-label">P R E V I E W</div>
+        <div class="thumb" id="thumb">
+          <div class="placeholder">
+            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta-strip" id="meta-strip">awaiting…</div>
+  </section>
+
+  <!-- RIGHT GAUGE CLUSTER -->
+  <aside class="right-cluster">
+    <div class="gauge">
+      <div class="cap">S H I F T &nbsp; E L A P S E D</div>
+      <div class="big" id="shift-elapsed" style="color: var(--green);">00:00:00</div>
+      <div class="sub">since you started helping</div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="gauge">
+      <div class="cap">Y O U R &nbsp; S L I C E</div>
+      <div class="row">
+        <div class="big" id="slice-done" style="color: var(--amber);">0</div>
+        <div class="frac">/ <span id="slice-total">0</span> pages</div>
+      </div>
+      <div class="bar"><div class="fill" id="slice-fill" style="background: var(--amber); width: 0%;"></div></div>
+      <div class="pct"><span id="slice-pct">0</span> % of your slice</div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="gauge">
+      <div class="cap">C O R P U S &nbsp; ( G L O B A L )</div>
+      <div class="row">
+        <div class="big" id="corpus-done" style="color: var(--green);">—</div>
+        <div class="frac">of <span id="corpus-target">—</span> pages</div>
+      </div>
+      <div class="bar"><div class="fill" id="corpus-fill" style="background: var(--green); width: 0%;"></div></div>
+      <div class="pct"><span id="corpus-pct">—</span> % search-ready</div>
+    </div>
+  </aside>
+</div>
+
+<!-- BOTTOM COMPLETIONS RAIL -->
+<div class="bottom-rail">
+  <div class="bottom-rule"></div>
+  <div class="bottom-cap">L A S T &nbsp; S I X &nbsp; C O M P L E T I O N S</div>
+  <div class="completions" id="completions">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-rule"></div>
+  <div class="footer-line" id="footer-line">Y O U R &nbsp;W A T C H &nbsp;M A T T E R S &nbsp;·&nbsp; T H A N K &nbsp; Y O U</div>
+  <div class="help-msg">
+    daemon at <span id="daemon-url" style="color: var(--green);">http://127.0.0.1:9223</span> ·
+    read the guide → <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md" target="_blank">HOW-CAN-I-HELP.md</a>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // ---- UTC clock ----
+  function tickClock() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, "0");
+    $("clock").textContent = `${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+  }
+  setInterval(tickClock, 1000); tickClock();
+
+  // ---- shift elapsed (driven from shiftStart in progress) ----
+  let shiftStart = null;
+  function tickShift() {
+    if (!shiftStart) { $("shift-elapsed").textContent = "00:00:00"; return; }
+    const s = Math.max(0, Math.floor((Date.now() - shiftStart) / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    const p = n => String(n).padStart(2, "0");
+    $("shift-elapsed").textContent = `${p(h)}:${p(m)}:${p(sec)}`;
+  }
+  setInterval(tickShift, 1000);
+
+  // ---- poll /progress every second ----
+  let lastSeen = 0;
+  function setStatus(text, color = "var(--green)") {
+    const el = $("status-text"); el.textContent = text; el.style.color = color;
+    const dot = $("status-dot").firstChild?.nextSibling; // ::after
+    document.body.classList.toggle("idle", text === "IDLE");
+  }
+
+  function renderCompletions(items) {
+    const el = $("completions");
+    el.innerHTML = "";
+    const stateColor = {
+      ok:        "var(--green)",
+      fallback:  "var(--amber)",
+      err:       "var(--rose)",
+      pending:   "var(--cyan)",
+      render_err:"var(--rose)",
+    };
+    const stateLabel = {
+      ok: "OK", fallback: "FALLBACK", err: "ERROR",
+      pending: "PENDING", render_err: "RENDER ERR",
+    };
+    // Pad to 6 items
+    while (items.length < 6) items.unshift(null);
+    items.slice(-6).forEach(item => {
+      const cell = document.createElement("div");
+      cell.className = "completion";
+      if (!item) {
+        cell.innerHTML = '<div class="page" style="color: var(--ghost);">—</div>';
+      } else {
+        const c = stateColor[item.state] || "var(--green)";
+        const lbl = stateLabel[item.state] || (item.state || "OK").toUpperCase();
+        cell.innerHTML = `
+          <div class="page" style="color: ${c};">p ${item.page}</div>
+          <div class="stat" style="color: ${c};">${lbl}</div>
+          <div class="sub">${(item.note || "")}</div>
+        `;
+      }
+      el.appendChild(cell);
+    });
+  }
+
+  async function poll() {
+    try {
+      const r = await fetch("/progress", { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const p = await r.json();
+      lastSeen = Date.now();
+
+      // Status
+      if (p.idle) setStatus("IDLE", "var(--green-dim)");
+      else if (p.onBreak) setStatus("BREAK · " + p.onBreak, "var(--amber)");
+      else setStatus("ACTIVE", "var(--green)");
+
+      // Identity
+      if (p.handle) $("handle").textContent = p.handle;
+
+      // Shift
+      shiftStart = p.shiftStart || null;
+      tickShift();
+
+      // Current focal
+      $("now-sub").textContent = p.now?.phase || "—";
+      $("doc-title").textContent = (p.now?.eid || "—").toUpperCase();
+      $("doc-meta").textContent = p.now?.docMeta || "";
+      $("page-num").textContent = p.now?.page ?? "—";
+      $("meta-strip").textContent = p.now?.metaLine || "—";
+
+      // Preview thumbnail
+      const thumb = $("thumb");
+      if (p.now?.previewUrl) {
+        thumb.innerHTML = `<img src="${p.now.previewUrl}?t=${Date.now()}" alt="page preview" />`;
+      } else if (!thumb.querySelector("img") && !thumb.querySelector(".placeholder")) {
+        thumb.innerHTML = '<div class="placeholder"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+      }
+
+      // Your slice
+      const sd = p.slice?.done ?? 0;
+      const st = p.slice?.total ?? 0;
+      $("slice-done").textContent = sd;
+      $("slice-total").textContent = st;
+      const slicePct = st ? Math.round(sd / st * 100) : 0;
+      $("slice-fill").style.width = slicePct + "%";
+      $("slice-pct").textContent = slicePct;
+
+      // Corpus global
+      const cd = p.corpus?.done ?? 0;
+      const ct = p.corpus?.target ?? 0;
+      $("corpus-done").textContent = cd.toLocaleString();
+      $("corpus-target").textContent = ct ? ct.toLocaleString() : "—";
+      const corpusPct = ct ? Math.round(cd / ct * 100) : 0;
+      $("corpus-fill").style.width = corpusPct + "%";
+      $("corpus-pct").textContent = corpusPct || "—";
+
+      // Footer count
+      if (typeof p.session?.pagesOk === "number") {
+        $("footer-line").innerHTML =
+          `Y O U R &nbsp;W A T C H &nbsp;M A T T E R S &nbsp;·&nbsp; ` +
+          `${p.session.pagesOk} &nbsp; P A G E S &nbsp; A D D E D &nbsp; T O D A Y &nbsp;·&nbsp; T H A N K &nbsp; Y O U`;
+      }
+
+      // Recent completions
+      renderCompletions(p.recent || []);
+    } catch (e) {
+      // Daemon went away or returned 401 — but dashboard is served BY the
+      // daemon, so 'going away' usually means we're being shut down.
+      if (Date.now() - lastSeen > 10_000) {
+        setStatus("OFFLINE", "var(--rose)");
+      }
+    }
+  }
+  poll();
+  setInterval(poll, 1000);
+})();
+</script>
+</body>
+</html>

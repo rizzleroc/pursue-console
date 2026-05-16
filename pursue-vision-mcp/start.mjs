@@ -83,3 +83,23 @@ await ensureChrome();
 
 // Hand off to the daemon — same Node process.
 await import(path.join(__dirname, "daemon.mjs"));
+
+// After daemon is up, print the dashboard URL prominently and try to open it.
+const DASHBOARD_URL = `http://127.0.0.1:${process.env.PURSUE_VISION_PORT || 9223}/dashboard`;
+console.log("");
+console.log("╭───────────────────────────────────────────────────────────╮");
+console.log("│  Dashboard:  " + DASHBOARD_URL.padEnd(43) + "│");
+console.log("│  Helmsman Phosphor — live progress while you contribute  │");
+console.log("╰───────────────────────────────────────────────────────────╯");
+
+if (!process.argv.includes("--no-open-dashboard")) {
+  // Best-effort open. Don't fail the daemon if it doesn't work.
+  const opener = platform() === "win32" ? ["cmd", ["/c", "start", "", DASHBOARD_URL]]
+              : platform() === "darwin" ? ["open", [DASHBOARD_URL]]
+              :                            ["xdg-open", [DASHBOARD_URL]];
+  try {
+    const c = spawn(opener[0], opener[1], { stdio: "ignore", detached: true });
+    c.on("error", () => {});
+    c.unref();
+  } catch {}
+}
