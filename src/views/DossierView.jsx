@@ -24,6 +24,24 @@ function useExtracts(eid) {
   return state;
 }
 
+// Lazy-load the FAISS-derived event-similarity map.
+let _simP = null;
+function useEventSimilarity(eid) {
+  const [neighbors, setNeighbors] = useState(null);
+  useEffect(() => {
+    if (!_simP) {
+      _simP = fetch(`${import.meta.env.BASE_URL}event-similarity.json`)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+        .catch(() => ({ events: {} }));
+    }
+    let cancelled = false;
+    setNeighbors(null);
+    _simP.then(j => { if (!cancelled) setNeighbors(j.events?.[eid]?.neighbors || []); });
+    return () => { cancelled = true; };
+  }, [eid]);
+  return neighbors;
+}
+
 // Source-color mapping for the per-page excerpt badges
 const SOURCE_COLOR = { vision: "#82B6FF", pdfjs: "#7CFFB2", ocr: "#FFD93D" };
 const FLAG_COLOR = {
@@ -32,10 +50,23 @@ const FLAG_COLOR = {
 };
 const FLAG_LABELS = { date: "DATE", clock: "TIME", entity: "ENTITY", shape: "SHAPE", behavior: "BEHAVIOR", sensor: "SENSOR", number: "NUMBER" };
 
-export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents }) {
+export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents, selectionPage }) {
   const [reading, setReading] = useState(false);
   const [expandedPages, setExpandedPages] = useState(new Set());
   const { data: extracts, loading: extractsLoading } = useExtracts(event?.id || "");
+  const semanticNeighbors = useEventSimilarity(event?.id || "");
+  const allEventsById = useMemo(() => Object.fromEntries(allEvents.map(e => [e.id, e])), [allEvents]);
+
+  // Deep-link: if caller passed a selectionPage prop, expand it + scroll into view
+  useEffect(() => {
+    if (!selectionPage || !extracts?.excerptsByPage) return;
+    setExpandedPages(prev => new Set(prev).add(selectionPage));
+    const t = setTimeout(() => {
+      document.getElementById(`page-anchor-${selectionPage}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+    return () => clearTimeout(t);
+  }, [selectionPage, extracts]);
+
   if (!event) {
     return (
       <div className="px-3 sm:px-8 py-12 text-center">
@@ -272,7 +303,8 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
                 const sourceColor = SOURCE_COLOR[entry.source] || "#7CFFB2";
                 const preview = entry.top[0]?.text?.slice(0, 100);
                 return (
-                  <div key={pn} className="border-l border-emerald-700/40 bg-black/20">
+                  <div key={pn} id={`page-anchor-${pn}`}
+                    className={`border-l bg-black/20 transition-colors ${selectionPage === pn ? "border-amber-400 bg-amber-400/5" : "border-emerald-700/40"}`}>
                     <button onClick={() => {
                       const next = new Set(expandedPages);
                       next.has(pn) ? next.delete(pn) : next.add(pn);
@@ -380,6 +412,38 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
           <div className="text-[9px] text-blue-400/70 tracking-widest mb-1">▌ VIDEO</div>
           <div>DVIDS Video ID: <span className="text-blue-200">{event.videoId}</span></div>
           <a href={`https://www.dvidshub.net/video/${event.videoId}`} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-blue-400 text-[10px]">→ OPEN ON DVIDS ↗</a>
+        </div>
+      )}
+
+      {/* FAISS-DERIVED SEMANTIC NEIGHBORS — top-K by cosine of mean event vectors */}
+      {semanticNeighbors && semanticNeighbors.length > 0 && (
+        <div className="mb-5">
+          <div className="flex items-baseline justify-between mb-2">
+            <div className="font-mono text-[9px] text-cyan-400 tracking-widest">
+              ▌ SEMANTICALLY RELATED RECORDS
+            </div>
+            <div className="font-mono text-[9px] text-emerald-700 tracking-widest">FAISS · cosine on mean event vector</div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {semanticNeighbors.slice(0, 6).map(n => {
+              const ev = allEventsById[n.eid];
+              if (!ev) return null;
+              const pct = Math.round(n.cos * 100);
+              const strong = n.cos >= 0.65;
+              return (
+                <div key={n.eid} className="relative">
+                  <MiniChip event={ev} onClick={onSelect} />
+                  <div className="absolute top-1 right-1 flex items-center gap-1 font-mono text-[9px]">
+                    <span className="text-cyan-400/80">{n.cos.toFixed(2)}</span>
+                  </div>
+                  {/* cosine strength bar overlay at the bottom edge */}
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-emerald-950/50">
+                    <div className="h-full" style={{ width: `${pct}%`, backgroundColor: strong ? "#82B6FF" : "#549A76" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

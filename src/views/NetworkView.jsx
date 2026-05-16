@@ -3,6 +3,21 @@ import { AGENCY_COLORS } from "../data/events.js";
 import { ENTITIES, ENTITY_KIND, EVENT_ENTITIES } from "../data/entities.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
 
+// FAISS-derived event-event similarity, loaded once and cached.
+let _simP = null;
+function useSimilarity() {
+  const [sim, setSim] = useState(null);
+  useEffect(() => {
+    if (!_simP) {
+      _simP = fetch(`${import.meta.env.BASE_URL}event-similarity.json`)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+        .catch(() => ({ events: {}, dim: 0, eventCount: 0, minCos: 0, topK: 0, generatedAt: null }));
+    }
+    _simP.then(setSim);
+  }, []);
+  return sim;
+}
+
 // Simple force-directed simulator. No deps.
 // Nodes have {id, x, y, vx, vy, kind, ref}. Links {a, b}.
 // Forces: repulsion (Coulomb-ish), spring on links, mild center pull.
@@ -69,6 +84,13 @@ export default function NetworkView({ events, onSelect }) {
   const [activeKinds, setActiveKinds] = useState(new Set(KIND_FILTERS));
   const [hover, setHover] = useState(null);
   const [pinnedId, setPinnedId] = useState(null);
+  // entity = bipartite events↔entities (legacy default)
+  // semantic = event↔event edges from FAISS cosine
+  // both = overlay of the two
+  const [graphMode, setGraphMode] = useState("both");
+  // Minimum cosine for a semantic edge to appear (tunable)
+  const [minCos, setMinCos] = useState(0.50);
+  const sim = useSimilarity();
   const svgRef = useRef(null);
   const [size, setSize] = useState({ w: 900, h: 620 });
 
@@ -87,17 +109,38 @@ export default function NetworkView({ events, onSelect }) {
   const eventIds = new Set(events.map(e => e.id));
 
   // Build nodes/links scoped to filtered events + visible entity kinds.
+  // Edges carry an optional `kind` ('entity' | 'semantic') and `weight` (cosine).
   const { nodes, links } = useMemo(() => {
-    const ents = ENTITIES.filter(e => activeKinds.has(e.kind) && e.events.some(id => eventIds.has(id)));
     const nodes = [];
     const links = [];
     for (const ev of events) nodes.push({ id: `e:${ev.id}`, kind: "event", ref: ev });
-    for (const en of ents) {
-      nodes.push({ id: `n:${en.id}`, kind: en.kind, ref: en });
-      for (const evId of en.events) if (eventIds.has(evId)) links.push({ a: `n:${en.id}`, b: `e:${evId}` });
+
+    // Entity edges
+    if (graphMode !== "semantic") {
+      const ents = ENTITIES.filter(e => activeKinds.has(e.kind) && e.events.some(id => eventIds.has(id)));
+      for (const en of ents) {
+        nodes.push({ id: `n:${en.id}`, kind: en.kind, ref: en });
+        for (const evId of en.events)
+          if (eventIds.has(evId))
+            links.push({ a: `n:${en.id}`, b: `e:${evId}`, kind: "entity", weight: 1 });
+      }
+    }
+    // Semantic edges — FAISS event↔event, dedup undirected pairs
+    if (graphMode !== "entity" && sim?.events) {
+      const seen = new Set();
+      for (const ev of events) {
+        const ns = sim.events[ev.id]?.neighbors || [];
+        for (const n of ns) {
+          if (!eventIds.has(n.eid) || n.cos < minCos) continue;
+          const key = ev.id < n.eid ? `${ev.id}|${n.eid}` : `${n.eid}|${ev.id}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          links.push({ a: `e:${ev.id}`, b: `e:${n.eid}`, kind: "semantic", weight: n.cos });
+        }
+      }
     }
     return { nodes, links };
-  }, [events, activeKinds]);
+  }, [events, activeKinds, graphMode, sim, minCos]);
 
   const positioned = useForceLayout(nodes, links, { width: size.w, height: size.h });
   const posIdx = useMemo(() => Object.fromEntries(positioned.map(n => [n.id, n])), [positioned]);
@@ -133,7 +176,36 @@ export default function NetworkView({ events, onSelect }) {
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ NETWORK</GlitchText></h2>
-        <div className="font-mono text-[10px] text-emerald-700">{nodes.length} NODES // {links.length} EDGES // CLICK TO PIN</div>
+        <div className="font-mono text-[10px] text-emerald-700">
+          {nodes.length} NODES // {links.length} EDGES
+          {sim?.eventCount > 0 && <> // FAISS sim · {sim.eventCount}ev · ≥{sim.minCos} cos · gen {sim.generatedAt?.slice(0,10)}</>}
+          {" // CLICK TO PIN"}
+        </div>
+      </div>
+
+      {/* Graph mode + semantic threshold */}
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <span className="font-mono text-[9px] text-emerald-700 tracking-widest mr-1">MODE</span>
+        {[
+          { id: "entity",   label: "ENTITY",   c: "#7CFFB2" },
+          { id: "semantic", label: "SEMANTIC", c: "#82B6FF" },
+          { id: "both",     label: "BOTH",     c: "#FFD93D" },
+        ].map(m => (
+          <button key={m.id} onClick={() => setGraphMode(m.id)}
+            style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)", borderColor: graphMode === m.id ? m.c : "#16382A", color: graphMode === m.id ? m.c : "#549A76" }}
+            className="px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-widest active:scale-[0.97]">
+            {m.label}
+          </button>
+        ))}
+        {graphMode !== "entity" && (
+          <span className="font-mono text-[10px] text-emerald-700 ml-3 flex items-center gap-2">
+            <span className="tracking-widest text-[9px]">EDGE THRESHOLD cos ≥</span>
+            <input type="range" min="0.30" max="0.85" step="0.05" value={minCos}
+              onChange={(e) => setMinCos(Number(e.target.value))}
+              className="accent-cyan-400 w-32" />
+            <span className="text-cyan-400 tabular-nums">{minCos.toFixed(2)}</span>
+          </span>
+        )}
       </div>
 
       {/* Kind filters */}
@@ -160,9 +232,17 @@ export default function NetworkView({ events, onSelect }) {
               const a = posIdx[l.a], b = posIdx[l.b];
               if (!a || !b) return null;
               const dim = focusedId && !(adjacent.has(l.a) && adjacent.has(l.b));
+              // Semantic edges: cyan, width + opacity scale with cosine.
+              // Entity edges: emerald, uniform.
+              const isSem = l.kind === "semantic";
+              const stroke = isSem ? "#82B6FF" : "#7CFFB2";
+              const width = isSem ? Math.max(0.4, (l.weight - 0.4) * 4) : 0.8;
+              const baseOp = isSem ? Math.min(0.7, l.weight * 0.7) : 0.45;
               return (
                 <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                  stroke={dim ? "#0f3a2c" : "#7CFFB2"} strokeWidth={dim ? 0.4 : 0.8} opacity={dim ? 0.25 : 0.45} />
+                  stroke={dim ? "#0f3a2c" : stroke}
+                  strokeWidth={dim ? 0.3 : width}
+                  opacity={dim ? 0.18 : baseOp} />
               );
             })}
             {/* Nodes */}

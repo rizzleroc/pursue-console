@@ -418,7 +418,7 @@ export default function LiveFeedView({ onSelect }) {
                   const agencyColor = AGENCY_COLORS[ev?.agency] || COLORS.greenDim;
                   return (
                     <button key={`${e.eventId}-${e.page}`}
-                      onClick={() => ev && onSelect?.(ev)}
+                      onClick={() => ev && onSelect?.(ev, { page: e.page })}
                       style={{ transition: `background-color 150ms ${EASE_OUT}` }}
                       className="group w-full text-left flex gap-4 py-3 border-b border-emerald-950 hover:bg-emerald-950/40 active:bg-emerald-900/30">
                       {/* left rail — bright on fresh */}

@@ -21,6 +21,7 @@ export default function App() {
   const [view, setView] = useState("timeline");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
+  const [selectionPage, setSelectionPage] = useState(null);  // deep-link target page in dossier
   const [tickerIdx, setTickerIdx] = useState(0);
 
   useEffect(() => {
@@ -40,8 +41,17 @@ export default function App() {
     );
   }, [query]);
 
-  const handleSelect = (event) => { setSelected(event); setView("dossier"); };
-  const handleViewChange = (v) => { setView(v); if (v !== "dossier") setSelected(null); };
+  // handleSelect(event)             — open dossier on that event
+  // handleSelect(event, { page })   — open dossier + scroll/expand to that page
+  const handleSelect = (event, opts) => {
+    setSelected(event);
+    setSelectionPage(opts?.page ?? null);
+    setView("dossier");
+  };
+  const handleViewChange = (v) => {
+    setView(v);
+    if (v !== "dossier") { setSelected(null); setSelectionPage(null); }
+  };
   const tickerEvent = EVENTS[tickerIdx];
 
   return (
@@ -115,7 +125,8 @@ export default function App() {
           )}
           {view === "dossier" && (
             <DossierView event={selected}
-              onClose={() => { setSelected(null); setView("timeline"); }}
+              selectionPage={selectionPage}
+              onClose={() => { setSelected(null); setSelectionPage(null); setView("timeline"); }}
               onSelect={handleSelect}
               onJumpThread={() => setView("threads")}
               allEvents={EVENTS} />

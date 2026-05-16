@@ -42,12 +42,16 @@ env.backends.onnx.wasm.proxy = false;
 
 // ---- one-time loaders (module-level cache) ----
 let _vectorsP = null;
-function loadVectors() {
-  if (!_vectorsP) {
+// forceBust=true bypasses module + HTTP cache so the LIVE-deployed index is
+// reread (every batch ships a fresh embeddings.bin; without bust the browser
+// keeps serving the stale one).
+function loadVectors(forceBust = false) {
+  if (forceBust || !_vectorsP) {
+    const t = forceBust ? `?t=${Date.now()}` : "";
     _vectorsP = Promise.all([
-      fetch(`${import.meta.env.BASE_URL}embeddings.bin`).then(r => r.arrayBuffer()),
-      fetch(`${import.meta.env.BASE_URL}embeddings-meta.json`).then(r => r.json()),
-      fetch(`${import.meta.env.BASE_URL}embeddings-info.json`).then(r => r.json()),
+      fetch(`${import.meta.env.BASE_URL}embeddings.bin${t}`, { cache: forceBust ? "reload" : "default" }).then(r => r.arrayBuffer()),
+      fetch(`${import.meta.env.BASE_URL}embeddings-meta.json${t}`).then(r => r.json()),
+      fetch(`${import.meta.env.BASE_URL}embeddings-info.json${t}`).then(r => r.json()),
     ]).then(([buf, meta, info]) => {
       const vectors = new Float32Array(buf);
       if (vectors.length !== info.count * info.dim) throw new Error(`size mismatch ${vectors.length} vs ${info.count}*${info.dim}`);
@@ -417,8 +421,27 @@ export default function SemanticSearchView({ onSelect }) {
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ SEMANTIC</GlitchText></h2>
-        <div className="font-mono text-[10px] text-emerald-700">
-          DENSE VECTORS · {vecState ? `${(vecState.info.count + droppedVecs.meta.length).toLocaleString()} CHUNKS · ${vecState.info.dim}D · MINI-LM` : "LOADING…"}
+        <div className="font-mono text-[10px] text-emerald-700 flex items-center gap-3 flex-wrap">
+          {vecState ? (
+            <>
+              <span>DENSE VECTORS · {(vecState.info.count + droppedVecs.meta.length).toLocaleString()} CHUNKS · {vecState.info.dim}D · MINI-LM</span>
+              {vecState.info.generatedAt && (
+                <span className="text-emerald-600">INDEX GEN {vecState.info.generatedAt.slice(0, 16).replace("T", " ")}</span>
+              )}
+              <button onClick={async () => {
+                setVecLoaded(false); setVecState(null);
+                _vectorsP = null;
+                try {
+                  const next = await loadVectors(true);
+                  setVecState(next); setVecLoaded(true);
+                } catch (e) { setError({ msg: e.message, stack: null }); }
+              }}
+                style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)" }}
+                className="px-2 py-0.5 rounded-sm border border-emerald-700/50 text-emerald-400 hover:border-amber-400 hover:text-amber-300 tracking-widest active:scale-[0.97]">
+                ↻ REFRESH INDEX
+              </button>
+            </>
+          ) : "LOADING…"}
         </div>
       </div>
 
@@ -727,17 +750,22 @@ export default function SemanticSearchView({ onSelect }) {
                           : h.chunkSource === "pdfjs" ? "TEXT-LAYER"
                           : h.chunkSource === "ocr" ? `OCR q${(h.chunkQuality ?? 0).toFixed(2)}`
                           : "";
+                        const clickable = h.chunkKind !== "meta" && h.page;
                         return (
-                          <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
+                          <button key={i}
+                            onClick={(ev) => { ev.stopPropagation(); clickable && onSelect(event, { page: h.page }); }}
+                            disabled={!clickable}
+                            className={`block w-full text-left border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed rounded-sm ${clickable ? "hover:bg-emerald-900/30 hover:border-amber-400 active:scale-[0.995]" : ""}`}
+                            style={{ transition: "background-color 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms cubic-bezier(0.23,1,0.32,1)" }}>
                             <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
-                              {h.chunkKind === "meta" ? "SUMMARY" : `PAGE ${h.page}`}
+                              {clickable ? `→ PAGE ${h.page}` : "SUMMARY"}
                               <span className="ml-2 text-emerald-700">
                                 cos {h.cos.toFixed(3)}{h.boost > 0 ? ` +${h.boost.toFixed(2)} match` : ""}
                               </span>
                               {qLabel && <span className={`ml-2 ${qColor}`}>{qLabel}</span>}
                             </span>
                             {highlightQuery(h.snippet, qTerms)}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
