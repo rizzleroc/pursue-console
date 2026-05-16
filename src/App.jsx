@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS } from "./data/events.js";
 import { ScanlineOverlay, GrainOverlay, VignetteOverlay, RadarSweep } from "./components/Primitives.jsx";
+import CorpusFreshness from "./components/CorpusFreshness.jsx";
 import Header from "./components/Header.jsx";
 import TimelineView from "./views/TimelineView.jsx";
 import GlobeView from "./views/GlobeView.jsx";
@@ -80,6 +81,7 @@ export default function App() {
           ticker={tickerEvent ? `LIVE: ${tickerEvent.title.slice(0,40)}…` : ""}
           view={view} onViewChange={handleViewChange} onSearch={setQuery} query={query}
         />
+        <CorpusFreshness />
 
         {view !== "dossier" && (
           <div className="px-3 sm:px-8 pt-6 pb-4 border-b border-emerald-700/20">

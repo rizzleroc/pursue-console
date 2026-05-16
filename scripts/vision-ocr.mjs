@@ -294,22 +294,66 @@ let consecutiveFetchFailures = 0; // for adaptive backoff
 let callsSinceMicro = 0;          // counter toward next coffee break
 let callsSinceMacro = 0;          // counter toward next meal break
 
-// Periodically refresh public/live-feed.json so a local `npm run dev` server
-// reflects new vision pages in near-real-time. The deployed build only
-// updates on the next git push, but at least the local dashboard is honest
-// about what's actively being processed during a long run.
+// Periodic auto-refresh of derived corpus artifacts so the deployed app
+// (and any local `npm run dev`) reflect new vision pages without waiting
+// for the maintainer to run `corpus:rebuild` by hand.
+//
+// Two cadences:
+//   • FAST every 90s — build-live-feed only (cheap, ~1s)
+//   • SLOW every 10 min — build-text-files → build-search-index →
+//                          build-dossier-extracts → build-patterns →
+//                          build-work-available (medium, ~10s combined).
+//     Skips build-embeddings (Python, ~30s, requires sentence-transformers)
+//     and build-event-similarity (depends on embeddings). Those still need
+//     manual corpus:rebuild for the embeddings step. But text-search and
+//     LIVE feed stay fresh between manual rebuilds.
 import { spawn } from "node:child_process";
-const FEED_REFRESH_MS = 90_000;   // every 90s
-let lastFeedRefresh = 0;
-function refreshFeedIfStale() {
-  const now = Date.now();
-  if (now - lastFeedRefresh < FEED_REFRESH_MS) return;
-  lastFeedRefresh = now;
-  // Fire-and-forget. Failures are non-fatal — we'll try again next batch.
-  const child = spawn(process.execPath, [path.join(ROOT, "scripts/build-live-feed.mjs")], {
+const FAST_REFRESH_MS = 90_000;       // live-feed.json
+const SLOW_REFRESH_MS = 10 * 60_000;  // text-files + search-index + extracts + patterns + work-queue
+let lastFastRefresh = 0;
+let lastSlowRefresh = 0;
+
+function spawnRefresh(scriptRelPath) {
+  const child = spawn(process.execPath, [path.join(ROOT, scriptRelPath)], {
     cwd: ROOT, stdio: "ignore", detached: false,
   });
   child.on("error", () => {});  // swallow
+}
+function refreshFeedIfStale() {
+  const now = Date.now();
+  if (now - lastFastRefresh >= FAST_REFRESH_MS) {
+    lastFastRefresh = now;
+    spawnRefresh("scripts/build-live-feed.mjs");
+  }
+  if (now - lastSlowRefresh >= SLOW_REFRESH_MS) {
+    lastSlowRefresh = now;
+    // Chain them sequentially via a single tiny shell so they don't all
+    // spawn at once and race on shared files. text-files first because the
+    // others depend on the merged .txt + visuals.json.
+    const child = spawn(process.execPath, ["-e", `
+      const { spawn } = require("node:child_process");
+      const path = require("node:path");
+      const ROOT = ${JSON.stringify(ROOT)};
+      const steps = [
+        "scripts/build-text-files.mjs",
+        "scripts/build-search-index.mjs",
+        "scripts/build-dossier-extracts.mjs",
+        "scripts/build-patterns.mjs",
+        "scripts/build-work-available.mjs",
+      ];
+      (async () => {
+        for (const s of steps) {
+          await new Promise((res) => {
+            const c = spawn(process.execPath, [path.join(ROOT, s)], { cwd: ROOT, stdio: "ignore" });
+            c.on("exit", () => res());
+            c.on("error", () => res());
+          });
+        }
+      })();
+    `], { cwd: ROOT, stdio: "ignore", detached: true });
+    child.on("error", () => {});
+    child.unref();
+  }
 }
 
 async function pacedCall(fn) {
