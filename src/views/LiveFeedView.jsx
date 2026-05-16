@@ -285,30 +285,41 @@ export default function LiveFeedView({ onSelect }) {
   //   uncatalogued — beyond our 52 (the 110 records still on war.gov we haven't catalogued)
   const docProgress = useMemo(() => {
     if (!feed) return null;
-    // Tally per-event source counts from the feed entries
+    // Tally per-event source counts + the most-recent activity timestamp.
     const perEvent = new Map();
+    let feedNewest = 0;
     for (const e of feed.entries) {
-      const row = perEvent.get(e.eventId) || { vision: 0, ocr: 0 };
+      const row = perEvent.get(e.eventId) || { vision: 0, ocr: 0, newest: 0 };
       row[e.source] = (row[e.source] || 0) + 1;
+      if (e.modifiedAt > row.newest) row.newest = e.modifiedAt;
+      if (e.modifiedAt > feedNewest) feedNewest = e.modifiedAt;
       perEvent.set(e.eventId, row);
     }
+    // "Active" = an event with new entries within 90 minutes of the most
+    // recent activity in the feed. This catches the doc the OCR script is
+    // currently working through (its pages stream in over 1-3 hours).
+    const ACTIVE_WINDOW_MS = 90 * 60_000;
+    const activeCutoff = feedNewest - ACTIVE_WINDOW_MS;
     let ready = 0, improving = 0, queued = 0, missing = 0;
+    const activeIds = [];
     for (const ev of EVENTS) {
       const row = perEvent.get(ev.id);
       if (!row) { missing++; continue; }
+      if (row.newest > activeCutoff && (row.vision + row.ocr) > 0) activeIds.push(ev.id);
       if (row.vision > 0 && row.ocr > 0) improving++;
       else if (row.vision > 0) ready++;
       else if (row.ocr > 0) queued++;
       else missing++;
     }
-    // pdfjs-clean docs don't appear in the feed (live-feed only lists OCR/vision pages),
-    // but their text was extracted at build time. Detect by looking at corpus stats:
-    // for now, assume any event NOT in the feed is either pdfjs-clean (build-time text)
-    // or genuinely missing. Without manifest access here we group them as "missing"
-    // — close enough; the LIVE feed is about the OCR pipeline anyway.
     const cataloguedTotal = EVENTS.length;
     const uncatalogued = Math.max(0, 162 - cataloguedTotal);
-    return { ready, improving, queued, missing, cataloguedTotal, uncatalogued, totalInventory: 162 };
+    return {
+      ready, improving, queued, missing, cataloguedTotal, uncatalogued,
+      totalInventory: 162,
+      active: activeIds.length,
+      activeIds,
+      feedNewest,
+    };
   }, [feed]);
 
   // Source counters
@@ -421,9 +432,21 @@ export default function LiveFeedView({ onSelect }) {
                   ▌ D O C U M E N T &nbsp; P R O G R E S S
                   <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">RELEASE 01 · {dp.totalInventory} INVENTORY</span>
                 </div>
-                <div className="font-mono text-[10px] tracking-widest text-emerald-700">
-                  <span className="text-cyan-300 text-base mr-1 tabular-nums">{pctReady}%</span>
-                  toward fully search-ready
+                <div className="flex items-center gap-4 font-mono text-[10px] tracking-widest text-emerald-700">
+                  {/* ACTIVE indicator — pulses when something is being worked on */}
+                  {dp.active > 0 && (
+                    <span className="inline-flex items-center gap-2 px-2 py-0.5 rounded-sm border" style={{ borderColor: `${COLORS.cyan}55`, color: COLORS.cyan }}>
+                      <span className="relative inline-flex items-center justify-center w-2 h-2">
+                        <span className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: COLORS.cyan, opacity: 0.4 }} />
+                        <span className="relative inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS.cyan }} />
+                      </span>
+                      ACTIVE <span className="tabular-nums text-emerald-100">{dp.active}</span>
+                    </span>
+                  )}
+                  <span>
+                    <span className="text-cyan-300 text-base mr-1 tabular-nums">{pctReady}%</span>
+                    toward fully search-ready
+                  </span>
                 </div>
               </div>
 
@@ -435,6 +458,21 @@ export default function LiveFeedView({ onSelect }) {
                     style={{ width: `${(seg.value / totalSegs) * 100}%`, backgroundColor: seg.color }} />
                 ))}
               </div>
+
+              {/* Active processing — which doc the OCR script is currently on */}
+              {dp.active > 0 && (
+                <div className="mb-3 font-mono text-[10px] tracking-widest">
+                  <span className="text-cyan-300 mr-2">▸ PROCESSING NOW</span>
+                  {dp.activeIds.slice(0, 4).map((id, i) => (
+                    <span key={id} className="text-emerald-300 mr-2">
+                      {i > 0 && <span className="text-emerald-700 mr-2">·</span>}
+                      {id.toUpperCase()}
+                    </span>
+                  ))}
+                  {dp.activeIds.length > 4 && <span className="text-emerald-700">+ {dp.activeIds.length - 4} more</span>}
+                  <span className="text-emerald-700 ml-2">(last 90 min of feed activity)</span>
+                </div>
+              )}
 
               {/* Per-segment counts */}
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">

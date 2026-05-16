@@ -294,6 +294,24 @@ let consecutiveFetchFailures = 0; // for adaptive backoff
 let callsSinceMicro = 0;          // counter toward next coffee break
 let callsSinceMacro = 0;          // counter toward next meal break
 
+// Periodically refresh public/live-feed.json so a local `npm run dev` server
+// reflects new vision pages in near-real-time. The deployed build only
+// updates on the next git push, but at least the local dashboard is honest
+// about what's actively being processed during a long run.
+import { spawn } from "node:child_process";
+const FEED_REFRESH_MS = 90_000;   // every 90s
+let lastFeedRefresh = 0;
+function refreshFeedIfStale() {
+  const now = Date.now();
+  if (now - lastFeedRefresh < FEED_REFRESH_MS) return;
+  lastFeedRefresh = now;
+  // Fire-and-forget. Failures are non-fatal — we'll try again next batch.
+  const child = spawn(process.execPath, [path.join(ROOT, "scripts/build-live-feed.mjs")], {
+    cwd: ROOT, stdio: "ignore", detached: false,
+  });
+  child.on("error", () => {});  // swallow
+}
+
 async function pacedCall(fn) {
   // Macro break first (rarer, longer — like stepping away for lunch)
   if (callsSinceMacro >= macroThreshold) {
@@ -408,6 +426,7 @@ for (const id of targets) {
       const results = await pacedCall(() => visionTranscribeBatch(paths, label));
       await writeBatchResult(batch, results);
       nOk += batch.length;
+      refreshFeedIfStale();
       const dt = ((Date.now() - docT0) / 60000).toFixed(1);
       const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
       const vis = results.reduce((s, r) => s + (r.visuals?.length || 0), 0);
@@ -423,6 +442,7 @@ for (const id of targets) {
         try {
           const result = await pacedCall(() => visionTranscribe(item.pngPath, `${id}-p${item.page}-fb`));
           await writeBatchResult([item], [result]);
+          refreshFeedIfStale();
           nOk++;
         } catch (e2) {
           nErr++;
