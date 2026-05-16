@@ -259,6 +259,23 @@ export default function LiveFeedView({ onSelect }) {
       .sort((a, b) => b.n - a.n).slice(0, 7);
   }, [feed]);
 
+  // Media-type classification per event (from type + docType fields).
+  // Returns one of: video | photo | audio | document
+  function mediaTypeOf(ev) {
+    const t = (ev.type || "").toLowerCase();
+    const dt = (ev.docType || "").toLowerCase();
+    if (/video/.test(t)) return "video";
+    if (/audio/.test(t)) return "audio";
+    if (/image|imagery|photo|composite|sketch|still/.test(t)) return "photo";
+    if (["photoset", "sketch", "annotated"].includes(dt)) return "photo";
+    return "document";
+  }
+  const mediaSplit = useMemo(() => {
+    const c = { document: 0, photo: 0, video: 0, audio: 0 };
+    for (const ev of EVENTS) c[mediaTypeOf(ev)]++;
+    return c;
+  }, []);
+
   // Per-doc progress — classify each catalogued event by source mix in the feed.
   // Categories:
   //   ready    — fully pdfjs-clean OR every page is vision (high-quality, queryable)
@@ -441,7 +458,35 @@ export default function LiveFeedView({ onSelect }) {
                 <span className="text-emerald-300">{dp.cataloguedTotal}</span> docs catalogued ·
                 <span className="text-emerald-300 ml-1">{indexed}</span> with body text indexed ·
                 <span className="text-cyan-300 ml-1">{dp.ready}</span> at vision quality ·
-                <span className="text-amber-300 ml-1">{dp.queued}</span> still tesseract-only
+                <span className="text-amber-300 ml-1">{dp.queued}</span> still tesseract-only ·
+                <span className="text-emerald-300 ml-1">{(stats?.totalPages || 0).toLocaleString()}</span> pages decoded total
+              </div>
+
+              {/* Media-type breakdown across the catalogued events */}
+              <div className="mt-2 pt-2 border-t border-emerald-950">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="font-mono text-[9px] tracking-[0.3em] text-emerald-700">▌ M E D I A &nbsp; T Y P E S</div>
+                  <div className="flex flex-wrap gap-3 font-mono text-[10px]">
+                    {[
+                      { key: "document", label: "DOCUMENT", glyph: "▤", color: COLORS.green,  note: "memos · reports · cables · interviews" },
+                      { key: "photo",    label: "PHOTO",    glyph: "◫", color: COLORS.cyan,   note: "stills · sketches · annotated images" },
+                      { key: "video",    label: "VIDEO",    glyph: "▶", color: COLORS.amber,  note: "DVIDS sensor footage · mission video" },
+                      { key: "audio",    label: "AUDIO",    glyph: "◉", color: COLORS.rose,   note: "radio / transcript" },
+                    ].map(m => {
+                      const n = mediaSplit[m.key] || 0;
+                      return (
+                        <div key={m.key}
+                          title={m.note}
+                          className="flex items-center gap-1.5 px-2 py-0.5 rounded-sm border"
+                          style={{ borderColor: n > 0 ? `${m.color}55` : "#0c2018", color: n > 0 ? m.color : COLORS.greenDim }}>
+                          <span className="text-[11px] leading-none">{m.glyph}</span>
+                          <span className="tracking-widest text-[9px]">{m.label}</span>
+                          <span className="text-emerald-200 tabular-nums">{n}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           );
