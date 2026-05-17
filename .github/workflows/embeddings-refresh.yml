@@ -1,0 +1,91 @@
+name: FAISS embeddings refresh
+
+# Every 4 hours: check if the text corpus has changed since the last
+# embeddings build. If yes, rebuild + commit. If no, exit clean.
+# Manual trigger also available via workflow_dispatch.
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: embeddings-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hash current corpus inputs
+        id: hash
+        run: |
+          # Hash everything build-embeddings.py reads:
+          #   public/text/*.txt  — per-event flat files (regenerated on deploy)
+          #   public/visuals.json — visual-element sidecar
+          #   src/data/events.js — event metadata baked into the synthetic chunks
+          # Sorted to keep ordering deterministic.
+          CURRENT=$(
+            { find public/text -type f -name '*.txt' | sort | xargs cat;
+              cat public/visuals.json 2>/dev/null || true;
+              cat src/data/events.js;
+            } | sha256sum | cut -c1-16
+          )
+          PRIOR=$(cat public/embeddings-input-hash.txt 2>/dev/null || echo "")
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "prior=$PRIOR"     >> "$GITHUB_OUTPUT"
+          echo "Current hash: $CURRENT"
+          echo "Prior hash:   $PRIOR"
+
+      - name: Decide
+        id: decide
+        run: |
+          if [ "${{ steps.hash.outputs.current }}" = "${{ steps.hash.outputs.prior }}" ]; then
+            echo "no corpus change since last embeddings build — exiting clean"
+            echo "rebuild=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "corpus changed — rebuilding embeddings"
+            echo "rebuild=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.decide.outputs.rebuild == 'true'
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        if: steps.decide.outputs.rebuild == 'true'
+        run: |
+          pip install --quiet faiss-cpu sentence-transformers numpy
+
+      - name: Rebuild FAISS embeddings
+        if: steps.decide.outputs.rebuild == 'true'
+        run: |
+          python scripts/build-embeddings.py
+          echo "${{ steps.hash.outputs.current }}" > public/embeddings-input-hash.txt
+
+      - name: Commit + push
+        if: steps.decide.outputs.rebuild == 'true'
+        env:
+          NEW_HASH: ${{ steps.hash.outputs.current }}
+          PRIOR_HASH: ${{ steps.hash.outputs.prior }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/embeddings.bin public/embeddings-meta.json public/embeddings-info.json public/embeddings-input-hash.txt
+          if git diff --cached --quiet; then
+            echo "no embeddings file changed — skipping commit"
+            exit 0
+          fi
+          PRIOR_SHORT="${PRIOR_HASH:-(none)}"
+          git commit -m "chore(embeddings): refresh FAISS index — corpus hash ${PRIOR_SHORT} → ${NEW_HASH}
+
+Automated rebuild triggered by the scheduled embeddings-refresh
+workflow because the text corpus changed since the last build.
+
+Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          git push origin main
