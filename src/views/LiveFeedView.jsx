@@ -29,8 +29,8 @@ const SOURCE = {
   ocr:    { color: COLORS.amber, label: "OCR"    },
 };
 
-const TIME_AGO = (ts) => {
-  const s = Math.max(0, (Date.now() - ts) / 1000);
+const TIME_AGO = (ts, nowTs = Date.now()) => {
+  const s = Math.max(0, (nowTs - ts) / 1000);
   if (s < 60)    return `${Math.round(s)}s`;
   if (s < 3600)  return `${Math.round(s/60)}m`;
   if (s < 86400) return `${Math.round(s/3600)}h`;
@@ -228,13 +228,28 @@ export default function LiveFeedView({ onSelect }) {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [reloadAt, setReloadAt] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
+  // Tick `now` every second so TIME_AGO and the ACTIVE indicator stay live
+  // even between feed re-fetches.
   useEffect(() => {
-    setFeed(null); setError(null);
-    fetch(`${import.meta.env.BASE_URL}live-feed.json?t=${reloadAt}`)
-      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
-      .then(setFeed)
-      .catch(e => setError(e.message));
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Re-fetch the feed every 30s so the strip updates without a page reload.
+  // Manual REFRESH button still works by bumping reloadAt.
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      fetch(`${import.meta.env.BASE_URL}live-feed.json?t=${Date.now()}`)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+        .then(d => { if (!cancelled) { setFeed(d); setError(null); } })
+        .catch(e => { if (!cancelled) setError(e.message); });
+    };
+    load();
+    const id = setInterval(load, 30_000);
+    return () => { cancelled = true; clearInterval(id); };
   }, [reloadAt]);
 
   const entries = useMemo(() => {
@@ -285,31 +300,40 @@ export default function LiveFeedView({ onSelect }) {
   //   uncatalogued — beyond our 52 (the 110 records still on war.gov we haven't catalogued)
   const docProgress = useMemo(() => {
     if (!feed) return null;
-    // Tally per-event source counts + the most-recent activity timestamp.
-    const perEvent = new Map();
+    // Classify from stats.byEvent (full per-event totals across the whole
+    // indexed corpus). The previous version classified from feed.entries,
+    // but that list is windowed (most-recent ~200 entries — often only the
+    // event the OCR script is currently working through), which left every
+    // other indexed event falsely classified as MISSING.
+    const byEvent = feed.stats?.byEvent || {};
+    // Pull recency from feed.entries (which entries it has are still real
+    // signals of "what just streamed in"); fall back to feed.generatedAt.
+    const recencyByEvent = new Map();
     let feedNewest = 0;
-    for (const e of feed.entries) {
-      const row = perEvent.get(e.eventId) || { vision: 0, ocr: 0, newest: 0 };
-      row[e.source] = (row[e.source] || 0) + 1;
-      if (e.modifiedAt > row.newest) row.newest = e.modifiedAt;
+    for (const e of feed.entries || []) {
+      const cur = recencyByEvent.get(e.eventId) || 0;
+      if (e.modifiedAt > cur) recencyByEvent.set(e.eventId, e.modifiedAt);
       if (e.modifiedAt > feedNewest) feedNewest = e.modifiedAt;
-      perEvent.set(e.eventId, row);
     }
-    // "Active" = an event with new entries within 90 minutes of the most
-    // recent activity in the feed. This catches the doc the OCR script is
-    // currently working through (its pages stream in over 1-3 hours).
+    // "Active" = an event whose newest entry is within the last 90 minutes
+    // of wall-clock time. Anchoring to `now` (not feedNewest) means the
+    // ACTIVE chip naturally goes idle if the daemon stops feeding pages,
+    // even before the next file regeneration.
     const ACTIVE_WINDOW_MS = 90 * 60_000;
-    const activeCutoff = feedNewest - ACTIVE_WINDOW_MS;
+    const activeCutoff = now - ACTIVE_WINDOW_MS;
     let ready = 0, improving = 0, queued = 0, missing = 0;
     const activeIds = [];
     for (const ev of EVENTS) {
-      const row = perEvent.get(ev.id);
+      const row = byEvent[ev.id];
       if (!row) { missing++; continue; }
-      if (row.newest > activeCutoff && (row.vision + row.ocr) > 0) activeIds.push(ev.id);
-      if (row.vision > 0 && row.ocr > 0) improving++;
-      else if (row.vision > 0) ready++;
-      else if (row.ocr > 0) queued++;
-      else missing++;
+      const v = row.vision || 0;
+      const o = row.ocr || 0;
+      if (v === 0 && o === 0) { missing++; continue; }
+      const lastSeen = recencyByEvent.get(ev.id) || 0;
+      if (lastSeen > activeCutoff) activeIds.push(ev.id);
+      if (v > 0 && o > 0) improving++;
+      else if (v > 0) ready++;
+      else queued++;
     }
     const cataloguedTotal = EVENTS.length;
     const uncatalogued = Math.max(0, 162 - cataloguedTotal);
@@ -320,12 +344,12 @@ export default function LiveFeedView({ onSelect }) {
       activeIds,
       feedNewest,
     };
-  }, [feed]);
+  }, [feed, now]);
 
   // Source counters
   const sourceRates = useMemo(() => {
     if (!feed) return { vision: 0, ocr: 0 };
-    const cut = Date.now() - 3600_000;
+    const cut = now - 3600_000;
     let v = 0, o = 0;
     for (const e of feed.entries) {
       if (e.modifiedAt < cut) continue;
@@ -333,7 +357,7 @@ export default function LiveFeedView({ onSelect }) {
       else if (e.source === "ocr") o++;
     }
     return { vision: v, ocr: o };
-  }, [feed]);
+  }, [feed, now]);
 
   return (
     <div className="relative overflow-hidden" style={{ backgroundColor: "#020806" }}>
@@ -614,7 +638,7 @@ export default function LiveFeedView({ onSelect }) {
                         <div className="flex items-baseline gap-3 flex-wrap font-mono">
                           <span className="text-[11px] tracking-widest tabular-nums"
                             style={{ color: isFresh ? COLORS.amber : COLORS.greenDim }}>
-                            T + {TIME_AGO(e.modifiedAt)}
+                            T + {TIME_AGO(e.modifiedAt, now)}
                           </span>
                           <span className="text-[11px] tracking-widest font-bold"
                             style={{ color: src.color }}>
