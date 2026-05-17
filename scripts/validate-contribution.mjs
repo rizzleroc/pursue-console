@@ -126,8 +126,25 @@ const out = { pass: [], review: [], reject: [] };
 for (const c of contribs) {
   const issues = [];
   // 1. SCHEMA
+  // Accept two file types per page:
+  //   p<NNN>.txt  — transcript (goes into search index, runs full gates)
+  //   p<NNN>.json — bounding-box / metadata companion (parse-checked only)
+  // Anything else is a schema violation.
+  if (/^p\d{1,4}\.json$/.test(c.file)) {
+    // Parse-check JSON, then skip the lexical/semantic gates for it.
+    try {
+      const raw = await readFile(c.fullPath, "utf8");
+      JSON.parse(raw);
+      pass++;
+      out.pass.push({ ...c, quality: 1, vsCanonical: null, issues: [], note: "json:companion" });
+    } catch (e) {
+      reject++;
+      out.reject.push({ ...c, quality: 0, vsCanonical: null, issues: [`invalid JSON: ${e.message}`] });
+    }
+    continue;
+  }
   if (!/^p\d{1,4}\.txt$/.test(c.file)) {
-    issues.push(`bad filename (expect p<NNN>.txt): ${c.file}`);
+    issues.push(`bad filename (expect p<NNN>.txt or p<NNN>.json): ${c.file}`);
   }
   if (!eventIds.has(c.eid)) {
     issues.push(`unknown event id: ${c.eid} (must exist in src/data/events.js)`);
