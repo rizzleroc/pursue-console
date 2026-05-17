@@ -1,0 +1,46 @@
+Tape 5/4
+00 03 38 01 CC Roger. Cut in.
+
+CMP Every once in a while, a fragment of considerably
+higher velocity than the others goes across my
+window. But that's very rare.
+
+cc Roger.
+
+CMP Hey, that's that field of view I saw out my window.
+Jack, do you see it now?
+
+LMP Yes.
+
+CMP And, Bob. At least, there ~ there's no apparent
+relative motion between fragments.
+
+cc Roger. Understand.
+
+CMP I'll take two pictures about a minute apart if IT
+can. And it'll be Frame 70.
+
+cc Okay. Frame 70.
+
+CDR ° And, Bob. This is Geno. My impression is that
+they are - flat, flakelike particles. Some may
+be 6 inches across. And, although there's no
+relative motion between the two, most of them seem
+to be twinkling. And I think, for the most part,
+they're all moving away from us.
+
+cc Roger, Gene. Thank you.
+
+00 03 39 35 CMP Okay. We've got 0180 and O on the old thumbwheels.
+
+LMP Okay.
+
+cc Roger, Ron.
+
+00 03 39 53 CMP Okay. TRANS CONTROL is ARMED.
+
+LMP ... two ARMED,
+
+00 03 39 57 CMP CONTROLLER number 2 is ARMED.
+
+LMP ... SECS LOGIC ...

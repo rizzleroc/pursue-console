@@ -1,0 +1,83 @@
+(b)()da |
+
+INGEST
+
+* Rank:
+
+¢ Full Name:
+
+Unit:
+
+* Wing:
+
+¢ Phone Number:
+
+* Email:
+
+Service:
+
+* Operations Center:
+
+ACEQUIP
+
+ACEQUIP
+
+« Aircraft Callsign:
+
++ Radar Name or Destination:
+
+* Radar Software Load or Mission Data:
+
++ Radar Warning Receiver (RWR) Name or Designator:
+
+* RWR Software Load or Mission Data:
+
+* MWS Name or Designator:
+
+* MWS Software Load or Mission Data:
+
++ IRCM Name or Designator:
+
+* IRCM Software Load or Mission Data:
+
++ ECM Name or Designator:
+
++ ECM Software Load or Mission Data:
+
+* CMD Name or Designator:
+
+¢ Chaff Designator:
+
+* Num Chaff or Cartridges:
+
+« Flare Designator:
+
+* Num Flares:
+
+go)()14a
+
+I
+
+|
+
+* Type of Radar-Guided AAM:
+
+* Num Radar-Guided AAM:
+
+* Type of IR-Guided AAM:
+
+¢ Num IR-Guided AAM:
+
+* Gun Name or Designator:
+
+* Num Gun Rounds:
+
+* Air-to-Ground Wpn to Include Num of Each:
+
+* TGT Pod Name or Designator ill
+
+* Additional Avionics:
+
+(b)tda |
+
+|

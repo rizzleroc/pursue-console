@@ -1,0 +1,31 @@
+EERTDINT
+: @ Prati FluveE 0
+CHECK=LIST = UNIDENTIFIED FLYING OBJECTS
+lo Date 7dsa ls Incidont # 77 2
+2, Time Approx iit 1320 CST
+3. Location  Godmem Fid., ¥¢ Knox, Ky.
+Li. Name of observer PFC Stenley Oliver
+5. Occupation of objorvor M/S « duty im control tower
+6, Address of observer pr Godman ¥id,, Fs Knox, Ky.
+7. Placo of obsorvtion Control Tower, Godman F14., Ft Knox, Ky.
+8. Numbor of objocts 1
+{ ) 9. Distance of objoct from observer  N/§
+10, Timo in sight 5/s
+; 11, Altitude Over 15,000 £% y
+12, Speed §/s
+13. Direction of flight Southwest
+i Tactics 5/8 |
+15. Soumd u/s
+16. Size §/s
+-~ 17. Color amid cae like "ice-cream come topped with red" -
+\ white with red above
+18. Shapo  €omS
+19. Odor dotectod u/s
+20, Apparent construction u/s
+21, Exhaust trails u/s
+22. Woathor conditions  Gloud formations
+23. Effoct on clouds Went behind clouds
+2lj, Sketches or photographs Hone
+25. Manner of disappearence  N/S
+26, Remarks: (over) NEC TR AT |
+JN Ras by § ev 5 84

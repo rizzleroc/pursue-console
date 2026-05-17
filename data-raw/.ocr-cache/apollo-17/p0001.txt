@@ -1,0 +1,47 @@
+Tape 5/2
+
+cc Yes, we copied your Vy and your EMS numbers, and
+we've got a number for you. Maneuver start time
+will be at 03 plus 33 plus 27.
+
+LMP Okay, we got you. Maneuver at 03:33:27.
+
+[ofe That's affirmative, Jack.
+
+LMP You guys didn't tell us we couldn't see anything
+going through the sunrise.
+
+cc (Laughter) Roger.
+
+00 03 25 01 CC 17, Houston. We're making plans here for a space-
+craft SEP time of 03 plus 43.
+
+LMP 03 plus 43. Roger.
+
+00 03 27 27 CC 17, Houston. We're copying cabin press of 5.9 this nN
+time.
+
+CMP Roger. We - we Just got it, Bob.
+
+CC Okay.
+
+CMP Thank you.
+
+00 03 31 55 LIMP Frame 65 for the IMPs mag November November.
+00 03 34 10 IMP Okay. We - we are maneuvering, Houston.
+
+cc Roger. We're watching it.
+
+CMP Now we've got a few very bright particles or frag-
+ments or something that go drifting by as we
+maneuver.
+
+cc Roger. Understand.
+
+LMP There's a whole bunce of big ones on my window
+down there - just bright. It looks like the
+Fourth of July out of Ron's window.
+
+CMP Yes. Now you can see some of them in shape.
+They're very Jagged, angular fragments that arc
+tumbling.

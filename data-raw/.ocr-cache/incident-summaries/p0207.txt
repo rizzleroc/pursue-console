@@ -1,0 +1,36 @@
+Fe e 1EST [L328
+/ PRN & vw, Ls
+CHECK=LIST ~ UNIDENTIFIED FLYING OBJECTS
+| 1. Dato 3 Jen 1948 . Incidont §# 99
+2, Time N/s |
+3. Locetion Military Attache, Helsinki, Finland (official source of |
+information) |
+Li. Namo of observer Helsinki Press, 10th Jan 48. Finland |
+(USMILATTACHE AMLEGATION Helsinki Finland sed Burrill)
+| 5. Occupation of obsorver N/S
+: 6, Address of observor Helsinki, Finland
+7. Placo of observation Vagsa, Finland 2
+8. Numbor of objoots Ome (1)
+4) 9. Distanco of objoct from obsorver N/S
+10, Timo in sight 3Q seconds
+_ 11. altitude N/S
+i 12. Speed N/S
+i 13. Diroction of flight west to east |
+1h. Tactics N/S
+15. Sound N/S
+16. Size N/s ;
+y 17. Color Shini
+J x :
+i 18. Shapo u/s L
+| 19. Odor dotectod N/S k
+20. Apparent construction N/s y
+21. Exhaust trails Ione tail
+22. Woathor conditions N/S
+23. Effoct on clouds N/S
+| ES TRIO
+2, Sketches or photographs None SE 5 [24] am
+SO IRIGIED
+25. Manner of disappearance N/s mG
+26, Romarks: Helsinki press 10th January reported obgervation of light
+‘ fo vicinity Vaasa 3rd January brightly shining object with 30°
+: moved west to east visible for 30 seconds,

@@ -1,0 +1,37 @@
+Tape 90/3
+. Page Th2
+i 05 19 14 58 ce That's affirmative. We're ready for the E-MOD. -
+05 19 16 31 cc Intrepid, Houston.
+05 19 16 35 CDR-IM Go.
+. 05 19 16 37 cc If you will give us POO and ACCEPT, we'll give
+. you a CSM state vector and RLS update.
+05 19 16 ks CDR-IM You have POO and ACCEPT.
+05 19 20 05 CMP Hello, Houston; Yankee Clipper.
+05 19 20 09 cc Yankee Clipper, Houston. Loud and clear.
+05 19 20 1k CMP Well, hello there, stranger. How are you?
+05 19 20 22 cc Morning, Dick. We are fine. How are you?
+05 19 20 27 CMP Well, pretty good. I hope you would like to have
+. some company for a change.
+i 05 19 20 31 cc Roger. Got the house clean? #
+: 3
+y 05 19 20 36 CMP As a matter of fact, I just finished that. I -
+: sure do; got everything in order; ready to go Fi
+\ towards the ILM and bring back ... That's quite
+: a chore; keeping this thing clean.
+: 05 19 20 53 cc Roger. You got a couple of coal miners coming
+H up to see you.
+t
+‘ 05 19 20 59 MP That's okay. I'll be glad to see them.
+i
+! 0519 21 10 cc Intrepid, Houston. The computer is yours.
+i Break. Yankee Clipper, if you will go POO and
+i ACCEPT, we have an uplink.
+i 05 19 21 20 CMP All yours.
+i 05 19 23 14 "CDR-IM Houston, you got the lift-off time for me?
+; 05 19 23 20 cc Stand by.
+05 19 23 39 ce Intrepid, Houston. Your lift-off time is
+1L2:03:47.
+05 19 23 52 © CDR-LM I copy 142:03:47.00.
+05 19 23 57 cS Affirmative.
+) 05 19 2k 05 cc Clipper, Houston. Computer's yours. )
+}

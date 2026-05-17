@@ -1,0 +1,38 @@
+| A
+‘ Tape 90/9
+Page Th8 IN
+8 05 20 08 23 cc Clipper, Houston. We'll give that data a good E
+: evaluation before we do anything with it.
+05 20 09 25 IMP-IM Houston, Intrepid.
+a 05 20 09 30 cc Intrepid, Houston. GO.
+05 20 09 3h IMP-1IM Got sort of an interesting thing going on AGS
+: right now. TI didn't notice earlier, but it may
+Just be because the lights ure brighter now.
+I'm getting an all 8's flash on both the address
+4 and the information registers at about one-
+fifth the brilliance of the normal numbers. And
+; a - It's pulsing every second.
+05 20 10 00 cc Roger, Al.
+: 05 20 10 06 IMP-IM If I turn down the illumination level just a
+: little bit, it's not noticeable.
+05 20 10 52 . IMP-IM Hello, Houston; Intrepid. You ready for my RCS
+; hot fire?
+) 05 20 10 59 cc Intrepid, Houston. Roger. Fire away.
+: 05 20 11 03 CDR-IM Okay. )
+i 05 20 11 32 cc Intrepid, Houston.
+!
+: 05 20 11 37 LMP-IM Go.
+t 05 20 11 39 cc Roger, ‘Al. Fredo is here. He and I have both
+i seen that phenomena on your DEDA during testing
+i of most all the spacecrafts up at Bethpage, and
+| it's probably an EMI.
+! 05 20 11 56 CDR-LM That's what we've been talking about, but we .
+i thought we'd Just tcuch in on it.
+{ 05 20 11 59 IMP-IM When you go to your roll rate, roll left, pitch
+| up - =
+: 05 20 12 01 cc Roger. I think TRW's got a workup on this
+: problem.
+s 05 20 12 08 CDR-IM Okay?
+05 20 12 11 CDR-IM Here you go, Houston, with roll, pitch, and
+i yaw.
+05 20 12 14 cc Roger, Pete. 3

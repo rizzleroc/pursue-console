@@ -1,0 +1,32 @@
+(b)(htda |
+Misrep 8799515
+Narrative
+(b)(1)1.4a, (b)(1)1.4c
+FEE
+AEE
+FEE
+FE
+FE
+]
+FE
+FEE
+|
+|
+Admin
+CLASSIFICATION
+* Classification: Sis@Risd
++ Associated Caveats: [S[§DIEENIINENG
+* Classification Source (MS or Classification Guide ID): [EI NEENIIENGEG
+* Declassification Date (YYYYMMDD): 20480603
+OPERATION
+« Operation: (IEEE)
+* Domain:
++ Operations Center: [QiIE§
+* Major Command (MAJCOM): AFCENT
+¢ Combatant Command (COCOM): [IEEE]
+MSGID
+* Report Type: MISREP
+* Originator (Unit or Squadron): [QI{XER
+* Submit Date (Auto-generated):
+ota |
+|

@@ -1,0 +1,39 @@
+Tape 90/4
+( ; Page T43
+J
+. . 0519 2h 11 CMP Okay. And Jerry, will you find out what they
+A want to do about this battery charge, because
+i I'm using the bus ties during the rendezvous?
+: 05 19 24 23 cc Roger.
+05 19 24 k3 cc Yankee Clipper, Houston. Why don't you figure
+on terminating the battery charge at LOS?
+05 19 2k 52 CMP © All right; I could let it go until I ... just
+before lift-off. That way it might take it
+all the way up.
+05 19 25 33 cc Clipper, Houston. We prefer that you terminate
+at LOS on this pass.
+05 19 25 Lo CMP Roger.
+05 19 25 ki cc Roger. That would be one less thing for us to
+keep track of prior to lift-off.
+05 19 25 48 CMP Okay.
+) . 05 19 27 17 CDR-IM Say, Houston; Intrepid.
+Po 05 19 27 20 cc Intrepid, Houston. Go.
+: 05 19 27 25 IMP-ILM Roger. When you look out the AOT in the dark
+5 quadrant? You can see these lights - particles
+! of light, flashes of light just seem to come
+H from ~ in this case, I'm looking in quadrant 1
+; which is the left one, It's coming from behind
+H me, the left, and they're just sailing off in
+: . space. I was thinking they're dropping from my
+{ water boiler, but it looks like some of those
+i things are escaping the Moon. They really haul
+out of here and Just press off at the stars.
+j 05 19 27 56 cc Roger.
+! 05 19 28 25 CC Yankee Clipper, Houston with a P22 tracking PAD.
+i
+! © 0519 28 L2 cM Go ahead.
+: 05 19 28 4k cc Roger. Your target is IM; 7, is 139:57:39;
+: T, is 140:02:38; south 05; latitude is i
+: minus 3 - -
+0519 29 10 CMP Roger. T 112 ~
+}

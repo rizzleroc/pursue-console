@@ -1,0 +1,18 @@
+14@ |
+14@
+I
+0
+I
+OO 0]
+I
+|
+OO Oo
+|
+GENTEXT/UAP
+* UAP Description (e.g., size, shape, color, markings, recognizable features): (SECRET NEES
+stiiiineii@) AT 16537, [IIE OBS 2X ROUND WHITE HOT UAPS
+DYNAMIC SOUTH AT APPROX 240NM/HOUR IVO 35SQT3423692957.
+* Gentext (UAP Event Description): (SS @RET RE nieesSrmiinngihiBmiiiismemilien AT 16537,
+[EIE OBS 2X UAPS DYNAMIC SOUTH AT APPROX 240NM/HOUR IVO 35SQT3423692957.
+id@ |
+|

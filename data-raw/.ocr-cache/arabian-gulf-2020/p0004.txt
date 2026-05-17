@@ -1,0 +1,38 @@
+(b)(htda |
+* Data Link:
++ Gentext:
+Timeline
+Takeoff
+- Calsign
+* Number of Aircraft: ff
++ Asset Type (Aircraft) jill
+« Aircraft Tail Number(s):
+* Takeoff Location (ICAO Code) jill
+« Takeoff Time DTG:
+* Mode 3 (IFF Codes):
++ Gentext/Additional Details: (SEEREF+REFO-E8#=FvE WEATHER WAS (NOT) A FACTOR
+(EXPLAIN WHY IF IT WAS)
+* Mission Canceled:
+Landing
+Last Land Location (ICAO Code):
+Last Land Time:
+« Last Engine Shutdown Time:
++ Total Mission Time: [(QI§{IEENINNENG
+* Gentext/Additional Details:
+ISR
+« Time-on Station DTG:
+« Time-off Station DTG:
+* Aircraft Callsign:
++ Msn Type:
++ Primary Sensor: [(JI§IYICE]
++ Sensors Available: [I { IEENIIINGEEEE
+* Tasking Type: [QIQIEE
+» Tasking or Request Number (JTAR#, AEM#, PRI#, or TIC#): -
+* BE Number (if NTISR): -
++ Tasked Start Point: [NI §N ENE
+* Activity Description: ISR
+* FMV or Image File Name (if NTISR): -
+* EEIs Observed:
+* Number of EEIs:
+ota |
+|

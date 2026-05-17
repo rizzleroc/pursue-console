@@ -1,0 +1,44 @@
+bl
+we Tape 93/8
+© Page T1718
+06 00 21 L2 CMP But I don't have you in the sextant, That's
+okay. Your blinking light's Just not blinking,
+' that's all.
+06 C0 21 51 CDR-IM Hey, Houston. It looks like our tracking
+. 1llght's burned out. Dick hasn't been able to
+find us in this sextant. And on the first
+nightside pass we had little bits and pieces
+floating along with us and we could tell that
+: the tracking light was flashing on them. And
+we still have, I've presumed to think, bits
+and pieces floating along and nothing's flashing
+: on them, so I'm pretty sure it burned out.
+06 00 22 11 cc Roger, Pete.
+i 06 00 22 22 IMP-IM Yes, sir. Okay.
+. 06 00 22 26 cc Hi, Intrepid.
+: 06 00 22 27 LMP-IM Okay.
+) { ) 06 00 22 28 cc This is Houston. How'd your sweepdown fore
+1 ( i and aft go?
+1
+-
+t 06 00 22 33 CDR-LM It's getting much cleaner in here running this
+: way; end, also, Yankee Clipper informs me he
+: has the television all set up. When we come
+i around the hora, we'll come around with the
+; television on in VOX.
+1
+| 06 00 22 47 cc Roger. .
+| 06 00 22 53 CDR-IM Who knows, you may get to see the first
+{ whifferdill.
+06 00 22 59 cc Roger, Pete. Our electrical watchers say that
+| the current indicates that your tracking light
+; is on.
+| 06 00 23 11 CDR-IM Okay. Now we just turned it off. Now does the
+; current show that?
+i 06 00 23 19 cc It - I¢ sure does, Pete.
+1 06 00 23 26 cmp You're - they're - You're flying through the
+: eir bockvards, then, Pete, because I don't see
+. it.
+tod 06 00 23 33 CDR-LM Well, my ball tells me I'm pointed at you, Dick,
+) i # end so does my radar.
+Se a SE He PRE SR soa oe se a ee ise es S00 ea as
