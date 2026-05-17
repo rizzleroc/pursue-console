@@ -4,9 +4,10 @@ import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
 
-// Hard-coded inventory size from the official war.gov/UFO/ landing page.
-// Update when subsequent tranches drop.
-const INVENTORY_TOTAL = 162;
+// Fallback inventory total — only used if public/corpus-stats.json hasn't
+// loaded yet (or 404s on dev). The real number comes from the corpus DB
+// (scripts/db-rebuild.mjs writes corpus-stats.json on every build).
+const INVENTORY_TOTAL_FALLBACK = 162;
 
 // =====================================================================
 // SEMANTIC SEARCH — dense-vector search over the corpus.
@@ -402,20 +403,26 @@ export default function SemanticSearchView({ onSelect }) {
     await refreshDropped();
   }
 
-  // Coverage numbers (static)
+  // Coverage numbers — derives from the DB stats when loaded.
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
+      .then(r => r.ok ? r.json() : null).then(setStats).catch(() => {});
+  }, []);
   const coverage = useMemo(() => {
-    const catalogued = EVENTS.length;
+    const inventoryTotal = stats?.inventory?.total ?? INVENTORY_TOTAL_FALLBACK;
+    const catalogued = stats?.events?.catalogued ?? EVENTS.length;
     const withText = vecState ? new Set(vecState.meta.map(m => m.eventId)).size : 0;
     return {
-      inventoryTotal: INVENTORY_TOTAL,
+      inventoryTotal,
       catalogued,
       withText,
-      missingFromCatalog: INVENTORY_TOTAL - catalogued,
+      missingFromCatalog: stats?.gap?.uncataloguedRecords ?? Math.max(0, inventoryTotal - catalogued),
       droppedDocs: droppedDocs.length,
       droppedChunks: droppedVecs.meta.length,
       staticChunks: vecState?.info.count || 0,
     };
-  }, [vecState, droppedDocs, droppedVecs]);
+  }, [vecState, droppedDocs, droppedVecs, stats]);
 
   return (
     <div className="px-3 sm:px-8 py-6">

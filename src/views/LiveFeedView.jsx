@@ -225,6 +225,7 @@ function SweepWedge() {
 // =================================================================
 export default function LiveFeedView({ onSelect }) {
   const [feed, setFeed] = useState(null);
+  const [dbStats, setDbStats] = useState(null);  // public/corpus-stats.json — TRUE numbers from the DB
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [reloadAt, setReloadAt] = useState(Date.now());
@@ -242,10 +243,14 @@ export default function LiveFeedView({ onSelect }) {
   useEffect(() => {
     let cancelled = false;
     const load = () => {
-      fetch(`${import.meta.env.BASE_URL}live-feed.json?t=${Date.now()}`)
-        .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
-        .then(d => { if (!cancelled) { setFeed(d); setError(null); } })
-        .catch(e => { if (!cancelled) setError(e.message); });
+      Promise.all([
+        fetch(`${import.meta.env.BASE_URL}live-feed.json?t=${Date.now()}`).then(r => r.ok ? r.json() : null),
+        fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`).then(r => r.ok ? r.json() : null),
+      ]).then(([f, s]) => {
+        if (cancelled) return;
+        if (!f) { setError("HTTP fetching live-feed"); return; }
+        setFeed(f); setDbStats(s); setError(null);
+      }).catch(e => { if (!cancelled) setError(e.message); });
     };
     load();
     const id = setInterval(load, 30_000);
@@ -335,16 +340,20 @@ export default function LiveFeedView({ onSelect }) {
       else if (v > 0) ready++;
       else queued++;
     }
-    const cataloguedTotal = EVENTS.length;
-    const uncatalogued = Math.max(0, 162 - cataloguedTotal);
+    // TRUE totals — pulled from public/corpus-stats.json (DB-backed) when
+    // available, fall back to the press-release claim only if stats hasn't
+    // loaded yet. Single source of truth, not three hardcodes.
+    const totalInventory = dbStats?.inventory?.total ?? 162;
+    const cataloguedTotal = dbStats?.events?.catalogued ?? EVENTS.length;
+    const uncatalogued = dbStats?.gap?.uncataloguedRecords ?? Math.max(0, totalInventory - cataloguedTotal);
     return {
       ready, improving, queued, missing, cataloguedTotal, uncatalogued,
-      totalInventory: 162,
+      totalInventory,
       active: activeIds.length,
       activeIds,
       feedNewest,
     };
-  }, [feed, now]);
+  }, [feed, now, dbStats]);
 
   // Source counters
   const sourceRates = useMemo(() => {

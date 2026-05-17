@@ -21,6 +21,7 @@ data-raw/*
 !data-raw/.ocr-cache/
 !data-raw/.vision-visuals-cache/
 !data-raw/.contributions-manifest.json
+!data-raw/corpus.sqlite
 
 # tesseract.js downloads the trained data on first run
 eng.traineddata

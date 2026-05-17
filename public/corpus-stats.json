@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-05-17T20:03:40.152Z",
+  "pressReleaseClaim": 162,
+  "inventory": {
+    "total": 162,
+    "enumerated": 48,
+    "placeholders": 110,
+    "pdfs": 48,
+    "videos": 0,
+    "images": 0,
+    "bytesKnown": 0
+  },
+  "events": {
+    "catalogued": 52,
+    "withPdfDownloaded": 0,
+    "withAnyPages": 23,
+    "withVisionPages": 19,
+    "fullyVision": 7
+  },
+  "pages": {
+    "totalKnown": 847,
+    "totalIndexed": 812,
+    "vision": 438,
+    "ocrOnly": 271,
+    "visualsAnnotated": 309,
+    "totalChars": 1002435
+  },
+  "contributions": {
+    "total": 18,
+    "contributors": [
+      {
+        "handle": "Rizzleroc",
+        "pages": 18,
+        "chars": 24246
+      }
+    ]
+  },
+  "runs": {
+    "last": {
+      "ts": "2026-05-17T20:03:40.152Z",
+      "kind": "db-rebuild",
+      "outcome": "ok",
+      "duration_ms": 239,
+      "note": "events=52 inventory=162 contributions=18"
+    },
+    "recent": [
+      {
+        "ts": "2026-05-17T20:03:40.152Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 239,
+        "note": "events=52 inventory=162 contributions=18"
+      },
+      {
+        "ts": "2026-05-17T20:03:15.027Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 244,
+        "note": "events=52 inventory=162 contributions=18"
+      },
+      {
+        "ts": "2026-05-17T20:01:58.720Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 533,
+        "note": "events=52 inventory=162 contributions=18"
+      }
+    ]
+  },
+  "gap": {
+    "uncataloguedRecords": 110,
+    "cataloguedButNoPages": 29,
+    "partialOcrNeedsVision": 15
+  }
+}

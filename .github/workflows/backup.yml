@@ -39,10 +39,14 @@ jobs:
           mkdir -p _snapshot
           # Each artifact, if present. Don't fail if any are missing.
           for f in \
+            data-raw/corpus.sqlite \
+            data-raw/.contributions-manifest.json \
+            public/corpus-stats.json \
             public/text/manifest.json \
             public/embeddings.bin \
             public/embeddings-meta.json \
             public/embeddings-info.json \
+            public/embeddings-input-hash.txt \
             public/dossier-extracts.json \
             public/patterns.json \
             public/search-index.json \

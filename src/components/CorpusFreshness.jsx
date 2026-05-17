@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 // the deployed site see updates as soon as a new build lands.
 
 let _versionP = null;
+let _statsP = null;
 function loadVersion(bust = false) {
   if (bust || !_versionP) {
     const t = bust ? `?t=${Date.now()}` : "";
@@ -14,6 +15,15 @@ function loadVersion(bust = false) {
       .catch(() => null);
   }
   return _versionP;
+}
+function loadStats(bust = false) {
+  if (bust || !_statsP) {
+    const t = bust ? `?t=${Date.now()}` : "";
+    _statsP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json${t}`, { cache: bust ? "reload" : "default" })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .catch(() => null);
+  }
+  return _statsP;
 }
 
 function fmtAgo(iso) {
@@ -28,12 +38,16 @@ function fmtAgo(iso) {
 
 export default function CorpusFreshness({ compact = false }) {
   const [v, setV] = useState(null);
+  const [s, setS] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
   async function refresh(bust = false) {
     setRefreshing(true);
-    if (bust) _versionP = null;
-    try { setV(await loadVersion(bust)); } finally { setRefreshing(false); }
+    if (bust) { _versionP = null; _statsP = null; }
+    try {
+      const [ver, st] = await Promise.all([loadVersion(bust), loadStats(bust)]);
+      setV(ver); setS(st);
+    } finally { setRefreshing(false); }
   }
   useEffect(() => {
     refresh(false);
@@ -41,16 +55,31 @@ export default function CorpusFreshness({ compact = false }) {
     return () => clearInterval(id);
   }, []);
 
-  if (!v) return null;
-  const ago = fmtAgo(v.generatedAt);
+  if (!v && !s) return null;
+  const ago = fmtAgo((s?.generatedAt) || v?.generatedAt);
+
+  // Pull TRUE numbers from the DB-derived stats when available; fall back
+  // to the version manifest. Single tooltip can explain the breakdown.
+  const inventoryTotal = s?.inventory?.total ?? null;
+  const catalogued     = s?.events?.catalogued ?? null;
+  const withVision     = s?.events?.withVisionPages ?? null;
+  const pagesIndexed   = s?.pages?.totalIndexed ?? null;
+  const pagesVision    = s?.pages?.vision ?? null;
+  const contribPages   = s?.contributions?.total ?? null;
+  const contribCount   = s?.contributions?.contributors?.length ?? 0;
+  const uncatalogued   = s?.gap?.uncataloguedRecords ?? null;
 
   if (compact) {
     return (
       <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        CORPUS · {ago}
-        {v.embeddingsCount && <span className="text-emerald-600">· {v.embeddingsCount.toLocaleString()} chunks</span>}
-        {v.pagesNeeded != null && <span className="text-amber-600">· {v.pagesNeeded} pages queued</span>}
+        {ago}
+        {inventoryTotal != null && (
+          <span className="text-emerald-600">· {catalogued}/{inventoryTotal} catalogued</span>
+        )}
+        {pagesVision != null && (
+          <span className="text-emerald-600">· {pagesVision.toLocaleString()}p vision</span>
+        )}
       </span>
     );
   }
@@ -60,16 +89,30 @@ export default function CorpusFreshness({ compact = false }) {
       <div className="flex items-center gap-3 flex-wrap">
         <span className="inline-flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          CORPUS REFRESHED <span className="text-emerald-400 ml-1">{ago}</span>
+          REFRESHED <span className="text-emerald-400 ml-1">{ago}</span>
         </span>
-        {v.embeddingsCount != null && (
-          <span className="text-emerald-600">·  FAISS <span className="text-emerald-400">{v.embeddingsCount.toLocaleString()}</span> chunks {v.embeddingsDim}D</span>
+        {inventoryTotal != null && (
+          <span className="text-emerald-600" title="Records claimed by war.gov press release (will be a live scrape count once the scraper lands)">
+            ·  <span className="text-emerald-400">{catalogued}</span> of <span className="text-emerald-400">{inventoryTotal}</span> records catalogued
+          </span>
         )}
-        {v.docsIndexed != null && (
-          <span className="text-emerald-600">·  <span className="text-emerald-400">{v.docsIndexed}</span> docs indexed</span>
+        {pagesIndexed != null && (
+          <span className="text-emerald-600" title="Per-page rows in the corpus DB across all events">
+            ·  <span className="text-emerald-400">{pagesIndexed.toLocaleString()}</span> pages indexed (<span className="text-cyan-300">{pagesVision.toLocaleString()}</span> vision)
+          </span>
         )}
-        {v.pagesNeeded != null && (
-          <span className="text-amber-600">·  <span className="text-amber-300">{v.pagesNeeded}</span> pages need volunteers</span>
+        {contribPages > 0 && (
+          <span className="text-emerald-600" title="Pages contributed by outside volunteers via PRs">
+            ·  <span className="text-amber-300">{contribPages}</span> from <span className="text-amber-300">{contribCount}</span> volunteer{contribCount === 1 ? "" : "s"}
+          </span>
+        )}
+        {uncatalogued > 0 && (
+          <span className="text-rose-400/80" title="Records on war.gov not yet catalogued in src/data/events.js">
+            ·  <span className="text-rose-300">{uncatalogued}</span> still uncatalogued
+          </span>
+        )}
+        {v?.embeddingsCount != null && (
+          <span className="text-emerald-700">·  FAISS <span className="text-emerald-500">{v.embeddingsCount.toLocaleString()}</span>D</span>
         )}
       </div>
       <button
