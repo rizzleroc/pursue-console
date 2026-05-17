@@ -21,7 +21,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: pip
+          # No `cache: pip` — setup-python's pip cache requires a manifest
+          # (requirements.txt / pyproject.toml) at repo root. Without one
+          # the action fails the whole job before any validator runs, which
+          # is what burned PR #3 (both gates reported "(no output)").
       - run: npm install --no-audit --no-fund
 
       - name: Ensure wordlist (Gate 3)
