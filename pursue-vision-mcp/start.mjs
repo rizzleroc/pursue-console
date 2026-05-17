@@ -81,25 +81,26 @@ async function ensureChrome() {
 
 await ensureChrome();
 
-// Hand off to the daemon — same Node process.
+// Hand off to the MCP daemon — same Node process. Binds 9223.
 await import(path.join(__dirname, "daemon.mjs"));
 
-// After daemon is up, print the dashboard URL prominently and try to open it.
-const DASHBOARD_URL = `http://127.0.0.1:${process.env.PURSUE_VISION_PORT || 9223}/dashboard`;
-console.log("");
-console.log("╭───────────────────────────────────────────────────────────╮");
-console.log("│  Dashboard:  " + DASHBOARD_URL.padEnd(43) + "│");
-console.log("│  Helmsman Phosphor — live progress while you contribute  │");
-console.log("╰───────────────────────────────────────────────────────────╯");
-
-if (!process.argv.includes("--no-open-dashboard")) {
-  // Best-effort open. Don't fail the daemon if it doesn't work.
-  const opener = platform() === "win32" ? ["cmd", ["/c", "start", "", DASHBOARD_URL]]
-              : platform() === "darwin" ? ["open", [DASHBOARD_URL]]
-              :                            ["xdg-open", [DASHBOARD_URL]];
+// Spawn the MONITOR as a separate detached process on 9224.
+// Lets the maintainer kill the daemon without losing the dashboard,
+// and keeps responsibilities cleanly split.
+const SKIP_MONITOR = process.argv.includes("--no-monitor");
+const SKIP_OPEN    = process.argv.includes("--no-open-dashboard");
+if (!SKIP_MONITOR) {
+  const monitorPath = path.join(__dirname, "monitor.mjs");
+  const args = [monitorPath];
+  if (SKIP_OPEN) args.push("--no-open");
   try {
-    const c = spawn(opener[0], opener[1], { stdio: "ignore", detached: true });
-    c.on("error", () => {});
-    c.unref();
-  } catch {}
+    const m = spawn(process.execPath, args, {
+      cwd: __dirname,
+      stdio: "inherit",
+      detached: false,    // keep tied to start.mjs lifecycle for cleaner shutdown
+    });
+    m.on("error", e => console.error("[start] monitor failed to spawn:", e.message));
+  } catch (e) {
+    console.error("[start] monitor spawn error:", e.message);
+  }
 }

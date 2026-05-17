@@ -9,6 +9,8 @@
   "scripts": {
     "start": "node start.mjs",
     "daemon": "node daemon.mjs",
+    "monitor": "node monitor.mjs",
+    "monitor:tui": "node monitor.mjs --tui",
     "status": "node -e \"const t=require('fs').readFileSync(require('os').homedir()+'/.pursue-vision-token','utf8').trim(); fetch('http://127.0.0.1:9223/status',{headers:{Authorization:'Bearer '+t}}).then(r=>r.text()).then(console.log)\""
   },
   "dependencies": {

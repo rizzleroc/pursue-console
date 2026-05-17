@@ -25,7 +25,7 @@
 //     1  setup error (no daemon, bad args, etc)
 //     2  partial completion (some pages succeeded, some failed)
 
-import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, rename } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -115,24 +115,43 @@ const total = claims.reduce((s, c) => s + c.pages.length, 0);
 console.log(`[volunteer] claiming ${total} page(s) across ${claims.length} doc(s):`);
 for (const c of claims) console.log(`    ${c.eid.padEnd(28)} pages ${c.pages.join(",")}`);
 
-// ---- progress reporter → daemon /progress ----
-// Best-effort. The dashboard polls /progress; if our POST fails the
-// dashboard just shows the previous state. Never fatal.
+// ---- progress reporter → MONITOR (separate process from MCP daemon) ----
+// Two parallel write paths:
+//   1. POST to http://127.0.0.1:9224/progress (the monitor) — live push
+//   2. Write to ~/.pursue-helper/progress.json — survives monitor restarts
+// Both are best-effort. The dashboard polls /progress; if the POST fails
+// the dashboard just shows the previous state. Never fatal.
+const MONITOR_URL = process.env.PURSUE_MONITOR_URL || "http://127.0.0.1:9224";
+const MONITOR_TOKEN = process.env.PURSUE_MONITOR_TOKEN || null;  // monitor is unauth by default
+const HELPER_DIR = process.env.PURSUE_HELPER_DIR || path.join(os.homedir(), ".pursue-helper");
+const STATE_PATH = path.join(HELPER_DIR, "progress.json");
+const STATE_TMP  = path.join(HELPER_DIR, "progress.json.tmp");
+await mkdir(HELPER_DIR, { recursive: true }).catch(() => {});
+
 const SHIFT_START = Date.now();
 const sessionRecent = [];
+let currentState = {
+  handle: HANDLE, shiftStart: SHIFT_START, idle: false,
+  now: null, slice: { done: 0, total: 0 }, corpus: { done: 0, target: 0 },
+  recent: [], session: { pagesOk: 0, pagesErr: 0 },
+};
 async function reportProgress(patch = {}) {
+  currentState = { ...currentState, ...patch, updatedAt: Date.now() };
+  // Path 1: POST to monitor
   try {
-    await fetch(`${DAEMON}/progress`, {
+    const headers = { "Content-Type": "application/json" };
+    if (MONITOR_TOKEN) headers.Authorization = `Bearer ${MONITOR_TOKEN}`;
+    await fetch(`${MONITOR_URL}/progress`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
-      body: JSON.stringify({
-        handle: HANDLE,
-        shiftStart: SHIFT_START,
-        idle: false,
-        ...patch,
-      }),
+      headers,
+      body: JSON.stringify(currentState),
       signal: AbortSignal.timeout(2000),
     });
+  } catch {}
+  // Path 2: atomic write to local file
+  try {
+    await writeFile(STATE_TMP, JSON.stringify(currentState), "utf8");
+    await rename(STATE_TMP, STATE_PATH);
   } catch {}
 }
 function recordCompletion(page, state, note) {

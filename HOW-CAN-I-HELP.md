@@ -22,9 +22,21 @@ Then:
 
 ```bash
 cd pursue-helper
-npm start --prefix pursue-vision-mcp                 # launches Chrome + daemon
+npm start --prefix pursue-vision-mcp        # launches Chrome + daemon (9223) + MONITOR (9224)
 # in another terminal:
 node scripts/volunteer.mjs --my-handle=YOU --slice=20
+```
+
+`npm start` brings up two independent processes:
+
+- **MCP daemon** at `http://127.0.0.1:9223` — handles ChatGPT vision OCR. Single-responsibility.
+- **Helper monitor** at `http://127.0.0.1:9224` — the live progress dashboard. Auto-opens in your default browser. Persists state to `~/.pursue-helper/progress.json` so it survives daemon restarts.
+
+You can also run them separately:
+```bash
+npm run daemon  --prefix pursue-vision-mcp    # MCP only
+npm run monitor --prefix pursue-vision-mcp    # dashboard only (useful to inspect last session)
+npm run monitor:tui --prefix pursue-vision-mcp   # terminal-only dashboard, no browser
 ```
 
 ### Manual setup (if you want the full repo)
