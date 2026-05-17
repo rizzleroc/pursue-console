@@ -30,7 +30,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
 
 process.on("unhandledRejection", e => console.error("  ! unhandled:", e?.message || e));
@@ -70,8 +70,13 @@ const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/
 async function loadToken() {
   if (process.env.PURSUE_VISION_TOKEN) return process.env.PURSUE_VISION_TOKEN;
   if (process.env.WHIPGEN_TOKEN) return process.env.WHIPGEN_TOKEN;
-  try { return (await readFile(TOKEN_FILE, "utf8")).trim(); }
-  catch { console.error(`error: no token. Start the daemon first (it writes ${TOKEN_FILE}), or set PURSUE_VISION_TOKEN`); process.exit(1); }
+  // Try our own token first, then fall back to whipgen-mcp's token so the
+  // script works against either daemon flavour. Credit: helper test PR #1.
+  for (const p of [TOKEN_FILE, path.join(os.homedir(), ".whipgen-token")]) {
+    try { return (await readFile(p, "utf8")).trim(); } catch {}
+  }
+  console.error(`error: no token. Start the daemon first (it writes ${TOKEN_FILE}), or set PURSUE_VISION_TOKEN`);
+  process.exit(1);
 }
 const TOKEN = await loadToken();
 
@@ -184,8 +189,8 @@ const live = claims.filter(c => !c.skip);
 
 // ----- step 4: render + OCR via daemon -----
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL  = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\","/");
-const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\","/");
+const PDFJS_WASM_URL  = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/wasm")).href + "/";
+const PDFJS_FONTS_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts")).href + "/";
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }

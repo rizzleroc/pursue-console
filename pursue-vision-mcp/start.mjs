@@ -1,8 +1,13 @@
-// One-shot entry point: ensure Chrome is up on the debug port, start the daemon.
+// One-shot entry point. Ensures Chrome is up on the debug port, then brings
+// up the MCP daemon (9223) AND the helper monitor (9224) as separate
+// processes.
 //
 // Usage:
-//   npm start                    — auto-launch Chrome if needed, start daemon
-//   npm start -- --no-chrome     — assume Chrome is already running on CDP port
+//   npm start                       — use primary MCP if already running, else launch Chrome + daemon + monitor
+//   npm start -- --no-chrome        — assume Chrome is already on CDP port
+//   npm start -- --no-primary       — skip the primary-MCP check, always spin up own instance
+//   npm start -- --no-monitor       — skip launching the helper dashboard
+//   npm start -- --no-open-dashboard — launch monitor but don't auto-open browser
 //
 // The actual ChatGPT login is your problem (and your computer's). We never
 // see your credentials; we only attach to a tab you already authenticated in.
@@ -10,13 +15,32 @@
 import { spawn } from "node:child_process";
 import { existsSync, statSync } from "node:fs";
 import { platform } from "node:os";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CDP_PORT = Number(process.env.PURSUE_CDP_PORT || 9222);
 const NO_CHROME = process.argv.includes("--no-chrome");
+const NO_PRIMARY = process.argv.includes("--no-primary");
+const PRIMARY_MCP_PORT = Number(process.env.PURSUE_PRIMARY_MCP_PORT || 9223);
+
+// If a primary MCP is already running on the standard port (i.e. the
+// maintainer has their full whipgen-mcp going), this helper instance just
+// reports it and exits. Volunteers should point their scripts at it via
+// DAEMON=http://127.0.0.1:9223 rather than fight for the port.
+async function probeMcp(port) {
+  try {
+    const r = await fetch(`http://127.0.0.1:${port}/health`, { signal: AbortSignal.timeout(2000) });
+    return r.ok;
+  } catch { return false; }
+}
+if (!NO_PRIMARY && await probeMcp(PRIMARY_MCP_PORT)) {
+  console.log(`[start] primary MCP already running on :${PRIMARY_MCP_PORT} — skipping Chrome + daemon startup`);
+  console.log(`[start] use DAEMON=http://127.0.0.1:${PRIMARY_MCP_PORT} in your scripts`);
+  console.log(`[start] for the dashboard, run:   npm run monitor`);
+  process.exit(0);
+}
 
 async function probeCdp() {
   try {
@@ -58,11 +82,15 @@ async function ensureChrome() {
     console.error(`[start] Chrome not found in the usual locations. Install Chrome or start it yourself with --remote-debugging-port=${CDP_PORT} and pass --no-chrome.`);
     process.exit(2);
   }
+  // Per-port profile suffix so spinning up a second instance on a different
+  // CDP port doesn't fight the primary Chrome over a shared user-data dir.
+  // Credit: helper test PR #1.
+  const profileSuffix = process.env.PURSUE_CHROME_PROFILE || `pursue-${CDP_PORT}`;
   const userDataDir = platform() === "win32"
-    ? `${process.env.LOCALAPPDATA}/Google/Chrome/User Data`
+    ? `${process.env.LOCALAPPDATA}/Google/Chrome/User Data - ${profileSuffix}`
     : platform() === "darwin"
-    ? `${process.env.HOME}/Library/Application Support/Google/Chrome`
-    : `${process.env.HOME}/.config/google-chrome`;
+    ? `${process.env.HOME}/Library/Application Support/Google/Chrome-${profileSuffix}`
+    : `${process.env.HOME}/.config/google-chrome-${profileSuffix}`;
   console.log(`[start] launching Chrome with --remote-debugging-port=${CDP_PORT}`);
   console.log(`[start] using profile ${userDataDir}`);
   spawn(chrome, [
@@ -82,7 +110,10 @@ async function ensureChrome() {
 await ensureChrome();
 
 // Hand off to the MCP daemon — same Node process. Binds 9223.
-await import(path.join(__dirname, "daemon.mjs"));
+// Windows: bare paths from path.join() don't satisfy the ESM URL scheme,
+// so we wrap with pathToFileURL to get 'file:///C:/...'.
+// Credit: helper test PR #1 (ERR_UNSUPPORTED_ESM_URL_SCHEME).
+await import(pathToFileURL(path.join(__dirname, "daemon.mjs")).href);
 
 // Spawn the MONITOR as a separate detached process on 9224.
 // Lets the maintainer kill the daemon without losing the dashboard,

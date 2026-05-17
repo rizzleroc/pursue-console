@@ -18,7 +18,7 @@ import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
 
 // pdfjs occasionally emits an AbortException from internal aborted-render
@@ -231,8 +231,11 @@ function splitTextAndVisuals(raw) {
 
 // ---- pdf → png rendering (same factory as ocr-scanned.mjs) ----
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\", "/");
-const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\", "/");
+// pathToFileURL produces 'file:///C:/...' on Windows. Raw 'file://C:/...'
+// concat lacks the third slash and pdfjs's font/wasm loaders fail silently,
+// surfacing as the recurring RENDER errors. Credit: helper test PR #1.
+const PDFJS_WASM_URL  = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/wasm")).href + "/";
+const PDFJS_FONTS_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts")).href + "/";
 
 class NodeCanvasFactory {
   create(width, height) {
