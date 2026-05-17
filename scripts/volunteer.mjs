@@ -26,12 +26,13 @@
 //     2  partial completion (some pages succeeded, some failed)
 
 import { readFile, writeFile, mkdir, readdir, rename } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, createReadStream } from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import os from "node:os";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { createCanvas } from "@napi-rs/canvas";
+import { createCanvas, Path2D } from "@napi-rs/canvas";
 
 process.on("unhandledRejection", e => console.error("  ! unhandled:", e?.message || e));
 process.on("uncaughtException",  e => console.error("  ! uncaught:",  e?.message || e));
@@ -70,9 +71,9 @@ const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/
 async function loadToken() {
   if (process.env.PURSUE_VISION_TOKEN) return process.env.PURSUE_VISION_TOKEN;
   if (process.env.WHIPGEN_TOKEN) return process.env.WHIPGEN_TOKEN;
-  // Try our own token first, then fall back to whipgen-mcp's token so the
-  // script works against either daemon flavour. Credit: helper test PR #1.
-  for (const p of [TOKEN_FILE, path.join(os.homedir(), ".whipgen-token")]) {
+  // Try whipgen-token first — if the primary MCP is running it takes precedence.
+  // Falls back to pursue-vision-token for standalone daemon setups.
+  for (const p of [path.join(os.homedir(), ".whipgen-token"), TOKEN_FILE]) {
     try { return (await readFile(p, "utf8")).trim(); } catch {}
   }
   console.error(`error: no token. Start the daemon first (it writes ${TOKEN_FILE}), or set PURSUE_VISION_TOKEN`);
@@ -188,9 +189,30 @@ for (const c of claims) {
 const live = claims.filter(c => !c.skip);
 
 // ----- step 4: render + OCR via daemon -----
+// pdfjs's isValidFetchUrl() rejects file:// URLs (only accepts http/https), so
+// useWorkerFetch is never enabled and wasm/font loading silently fails. Serve
+// the pdfjs-dist assets over a local HTTP server so the URLs pass validation.
+const PDFJS_DIST_DIR = path.join(ROOT, "node_modules/pdfjs-dist");
+const assetServer = http.createServer((req, res) => {
+  const safePath = path.normalize(decodeURIComponent(req.url)).replace(/^[/\\]+/, "");
+  const filePath = path.join(PDFJS_DIST_DIR, safePath);
+  if (!filePath.startsWith(PDFJS_DIST_DIR + path.sep) && filePath !== PDFJS_DIST_DIR) {
+    res.writeHead(403); return res.end();
+  }
+  const ct = filePath.endsWith(".wasm") ? "application/wasm" : "application/octet-stream";
+  res.writeHead(200, { "Content-Type": ct });
+  createReadStream(filePath).on("error", () => res.end()).pipe(res);
+});
+await new Promise(resolve => assetServer.listen(0, "127.0.0.1", resolve));
+const { port: assetPort } = assetServer.address();
+console.log(`[volunteer] pdfjs asset server → http://127.0.0.1:${assetPort}/`);
+
+// pdfjs creates `new Path2D()` from whatever is in scope; @napi-rs/canvas's
+// clip/fill only accept their own Path2D class. Wire it up before import.
+globalThis.Path2D = Path2D;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL  = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/wasm")).href + "/";
-const PDFJS_FONTS_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts")).href + "/";
+const PDFJS_WASM_URL  = `http://127.0.0.1:${assetPort}/wasm/`;
+const PDFJS_FONTS_URL = `http://127.0.0.1:${assetPort}/standard_fonts/`;
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }
@@ -278,6 +300,7 @@ for (const c of live) {
   const doc = await pdfjs.getDocument({
     data: new Uint8Array(pdfBuf),
     useSystemFonts: false, disableFontFace: true,
+    useWorkerFetch: true,
     wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL,
   }).promise;
   const docDir = path.join(CONTRIB_ROOT, c.eid);
@@ -299,7 +322,7 @@ for (const c of live) {
       pagesErr++;
       await writeFile(txt, "", "utf8");
       await writeFile(jsn, "[]", "utf8");
-      console.log(`  ✗ ${c.eid} p${p}  RENDER  ${e.message.slice(0,120)}`);
+      console.log(`  ✗ ${c.eid} p${p}  RENDER  ${e.message.slice(0,120)}\n${e.stack?.split('\n').slice(1,5).join('\n')}`);
       recordCompletion(p, "render_err", e.message.slice(0, 60));
       reportProgress({
         slice: { done: pagesOK, total },
@@ -390,6 +413,7 @@ await reportProgress({
   recent: sessionRecent.slice(),
 });
 
+assetServer.close();
 const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);
 console.log(`[volunteer] files at: ${CONTRIB_ROOT}`);
