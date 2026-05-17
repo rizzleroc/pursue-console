@@ -1,0 +1,7 @@
+AQ 62-1028
+
+It may be noted that Captain HOLDER immediately contacted proper military personnel concerning this incident.
+
+Liaison will be maintained with Major CONNER, who advised he has received several more reported incidents to which he will give attention.
+
+3

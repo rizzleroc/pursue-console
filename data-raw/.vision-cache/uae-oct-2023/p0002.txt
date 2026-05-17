@@ -1,0 +1,48 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 12 September 2025
+~~FOUO / Privacy Act applies~~
+
+~~SECRET//NOFORN~~
+
+## Admin
+
+### CLASSIFICATION
+* **Classification:** ~~SECRET~~
+* **Associated Caveats:** ~~NOFORN~~
+* **Classification Source (MS or Classification Guide ID):** MULTIPLE SOURCES
+* **Declassification Date (YYYYMMDD):** 20481025
+
+### OPERATION
+* **Operation:** OP SPARTAN SHIELD
+* **Domain:** AIR
+* **Operations Center:** 609th
+* **Major Command (MAJCOM):** ACC
+* **Combatant Command (COCOM):** USCENTCOM
+
+### MSGID
+* **Report Type:** MISREP
+* **Originator (Unit or Squadron):** 50ATKS
+* **Submit Date:** 
+
+### MSNID
+* **Tasking Order (ATO):** UR
+* **Mission Type:** ISR
+* **ATO Mission Number:** 1.4a
+* **Country Tasked:** US - UNITED STATES
+* **Service Tasked:** A - AIR FORCE
+
+## Poc
+
+### POC
+* **Rank:** A1C
+* **Full Name:** [redacted]
+* **Unit:** 50TH ATKS
+* **Wing:** 432 AEW
+* **Phone Number:** [redacted]
+* **Email:** [redacted]
+
+[redacted]
+
+~~SECRET//NOFORN~~
+USCENTCOM MDR 25-0104 | Approved for Release to AARO ~~FOUO / Privacy Act applies~~ | 09/12/25 | 000002

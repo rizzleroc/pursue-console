@@ -1,0 +1,12 @@
+CONFIDENTIAL
+
+UNEXPLAINED FLYING DISCS
+7 July 1947
+
+5. This agent interviewed W. A. Lissy and D. W. Ellis, both Patrolmen, Portland City Police Department and both possess private pilots licenses. Both officers advised that upon hearing the radio alert, they saw three flat round discs, having a white color to them. These discs were, according to these officers, flying at a terrific speed in a Southerly direction away from Portland, They described them as flying in a straight line formation, the last disc fluttering very rapidly in a side way arc. They further advised the discs were equally spaced and kept in formation. Both officers estimated the discs altitude at 40,000 feet. They saw no evidence of any motivating powers and vapor trails or smoke trails. Both officers stated these discs were traveling so fast, they were out of sight before any detailed observation could be made, or any sound could be heard.
+
+AGENT'S NOTE: All informants mentioned herein are known to this agent as very dependable and trustworthy officers, not being afflicted with hallucinations. The weather in the Portland area at this time was clear with little or no cloud formations being visable from the ground. Ground temperature at this time was 82 degrees Fahrenheit.
+
+Keith A. Sorensen, S/A CIC, Sixth Army
+
+CONFIDENTIAL

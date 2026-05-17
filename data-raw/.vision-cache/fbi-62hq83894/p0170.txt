@@ -1,0 +1,9 @@
+Director
+8-12-47
+
+The above constitutes the only two instances in which this office was contacted concerning flying discs. Unless contrary instructions are received from the Bureau, this office does not contemplate taking any further action in connection with the above two cases, but will fully investigate all future reports concerning flying discs.
+
+JGF/ddc
+98-0
+
+-2-

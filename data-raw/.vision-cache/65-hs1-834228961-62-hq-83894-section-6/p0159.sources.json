@@ -1,0 +1,11 @@
+{
+  "best": "gemini",
+  "sources": {
+    "gemini": {
+      "chars": 2812,
+      "imported_at": "2026-05-17T22:41:07.017Z",
+      "model": "gemini-3.1-flash-lite",
+      "generated_at": "2026-05-08T15:26:29.299296+00:00"
+    }
+  }
+}

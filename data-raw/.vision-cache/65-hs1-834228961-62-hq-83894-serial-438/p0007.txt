@@ -1,0 +1,13 @@
+UNIDENTIFIED FLYING OBJECT
+
+by Officer Zamora. These depressions appeared regular in shape, approximately sixteen by six inches rectangular. Each depression seemed to have been made by an object going into the earth at an angle from a center line. Each depression was approximately two inches deep and pushed some earth to the far side.
+
+Inside the four depressions were three burned patches of clumps of grass. Other clumps of grass in the same area appeared not to be disturbed. One burned area was outside the four depressions.
+
+There were three circular marks in the earth which were smooth, approximately four inches in diameter and penetrated in the sandy earth approximately one-eighth of an inch as if a jar lid had gently been pushed into the sand.
+
+No other person was noted in the area the night of April 24, 1964. No other objects were noted in the area possibly connected with the incident related by Officer Zamora.
+
+So far as could be noted, there were no houses or inhabited dwellings in the area or in sight of the area.
+
+-2-

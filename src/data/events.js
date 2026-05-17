@@ -59,7 +59,20 @@ const RAW = [
   { id: "pursue-release-01", title: "PURSUE Release 01 — Public Disclosure", date: "2026-05-08", sort: 20260508, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", summary: "Cleared for public release: 162 records (120 PDFs, 28 videos, 14 images, 4,185 PDF pages, 2.3 GB total) hosted at war.gov/UFO. Interagency effort: White House, ODNI (Tulsi Gabbard), DOE, AARO, NASA (Jared Isaacman), FBI (Kash Patel), Department of War (Pete Hegseth). Rolling tranches every few weeks. All cases marked UNRESOLVED.", url: "", tags: ["PURSUE","Hegseth","Trump","Gabbard","Isaacman","Patel","disclosure","TODAY"] },
 ];
 
-export const EVENTS = RAW.map(e => ({ ...e, url: e.url && !e.url.startsWith("http") ? URL_BASE + e.url : e.url }));
+// Concat auto-catalogued stubs from the Gemini-corpus import. These fill
+// out the long tail of Release 01 PDFs we haven't hand-curated yet;
+// they're flagged auto: true so the UI can dim or section them. Promote
+// a stub by writing a fully-curated entry in RAW above and removing it
+// from events-auto.js.
+import { EVENTS_AUTO } from "./events-auto.js";
+
+const _curatedIds = new Set(RAW.map(e => e.id));
+const _autoMinusDupes = EVENTS_AUTO.filter(e => !_curatedIds.has(e.id));
+
+export const EVENTS = [...RAW, ..._autoMinusDupes].map(e => ({
+  ...e,
+  url: e.url && !e.url.startsWith("http") ? URL_BASE + e.url : e.url,
+}));
 
 export const AGENCY_COLORS = {
   "FBI": "#FF8C42",

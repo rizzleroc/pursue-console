@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1947-12-30
 Location: United States
 Type: Memorandum
-Source extraction: MIXED · 28 pages
+Source extraction: VISION · 28 pages
 
 ---
 
@@ -683,49 +683,53 @@ HEADQUARTERS ARMY AIR FORCES
 CORRESPONDENCE REFERENCE FORM
 
 
-=== Page 18 ===
+=== Page 18 (vision) ===
 
-Vad rt Ur :
-AE iad @  pesTh ATED @ : ;
-3 Wrén 22 Oct 1947
-B/L fm AMC, Subj: "Flyimg Dises", td 18 Cot 47 Lt Col Garrett/d1/a544
+[Stamp: ~~CONFIDENTIAL~~ RESTRICTED]
+
+Wrtn 22 Oct 1947
+B/L fm AMC, Subj: "Flying Discs", dtd 13 Oct 47
+Lt Col Garrett/dl/4544
 AFBIR-CO-5
-AFBIR-CO-8 let Ind
-T1194
-Dept. of the Alr Force, Hq., USAF , {Washingtoh 25, D. C. 28 0CT 1947
-Tos Commanding General, Air Vateriel Command, Wright Field, Ohio
-(attention: 7-2)
-1. A representative of this headquarters has contacted Lt. Colonel
-Herbert C. Cee concerning Mrs. Merchant's theory on the flying dises,
-as expressed to General Brentnall. ) 7 :
-‘2. It is recommended that mo action be taken to interrogate
-Mrs. ¥erchant end that this osse be closed.
-® BY ORDER OF THE SECRETARY OF THE AIR FORCE: $ ¥ 5
-Inels - n/c DOUGEASS W, EISEVAN
-It. Colonel Afr=CorRs USAFE
-~Exeoutive; yir Iniely Requirements Division
-. : Office of Ass't Chiler of Ait Staff-2 CE -
-7a RAR ; : id
-£8 0C71947 2
-aes - WAIL BRANGH : Bond
-0 5
-@® we ©
-Po
-. NS
-AY
-P 94845 Y
-x
-|
-. ; f
-ft sped
-4 ee 1 IL il
-d :
-SIGNATURE OF = Vi i Z3 rs; iE »
-ResroNsiBLE Orvicer [( ef Fee 5 Lite gery TN + l
-i I [.i/a%0s SeREIS ST RL
-TIyteRNAL OFFICE (5 4 ep USAE ST Ie lize ll bi . EE eo
-TIEN Ch BE lar
-6-2035-1 u. 5. coveanMENT PUNTING OFFICE
+
+AFBIR-CO-5 1st Ind
+Dept. of the Air Force, Hq., USAF, Washington 25, D. C.
+28 OCT 1947
+
+To: Commanding General, Air Materiel Command, Wright Field, Ohio
+(Attention: T-2)
+
+1. A representative of this headquarters has contacted Lt. Colonel Herbert C. Gee concerning Mrs. Merchant's theory on the flying discs, as expressed to General Brentnall.
+
+2. It is recommended that no action be taken to interrogate Mrs. Merchant and that this case be closed.
+
+BY ORDER OF THE SECRETARY OF THE AIR FORCE:
+
+Incls - n/c
+
+DOUGLASS W. EISEMAN
+Lt. Colonel, Air Corps USAF
+Executive, Air Intel, Requirements Division
+Office of Ass't Chief of Air Staff-2
+
+[Stamp: HQ AAF 28 OCT 1947 AAG - MAIL BRANCH]
+
+[Handwritten: ace]
+
+P 94846
+
+[Vertical handwritten text on right margin: 000.9 Phumuna]
+
+[Stamp: ~~CONFIDENTIAL~~ RESTRICTED]
+
+18
+
+| OFFICE SYMBOL | 1 | 2 | 3 | 4 | 5 | 6 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **SIGNATURE OF RESPONSIBLE OFFICER** | AFOIR-CO<br>Col Taylor | AFOIR<br>Eiseman | Geo. F. Schulgen<br>Brig. Gen., USA | | | |
+| **INTERNAL OFFICE COORDINATION** | Lt Col Garrett | | | | | |
+
+16-29242-1 U. S. GOVERNMENT PRINTING OFFICE
 
 
 === Page 19 (vision) ===

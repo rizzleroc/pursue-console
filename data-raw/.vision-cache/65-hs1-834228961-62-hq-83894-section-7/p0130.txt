@@ -1,0 +1,13 @@
+carrying additional stories on "flying saucers."
+Also significant is the fact that it appeared in
+a small and practically unknown newspaper.
+
+Major Walkers states he is merely reporting
+this for what it may be worth.
+
+The above data is being furnished to you for
+your information and any action you desire to take in connection
+therewith, inasmuch as this Bureau is not conducting any in-
+vestigations relating to the captioned matter.
+
+- 2 -

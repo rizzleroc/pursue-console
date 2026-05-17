@@ -1,0 +1,43 @@
+Recommendation by MG Brandon R. Tegtmeier
+USCENTCOM Chief of Staff
+Recommended on: 2 June 2025
+~~FOUO / Privacy Act applies~~
+
+[1.4g]
+
+* Air-to-Ground Wpn to Include Num of Each: [1.4a]
+
+[1.4g]
+
+## Timeline
+
+### Takeoff
+* Callsign: [1.4a]
+* Number of Aircraft: 1
+* Asset Type (Aircraft): [1.4a, 1.4g]
+* Aircraft Tail Number(s): [1.4a]
+* Takeoff Location (ICAO Code): [1.4a]
+* Takeoff Time DTG: [1.4a]
+* [1.4g]
+* Gentext/Additional Details:
+* Mission Canceled:
+
+### Landing
+* Last Land Location (ICAO Code): [1.4a]
+* Last Land Time: [1.4a]
+* Last Engine Shutdown Time: [1.4a]
+* Total Mission Time: [1.4g]
+* Gentext/Additional Details:
+
+### ISR
+* Time-on Station DTG: [1.4a]
+* Time-off Station DTG: [1.4a]
+* Aircraft Callsign: [1.4a]
+* Msn Type: [1.4a]
+* Primary Sensor: FMV
+
+3.5c, (b)(6)
+USCENTCOM MDR 25-0072
+~~SECRET//REL TO USA, FVEY~~
+06/02/2025 000004
+Approved for Release to AARO FOUO/PA

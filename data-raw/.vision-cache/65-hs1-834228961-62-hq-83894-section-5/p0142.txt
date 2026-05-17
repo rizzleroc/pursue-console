@@ -1,0 +1,43 @@
+Drawing 2
+
+[Top Left]
+just a rest bearing for shaft the shaft does not turn in this bearing - just slides a little
+
+[Top Right]
+thrust bearing
+gear tongue
+cable
+turnbuckle
+ball bearing
+weights mercury filled
+this slides up and down shaft on sliding ways in shaft and revolves with shaft
+this does not revolve with shaft
+thrust plate does not revolve with shaft
+collar revolves with shaft
+ball bearing
+
+[Left]
+rest bearing
+equalizers
+rudder horizontal
+rudder vertical
+
+[Center]
+engines 000000
+engines 000000
+cable
+D.C. electric
+center stanchion
+ball bearings on stanchion
+
+[Bottom]
+equalizers
+just a rest bearing for shaft shaft does not turn in this bearing just slides a little
+thrust bearing
+gear tongue
+ball bearing
+turnbuckles
+Rudder
+
+[Bottom Center - Inverted]
+Drawing 2

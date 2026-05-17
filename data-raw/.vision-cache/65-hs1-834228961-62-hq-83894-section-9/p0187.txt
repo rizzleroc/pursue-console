@@ -1,0 +1,26 @@
+Street, Washington, D.C., Major Donald Keyhoe, Director.
+Mr. Stringfield noted that the personnel of this
+committee are made up of civilian personnel.
+
+On October 2, 1961, Mr. Stringfield advised
+the Cincinnati Office, FBI, Cincinnati, Ohio, that
+he had noted an article in the Sunday edition of the
+Cincinnati Enquirer, October 1, 1961, on page 1, section E,
+under the caption, "Offbeat Washington", which contained
+one paragraph, "Some Defense Department bigwigs are
+apprehensive that Russia will climax its campaign of
+intimidation by a spectacular explosion in space--an
+immense nuclear blast visible to hundreds of millions
+of people. These officials believe that the Soviet
+Union has the capability of setting off such an explosion
+200 miles or so above the earth where it could be seen
+from many countries."
+
+Mr. Stringfield advised that the above
+paragraph was printed as a reprint from the Herald
+Tribune News Service, Washington, D.C., and that this
+article seemed to tie in well with what the caller
+had related to Mr. Stringfield in the anonymous
+telephone call on September 25, 1961.
+
+-3-

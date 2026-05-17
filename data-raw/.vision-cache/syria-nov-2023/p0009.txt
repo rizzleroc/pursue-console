@@ -1,0 +1,55 @@
+Recommendation by MG Brandon R. Tegtmeier
+USCENTCOM Chief of Staff
+Recommended on: 2 June 2025
+~~FOUO / Privacy Act applies~~
+
+~~SECRET//NOFORN~~
+
+* **Initial Contact DTG:** 092153:00ZNOV23
+* **UAP Event Type:** UAP Incident
+* **UAP Maneuverability Observations:** NONE
+* **UAP Response to Observer Actions:** NO
+* **MDS Type / Asset Type:** [1.4a], [1.4g]
+* **Tail Number:** [1.4a]
+* **Friendly Aircraft Location:** 37S ET 34[1.4a]09[1.4a]
+* **Friendly Aircraft Altitude/Depth:** [1.4g]
+* **Friendly Aircraft Trajectory:** SOUTHEAST
+* **Observer Assessment of UAP:** Benign
+* **Friendly Aircraft Speed:**
+* **Observation Interrogation of UAP (yes/no; if yes list sensor(s) and returns)::** NO
+* **Third-party Observers and/or Reporters:** NONE
+* **Friendly Aircraft State:**
+* **Training Range (If applicable):**
+* **Operational Range:**
+* **UAP Physical State:** Solid
+* **Number of UAP Sighted:**
+* **UAP Propulsion Means:** UNK
+* **UAP Payload:**
+* **UAP Under Intelligent Control (yes/no; if yes, describe):** NO
+* **UAP Signatures:** [1.4g]
+* **UAP Advanced Capabilities And/Or Materials (yes/no; if yes, describe):** YES, TRAVELED ~424KN CONSISTANTLY FOR AT LEAST 7MINS IN THE SHAPE OF A BOUNCY BALL.
+* **UAP RF Frequency:** NONE
+* **UAP RF Duration:** N/A
+* **UAP Event Serial Number:** 092153ZNOV2023-CENTCOM
+* **UAP Effects on Persons:** NO
+* **UAP Objects/Material Recovered (yes/no; if yes, describe):** NO
+* **UAP Effects on Equipment:** NONE
+* **Full Name:** [3.5c,(b)(3)130b, (b)(6)]
+* **Rank/Grade:** [3.5c,(b)(6)]
+* **Email:** [3.5c,(b)(6)]
+* **Phone Number (VOSIP/STE):** [3.5c,(b)(6)]
+* **Observer Engagement of UAP (yes/no; if yes, describe):** NO
+* **First Coordinate:** 37DST69[1.4a]7[1.4a]
+* **First Seen Radius:** 5
+* **Last Accuracy:** Estimated
+* **Last Coordinate:** 37SFT28[1.4a]3[1.4a]
+* **Last Seen Radius:** 10
+* **Kinetic Altitude Accuracy:** Estimated
+* **Kinetic Altitude:** 170
+* **Kinetic Depth Accuracy:** Estimated
+
+[3.5c, (b)(6)]
+
+USCENTCOM MDR 25-0072  ~~SECRET//NOFORN~~  06/02/2025 000009
+
+Approved for Release to AARO ~~FOUO/PA~~

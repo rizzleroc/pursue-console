@@ -1,0 +1,5 @@
+Upon receiving the above information from Mr. Hitchens, he was advised that this Bureau would turn the information over to another Government agency. Mr. Hitchens indicated his approval of this action, but specifically requested that no public announcement or comment be given to the fact that he had reported seeing the above object.
+
+The above information has been furnished to your office for your confidential information and assistance in connection with the captioned matter. It is requested that no dissemination be made of this information.
+
+- 3 -

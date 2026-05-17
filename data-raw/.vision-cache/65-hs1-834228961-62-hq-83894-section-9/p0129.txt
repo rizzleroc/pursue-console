@@ -1,0 +1,8 @@
+Office of Special Investigations
+Air Force
+
+furnished a copy of his letter to the President. Make certain that Perry is aware that the Bureau is taking no investigative action in this matter.
+
+NOTE: Perry, proprietor of a restaurant in Grand Blanc, Michigan, and an amateur photographer with a hobby of taking pictures of the moon, on 3-5-60 advised Detroit Office that two of his pictures showed a foreign object which he believed to be flying saucers. At his request, Bureau agents contacted him and he furnished them the film which our agents turned over to local OSI representatives. No further action was taken by us. The "Detroit Times" article pointed out that we were investigating this matter. SAC, Detroit, contacted appropriate officials at the newspaper and advised them that this was not the case.
+
+- 3 -

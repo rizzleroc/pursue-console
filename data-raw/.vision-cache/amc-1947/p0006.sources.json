@@ -1,0 +1,21 @@
+{
+  "best": "human",
+  "sources": {
+    "gpt-vision": {
+      "chars": 1490,
+      "imported_at": null,
+      "note": "seeded from pre-existing canonical"
+    },
+    "gemini": {
+      "chars": 1434,
+      "imported_at": "2026-05-17T22:41:07.017Z",
+      "model": "gemini-3.1-flash-lite",
+      "generated_at": "2026-05-08T15:53:53.613369+00:00"
+    },
+    "human": {
+      "chars": 1490,
+      "imported_at": "2026-05-17T22:45:41.234Z",
+      "handle": "Rizzleroc"
+    }
+  }
+}

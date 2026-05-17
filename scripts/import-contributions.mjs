@@ -85,26 +85,36 @@ for (const handleEnt of await listDirs(CONTRIB)) {
         existingText = (await readFile(existingPath, "utf8")).trim();
       }
 
-      // Only overwrite if the contribution is meaningfully longer than
-      // what's already there. Maintainer-run vision is canonical; we
-      // don't replace a 500-char vision page with a 60-char contribution.
-      const action =
-        !existingText                                                ? "imported"     :
-        srcText.length >= existingText.length * 1.15                 ? "overwritten"  :
-                                                                       "skipped_existing_better";
+      // Human contributions ALWAYS win the canonical spot — they're the
+      // result of a person actually reading the page, which outranks any
+      // machine transcription regardless of length. We still keep the
+      // machine versions in the sidecar so we can compare.
+      const importedAt = new Date().toISOString();
 
-      if (action === "skipped_existing_better") {
-        stats.skipped_existing_better++;
-        continue;
+      // Update sidecar provenance: this page was transcribed by a human.
+      const sidecarPath = path.join(dstDir, `p${pad4(pageNum)}.sources.json`);
+      let sidecar = { best: null, sources: {} };
+      if (existsSync(sidecarPath)) {
+        try { sidecar = JSON.parse(await readFile(sidecarPath, "utf8")); } catch {}
+      } else if (existingText.length >= 30) {
+        // Seed: the existing canonical was a machine transcription with
+        // unknown lineage. Tag it as gpt-vision (our default machine source
+        // for the project, pre-Gemini-merge).
+        sidecar.sources["gpt-vision"] = { chars: existingText.length, imported_at: null, note: "seeded from pre-existing canonical" };
       }
+      sidecar.sources.human = { chars: srcText.length, imported_at: importedAt, handle };
+      sidecar.best = "human";
+      await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
 
+      const action = !existingText ? "imported" : "overwritten";
       await writeFile(dstPath, srcText + "\n", "utf8");
       stats[action]++;
 
       manifest[`${eid}/p${pad4(pageNum)}.txt`] = {
         handle,
-        importedAt: new Date().toISOString(),
+        importedAt,
         chars: srcText.length,
+        source: "human",
       };
     }
   }

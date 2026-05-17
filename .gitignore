@@ -22,6 +22,10 @@ data-raw/*
 !data-raw/.vision-visuals-cache/
 !data-raw/.contributions-manifest.json
 !data-raw/corpus.sqlite
+# upstream-gemini is a clone of DenisSergeevitch/UFO-USA — the imported
+# transcripts live in .vision-cache/, so the upstream clone itself only
+# needs to exist on the maintainer's box for refreshes.
+data-raw/upstream-gemini/
 
 # tesseract.js downloads the trained data on first run
 eng.traineddata

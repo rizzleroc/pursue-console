@@ -1,0 +1,16 @@
+L/Dir., FBI
+9/4/47
+Flying Discs
+Miscellaneous
+
+Mr. WENYON stated that what he had seen traveled at such a high rate of speed that it was very difficult to describe it, but the description "flying mayonnaise jars" was concocted by the newspaper reporter.
+
+This information has not been brought to the attention of any Army sources in view of the fact that only a preliminary inquiry was conducted on the basis of a news article which sets forth essentially the facts obtained from Mr. WENYON.
+
+No further action in this matter is contemplated by this office unless advised otherwise by the Bureau.
+
+SB:arf
+62-0
+Attachment
+
+-2-

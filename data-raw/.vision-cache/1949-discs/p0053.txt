@@ -1,0 +1,44 @@
+CONFIDENTIAL
+
+[Map of coastline with the following annotations:]
+
+*   Lyman Peninsula
+*   Womens Bay
+*   Buskin River
+*   Bluff Pt
+*   I. [illegible]
+*   app spot first seen (with arrow)
+*   line of flight = app 3 1/2 miles
+*   possible range of error
+*   flame went out here (with arrow pointing to St Paul Light)
+*   St Paul Light
+*   Lupin I.
+*   Near I.
+*   Erskine residence - Kodiak
+*   line of vision - app 3 1/2 miles
+*   line of vision - app 4 miles
+
+| Data | |
+| :--- | :--- |
+| Duration of flight | app 10 seconds |
+| Speed of object | 1000 to 1200 mph |
+| Time and date | April 8 - 9:15 PM |
+| Color of flame | bluish-green red |
+| Observer | PC Herring - Kodiak |
+
+[Diagram of trajectory and error margin:]
+
+Possible error - (maximum)
+2500'
+2000'
+1500'
+1000'
+500'
+[trajectory]
+approximation only
+
+ENCLOSURE (A) TO DIO-17ND
+CONF NNI-96, SERIAL 13-49
+DATED 23 APRIL 1949
+
+PHOTOSTATIC COPY OF A DRAWING MADE BY PAUL HERRING INDICATING COURSE OF ATMOSPHERIC DISTURBANCE ON 8 APRIL 1949.

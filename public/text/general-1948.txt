@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1948-06-15
 Location: United States
 Type: Memorandum
-Source extraction: MIXED · 26 pages
+Source extraction: VISION · 28 pages
 
 ---
 
@@ -208,29 +208,37 @@ SECRET                                      u.39942
 (?)
 
 
-=== Page 6 ===
+=== Page 6 (vision) ===
 
-Het LF. 3 : ~SECRET— ; 2
-| baste ltr, did 2 Sep U7, to 00, Tq AIF, ash, mbjs “Tying Dige”
-a 8+ Page 69, The Horten WII.
-Me Pages 71 and 72, Photographs of the lorten IX Versions. |
-| 774. Page Thy Drawing of the "Parabola, 2
-y Mita doetmont should aloo be retumed when ib has served its intended 4
-3 Ls A recent report fnom the U, S. ¥ilitary attache, Moscow, USSR !
-Se dabed une 1907, Tndiontes that 1500 ireraft, directly or indirectly
-besed on the Horten VIII design (six engine pusher, having a wing spread
-: i ees rob py gy ob tn he Tuasien version,
-[i] coma pg Zonet yh vero prent fe B dey Seg
-x Ve 229ml :
-' B, The 12 report "ermen Flying Wings Deelgied by Horten Frothars’
-SE NG Mh Tir ode ide yi fi Bin Trig i, Ose ho
-| if'domired, ; ;
-| : POR THE CODANDTNG UEMERALs y
-: Ka Ko aE bk ;
-® i ey
-: “2, RAB Tech Note, AXRO 1703 ;
-3. 1-2 Rot, No, P-SU-1130.D Og
-\ - 3 SECRET U-39842
+~~SECRET~~
+
+Basic ltr, dtd 24 Sep 47, to CG, Hq AAF, Wash, subj: "Flying Disc"
+
+g. Page 69, The Horten VIII.
+h. Pages 71 and 72, Photographs of the Horten IX Versions.
+i. Page 74, Drawing of the "Parabola".
+
+This document should also be returned when it has served its intended purpose.
+
+4. A recent report from the U. S. Military attache, Moscow, USSR, dated 9 June 1947, indicates that 1800 aircraft, directly or indirectly based on the Horten VIII design (six engine pusher, having a wing spread of 131 feet and a gross weight of approximately thirty-three thousand pounds) are being built for bomber squadron use. The Russian version, however, is jet propelled, reference report whose identification No. is V-32291-S.
+
+5. The T-2 report "German Flying Wings Designed by Horten Brothers", No. F-SU-1110-Nd, also inclosed herewith, may be retained by your office if desired.
+
+FOR THE COMMANDING GENERAL:
+
+sgd
+H. M. McCOY
+Colonel, Air Corps
+Deputy Commanding General
+Intelligence (T-2)
+
+3 Incls:
+1. Drawing
+2. RAE Tech Note, AERO 1703
+3. T-2 Rpt, No. F-SU-1110-ND
+
+~~SECRET~~
+U.39942
 
 
 === Page 7 (vision) ===
@@ -610,6 +618,105 @@ CONFIDENTIAL
 16—29242-2     U. S. GOVERNMENT PRINTING OFFICE
 
 
+=== Page 16 (vision) ===
+
+C O P Y
+
+~~CONFIDENTIAL~~
+
+HEADQUARTERS FOURTH AIR FORCE
+Office of the Assistant Chief of Staff, A-2
+Intelligence
+Hamilton Field, California
+
+4AFDA-3/1208-I                                      Mar 11, 1948
+
+SUBJECT: Investigation of Flying Disc.
+
+TO:          Chief of Staff
+             United States Air Forces
+             Washington, D. C.
+             ATTN: Directorate of Intelligence
+             Air Intelligence Requirements Division
+
+1. Incident reported on 9 March 1948, this headquarters, per telephone call from Sgt. A. M. Larsen, Sheriff's office, Bakersfield, California.
+
+a. Observation by Mr. Les Buchner, Bakersfield, California, of two objects falling to earth from unknown source on 5 March 1948 between 1610 and 1655 hours. Description of objects similar to falling aircraft with smoke and debris trailing. Observation made at Bakersfield with objects sighted southwest toward Buena Vista Lake, California.
+
+b. Observation by Mr. Denio, employee of the Pacific General Electric Company, Bakersfield, California, of two objects which fell to earth from unknown source north of Bakersfield, California, 8 March 1948. One object seemed to be on fire with red and black smoke trailing behind.
+
+2. Informant Larsen stated that searching parties, aircraft and rescue units have made numerous attempts to locate these reported objects without success.
+
+3. Investigation of incident has been initiated by this headquarters. Report will follow.
+
+                                    /s/ DONALD L. SPRINGER
+                                    Lt. Colonel, USAF
+                                    AC of S, A-2
+
+Information to:
+ADC, Mitchel Fld, N.Y.
+FBI, San Francisco
+G-2, Sixth Army
+DIO, San Francisco (12th Nav. Dist)
+
+~~CONFIDENTIAL~~
+
+
+=== Page 17 (vision) ===
+
+AFOIR-CO-5/Lt.Col.Garrett/dk/
+4544
+9 March 48
+
+[SECRET]
+
+AFOIR-CO-5
+17 MAR 1948
+
+SUBJECT: Flying Discs
+
+TO: Commanding General
+Air Materiel Command
+Wright-Patterson Air Force Base
+Dayton, Ohio
+ATTN: MCI
+
+1. Reference is made to Colonel McCoy's informal proposal that certain fighter aircraft be maintained on a continuous alert status, within the Zone of the Interior, to aid in gathering information on Flying Discs.
+
+2. This proposal is considered unfeasible for the following reasons:
+
+a. The outlay of aircraft and personnel would be too great in relation to the results obtained.
+
+b. Proper interception is not possible, except by accident, without complete radar coverage. The Air Force is incapable of providing such coverage.
+
+c. It is doubtful if fighter aircraft would be able to follow up reports emanating, for the most part, from civilian sources.
+
+BY COMMAND OF THE CHIEF OF STAFF:
+
+[Stamp: HQ USAF, 17 MAR 1948, OAS-MAIL ROOM]
+
+GEORGE C. MCDONALD
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+P 99846
+
+[Handwritten note, vertical, right margin]: 000.9 Plum[illegible]
+
+[Handwritten note, bottom right]:
+P80
+recommended
+above answer by RBR
+Cont 2 3 Mar to D/I USAF
+
+| OFFICE SYMBOL | AFOIR-CO | AFOIR | AFOIN | | |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GRADE AND SURNAME OF COORDINATING OFFICERS | Col. Taylor III<br>LtCol.Garrett | C. P. CABELL<br>Maj. Gen., USAF | [illegible] | | |
+
+16-20242-2 U. S. GOVERNMENT PRINTING OFFICE
+
+
 === Page 18 (vision) ===
 
 AF HQ-33 (20 MAY 44)
@@ -686,45 +793,54 @@ PAGE _____
 3-1109, AF (REV 20 MAY 44)
 
 
-=== Page 20 ===
+=== Page 20 (vision) ===
 
-y. I N yp TP Ee Re Rr CIR Ronie..  |
-Ki 3 ¢ AFOLL-CU/Lt. Col Garrett/lwd/A5hL
-' afad Unilatm thal AS 4 March 48
-\,
-B/L fm Hq. Tenth Air Force, Brooks Fld, San Antonie, Texas, dtd
+CONFIDENTIAL
+
+AFOIR-CO/Lt. Col Garrett/lwd/4544
+4 March 48
+
+B/L fm Hq. Tenth Air Force, Brooks Fld, San Antonio, Texas, dtd
 7 Jan 48, subj: "Flying Disks"
-AFCIR-CO-5 1st Ind, : d
-i Dept. of the Adr Fores, Hq. USAF, Washington 25, D. C. "9 MAR 1948
-TO: Commanding General, Air Materiel Command, iright-Fatterson Adr
-o Force Base, Dayton, (hic
-ARIN:  TSDIN
-Forwarded as 4 matter pertaining to your Command. 5
-BY COMMAND 'CF THE CHIEF OF STAFF:
-“1 Tat, DOUGLASS W. EISEMAN ~~. TOTRATSRGE
-n/e Jt. Colonel, U.S.A.F.
-Emecut ive, Air Intelligences Requirements Div,
-2 Pirestorets of Intelligence
-Wy : Cc
-a o>
-0D he
-Liglills PR ~5
-et :
-e 3
-A
-P 99606 DE
-Ey Ref: B/L fm 10th A.F{ dtd 7 Jan 48; subj: és above ?
-To $0
-Poy ¥*
-v4 : 5 CONHB-RHE :
-| _orrice seanol//] I Foli-Gu | *APUIR 3 T B CP
-Silo polos 5 21 dh LU JR UE ok SRE i
-GRADE AND /4 I ol Taylor C. P. OARE) §
-SURNAME OF I —_—t
-codiipma abel ff ESSENSE Sar S CEA AREA, rt
-QFFICER! Lt, Col Garret] ar 70lees os TTT
-" i ] oy 10—20M3 2 u. 5. SOVERMNENT PRINTING Trice !
-- ® "og UND NL TRNSER
+
+AFOIR-CO-5 1st Ind.
+Dept. of the Air Force, Hq. USAF, Washington 25, D. C. 9 MAR 1948
+
+TO: Commanding General, Air Materiel Command, Wright-Patterson Air
+Force Base, Dayton, Ohio
+ATTN: TSDIN
+
+Forwarded as a matter pertaining to your Command.
+
+BY COMMAND OF THE CHIEF OF STAFF:
+
+1. Incl.
+n/c
+[Handwritten: w/incl]
+
+DOUGLASS W. EISEMAN
+Lt. Colonel, U.S.A.F.
+Executive, Air Intelligence Requirements Div.
+Directorate of Intelligence
+
+[Blue Stamp]
+HQ USAF
+9 MAR 1948
+CAS-MAIL BRANCH
+
+P 99606
+
+[Handwritten marginalia on right: J.D.P. Plummer]
+
+Ref: B/L fm 10th A.F. dtd 7 Jan 48, subj: as above
+
+| OFFICE SYMBOL | 1. AFOIR-CO | 2. AFOIR | 3. | 4. | 5. |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GRADE AND SURNAME OF COORDINATING OFFICERS | Col Taylor<br>Lt. Col Garrett | C. P. CARELL<br>Maj Gen<br>USAF | | | |
+
+CONFIDENTIAL
+
+16-20242-2 U. S. GOVERNMENT PRINTING OFFICE
 
 
 === Page 21 (vision) ===

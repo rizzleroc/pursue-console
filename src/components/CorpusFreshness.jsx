@@ -101,6 +101,15 @@ export default function CorpusFreshness({ compact = false }) {
             ·  <span className="text-emerald-400">{pagesIndexed.toLocaleString()}</span> pages indexed (<span className="text-cyan-300">{pagesVision.toLocaleString()}</span> vision)
           </span>
         )}
+        {s?.bySource && (
+          <span className="text-emerald-700" title="How many pages each transcription source has produced (a page can have multiple sources for cross-validation)">
+            ·  by source:
+            {s.bySource.human > 0 && <span className="text-amber-300 ml-1">{s.bySource.human}H</span>}
+            {s.bySource.gptVision > 0 && <span className="text-cyan-300 ml-1">{s.bySource.gptVision.toLocaleString()}G5</span>}
+            {s.bySource.gemini > 0 && <span className="text-emerald-400 ml-1">{s.bySource.gemini.toLocaleString()}Gem</span>}
+            {s.bySource.ocr > 0 && <span className="text-emerald-600 ml-1">{s.bySource.ocr.toLocaleString()}OCR</span>}
+          </span>
+        )}
         {contribPages > 0 && (
           <span className="text-emerald-600" title="Pages contributed by outside volunteers via PRs">
             ·  <span className="text-amber-300">{contribPages}</span> from <span className="text-amber-300">{contribCount}</span> volunteer{contribCount === 1 ? "" : "s"}

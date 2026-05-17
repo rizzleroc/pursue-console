@@ -5,161 +5,79 @@ Agency: NASA
 Date: 1972-12-11
 Location: Cislunar Space / Moon
 Type: Documents + Imagery
-Source extraction: MIXED · 16 pages
+Source extraction: VISION · 16 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
 Tape 5/2
 
-cc Yes, we copied your Vy and your EMS numbers, and
-we've got a number for you. Maneuver start time
-will be at 03 plus 33 plus 27.
-
-LMP Okay, we got you. Maneuver at 03:33:27.
-
-[ofe That's affirmative, Jack.
-
-LMP You guys didn't tell us we couldn't see anything
-going through the sunrise.
-
-cc (Laughter) Roger.
-
-00 03 25 01 CC 17, Houston. We're making plans here for a space-
-craft SEP time of 03 plus 43.
-
-LMP 03 plus 43. Roger.
-
-00 03 27 27 CC 17, Houston. We're copying cabin press of 5.9 this nN
-time.
-
-CMP Roger. We - we Just got it, Bob.
-
-CC Okay.
-
-CMP Thank you.
-
-00 03 31 55 LIMP Frame 65 for the IMPs mag November November.
-00 03 34 10 IMP Okay. We - we are maneuvering, Houston.
-
-cc Roger. We're watching it.
-
-CMP Now we've got a few very bright particles or frag-
-ments or something that go drifting by as we
-maneuver.
-
-cc Roger. Understand.
-
-LMP There's a whole bunce of big ones on my window
-down there - just bright. It looks like the
-Fourth of July out of Ron's window.
-
-CMP Yes. Now you can see some of them in shape.
-They're very Jagged, angular fragments that arc
-tumbling.
+| Time | Speaker | Dialogue |
+| :--- | :--- | :--- |
+| | CC | Yes, we copied your V_I and your EMS numbers, and we've got a number for you. Maneuver start time will be at 03 plus 33 plus 27. |
+| | LMP | Okay, we got you. Maneuver at 03:33:27. |
+| | CC | That's affirmative, Jack. |
+| | LMP | You guys didn't tell us we couldn't see anything going through the sunrise. |
+| | CC | (Laughter) Roger. |
+| 00 03 25 01 | CC | 17, Houston. We're making plans here for a spacecraft SEP time of 03 plus 43. |
+| | LMP | 03 plus 43. Roger. |
+| 00 03 27 27 | CC | 17, Houston. We're copying cabin press of 5.9 this time. |
+| | CMP | Roger. We - we just got it, Bob. |
+| | CC | Okay. |
+| | CMP | Thank you. |
+| 00 03 31 55 | LMP | Frame 65 for the LMPs mag November November. |
+| 00 03 34 10 | LMP | Okay. We - we are maneuvering, Houston. |
+| | CC | Roger. We're watching it. |
+| | CMP | Now we've got a few very bright particles or fragments or something that go drifting by as we maneuver. |
+| | CC | Roger. Understand. |
+| | LMP | There's a whole bunce of big ones on my window down there - just bright. It looks like the Fourth of July out of Ron's window. |
+| | CMP | Yes. Now you can see some of them in shape. They're very jagged, angular fragments that are tumbling. |
 
 
-=== Page 2 ===
+=== Page 2 (vision) ===
 
 Tape 5/3
 
-CC Roger. They look like fluid of some sort?
-
-CMP Not to me. They look like pieces of something.
-
-cc Roger.
-
-CMP They're very bright.
-
-CC Jack, we'd like OMNI Charlie.
-
-CMP Bob, for the most part, these fragments are not -
-or are tumbling at a very slow rate. T tried a
-couple of pictures of them - different settings.
-You may get an idea of what, at least, the patterns
-look like.
-
-CC Roger. I've got you. We're all ears on thesc frag-
-ments. Do you think you can figure out what they
-might be?
-
-CMP Well, you know IT —- I don't know. There are a num-
-ber of possibilities. If you had some kind of a -
-I got the impression maybe they were curved a little
-bit, as if they might be - off the side of the
-S-IVB., And that's a wild guess - -
-
-CDR Okay. RCS LOGIC is ... = -—
-
-CMP ~ — ice chunks, possibly. Or maybe there's paint
-coming off of it.
-
-00 03 37 3k CC Roger. I noticed on one trip up the elevator last
-weak near one of the flags. TI thought it was on
-the S-II, but it might have been on the S-IVB.
-Looked like it was peeling. Maybe that's what
-you've got.
-
-00 03 37 45 CC And the S-IVB maneuver is complete.
-
-00 03 37 46 IMP +... in 1 minute.
-
-CDR Okay. We'll set the old clock.
-
-CMP Okay. And the - with the maneuver complete, the
-fragment field is essentially static, except for
-very slight tumbling within the fragments.
+CC      Roger. They look like fluid of some sort?
+CMP     Not to me. They look like pieces of something.
+CC      Roger.
+CMP     They're very bright.
+CC      Jack, we'd like OMNI Charlie.
+CMP     Bob, for the most part, these fragments are not - or are tumbling at a very slow rate. I tried a couple of pictures of them - different settings. You may get an idea of what, at least, the patterns look like.
+CC      Roger. I've got you. We're all ears on these fragments. Do you think you can figure out what they might be?
+CMP     Well, you know I - I don't know. There are a number of possibilities. If you had some kind of a - I got the impression maybe they were curved a little bit, as if they might be - off the side of the S-IVB. And that's a wild guess - -
+CDR     Okay. RCS LOGIC is ... - -
+CMP     - - ice chunks, possibly. Or maybe there's paint coming off of it.
+00 03 37 34 CC      Roger. I noticed on one trip up the elevator last weak near one of the flags. I thought it was on the S-II, but it might have been on the S-IVB. Looked like it was peeling. Maybe that's what you've got.
+00 03 37 45 CC      And the S-IVB maneuver is complete.
+00 03 37 46 LMP     ... in 1 minute.
+CDR     Okay. We'll set the old clock.
+CMP     Okay. And the - with the maneuver complete, the fragment field is essentially static, except for very slight tumbling within the fragments.
 
 
-=== Page 3 ===
+=== Page 3 (vision) ===
 
 Tape 5/4
-00 03 38 01 CC Roger. Cut in.
 
-CMP Every once in a while, a fragment of considerably
-higher velocity than the others goes across my
-window. But that's very rare.
-
-cc Roger.
-
-CMP Hey, that's that field of view I saw out my window.
-Jack, do you see it now?
-
-LMP Yes.
-
-CMP And, Bob. At least, there ~ there's no apparent
-relative motion between fragments.
-
-cc Roger. Understand.
-
-CMP I'll take two pictures about a minute apart if IT
-can. And it'll be Frame 70.
-
-cc Okay. Frame 70.
-
-CDR ° And, Bob. This is Geno. My impression is that
-they are - flat, flakelike particles. Some may
-be 6 inches across. And, although there's no
-relative motion between the two, most of them seem
-to be twinkling. And I think, for the most part,
-they're all moving away from us.
-
-cc Roger, Gene. Thank you.
-
-00 03 39 35 CMP Okay. We've got 0180 and O on the old thumbwheels.
-
-LMP Okay.
-
-cc Roger, Ron.
-
-00 03 39 53 CMP Okay. TRANS CONTROL is ARMED.
-
-LMP ... two ARMED,
-
-00 03 39 57 CMP CONTROLLER number 2 is ARMED.
-
-LMP ... SECS LOGIC ...
+00 03 38 01  CC    Roger. Cut in.
+             CMP   Every once in a while, a fragment of considerably higher velocity than the others goes across my window. But that's very rare.
+             CC    Roger.
+             CMP   Hey, that's that field of view I saw out my window. Jack, do you see it now?
+             LMP   Yes.
+             CMP   And, Bob. At least, there - there's no apparent relative motion between fragments.
+             CC    Roger. Understand.
+             CMP   I'll take two pictures about a minute apart if I can. And it'll be Frame 70.
+             CC    Okay. Frame 70.
+             CDR   And, Bob. This is Geno. My impression is that they are - flat, flakelike particles. Some may be 6 inches across. And, although there's no relative motion between the two, most of them seem to be twinkling. And I think, for the most part, they're all moving away from us.
+             CC    Roger, Gene. Thank you.
+00 03 39 35  CMP   Okay. We've got 0180 and 0 on the old thumbwheels.
+             LMP   Okay.
+             CC    Roger, Ron.
+00 03 39 53  CMP   Okay. TRANS CONTROL is ARMED.
+             LMP   ... two ARMED.
+00 03 39 57  CMP   CONTROLLER number 2 is ARMED.
+             LMP   ... SECS LOGIC ...
 
 
 === Page 4 (vision) ===
@@ -189,241 +107,125 @@ at 59:30.
           CMP      Okay, check the covers.  Okay.  And check the                   other ones off.          LMP      They're all ...          CMP      Okay, I'm going to start the - My gosh, look at                   the junk!  Okay; there's 15 seconds.  Pitch her                   up.  Okay, we'll PROCEED on the - -
 
 
-=== Page 5 ===
+=== Page 5 (vision) ===
 
 Tape 46/4
 
 02 18 41 11 CDR Okay. Is that it? Yes, I can get that, Gene.
-
-CMP Okay, you want to take a picture of it first?
-Okay, POWER ... Okay, stand by. 3, 2, 1 -
-
-02 18 k1 59 CMP MARK it. POWER switch OFF.
-
-CDR Say, Bob or Stu.
-
-cc Roger. Go ahead.
-
-02 18 L2 34 CDR Okay, add - to ad to today. Not last night, but -
-I guess the first night I was in bed - I definitely
-saw some of these —- because I had a hard time going
-to bed, to start with - I saw some of the same
-peripheral horizon-type things you said were not
-the type of data you were looking for; but I also
-saw a - some sets of the streaks. And probably
-the one most imposing thing I remember is - and the
-last one I remember before falling asleep - was
-the fact that there was a very bright spot that
-flashed right between my eyes like a very bright
-headlight - like a train coming at you, only with
-a flash. It's difficult probably to estimate the
-frequency of any of those because I was in & -
-sort of a sleep-hazy mode.
-
-CC Roger.
-
-CDR But then, as today, I saw some that flashed and
-1it up the horizon and some that 1it up peripher-
-ally; and I guess, as you say, that's a different
-kind of data, but I did see them there and they
-impressed me.
-
-cc Okay. We got all that, Gene.
-
-CDR Okay.
-
-CMP And it might be interesting to know I've never
-seen it before today.
-
-CC Hey, Gene, we appreciate all the data. We were
-Just trying to make the data fit the curve; you
-know the old trick.
+            CMP Okay, you want to take a picture of it first?
+                Okay, POWER ... Okay, stand by. 3, 2, 1 -
+02 18 41 59 CMP MARK it. POWER switch OFF.
+            CDR Say, Bob or Stu.
+            CC  Roger. Go ahead.
+02 18 42 34 CDR Okay, add - to ad to today. Not last night, but -
+                I guess the first night I was in bed - I definitely
+                saw some of these - because I had a hard time going
+                to bed, to start with - I saw some of the same
+                peripheral horizon-type things you said were not
+                the type of data you were looking for; but I also
+                saw a - some sets of the streaks. And probably
+                the one most imposing thing I remember is - and the
+                last one I remember before falling asleep - was
+                the fact that there was a very bright spot that
+                flashed right between my eyes like a very bright
+                headlight - like a train coming at you, only with
+                a flash. It's difficult probably to estimate the
+                frequency of any of those because I was in a -
+                sort of a sleep-hazy mode.
+            CC  Roger.
+            CDR But then, as today, I saw some that flashed and
+                lit up the horizon and some that lit up peripher-
+                ally; and I guess, as you say, that's a different
+                kind of data, but I did see them there and they
+                impressed me.
+            CC  Okay. We got all that, Gene.
+            CDR Okay.
+            CMP And it might be interesting to know I've never
+                seen it before today.
+            CC  Hey, Gene, we appreciate all the data. We were
+                just trying to make the data fit the curve; you
+                know the old trick.
 
 
-=== Page 6 ===
+=== Page 6 (vision) ===
 
-Tape L6/5
-02 18 44 40 CDR Okay, I just wanted you to - Just told them like
-- we saw them. That's all,
+Tape 46/5
 
-cc Roger.
-
-CDR I will say one thing, though; no question in my
-mind but that they're there. Last trip I took,
-
-I guess I just wasn't looking for them or paying
-any attention to them. Maybe they were there and
-
-T ignored them because of other things. But they're
-there.
-
-MP Okay, all you flash bugs down there - or flash-
-bulbs I guess is the word - frame 50. I Just took
-four pictures to show - two on the side and two
-on the bottom - to show the position of the ALFMED,
-and one of them of each set was focused on the
-ALFMED. The others were focused on the - the
-other set was focused on the struts.
-
-cC Roger, Jack.
-
-LMP And when you don't have anything else to do, why
-don't you have somebody predict where the S-IVB
-is. I think I've got her spotted - behind us and
-above us with respect to the Earth and our travel
-from it.
-
-cC FIDO just went out and shot himself, but we'll
-get working on it.
-
-LMP Oh, don't worry about it. Shoot. I thought you
-guys might have an idea off-the-cuff there.
-
-cc No, what's humorous on this, Jack, is they have
-really been working on that S-IVB impact point -,
-and they've really been -— it's been a — a real
-difficult problem for them so far.
-
-LMP I'11 tell you, I bet you Ron could give a star
-sighting on it (laughter). TI looked at it through
-the monocular and sure looks like the S-IVB.
-
-cC Jack, we're not doubting you at all. We could
-probably start cranking it right now.
+| Time | Speaker | Dialogue |
+| :--- | :--- | :--- |
+| 02 18 44 40 | CDR | Okay, I just wanted you to - just told them like we saw them. That's all. |
+| | CC | Roger. |
+| | CDR | I will say one thing, though; no question in my mind but that they're there. Last trip I took, I guess I just wasn't looking for them or paying any attention to them. Maybe they were there and I ignored them because of other things. But they're there. |
+| | LMP | Okay, all you flash bugs down there - or flash-bulbs I guess is the word - frame 50. I just took four pictures to show - two on the side and two on the bottom - to show the position of the ALFMED, and one of them of each set was focused on the ALFMED. The others were focused on the - the other set was focused on the struts. |
+| | CC | Roger, Jack. |
+| | LMP | And when you don't have anything else to do, why don't you have somebody predict where the S-IVB is. I think I've got her spotted - behind us and above us with respect to the Earth and our travel from it. |
+| | CC | FIDO just went out and shot himself, but we'll get working on it. |
+| | LMP | Oh, don't worry about it. Shoot. I thought you guys might have an idea off-the-cuff there. |
+| | CC | No, what's humorous on this, Jack, is they have really been working on that S-IVB impact point -, and they've really been - it's been a - a real difficult problem for them so far. |
+| | LMP | I'll tell you, I bet you Ron could give a star sighting on it (laughter). I looked at it through the monocular and sure looks like the S-IVB. |
+| | CC | Jack, we're not doubting you at all. We could probably start cranking it right now. |
 
 
-=== Page 7 ===
+=== Page 7 (vision) ===
 
 Tape 46/6
-02 18 46 46 cC Jack, are you sto - you all stowing the ALFMED
-now or are you done?
 
-CMP What's that, Bob?
-
-cc Are you all done with the ALFMED now, Ron?
-
-CMP Yes, I've got to get it to - get the plate moved
-back down there yet.
-
-ce Okay, Ron - =
-
-CMP «.. get the blindfold off first so I can see what
-I'm doing.
-
-cc Roger. I just want you to know. We've got a real
-long update coming up tc you here on the LOI abort
-charts and that - and it's going to be, probably,
-a difficult readup. And you're the most familiar
-with the charts; you probably would want to take
-them. But whenever you want to take them, they
-are on - charts on page 3-81, 3-82, and then the
-cue card for LOI limits. Whenever you want to
-take them. It will be a lengthy one.
-
-CMP Stand by, Bob. Let us get squared away from the
-ALFMED; then we can get going on that.
-
-cc No, I don't want to hurry you, Ron. I just want
-you to know what — when - just get yourself com-~
-fortable and be ready to take them whenever you
-want them. It's going to be a lengthy time,
-though.
-
-02 18 47 51 cmp Okay.
-
-CDR Hey, Bob, I'm looking at what - what Jack was
-talking about; and it's definitely not a particle
-that's nearby because there is another one I can
-look at and get a three-dimensional comparison
-with. It is a - it is a bright object, and it's
-obviously rotating because it's flashing. Tt's
-way out in the distance, as I say, because there
-are particles that are close by and it's obviously
-not one of those. It's apparently rotating in a
+| Time | Speaker | Dialogue |
+| :--- | :--- | :--- |
+| 02 18 46 46 | CC | Jack, are you sto - you all stowing the ALFMED now or are you done? |
+| | CMP | What's that, Bob? |
+| | CC | Are you all done with the ALFMED now, Ron? |
+| | CMP | Yes, I've got to get it to - get the plate moved back down there yet. |
+| | CC | Okay, Ron - - |
+| | CMP | ... get the blindfold off first so I can see what I'm doing. |
+| | CC | Roger. I just want you to know. We've got a real long update coming up to you here on the LOI abort charts and that - and it's going to be, probably, a difficult readup. And you're the most familiar with the charts; you probably would want to take them. But whenever you want to take them, they are on - charts on page 3-81, 3-82, and then the cue card for LOI limits. Whenever you want to take them. It will be a lengthy one. |
+| | CMP | Stand by, Bob. Let us get squared away from the ALFMED; then we can get going on that. |
+| | CC | No, I don't want to hurry you, Ron. I just want you to know what - when - just get yourself comfortable and be ready to take them whenever you want them. It's going to be a lengthy time, though. |
+| 02 18 47 51 | CMP | Okay. |
+| | CDR | Hey, Bob, I'm looking at what - what Jack was talking about; and it's definitely not a particle that's nearby because there is another one I can look at and get a three-dimensional comparison with. It is a - it is a bright object, and it's obviously rotating because it's flashing. It's way out in the distance, as I say, because there are particles that are close by and it's obviously not one of those. It's apparently rotating in a |
 
 
-=== Page 8 ===
+=== Page 8 (vision) ===
 
 Tape 46/7
-very rhythmic fashion because the flashes come
-around almost - almost on time, And it's as we
-look back at the Earth, it's up at about 11:00
-about - oh, maybe 10 or 12 Earth diameters. I
-don't know whether that does you any good, but .
-there is something out there.
-cc Roger. We don't doubt it, Gene. And we might
-work out a set of gimbal angles or something here;
-maybe we can get a look at it through the optics.
 
-02 18 L9 02 CDR Okay. And I - I ~ I just want to emphasize that
-it's definitely not - not one of these particles
-that tends to look like a star out there. It's
-something physical in the distance. (Laughter)
-Oh, yes.
-
-SC ... thing off.
-
-02 18 50 13 CMP Yes, guess I am.
-
-cc Okay, Gene. If you can call up a NOUK 20 so we
-know the spacecraft attitude, and if you can
-reference the object you're looking at out of your
-window, with - with respect to body axis and let
-us look at your ~- your - give us a mark, somehow,
-and give us your NOUN 20s, we can try and get a
-tie-in and start locating - locating this object
-down for you.
-
-02 18 50 58 CDR Okay, I'm looking it out - looking at it out the
-center window - the hatch window - and I'll give
-you a hack when it crosses the XX axis at the
-center window; and I guess it's up maybe 45 degrees.
-
-[oo] Okay, give us a hack and we're copying your
-NOUN 20s right now.
-CDR Okay, Jack says pitched up about 30 degrees but - -
-LMP No. 45, because -
-CDR Yes, he agrees. It's 45 degrees pitched up, and
-I'11 give you a hack when it crosses the XX axis.
-CDR Okay -
+| Timestamp | Speaker | Text |
+| :--- | :--- | :--- |
+| | | very rhythmic fashion because the flashes come around almost - almost on time. And it's as we look back at the Earth, it's up at about 11:00 about - oh, maybe 10 or 12 Earth diameters. I don't know whether that does you any good, but there is something out there. |
+| | CC | Roger. We don't doubt it, Gene. And we might work out a set of gimbal angles or something here; maybe we can get a look at it through the optics. |
+| 02 18 49 02 | CDR | Okay. And I - I - I just want to emphasize that it's definitely not - not one of these particles that tends to look like a star out there. It's something physical in the distance. (Laughter) Oh, yes. |
+| | SC | ... thing off. |
+| 02 18 50 13 | CMP | Yes, guess I am. |
+| | CC | Okay, Gene. If you can call up a NOUN 20 so we know the spacecraft attitude, and if you can reference the object you're looking at out of your window, with - with respect to body axis and let us look at your - your - give us a mark, somehow, and give us your NOUN 20s, we can try and get a tie-in and start locating - locating this object down for you. |
+| 02 18 50 58 | CDR | Okay, I'm looking it out - looking at it out the center window - the hatch window - and I'll give you a hack when it crosses the XX axis at the center window; and I guess it's up maybe 45 degrees. |
+| | CC | Okay, give us a hack and we're copying your NOUN 20s right now. |
+| | CDR | Okay, Jack says pitched up about 30 degrees but - - |
+| | LMP | No. 45, because - |
+| | CDR | Yes, he agrees. It's 45 degrees pitched up, and I'll give you a hack when it crosses the XX axis. |
+| | CDR | Okay - |
 
 
-=== Page 9 ===
+=== Page 9 (vision) ===
 
 Tape 46/8
-02 18 51 32 CDR MARK it. It just crossed through the - -
-cc Mark. We got it.
-CDR - —- let's call it the XZ plane of the spacecraft.
-One unigue thing about it, Bob, is that it's got
-two flashes. As it comes around in — in rhythmic
-fashion, you get a very bright flash; and then
-you get a dull flash. And then it'll come around :
-with a bright flash, and then a dull flash. .
-02 18 52 18 IMP That's the side and - of the S-IVB - and then the
-engine bell, Gene.
-LMP The commander doesn't think that I can see the
-engine bell on that thing.
-cc Roger, Jack. Is that with the monocular you're
-looking at it?
-CDR He couldn't see the engine bell if he had 10 monoc-
-ulars.
-CMP Okay. I've got the cable restowed now.
-cc Say again, Ron.
-02 18 53 10 CMP And, Gene, where's your blindfold? ...
-02 18 55 24 IMP Bob, couple of revolutions ago when I was looking
-at it, I had a much brighter view and I believe
-I was looking at it broadside. It looks to me like
-it may be flashing more or less end-on now. It's
-much, not - not as bright, although it's getting
-brighter. But it's not as bright now as it was
-awhile ago.
-cc Roger, Jack.
-MP +... we've been noticing that, I think, for about
-24 hours or so. I just — hadn't put it together
-as maybe being the S-IVB. I thought it was Just
-some other particle out there.
-02 18 56 27 CC Roger, Jack.
-CDR Hey, Robert, what's the final Cowboy score?
+
+| Timestamp | Speaker | Dialogue |
+| :--- | :--- | :--- |
+| 02 18 51 32 | CDR | MARK it. It just crossed through the - - |
+| | CC | Mark. We got it. |
+| | CDR | - - let's call it the XZ plane of the spacecraft. One unique thing about it, Bob, is that it's got two flashes. As it comes around in - in rhythmic fashion, you get a very bright flash; and then you get a dull flash. And then it'll come around with a bright flash, and then a dull flash. |
+| 02 18 52 18 | LMP | That's the side and - of the S-IVB - and then the engine bell, Gene. |
+| | LMP | The commander doesn't think that I can see the engine bell on that thing. |
+| | CC | Roger, Jack. Is that with the monocular you're looking at it? |
+| | CDR | He couldn't see the engine bell if he had 10 monoc- ulars. |
+| | CMP | Okay. I've got the cable restowed now. |
+| | CC | Say again, Ron. |
+| 02 18 53 10 | CMP | And, Gene, where's your blindfold? ... |
+| 02 18 55 24 | LMP | Bob, couple of revolutions ago when I was looking at it, I had a much brighter view and I believe I was looking at it broadside. It looks to me like it may be flashing more or less end-on now. It's much, not - not as bright, although it's getting brighter. But it's not as bright now as it was awhile ago. |
+| | CC | Roger, Jack. |
+| | LMP | ... we've been noticing that, I think, for about 24 hours or so. I just - hadn't put it together as maybe being the S-IVB. I thought it was just some other particle out there. |
+| 02 18 56 27 | CC | Roger, Jack. |
+| | CDR | Hey, Robert, what's the final Cowboy score? |
 
 
 === Page 10 (vision) ===
@@ -464,55 +266,23 @@ CC        That's affirmative.
 CDR       Which one do you want to start on?
 
 
-=== Page 11 ===
+=== Page 11 (vision) ===
 
-Tape 4T/1L
-And I'll just confirm that the - that disturbance
-over the So - Solomon Islands is an awfully tightly
-wound little storm system. And right now, I finally
-have see New Zealand for the first time in a couple
-of days, for sure. And the South Island's got some,
-probably high cirrus over it. North Island looks
-pretty clear. That's the end that I can get right
-now.
-
-cc Roger. We saw you locking at Regulus there; we
-didn't realize you were looking at the Earth
-instead.
-
-LMP Ron's been looking for the booster. And he called
-me down and asked me to look at the Earth. He's
-been holding out on me.
-
-cc Roger.
-
-LMP Pass the torch of weather forecasting to Ron.
-
-02 20 55 22 CC Hey, Jack. TI also have some words for you and
-Gene. Got some advice from the home front. The
-thing to do with Ron in the future is to hook up
-a Baby Ben and a metal dishpan. It works every
-time, if you want to wake him up.
-
-CMP No. I think that's not a good way.
-
-’ cc Ron, everybody's fine over at El Lago. They are
-doing great. Listening to every word.
-
-CMP Very good, Bob. Thank you very much.
-
-CDR Hey, Bob. We got two of those flashers out there.
-They could be SLA panels. I don't know. They're
-alike in intensity and pretty reguler in the - in
-the intensity, bright and dim flashes they come
-out with, and they're widely separated. One is
-about the position we called at the first time;
-the other one is - oh, as I'm looking at the Earth,
-far to the left. Closer to the center window now.
-
-02 20 56 52 CC Roger.
-
-02 21 01 OT LMP Houston, 17.
+| | |
+|---|---|
+| Tape 47/14 | |
+| | And I'll just confirm that the - that disturbance over the So - Solomon Islands is an awfully tightly wound little storm system. And right now, I finally have see New Zealand for the first time in a couple of days, for sure. And the South Island's got some, probably high cirrus over it. North Island looks pretty clear. That's the end that I can get right now. |
+| CC | Roger. We saw you looking at Regulus there; we didn't realize you were looking at the Earth instead. |
+| LMP | Ron's been looking for the booster. And he called me down and asked me to look at the Earth. He's been holding out on me. |
+| CC | Roger. |
+| LMP | Pass the torch of weather forecasting to Ron. |
+| 02 20 55 22 CC | Hey, Jack. I also have some words for you and Gene. Got some advice from the home front. The thing to do with Ron in the future is to hook up a Baby Ben and a metal dishpan. It works every time, if you want to wake him up. |
+| CMP | No. I think that's not a good way. |
+| CC | Ron, everybody's fine over at El Lago. They are doing great. Listening to every word. |
+| CMP | Very good, Bob. Thank you very much. |
+| CDR | Hey, Bob. We got two of those flashers out there. They could be SLA panels. I don't know. They're alike in intensity and pretty regular in the - in the intensity, bright and dim flashes they come out with, and they're widely separated. One is about the position we called at the first time; the other one is - oh, as I'm looking at the Earth, far to the left. Closer to the center window now. |
+| 02 20 56 52 CC | Roger. |
+| 02 21 01 07 LMP | Houston, 17. |
 
 
 === Page 12 (vision) ===
@@ -607,55 +377,22 @@ tinction's possible in this lighter small.  Now I'm
 starting to see that there are shadows in the craters.
 
 
-=== Page 16 ===
+=== Page 16 (vision) ===
 
 Tape 60/2
 
-cc Roger.
-
-LMP That's the small craters. There, in the Mare
-Procellarum closest to Grimaldi, there are two
-srcuate rilles. Look like they are probably
-V-shaped in their cross section. I'm sure we've
-seen those on the rhotographs much better than I
-can see them here. Those - the rille patterns,
-though, do seem to project over into the highlands.
-
-cc Okay.
-
-LMP To the north of that - to the north of that bay
-of mare. Just interrupt.
-
-03 15 38 09 LMP Hey, I just saw a flash on the lunar surface!
-
-cc Ch, yes?
-
-LMP It was just out there north of Grimaldi. Just
-north of Grimeldi. You might see if you got any-
-thing on your seismometers, although a small impact
-probably would give a fair amount of visible light.
-
-cc Okay. We'll check.
-
-IMP Tt was a bright little flash right out there near
-that crater. See the crater right at the edge of
-Grimaldi. Then there is another one north of it.
-Fairly sharp one north of it is where there was
-Just a thin streak of light.
-
-cc How about putting an X on the map where you saw it.
-
-LMP I keep looking occasionally for — yes, we will.
-
-I - I was planning on locking for those kind of
-things. Starting to see the edge of Orientele,
-Gordy. Way off to the west. Hey, just yell,
-Gene, anytime you - -
-
-03 15 39 46 IMP Gordy, to the north of Grimaldi there is a large
-basin that is about the same size but only incom-
-pletely filled with mere in its northeastern
-quadrant. The rest of it looks like a fairly ir-
-regular and hummocky floor materiel of some kind.
-
-cc Roger.
+| Timestamp | Speaker | Text |
+| :--- | :--- | :--- |
+| | CC | Roger. |
+| | LMP | That's the small craters. There, in the Mare Procellarum closest to Grimaldi, there are two arcuate rilles. Look like they are probably V-shaped in their cross section. I'm sure we've seen those on the photographs much better than I can see them here. Those - the rille patterns, though, do seem to project over into the highlands. |
+| | CC | Okay. |
+| | LMP | To the north of that - to the north of that bay of mare. Just interrupt. |
+| 03 15 38 09 | LMP | Hey, I just saw a flash on the lunar surface! |
+| | CC | Oh, yes? |
+| | LMP | It was just out there north of Grimaldi. Just north of Grimaldi. You might see if you got anything on your seismometers, although a small impact probably would give a fair amount of visible light. |
+| | CC | Okay. We'll check. |
+| | LMP | It was a bright little flash right out there near that crater. See the crater right at the edge of Grimaldi. Then there is another one north of it. Fairly sharp one north of it is where there was just a thin streak of light. |
+| | CC | How about putting an X on the map where you saw it. |
+| | LMP | I keep looking occasionally for - yes, we will. I - I was planning on looking for those kind of things. Starting to see the edge of Orientale, Gordy. Way off to the west. Hey, just yell, Gene, anytime you - - |
+| 03 15 39 46 | LMP | Gordy, to the north of Grimaldi there is a large basin that is about the same size but only incompletely filled with mare in its northeastern quadrant. The rest of it looks like a fairly irregular and hummocky floor material of some kind. |
+| | CC | Roger. |

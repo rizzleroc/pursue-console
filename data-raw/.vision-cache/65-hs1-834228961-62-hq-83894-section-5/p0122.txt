@@ -1,0 +1,45 @@
+[Diagram Annotations]
+
+(Top Left)
+weight revolves
+
+(Top Center)
+double cable sheave
+double cable sheave
+sheave plate holding cables also revolves
+
+(Top Right)
+weight revolves
+this sheave revolves
+
+(Middle Left)
+keeper across sheave to hold cable on as it revolves
+cable lace up to weights
+
+(Middle Center)
+sheave double acts also as spacer or spreader
+ball bearing swivel & bolt
+this plate revolves
+This plate doesn't revolve
+stanchion in saucer
+4
+
+(Middle Right/Bottom)
+sheave double
+cable lace up to weights
+cable anchor 2
+3
+cross bar
+
+[Main Text]
+
+this shows lace of cable to weights and sheaves.
+there are two of these set ups. one on each side this shows
+detail of one the other one is left out it would be at 3
+the next sketch will show what makes it revolve that
+swivel plate is a cog wheel at 4. The sheave plate at 5 is made
+double and a bearing is between the two plates so it can move
+
+[Footer]
+
+hme ate 4-14-50 ngo                                          (over)

@@ -90,7 +90,13 @@ CREATE TABLE IF NOT EXISTS pages (
   has_ocr         INTEGER NOT NULL DEFAULT 0,
   has_vision      INTEGER NOT NULL DEFAULT 0,
   has_visuals     INTEGER NOT NULL DEFAULT 0,
-  best_source     TEXT,        -- 'vision' | 'ocr' | 'pdfjs' | NULL
+  -- Per-source flags from sidecar provenance (which transcription sources
+  -- have produced text for this page). best_source names which one is
+  -- canonical in p<NNN>.txt.
+  has_gemini      INTEGER NOT NULL DEFAULT 0,
+  has_gpt_vision  INTEGER NOT NULL DEFAULT 0,
+  has_human       INTEGER NOT NULL DEFAULT 0,
+  best_source     TEXT,        -- 'human' | 'gpt-vision' | 'gemini' | 'ocr' | 'pdfjs' | NULL
   chars           INTEGER NOT NULL DEFAULT 0,
   contributor     TEXT,        -- handle if a volunteer's page outranks/equals canonical
   last_updated    TEXT,
@@ -220,11 +226,30 @@ db.transaction((rs) => { for (const r of rs) insInv.run(r); })(inventoryRows);
 
 // ---- pages table from caches ----
 db.exec("DELETE FROM pages");
+// Force-rebuild the pages schema in case columns were added since the DB
+// file was last written.
+db.exec(`DROP TABLE IF EXISTS pages;
+CREATE TABLE pages (
+  event_id TEXT NOT NULL, page_num INTEGER NOT NULL,
+  has_pdfjs INTEGER NOT NULL DEFAULT 0, has_ocr INTEGER NOT NULL DEFAULT 0,
+  has_vision INTEGER NOT NULL DEFAULT 0, has_visuals INTEGER NOT NULL DEFAULT 0,
+  has_gemini INTEGER NOT NULL DEFAULT 0, has_gpt_vision INTEGER NOT NULL DEFAULT 0,
+  has_human INTEGER NOT NULL DEFAULT 0,
+  best_source TEXT, chars INTEGER NOT NULL DEFAULT 0,
+  contributor TEXT, last_updated TEXT,
+  PRIMARY KEY (event_id, page_num)
+);
+CREATE INDEX IF NOT EXISTS idx_pages_event   ON pages(event_id);
+CREATE INDEX IF NOT EXISTS idx_pages_source  ON pages(best_source);`);
 const insPage = db.prepare(`
   INSERT OR REPLACE INTO pages
-    (event_id, page_num, has_pdfjs, has_ocr, has_vision, has_visuals, best_source, chars, contributor, last_updated)
+    (event_id, page_num, has_pdfjs, has_ocr, has_vision, has_visuals,
+     has_gemini, has_gpt_vision, has_human,
+     best_source, chars, contributor, last_updated)
   VALUES
-    (@event_id, @page_num, @has_pdfjs, @has_ocr, @has_vision, @has_visuals, @best_source, @chars, @contributor, @last_updated)
+    (@event_id, @page_num, @has_pdfjs, @has_ocr, @has_vision, @has_visuals,
+     @has_gemini, @has_gpt_vision, @has_human,
+     @best_source, @chars, @contributor, @last_updated)
 `);
 
 async function existsDir(p) { try { return (await stat(p)).isDirectory(); } catch { return false; } }
@@ -308,15 +333,40 @@ if (existsSync(manifestFile)) {
 }
 db.transaction((rs) => { for (const r of rs) insContrib.run(...r); })(contribRows);
 
+// Read sidecar JSONs (p<NNN>.sources.json) for source provenance.
+// These get written by import-gemini-corpus.mjs and (future) by
+// the GPT vision-ocr pipeline.
+for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : []) {
+  const dirAbs = path.join(VIS_CACHE, eidDir);
+  if (!(await existsDir(dirAbs))) continue;
+  for (const f of await readdir(dirAbs)) {
+    const m = f.match(/^p(\d+)\.sources\.json$/);
+    if (!m) continue;
+    const pn = Number(m[1]);
+    try {
+      const sc = JSON.parse(await readFile(path.join(dirAbs, f), "utf8"));
+      const row = touch(eidDir, pn);
+      row._sidecarBest = sc.best || null;
+      row._hasGemini    = sc.sources?.gemini      ? 1 : 0;
+      row._hasGptVision = sc.sources?.["gpt-vision"] ? 1 : 0;
+      row._hasHuman     = sc.sources?.human       ? 1 : 0;
+    } catch {}
+  }
+}
+
 // Flush pageMap → pages table
 const pageRows = [];
 for (const [eid, m] of pageMap) {
   for (const [pn, r] of m) {
-    const best = r.has_vision ? "vision" : r.has_ocr ? "ocr" : null;
+    // best_source priority: sidecar (if present) > vision > ocr
+    const best = r._sidecarBest || (r.has_vision ? "gpt-vision" : r.has_ocr ? "ocr" : null);
     pageRows.push({
       event_id: eid, page_num: pn,
-      has_pdfjs: 0,    // populated from public/text/manifest.json source=pdfjs case below
+      has_pdfjs: 0,
       has_ocr: r.has_ocr, has_vision: r.has_vision, has_visuals: r.has_visuals,
+      has_gemini: r._hasGemini || 0,
+      has_gpt_vision: r._hasGptVision || (r.has_vision && !r._hasGemini && !r._hasHuman ? 1 : 0),
+      has_human: r._hasHuman || 0,
       best_source: best, chars: r.chars,
       contributor: r._contributor || null,
       last_updated: new Date(r.mtime || Date.now()).toISOString(),
@@ -382,6 +432,25 @@ const stats = {
     visualsAnnotated: q("SELECT COUNT(*) AS n FROM pages WHERE has_visuals=1").n,
     totalChars: q("SELECT COALESCE(SUM(chars), 0) AS n FROM pages").n,
   },
+  // Per-source breakdown — which transcription source produced each page.
+  // A page can have multiple sources (e.g. both Gemini and GPT
+  // transcribed it); has_X counts include overlap, best counts each page once.
+  bySource: {
+    gemini:    q("SELECT COUNT(*) AS n FROM pages WHERE has_gemini=1").n,
+    gptVision: q("SELECT COUNT(*) AS n FROM pages WHERE has_gpt_vision=1").n,
+    human:     q("SELECT COUNT(*) AS n FROM pages WHERE has_human=1").n,
+    ocr:       q("SELECT COUNT(*) AS n FROM pages WHERE has_ocr=1").n,
+    pagesWithMultipleSources: q(`
+      SELECT COUNT(*) AS n FROM pages
+      WHERE (has_gemini + has_gpt_vision + has_human) > 1
+    `).n,
+  },
+  bestSource: {
+    human:     q("SELECT COUNT(*) AS n FROM pages WHERE best_source='human'").n,
+    gptVision: q("SELECT COUNT(*) AS n FROM pages WHERE best_source='gpt-vision'").n,
+    gemini:    q("SELECT COUNT(*) AS n FROM pages WHERE best_source='gemini'").n,
+    ocr:       q("SELECT COUNT(*) AS n FROM pages WHERE best_source='ocr'").n,
+  },
   contributions: {
     total: q("SELECT COUNT(*) AS n FROM contributions").n,
     contributors: qAll("SELECT handle, COUNT(*) AS pages, SUM(chars) AS chars FROM contributions GROUP BY handle ORDER BY pages DESC").map(r => ({
@@ -417,6 +486,8 @@ console.log(`[db] ${DB_PATH}`);
 console.log(`[db] inventory ${stats.inventory.total} (${stats.inventory.enumerated} enumerated · ${stats.inventory.placeholders} placeholder)`);
 console.log(`[db] events    ${stats.events.catalogued} catalogued · ${stats.events.withVisionPages} with vision pages`);
 console.log(`[db] pages     ${stats.pages.totalIndexed} indexed (${stats.pages.vision} vision · ${stats.pages.ocrOnly} ocr-only · ${stats.pages.visualsAnnotated} visuals)`);
+console.log(`[db] sources   gemini=${stats.bySource.gemini}  gpt-vision=${stats.bySource.gptVision}  human=${stats.bySource.human}  ocr=${stats.bySource.ocr}  multi=${stats.bySource.pagesWithMultipleSources}`);
+console.log(`[db] canonical human=${stats.bestSource.human}  gpt-vision=${stats.bestSource.gptVision}  gemini=${stats.bestSource.gemini}  ocr=${stats.bestSource.ocr}`);
 console.log(`[db] chars     ${stats.pages.totalChars.toLocaleString()}`);
 console.log(`[db] contribs  ${stats.contributions.total} pages from ${stats.contributions.contributors.length} volunteer(s):`);
 for (const c of stats.contributions.contributors) {

@@ -1,0 +1,58 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 8 October 2025
+
+~~SECRET//NOFORN~~
+
+*   Towed Decoy Software Load or Mission Data: MTP AA51
+*   Num Towed Decoys: 2
+*   Type of Radar-Guided AAM: AIM-120
+*   Num Radar-Guided AAM: 2
+*   Type of IR-Guided AAM: AIM-9X
+*   Num IR-Guided AAM: 2
+*   Gun Name or Designator: M61A1
+*   Num Gun Rounds: 510
+*   Air-to-Ground Wpn to Include Num of Each: [1.4a]
+*   TGT Pod Name or Designator: SNIPER LDP
+*   Additional Avionics: HTS-P R7.85
+*   Data Link: LINK 16
+*   Gentext:
+
+### ACEQUIP
+
+*   Aircraft Callsign: [1.4a]
+*   Radar Name or Destination: [1.4a, 1.4a]
+*   Radar Software Load or Mission Data: 8070 / MMC 7.3
+*   Radar Warning Receiver (RWR) Name or Designator: ALR-56M
+*   RWR Software Load or Mission Data: 102 / SY0730
+*   MWS Name or Designator:
+*   MWS Software Load or Mission Data:
+*   IRCM Name or Designator:
+*   IRCM Software Load or Mission Data:
+*   ECM Name or Designator: ALQ-184
+*   ECM Software Load or Mission Data: C01856
+*   CMD Name or Designator: ALQ-213
+*   Chaff Designator: RR-180
+*   Num Chaff or Cartridges: 60
+*   Flare Designator: MJU-53, MJU-66
+*   Num Flares: 45
+*   Towed Decoy Name or Designator: ALE-50
+*   Towed Decoy Software Load or Mission Data: MTP AA51
+*   Num Towed Decoys: 2
+*   Type of Radar-Guided AAM: AIM-120
+*   Num Radar-Guided AAM: 2
+*   Type of IR-Guided AAM: AIM-9X
+*   Num IR-Guided AAM: 2
+*   Gun Name or Designator: M61A1
+*   Num Gun Rounds: 510
+*   Air-to-Ground Wpn to Include Num of Each: [1.4a]
+*   TGT Pod Name or Designator: SNIPER LDP
+
+________________________________________________________________________________
+| 3.5c, FOIA Exemption (b)(6)                                                   |
+--------------------------------------------------------------------------------
+
+~~SECRET//NOFORN~~
+
+MDR 25-0094 thru MDR 25-0099 / JS-250710-TM8S                                     10/17/25 004
+Approved for Release to AARO

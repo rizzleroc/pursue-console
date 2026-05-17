@@ -5,7 +5,7 @@ Agency: Department of War
 Date: 1945-03-18
 Location: Germany
 Type: Intelligence Memo
-Source extraction: MIXED · 13 pages
+Source extraction: VISION · 17 pages
 
 ---
 
@@ -272,221 +272,362 @@ Smith
 7:4899 Wt. 49687/03734 497,000 Pads 3/44 MP 51-8336
 
 
-=== Page 9 ===
+=== Page 9 (vision) ===
 
-v SHAEF
+~~SECRET~~
+SHAEF
 STAFF MESSAGE CONTROL
-ra INCOMING MESSAGE \
-POR QL2L004 HMSRCH
-TOO CLIGHTA MARCH whm 0121154 MARCH
-QF PRIORITY AE ERI.
-qc =2MAR1945
-FROM : HQ IX TAC SIGNED QUESADA A Reiss
-TQ :CG SHAEF MAIN ATTN A-2, CG NINTH AF ADV ATTN A-2
+INCOMING MESSAGE
+(54A)
+
+JEUS
+TOO 011947A MARCH
+
+SHAEF X02/1
+TOR 012100A MARCH
+mhm 012115A MARCH
+
+~~SECRET~~
+OP PRIORITY
+[Handwritten: HAEF fwd]
+[Stamp: 2 MAR 1945]
+[Stamp: 37153]
+
+FROM : HQ IX TAC SIGNED QUESADA
+TO : CG SHAEF MAIN ATTN A-2, CG NINTH AF ADV ATTN A-2
 REF NO : NONE, 1 MARCH 1945
+
 Pilots report the following.
 
-An aluminum colored cylindez= sheéped Object.
-about 12 £t long and 1 ft in diameter wes observea floating in the
-gir at 9,000 ft. It appeared t0 be suspended vertically with smell
-fins and a mast projecting from the lover end. The. object was antacied
-ané partially deflated, a red flame resulted without smoke. The
-cylinder dld not disintegrate]
+An aluminum colored cylinder shaped object, about 12 ft long and 1 ft in diameter was observed floating in the air at 9,000 ft. It appeared to be suspended vertically with small fins and a mast projecting from the lower end. The object was attacked and partially deflated, a red flame resulted without smoke. The cylinder did not disintegrate.
 
-Photo taken by 107 SQ of 67 TAC/R Group at 011030
-hours vic F~5710,
-ACTION : AIR STAFF a : loc) 1%
-INFORMATION  : G-2 SA AIR STAFE |
-SHAEEF FORWARD DISTRIBUTION
-EF DISTRIBU __—__
-« AG RECORDS 7 ON (NFOR. | |
-FE EE
-Tae 2 | SRT
-Ao | ETE EA
-EE
-En. J Ls
-. a
-2364 40%9 RT A
-SMC IN 3.0 1 MAR 45 22004 AGD ful REF NO: WONE
-SECRET COPY NO. 8
-THE MAKING OF AN EXACT Cory OF THIS MESSAGE IS FORBIDDEN =u
+Photo taken by 107 SQ of 67 TAC/R Group at 011030 hours vic F-5710.
 
+ACTION : AIR STAFF
+INFORMATION : G-2
+SHAEF FORWARD
+AG RECORDS
 
-=== Page 12 ===
+[Handwritten: m/B. 164/14.]
 
-\ f od | ¥ Ho Tam) Py
-hs A
-ul
-AIR STAFF /
-SUPREME HEADQUARTERS NU
-5 ALLIFD EXPEDITIONARY FORCE To
-LRTES ;
-REF: ~ j 11 February 1945.
-TO:- Firat Tactical Air Force (Prov.), iP0 37%, U.S, ARMY,
-1. Reference to your 3rd Indorsement on the subject of
-night phenomenon originated by the L15th Wight Fighter
-Squadron, there is nc information at this Headmuariers
-which might explain the nature and cause of the lights
-and other phenomena described by the pilots of this >
-Squadron,
-2. The matter ie, therefore, being referred to the
-Air Ministry in order to find out whether any further elit !
-Domol bo oaks Br roneoasaned,£ron thet ACR. mmtelligence
-Officer from USSTAF to visit the Unit concerned.
-For the Deputy Supreme Commender,
-. / i! Ko
-S AAAI
-ane Ee
-; C.l. GRIERSQK,
-3 Air Commodore,
-A.C, of 8., A-2,
-[4 ~
+[Stamp: 2364 4249]
+
+| AIR STAFF DISTRIBUTION | |
+| :--- | :--- |
+| **ACTION** | **NFOR.** |
+| A-2 | [x] |
+| A-3 | |
+| A-4 | |
+| S1 | |
+| A G | [x] |
+
+SMC IN 310 1 MAR 45 2200A AGD/vml REF NO: NONE
+
+~~SECRET~~
+COPY NO. 8
+THE MAKING OF AN EXACT COPY OF THIS MESSAGE IS FORBIDDEN
 
 
-=== Page 14 ===
+=== Page 10 (vision) ===
 
-/ SECRET ® SECRET B
-x » PTH: CG, TTACH Le
-sInitial i :
-E ! sDate: 16/Jan 1945
-HEADQUARTERS XIT TACTICAL ATR COMMAND (ADV) D-C-1
-; Office of the A/C of S, A-2
-| APO 374, US Army,
-| 16 January 1945,
+[Redacted]
+~~SECRET~~ PLUS 3A
+
+From:- A.D.I.(K), Air Ministry.
+
+To:- A/Cdr. Grierson, S.H.A.E.F.Main, (Air Div.).
+Copy to C.I.O. 2nd T.A.F.
+Date:- 17th February 1945.
+(Handwritten: 51A)
+
+Reference your SHAEF AIR/S.37153/A.2 dated 14th February 1945 with the attached CX report, this probably refers to "Flak Bombe" mentioned in A.D.I.(K) Report No.562/1944, paragraphs 128 and 129.
+(Handwritten: 52A)
+
+(Handwritten: FWD)
+[Red Stamp: SHAEF MAIN]
+[Red Stamp: 21 FEB 1945]
+(Handwritten: 5C) [Red Triangle Stamp] (Handwritten: 37/53)
+
+S.D. Felkin,
+Wing Commander.
+
+SDF/GJ
+
+2365
+4350
+
+
+=== Page 11 (vision) ===
+
+AIR STAFF
+SUPREME HEADQUARTERS
+ALLIED EXPEDITIONARY FORCE.
+
+[SECRET]
+(Handwritten: 8A in a circle)
+
+REF: SHAEF AIR/T8.37153/A-2. 11 February 1945.
+
+SUBJECT: Night Phenomena.
+
+TO: Headquarters, U.S.S.T.A.F
+(For attention of Chief Technical Intelligence
+Officer, Col. Bradley).
+
+1., Attached are copies of papers received from the First Tac. Air Force (Prov). From the number of reports quoted in the 2nd W/Ind from the 415th Night Fighter Squadron, it would seem that there must be something more than mere imagination behind the matter, and in view of the fact that pilots and crews are becoming slightly worried by them, it is considered that everything possible should be done to get to the root of the matter.
+
+2., Copies of the reports have been sent to the Air Ministry for their consideration, and the Scientific Investigation Division of this Headquarters (Mr. Robertson) has also been asked to consider the problem.
+
+3., In the meantime, it is suggested that it might be as well for an Air Technical Intelligence Officer to visit the Unit concerned and obtain reports and impressions at first hand from aircrew personnel.
+
+For the Deputy Supreme Commander,
+
+[Signature]
+
+C.M. GRIERSON,
+Air Commodore,
+A.C. of S., A-2,
+Air Staff, SHAEF.
+
+2402
+4891
+
+
+=== Page 12 (vision) ===
+
+~~SECRET~~
+
+FILE COPY
+(47A)
+
+AIR STAFF
+SUPREME HEADQUARTERS
+ALLIED EXPEDITIONARY FORCE
+
+REF:- 37153
+11 February 1945.
+
+TO:- First Tactical Air Force (Prov.), APO 374, U.S. ARMY.
+
+1. Reference to your 3rd Indorsement on the subject of night phenomenon originated by the 415th Night Fighter Squadron, there is no information at this Headquarters which might explain the nature and cause of the lights and other phenomena described by the pilots of this Squadron.
+
+2. The matter is, therefore, being referred to the Air Ministry in order to find out whether any further information can be obtained from that source. It is also hoped to make arrangements for an Air Technical Intelligence Officer from USSTAF to visit the Unit concerned.
+
+For the Deputy Supreme Commander,
+
+[Handwritten signature]
+C.M. GRIERSON,
+Air Commodore,
+A.C. of S., A-2.
+
+2403
+4392
+
+
+=== Page 13 (vision) ===
+
+37153 ~~SECRET~~
+Please return to A2. [Signature]
+
+15 051400
+GAF 46A
+D-W-2
+
+2nd Ind.
+HEADQUARTERS XII TACTICAL AIR COMMAND (ADV), APO #374, U.S. Army,
+4 February 1945.
+
+TO: Commanding General, First Tactical Air Force (Prov), APO #374,
+U.S. Army. Attn: A/C of S, A-2.
+
+Attention is invited to 2nd W/Ind.
+
+[Red stamp: SHAEF MAIN] [Red stamp: A] 15C
+
+for [Signature]
+LEAVITT CORNING, JR.,
+Lt. Colonel, G. S. C.,
+A/C of S, A-2.
+
+3rd Ind.
+D-Y-1
+HEADQUARTERS, FIRST TACTICAL AIR FORCE (PROV), APO 374, U S Army, 5 February 1945.
+
+TO: Chief Intelligence Officer, Air Staff SHAEF, APO 757.
+
+1. Forwarded for your information.
+
+2. This headquarters has no further information or explanation in connection with these phenomena.
+
+3. It is believed that further investigation is warranted. Since appropriate technical personnel are not available within the First Tactical Air Force, the matter is forwarded for such further investigation as may be advisable.
+
+1 Incl.
+#1 - 1st & 2nd W/Ind, 23 Jan 45
+and 30 Jan 45.
+
+[Circular Stamp: SHAEF MAIN AIR / 8 FEB 1945 / A2 / REGISTRY]
+
+[Signature: C. A. Young]
+C. A. YOUNG,
+Colonel, AC,
+AC of S, A-2
+
+~~SECRET~~
+
+4393
+2404
+307
+- 2 -
+
+
+=== Page 14 (vision) ===
+
+SECRET
+                                                                SECRET
+                                                                TH: CG, XII TAC
+                                                                :Initial [handwritten signature]
+                                                                :Date: 16 Jan 1945 :
+
+HEADQUARTERS XII TACTICAL AIR COMMAND (ADV)                               D-C-1
+Office of the A/C of S, A-2
+
+                                                                APO 374, US Army,
+                                                                16 January 1945.
+
 SUBJECT: Night Phenomenon.
-TO : Commending General, First Tactical Air Force (Prov),
 
-APO 374, US Army. Attn: A/C of 8, A-2.
+TO      : Commanding General, First Tactical Air Force (Prov),
+          APO 374, US Army. Attn: A/C of S, A-2.
 
-1. The following is quoted from training and tactical
-information supplied by the 415th Night Fighter Squadron for .
+     1. The following is quoted from training and tactical
+information supplied by the 415th Night Fighter Squadron for
 the month of December 1944:
 
-"We have encountered a phenomenon which we camnot
+     "We have encountered a phenomenon which we cannot
 explain; crews have been followed by lights that blink on and
 off changing colors etc. The lights come very close and fly
-formation with our planes, They are agitating and keep the
+formation with our planes. They are agitating and keep the
 crews on edge when they encounter them, mainly because they
 cannot explain them. It is requested further information be
 furnished on this subject, such as similar experiences of other
-night units",
+night units".
 
-2. Further information is requested, h LK
-LEAVITT CORNING, JR.,
-Lt. Colonel, G. S. C.,
-A/C of 8, A-2.
-lst Ind D-B-1
+     2. Further information is requested.
+
+                                        [handwritten signature]
+                                        LEAVITT CORNING, JR.,
+                                        Lt. Colonel, G. S. C.,
+                                        A/C of S, A-2.
+
+                                1st Ind                                   D-B-1
 HEADQUARTERS, FIRST TACTICAL AIR FORCE (PROV), AC of S A-2, APO 374, US Army,
-20 Jenuery 1945
-TO: AC of S A-2, XII Tactical Air Command, APO 574, US Army
+20 January 1945
 
-1. There have been no instances reported as above.
+TO: AC of S A-2, XII Tactical Air Command, APO 374, US Army
 
-2, Before an investigation can be made it will be necessary to have
+     1. There have been no instances reported as above.
+
+     2. Before an investigation can be made it will be necessary to have
 more complete information, such as colors of the lights, their intensity,
 size, duration, and at what altitudes seen; also if the lights are observed
-at eny specific hours. Do subject lights cross Allied lines and in what
-direction are they seen to travel? Also, has it been noted op what part of
+at any specific hours. Do subject lights cross Allied lines and in what
+direction are they seen to travel? Also, has it been noted on what part of
 the aircraft are they carried, i.e. wing, tail, prop; and how close do they
 approach our aircraft?
 
-For the Assistent Chief of Staff A-2: 2 \ Ton bon
-2405 Sh 4395 § V BOYKIN
-5) Pi Major AC
-SECRET Executive Officer
+     For the Assistant Chief of Staff A-2:
+
+                                        [handwritten signature]
+                                        S V BOYKIN
+                                        Major AC
+                                        Executive Officer
+
+2405 -1-                                4395
+SECRET
 
 
-=== Page 15 ===
+=== Page 15 (vision) ===
 
-® ==crez @
-1st W/Ind, D-W-2
-HEADQUARTERS XII TACTICAL AIR COMMAND, APO #574, U.S. Army, 23 January 1945,
-T0: 8-2, 415 Night Fighter Squadron.
-Forwarded for compliance with paragraph 2 of 1st Inde
-EAVITT CORNING, JR.,
-Lt. Colonel, Ge S. Ce,
-A/C of 8, A=2¢
+~~S E C R E T~~
+
+1st W/Ind.                                          D-W-2
+
+HEADQUARTERS XII TACTICAL AIR COMMAND, APO #374, U.S. Army, 23 January 1945.
+
+TO: S-2, 415 Night Fighter Squadron.
+
+Forwarded for compliance with paragraph 2 of 1st Ind.
+
+[Signature: for John E. Woodley]
+LEAVITT CORNING, JR.,
+Lt. Colonel, G. S. C.,
+A/C of S, A-2.
+
 2nd. W/Ind.
-415th. NIGHT FIGHTER SQUADRON, APO #374, U. S. Army, 30 January 1945,
-TO: AC of § A-2 XII Tectical Air Command, APO 374, U. S. Army,
-1. In complisnce with paragraph 2 of lst. Ind., the following extracts from
-the Sortie Reports of verious pilots who have encountered the Night Phenomenon
-are submitted for your information.
-Night of 14-15 December 1944 - "In vicinity of Erstein (V-9381) flying at
-1000 ft. observed large red light at 2000 ft. going East at 18:40 hrs.
-Travelling at approximately 200 MPH"
-Night of 16-17 December 1944 - "20 miles North of Breisach (W-0173) at
-800 ft. observed 5 or 6 flashing red and green lights in "T" shape,
-Thought they were flak. About 10 minutes later saw the same lights mach
-closer and behind me. We turned port end Starboard and the lights
-followed. They closed in to about 8 O'clock and 1000 £4. and remained
-in that position for several minutes and then disappeared."
-Night of 22-23 December 1944 - "Patrolling at Angels 10 from Sarrebourg
-to Strasbourg North and South of highway. At 06:00 hrs. sew two lights
-coming towards A/G from the ground, Upon reaching altitude of Plane,
-they leveled off and stayed on my tail for approximately 2 minutes,
-Lygate appeared to be a large orance $low. After staying with Af¢ for
-approximately 2 minutes, they would peel off end turn away, fly along
-level for a few mimutes and then go out. They appeared. to be under perfect
-control at all times. Lights were seen somewhere in vicinity of Wagenau."
-= E56R BF
-Full #1
-a A ee ee ee er re ae
+
+415th. NIGHT FIGHTER SQUADRON, APO #374, U. S. Army, 30 January 1945.
+
+TO: AC of S A-2 XII Tactical Air Command, APO 374, U. S. Army.
+
+1. In compliance with paragraph 2 of 1st. Ind., the following extracts from the Sortie Reports of various pilots who have encountered the Night Phenomenon are submitted for your information.
+
+Night of 14-15 December 1944 - "In vicinity of Erstein (V-9381) flying at 1000 ft. observed large red light at 2000 ft. going East at 18:40 hrs. Travelling at approximately 200 MPH"
+
+Night of 16-17 December 1944 - "20 miles North of Breisach (W-0173) at 800 ft. observed 5 or 6 flashing red and green lights in "T" shape. Thought they were flak. About 10 minutes later saw the same lights much closer and behind me. We turned port and Starboard and the lights followed. They closed in to about 8 O'clock and 1000 ft. and remained in that position for several minutes and then disappeared."
+
+Night of 22-23 December 1944 - "Patrolling at Angels 10 from Sarrebourg to Strasbourg North and South of highway. At 06:00 hrs. saw two lights coming towards A/C from the ground. Upon reaching altitude of plane, they leveled off and stayed on my tail for approximately 2 minutes. Lights appeared to be a large orange glow. After staying with A/C for approximately 2 minutes, they would peel off and turn away, fly along level for a few minutes and then go out. They appeared to be under perfect control at all times. Lights were seen somewhere in vicinity of Hagenau."
+
+~~S E C R E T~~
+
+Juel #1                                     2406                                     4296
 
 
-=== Page 16 ===
+=== Page 16 (vision) ===
 
-| $ 3
-[ SXE-C-R-E~T ® y
-» y
+S-E-C-R-E-T
 
-2 nd. Vi/Ind., 415th. Night Fighter Squadron. 30. January 1945 con't,
-Night of 23-24 December 1944 - "Observed reddish colored flames at .
-considerable distance end at approximately 10,000 £t."
-Night of 23-24 December 1944 - "Approximately 10 miles South of Point x (Q6745)
-noticed to NE approximately 5 miles a glowing red object shooting straight
-up. Changed suddenly to plane view of afc doing a wing over and going
-into a dive and disappearing."
-Hight of 26-27 December 1944 ~ "At 01:45 hrs. saw two yellow streaks of
-flame flying at seme level at approximately 3000 ft. off port side. We also
-sav red balls of fire that stayed up for 10 seconds approximately 45 miles
-avey. After seeing yellow stresks, made starboard vector lost altitude
-and streaks disappeared from view. Galled GCI Blunder and asked if any E/A
-were in vicinity. They answered No. Instruded to return to Angels 10. d
-Vie falt what was thought to be prop wash; very distinct. Noticed several
-groups of lights off port while patrolling in vicinity of Q-2050 and R-1556
-Lights mede distinct lines somewhat like arrows,"
+2 nd. W/Ind., 415th. Night Fighter Squadron 30 January 1945 con't.
 
-' Night of 26-27 December 1944 - "fhile on vector 090 near V-7050 during §
-patrol we observed airborne white lights. They were stagzered evenly
-vertically and we could see from 1 to-4 swing at once. They appeared
-stationary at 10,000 ft."
+Night of 23-24 December 1944 - "Observed reddish colored flames at considerable distance and at approximately 10,000 ft."
 
-Wight of 26-27 December 1944 - "Observed light at same sltitude while in
-vicinity of Worms Observer saw light come within 100 ft. Peeled off and
-took evasive action but light contimied to follow for 5 minutes. Light
-then pulled up rapidly and went out of sight."
+Night of 23-24 December 1944 - "Approximately 10 miles South of Point X (Q6745) noticed to NE approximately 5 miles a glowing red object shooting straight up. Changed suddenly to plane view of A/C doing a wing over and going into a dive and disappearing."
 
-of
+Night of 26-27 December 1944 - "At 01:45 hrs. saw two yellow streaks of flame flying at same level at approximately 3000 ft. off port side. We also saw red balls of fire that stayed up for 10 seconds approximately 45 miles away. After seeing yellow streaks, made starboard vector lost altitude and streaks disappeared from view. Called GCI Blunder and asked if any E/A were in vicinity. They answered No. Instructed to return to Angels 10. We felt what was thought to be prop wash; very distinct. Noticed several groups of lights off port while patrolling in vicinity of Q-9050 and R-1556 Lights made distinct lines somewhat like arrows."
 
-N ght of 27-28 December 1944 - "While on North heading in patrol area
-ndticed in vicinity of Q-1378 lights suspended i% air moving slowly and
-vould then disappear. Vere orange in color’. Lights appeared singly and in
-pairs. Observed these lights four or five times during period."
-Night of 27-28 December 1944 - "Bight miles NE of Luneville at 19:10 hrs.
-saw three sete of three lights (red and vhite) one on starboard and one on
-port from 1000 £t. to 2000 ft. to rear and clasing in at Angels 10. Pulled
-up to Angele 8 and lights went out. Called Churchman to see if there was
-anything in area, Received a negative reply."
+Night of 26-27 December 1944 - "While on vector 090 near V-7050 during patrol we observed airborne white lights. They were staggered evenly vertically and we could see from 1 to 4 swing at once. They appeared stationary at 10,000 ft."
 
-5 Night of 30-31 December 1944 - "Say a group of lights flying through the
-air 30 or 40 miles East of base vhile flying at Angels 9 - 10."
+Night of 26-27 December 1944 - "Observed light at same altitude while in vicinity of Worms Observer saw light come within 100 ft. Peeled off and took evasive action but light continued to follow for 5 minutes. Light then pulled up rapidly and went out of sight."
 
-!
-Night of 1-2 January 1945 - "SawFoofighters North of Strasbourg and North |
-of Saverne". 7 ~
-Nieht of 14-15 January 1945 - "Observed a large orange glow in sky approx.
-5 ft. in diemeter in vicinity of Ingweiller at 6000 ft, at 20:00 hrs,"
-: _—
-¥: 2407 §-E~C-R-E~-T
-u PEt
+Night of 27-28 December 1944 - "While on North heading in patrol area noticed in vicinity of Q-1378 lights suspended in air moving slowly and would then disappear. Were orange in color. Lights appeared singly and in pairs. Observed these lights four or five times during period."
+
+Night of 27-28 December 1944 - "Eight miles NE of Luneville at 19:10 hrs. saw three sets of three lights (red and white) one on starboard and one on port from 1000 ft. to 2000 ft. to rear and closing in at Angels 10. Pulled up to Angels 8 and lights went out. Called Churchman to see if there was anything in area. Received a negative reply."
+
+Night of 30-31 December 1944 - "Saw a group of lights flying through the air 30 or 40 miles East of base while flying at Angels 9 - 10."
+
+Night of 1-2 January 1945 - "Saw Foofighters North of Strasbourg and North of Saverne".
+
+Night of 14-15 January 1945 - "Observed a large orange glow in sky approx. 5 ft. in diameter in vicinity of Ingweiller at 6000 ft. at 20:00 hrs."
+
+2407 S-E-C-R-E-T 4397
+
+
+=== Page 17 (vision) ===
+
+~~S-E-G-R-E-T~~
+
+2nd. W/Ind., 415th. Night Fighter Squadron, 30 January 1945 Con't.
+
+Night of 29-30 January 1945 - "At about 00:10 hrs. sighted a Foofighter about half way between Weissembourg and Landau. Foofighter was off to the starboard and rear at Angels 2. Lights were amber and one was 20 - 50 ft. above the other and of about 30 seconds duration. Foofighter was about 1000 ft. away and following. The lights were about a foot in diameter. Lights disappeared when Travel 34 turned into them."
+
+2. In every case where pilot called GCI Control and asked if there was a Bogey A/C in the area he received a negative answer.
+
+[Signature: F. B. Ringwald]
+F. B. RINGWALD,
+Captain, A. C.,
+Intelligence Officer.
+
+* Foofighters is the name given these phenomenon by combat crews of this Squadron.
+
+~~S-E-G-R-E-T~~
+
+2408 - 4293

@@ -1,0 +1,48 @@
+[redacted]
+
+* Killbox (Location):
+* Mission Type: [redacted]
+* JTAC Callsign:
+* Gentext/Additional Details:
+* Did not Arrive On Station:
+
+*Off Station*
+
+* Time Off Station DTG: [redacted]
+* Total Time On Station: [redacted]
+* Gentext/Additional Details:
+
+*UAP*
+
+* Initial Contact DTG: [redacted]
+* UAP Event Type: [redacted]
+* UAP Maneuverability Observations:
+* UAP Response to Observer Actions:
+* MDS Type / Asset Type: [redacted]
+* Tail Number: [redacted]
+* Friendly Aircraft Location: [redacted]
+* Friendly Aircraft Altitude/Depth: [redacted]
+* Friendly Aircraft Trajectory:
+* Observer Assessment of UAP:
+* Friendly Aircraft Speed: [redacted]
+* Observation Interrogation of UAP (yes/no; if yes list sensor(s) and returns)::
+* Third-party Observers and/or Reporters:
+* Friendly Aircraft State:
+* Training Range (If applicable):
+* Operational Range:
+* UAP First Seen Location: [redacted]
+* UAP Last Seen Location: [redacted]
+* UAP Altitude, Depth, Velocity, and Trajectory (indicate estimated or measured):
+* UAP Physical State: [redacted]
+* Number of UAP Sighted: [redacted]
+* UAP Propulsion Means:
+* UAP Payload:
+* UAP Under Intelligent Control (yes/no; if yes, describe):
+* UAP Signatures:
+* UAP Advanced Capabilities And/Or Materials (yes/no; if yes, describe): NO
+* UAP RF Frequency:
+* UAP RF Duration:
+* UAP Event Serial Number: -
+
+[redacted]
+[redacted]

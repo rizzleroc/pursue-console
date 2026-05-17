@@ -1,0 +1,5 @@
+Mr. Larry W. Bryant
+
+NOTE: Writer advised he understood FBI has participated in the Government's program of investigation of unidentified flying objects and he asked for information concerning these phenomena. He also asked whether FBI ever made analysis of unidentified flying object maneuvers and if FBI representative ever gave testimony before Congressional committees on this subject.
+
+- 2 -
