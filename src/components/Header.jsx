@@ -45,6 +45,7 @@ export default function Header({ view, onViewChange, onVolunteer, query, onSearc
           aria-label="Go to LIVE">
           <span className="text-emerald-400 text-xs tracking-[0.3em] font-mono">
             <span className="text-amber-400">▶</span> PURSUE
+            <span className="ml-2 text-emerald-800 text-[10px] tracking-[0.25em]">release 2.0</span>
           </span>
           {catalogued != null && totalInv != null && (
             <span className="hidden sm:inline text-emerald-700 text-[10px] font-mono">
