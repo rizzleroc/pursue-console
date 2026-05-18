@@ -1,52 +1,34 @@
 {
-  "best": "human",
+  "best": "gemini",
   "sources": {
     "gpt-vision": {
       "chars": 1281,
-      "imported_at": null,
-      "note": "seeded from pre-existing canonical"
+      "imported_at": "2026-05-18T02:14:52.732Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0008.gpt-vision.txt"
     },
     "gemini": {
       "chars": 1427,
-      "imported_at": "2026-05-18T01:53:49.564Z",
+      "imported_at": "2026-05-18T02:14:48.612Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:57:18.104418+00:00",
       "text_file": "p0008.gemini.txt"
-    },
-    "human": {
-      "chars": 1281,
-      "imported_at": "2026-05-18T01:53:52.832Z",
-      "handle": "Rizzleroc",
-      "text_file": "p0008.human.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-18T01:53:53.392Z",
+    "computed_at": "2026-05-18T02:14:53.364Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 3,
-    "canonical": "human",
-    "agreement_score": 0.898,
+    "sources_count": 2,
+    "canonical": "gemini",
+    "agreement_score": 0.935,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
-        "score": 0.898
-      },
-      {
-        "a": "gpt-vision",
-        "b": "human",
-        "score": 1
-      },
-      {
-        "a": "gemini",
-        "b": "human",
         "score": 0.935
       }
     ],
     "confidence": "high",
-    "needs_review": false,
-    "against_human": {
-      "gemini": 0.935
-    }
+    "needs_review": false
   }
 }

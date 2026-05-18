@@ -77,6 +77,13 @@ function safetyCheck(text) {
 }
 
 // ---- 2. Walk contributions/ ----
+// Path convention: contributions/<handle>/<source>/<eid>/p<NNN>.txt
+//   `human`     reserved for hand-typed transcriptions only
+//   `gpt-vision` what scripts/volunteer.mjs produces (ChatGPT vision)
+//   `gemini`    future Gemini-via-volunteer flow
+// Legacy <handle>/<eid>/ shape is accepted and labeled gpt-vision.
+const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
+
 async function collectContributions() {
   if (!existsSync(CONTRIB)) return [];
   const handles = await readdir(CONTRIB);
@@ -84,13 +91,30 @@ async function collectContributions() {
   for (const handle of handles) {
     const hdir = path.join(CONTRIB, handle);
     if (!(await stat(hdir)).isDirectory()) continue;
-    for (const eid of await readdir(hdir)) {
-      const edir = path.join(hdir, eid);
-      const stE = await stat(edir);
-      if (!stE.isDirectory()) continue;
-      for (const f of await readdir(edir)) {
-        const fp = path.join(edir, f);
-        out.push({ handle, eid, file: f, fullPath: fp, relPath: `contributions/${handle}/${eid}/${f}` });
+    for (const child of await readdir(hdir)) {
+      const childPath = path.join(hdir, child);
+      if (!(await stat(childPath)).isDirectory()) continue;
+      if (KNOWN_SOURCES.has(child)) {
+        const source = child;
+        for (const eid of await readdir(childPath)) {
+          const edir = path.join(childPath, eid);
+          if (!(await stat(edir)).isDirectory()) continue;
+          for (const f of await readdir(edir)) {
+            out.push({
+              handle, source, eid, file: f, fullPath: path.join(edir, f),
+              relPath: `contributions/${handle}/${source}/${eid}/${f}`,
+            });
+          }
+        }
+      } else {
+        const eid = child;
+        for (const f of await readdir(childPath)) {
+          out.push({
+            handle, source: "gpt-vision", eid, file: f, fullPath: path.join(childPath, f),
+            relPath: `contributions/${handle}/${eid}/${f}`,
+            legacy: true,
+          });
+        }
       }
     }
   }

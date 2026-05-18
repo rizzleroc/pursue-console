@@ -50,21 +50,54 @@ if (!(await exists(CONTRIB))) {
 
 await mkdir(VIS_CACHE, { recursive: true });
 
+// Recognized transcription sources. `human` means a person literally
+// typed the page out word-for-word — it's reserved, never produced by
+// automation. `gpt-vision` is what the volunteer.mjs flow writes (which
+// runs ChatGPT vision on rendered page images). New machine sources
+// can be added here as their importers come online.
+const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
+
+// Path convention: contributions/<handle>/<source>/<eid>/p<NNN>.txt
+//
+// Backward-compat: if a directory directly under <handle>/ is NOT one
+// of the known sources, we assume it's an event id from the pre-source
+// path shape and label its contents as gpt-vision (the only flow that
+// existed then). The fix-contribution-source-labels.mjs migration moved
+// existing contributions into the new shape so this fallback should be
+// dead in practice — kept only for PRs from forks that predate the
+// migration.
 for (const handleEnt of await listDirs(CONTRIB)) {
   if (!handleEnt.isDirectory()) continue;
   const handle = handleEnt.name;
   const hDir = path.join(CONTRIB, handle);
 
-  for (const eidEnt of await listDirs(hDir)) {
-    if (!eidEnt.isDirectory()) continue;
-    const eid = eidEnt.name;
-    const srcDir = path.join(hDir, eid);
+  // Build a flat list of (source, eid, srcDir) triples to import.
+  const importTargets = [];
+  for (const child of await listDirs(hDir)) {
+    if (KNOWN_SOURCES.has(child.name)) {
+      // New shape: <handle>/<source>/<eid>/files
+      const srcLabel = child.name;
+      const sourceDir = path.join(hDir, child.name);
+      for (const eidEnt of await listDirs(sourceDir)) {
+        importTargets.push({
+          source: srcLabel, eid: eidEnt.name, srcDir: path.join(sourceDir, eidEnt.name),
+        });
+      }
+    } else {
+      // Legacy shape: <handle>/<eid>/files — assume gpt-vision lineage
+      importTargets.push({
+        source: "gpt-vision", eid: child.name, srcDir: path.join(hDir, child.name),
+        legacy: true,
+      });
+    }
+  }
+
+  for (const t of importTargets) {
+    const { source: contribSource, eid, srcDir } = t;
     const dstDir = path.join(VIS_CACHE, eid);
     await mkdir(dstDir, { recursive: true });
 
     for (const f of await readdir(srcDir)) {
-      // We only import transcripts. JSON companions stay in contributions/
-      // (the search pipeline doesn't consume them).
       const pageNum = await pageNumFromName(f);
       if (pageNum == null) continue;
       stats.scanned++;
@@ -73,9 +106,8 @@ for (const handleEnt of await listDirs(CONTRIB)) {
       const srcText = (await readFile(srcPath, "utf8")).trim();
       if (srcText.length < MIN_CHARS) { stats.skipped_empty++; continue; }
 
-      // Canonical destination filename uses p<NNN>.txt (zero-padded) to
-      // match what vision-ocr.mjs writes.
-      const dstPath = path.join(dstDir, `p${pad4(pageNum)}.txt`);
+      const pad4Page = pad4(pageNum);
+      const dstPath = path.join(dstDir, `p${pad4Page}.txt`);
       const dstPathLegacy = path.join(dstDir, `p${pageNum}.txt`);
 
       let existingPath = null, existingText = "";
@@ -85,48 +117,58 @@ for (const handleEnt of await listDirs(CONTRIB)) {
         existingText = (await readFile(existingPath, "utf8")).trim();
       }
 
-      // Human contributions ALWAYS win the canonical spot — they're the
-      // result of a person actually reading the page, which outranks any
-      // machine transcription regardless of length. We still keep the
-      // machine versions in the sidecar so we can compare.
       const importedAt = new Date().toISOString();
+      const perSourcePath = path.join(dstDir, `p${pad4Page}.${contribSource}.txt`);
+      await writeFile(perSourcePath, srcText + "\n", "utf8");
 
-      // Persist human text as its own per-source file so future re-imports
-      // don't lose it. Canonical p<NNN>.txt is a copy of the winner.
-      const humanTextPath = path.join(dstDir, `p${pad4(pageNum)}.human.txt`);
-      await writeFile(humanTextPath, srcText + "\n", "utf8");
-
-      const sidecarPath = path.join(dstDir, `p${pad4(pageNum)}.sources.json`);
+      const sidecarPath = path.join(dstDir, `p${pad4Page}.sources.json`);
       let sidecar = { best: null, sources: {} };
       if (existsSync(sidecarPath)) {
         try { sidecar = JSON.parse(await readFile(sidecarPath, "utf8")); } catch {}
       } else if (existingText.length >= 30) {
-        // Seed: previous canonical was a machine transcription with
-        // unknown lineage. Save it as gpt-vision per-source file too.
-        const gptPath = path.join(dstDir, `p${pad4(pageNum)}.gpt-vision.txt`);
-        if (!existsSync(gptPath)) await writeFile(gptPath, existingText + "\n", "utf8");
+        // Seed: previous canonical with unknown lineage. Tag as
+        // gpt-vision (default machine source) so future imports can
+        // compare against it.
+        const seedPath = path.join(dstDir, `p${pad4Page}.gpt-vision.txt`);
+        if (!existsSync(seedPath)) await writeFile(seedPath, existingText + "\n", "utf8");
         sidecar.sources["gpt-vision"] = {
           chars: existingText.length, imported_at: null,
-          text_file: `p${pad4(pageNum)}.gpt-vision.txt`,
+          text_file: `p${pad4Page}.gpt-vision.txt`,
           note: "seeded from pre-existing canonical",
         };
       }
-      sidecar.sources.human = {
+      sidecar.sources[contribSource] = {
         chars: srcText.length, imported_at: importedAt, handle,
-        text_file: `p${pad4(pageNum)}.human.txt`,
+        text_file: `p${pad4Page}.${contribSource}.txt`,
       };
-      sidecar.best = "human";
+      // Canonical priority: human always wins; otherwise longest text wins.
+      if (contribSource === "human") {
+        sidecar.best = "human";
+      } else {
+        // longest-wins among present sources
+        const present = Object.keys(sidecar.sources).filter(k => sidecar.sources[k]?.chars > 0);
+        present.sort((a, b) => (sidecar.sources[b].chars || 0) - (sidecar.sources[a].chars || 0));
+        sidecar.best = present[0] || contribSource;
+      }
       await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
 
+      // Sync canonical p<NNN>.txt to the winning source's text
+      const winnerInfo = sidecar.sources[sidecar.best];
+      if (winnerInfo?.text_file) {
+        const winnerFull = path.join(dstDir, winnerInfo.text_file);
+        if (existsSync(winnerFull)) {
+          await writeFile(dstPath, await readFile(winnerFull, "utf8"), "utf8");
+        }
+      }
+
       const action = !existingText ? "imported" : "overwritten";
-      await writeFile(dstPath, srcText + "\n", "utf8");
       stats[action]++;
 
-      manifest[`${eid}/p${pad4(pageNum)}.txt`] = {
+      manifest[`${eid}/p${pad4Page}.txt`] = {
         handle,
         importedAt,
         chars: srcText.length,
-        source: "human",
+        source: contribSource,
       };
     }
   }

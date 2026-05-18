@@ -56,8 +56,26 @@ That's it. The script:
 2. Claims a slice of 20 unprocessed pages (configurable)
 3. Downloads the source PDFs directly from `war.gov/UFO` (no auth needed)
 4. Renders, batches, and OCRs them via your own ChatGPT browser session
-5. Writes results to `contributions/<your-handle>/<event-id>/p<NNNN>.txt`
+5. Writes results to `contributions/<your-handle>/gpt-vision/<event-id>/p<NNNN>.txt`
 6. Opens a pull request
+
+### Contribution path convention
+
+```
+contributions/<your-handle>/<source>/<event-id>/p<NNNN>.txt
+```
+
+`<source>` records *how* the text was produced. This is what lets the corpus separate machine OCR from human ground truth and score every machine source against the human gold over time:
+
+| `<source>` | What it means | How to submit |
+|---|---|---|
+| `gpt-vision` | ChatGPT vision through the volunteer flow | Default — what `npm run volunteer` writes |
+| `gemini` | Gemini vision (per Denis's pipeline) | Run a Gemini variant of the volunteer script |
+| `human` | **Typed by a person, word-for-word from the source page** | Drop your `.txt` into `contributions/<handle>/human/<eid>/p<NNNN>.txt` by hand, open a PR |
+| `ocr` | Plain tesseract/poppler output | Maintainer pipeline only |
+
+`human` is reserved — automation never writes there. A page in `human/` becomes the canonical text for that page no matter how many machine sources also have it, **and is used as gold to grade every machine source.** One hand-typed page is worth more than a dozen machine passes for calibrating the pipeline.
+
 
 CI auto-validates against `JUDGE-STANDARD.md`. A maintainer reviews and merges. Your transcriptions are in the next deploy.
 

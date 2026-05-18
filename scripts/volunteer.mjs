@@ -65,7 +65,12 @@ const NO_PR = !!args["no-pr"];
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volunteer"));
-const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE);
+// Volunteer flow writes through ChatGPT vision via the MCP daemon — so
+// the source of every page this script produces is `gpt-vision`, NOT
+// `human`. The `human` slot in the corpus is reserved for transcriptions
+// that someone literally typed word-for-word; see HOW-CAN-I-HELP.md.
+const CONTRIB_SOURCE = "gpt-vision";
+const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);
 const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/, os.homedir());
 
 async function loadToken() {

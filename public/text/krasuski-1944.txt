@@ -12,49 +12,51 @@ Source extraction: VISION · 15 pages
 === Page 1 (vision) ===
 
 FD-245 (REV. 1-21-80)
-Screened by NARA (RIF)
-11-19-2025 FOIA #
-#0290 DOCID: 34714592
+
+> Screened by NARA (RF)
+> 11-19-2025 FOIA #
+> 80290 DOCID: 34714592
+
 U. S. Department of Justice
-(?) MUST NOT BE REMOVED FROM OR ADDED TO THIS FILE)
-BUREAU
-of
-(?)TIGATION
-Declassification authority
-derived from FBI Automatic
-Declassification Guide,
-Issued May 24, 2007
-CLASSIFICATION NO.
-0100 26505
-Class / Case #
+
+> Declassification authority
+> Derived from FBI Automatic
+> Declassification Guide,
+> Issued May 24, 2007
+
+MUST NOT BE REMOVED FROM OR ADDED TO THIS FILE
+
+BUREAU of INVESTIGATION
+
+**FBI - CENTRAL RECORDS CENTER**
 DE - DETROIT
-Sub
-Vol.
-Serial #
-1
-1
-OPEN
-FBI - CENTRAL RECORDS CENTER
+Class / Case #: 0100 26505
+Sub: 1
+Vol.: 1
+Serial #:
 8/08/374524
-RRP000PJD9
-COPIED FOR FOIPA
-See also Nos.
-SERIALS
-REQUESTERS FULL NAME
-COMPUTER
-NUMBER
-DATE
-BY
-ALL
-Luarest, Michael R.
-245,974
-5-31-85
-Lee
+OPEN
+
+
+**Right Margin:**
+CLASSIFICATION NO.
+100-DE-26505
 Volume Number
 Serials
-90290
-d:34714592 Page 1
-Closed Section
+
+
+COPIED FOR FOIPA
+
+| SERIALS | REQUESTERS FULL NAME | COMPUTER NUMBER | DATE | BY |
+| :--- | :--- | :--- | :--- | :--- |
+| All | Charest, Michael R. | 245,974 | 5-31-85 | Dee |
+
+See also Nos.
+
+*Closed Section*
+
+NW 90290
+DocId:34714592 Page 1
 
 
 === Page 2 (vision) ===
@@ -211,54 +213,37 @@ DocId:34714592 Page 8
 === Page 9 (vision) ===
 
 Detroit 31, Michigan
-November 7,1957
+November 7, 1957
+
 ALL INFORMATION CONTAINED
 HEREIN IS UNCLASSIFIED
-DATE 3/20/15 BY (?)
+DATE 3/20/13 BY [illegible]
+
 UNIDENTIFIED FLYING OBJECTS
-In response to a letter directed by him to Mr.
-Robert Cutler, Special Assistant to President Dwight D.
-Eisenhower,reflecting that he "might have some information
-about the rocket in Texas," Wladyslaw Krasuski, 5457
-Joseph Campau, Detroit, was interviewed November 7, 1957,
-and furnished the following information:
-Born (?) in the State of (?), FOIA(b)(6)
-Krasuski was brought from Poland as a Prisoner of War to
-Gut Alt Golssen,approximately 30 miles east of Berlin, Germany,
-in May, 1942, where he remained until a few weeks after the
-end of World War II.  He spent the following years at the
-Displaced Persons Camps at Kork, Strasburg, Offenburg, Milheim
-and Freiburg, Germany.  He attended a radio technician school
-at Freiburg and for about a year was employed in a textile
-mill at Laurachbaden, Germany.  He arrived in the United
-States at New York, May 2, 1951, via the "S.S. General Stewart"
-as a Displaced Person, destined to the Reverend Father Petro
-Walkowiak, Hamtramck, Michigan; his alien registration number -
-(?)
-Since May, 1951, he has been employed at the Gobel
-Brewery, Detroit.
-News report of mysterious vehicle in Texas causing
-engines to stall prompted him to communicate with the
-United States Government concerning a similar phenomenon
-observed by him in 1944 in the area of Gut Alt Golssen.
-According to Krasuski, during 1944, month not recalled,
-while enroute to work in a field a short distance north of
-Gut Alt Golssen, their tractor engine stalled on a road through
-a swamp area.  No machinery or other vehicle was then visible
-although a noise was heard described as a high-pitched whine
-similar to that produced by a large electric generator.
+
+In response to a letter directed by him to Mr. Robert Cutler, Special Assistant to President Dwight D. Eisenhower, reflecting that he "might have some information about the rocket in Texas," Wladyslaw Krasuski, 5457 Joseph Campau, Detroit, was interviewed November 7, 1957, and furnished the following information:
+
+Born [redacted] in the State of [redacted] FOIA(b)(6)
+Krasuski was brought from Poland as a Prisoner of War to Gut Alt Golssen, approximately 30 miles east of Berlin, Germany, in May, 1942, where he remained until a few weeks after the end of World War II. He spent the following years at Displaced Persons Camps at Kork, Strasburg, Offenburg, Milheim and Freiburg, Germany. He attended a radio technician school at Freiburg and for about a year was employed in a textile mill at Laurachbaden, Germany. He arrived in the United States at New York, May 2, 1951, via the "S.S. General Stewart" as a Displaced Person, destined to the Reverend Father Petro Walkowiak, Hamtramck, Michigan; his alien registration number [redacted] (b)(6)
+
+Since May, 1951, he has been employed at the Gobel Brewery, Detroit.
+
+News report of mysterious vehicle in Texas causing engines to stall prompted him to communicate with the United States Government concerning a similar phenomenon observed by him in 1944 in the area of Gut Alt Golssen.
+
+According to Krasuski, during 1944, month not recalled, while enroute to work in a field a short distance north of Gut Alt Golssen, their tractor engine stalled on a road through a swamp area. No machinery or other vehicle was then visible although a noise was heard described as a high-pitched whine similar to that produced by a large electric generator.
+
 5 - Bureau (RM)
-① - Detroit (100-26505)
-ga CR:JLK
-(6)
-(?)
-M-26505-2
-Searched
-Serialized
-Indexed
-Filed
+1 - Detroit (100-26505)
+CR:JLK [handwritten signature]
+
+100-26505-2
+Searched [check]
+Serialized [check]
+Indexed [check]
+Filed [check]
+
 NW 90290
-DocId:34714592 P
+DocId:34714592 Page 9
 
 
 === Page 10 (vision) ===

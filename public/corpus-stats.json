@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-18T01:53:54.182Z",
+  "generatedAt": "2026-05-18T02:14:54.152Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -23,19 +23,19 @@
     "vision": 3372,
     "ocrOnly": 4,
     "visualsAnnotated": 309,
-    "totalChars": 7000951
+    "totalChars": 7001332
   },
   "bySource": {
     "gemini": 3370,
     "gptVision": 427,
-    "human": 18,
+    "human": 0,
     "ocr": 693,
     "pagesWithMultipleSources": 425
   },
   "bestSource": {
-    "human": 18,
-    "gptVision": 409,
-    "gemini": 2945,
+    "human": 0,
+    "gptVision": 421,
+    "gemini": 2951,
     "ocr": 4
   },
   "contributions": {
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-18T01:53:54.182Z",
+      "ts": "2026-05-18T02:14:54.152Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1028,
+      "duration_ms": 1075,
       "note": "events=121 inventory=173 contributions=18"
     },
     "recent": [
+      {
+        "ts": "2026-05-18T02:14:54.152Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1075,
+        "note": "events=121 inventory=173 contributions=18"
+      },
       {
         "ts": "2026-05-18T01:53:54.182Z",
         "kind": "db-rebuild",
@@ -129,8 +136,8 @@
   },
   "review": {
     "pagesNeedingReview": 22,
-    "pagesHighConfidence": 365,
-    "pagesMediumConfidence": 38,
+    "pagesHighConfidence": 367,
+    "pagesMediumConfidence": 36,
     "pagesLowConfidence": 22,
     "topEventsByReviewQueue": [
       {
@@ -159,10 +166,5 @@
       }
     ]
   },
-  "sourceQuality": {
-    "gemini": {
-      "samples": 18,
-      "meanScoreVsHuman": 0.866
-    }
-  }
+  "sourceQuality": {}
 }

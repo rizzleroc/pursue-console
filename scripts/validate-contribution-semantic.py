@@ -65,18 +65,32 @@ def collect_contributions():
         if not handle_dir.is_dir():
             continue
         handle = handle_dir.name
-        for eid_dir in handle_dir.iterdir():
-            if not eid_dir.is_dir():
+        # contributions/<handle>/<source>/<eid>/p<NNN>.txt is canonical.
+        # Legacy <handle>/<eid>/ shape is accepted and tagged gpt-vision.
+        KNOWN_SOURCES = {"human", "gpt-vision", "gemini", "ocr"}
+        for child in handle_dir.iterdir():
+            if not child.is_dir():
                 continue
-            for f in eid_dir.iterdir():
-                if f.is_file() and f.suffix == ".txt":
-                    out.append({
-                        "handle": handle,
-                        "eid": eid_dir.name,
-                        "file": f.name,
-                        "path": f,
-                        "rel": f"contributions/{handle}/{eid_dir.name}/{f.name}",
-                    })
+            if child.name in KNOWN_SOURCES:
+                source = child.name
+                for eid_dir in child.iterdir():
+                    if not eid_dir.is_dir():
+                        continue
+                    for f in eid_dir.iterdir():
+                        if f.is_file() and f.suffix == ".txt":
+                            out.append({
+                                "handle": handle, "source": source,
+                                "eid": eid_dir.name, "file": f.name, "path": f,
+                                "rel": f"contributions/{handle}/{source}/{eid_dir.name}/{f.name}",
+                            })
+            else:
+                for f in child.iterdir():
+                    if f.is_file() and f.suffix == ".txt":
+                        out.append({
+                            "handle": handle, "source": "gpt-vision",
+                            "eid": child.name, "file": f.name, "path": f,
+                            "rel": f"contributions/{handle}/{child.name}/{f.name}",
+                        })
     return out
 
 
