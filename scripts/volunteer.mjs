@@ -32,7 +32,7 @@ import path from "node:path";
 import os from "node:os";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { createCanvas, Path2D } from "@napi-rs/canvas";
+import { createCanvas, Path2D, DOMMatrix } from "@napi-rs/canvas";
 
 process.on("unhandledRejection", e => console.error("  ! unhandled:", e?.message || e));
 process.on("uncaughtException",  e => console.error("  ! uncaught:",  e?.message || e));
@@ -210,6 +210,7 @@ console.log(`[volunteer] pdfjs asset server → http://127.0.0.1:${assetPort}/`)
 // pdfjs creates `new Path2D()` from whatever is in scope; @napi-rs/canvas's
 // clip/fill only accept their own Path2D class. Wire it up before import.
 globalThis.Path2D = Path2D;
+globalThis.DOMMatrix = DOMMatrix;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 const PDFJS_WASM_URL  = `http://127.0.0.1:${assetPort}/wasm/`;
 const PDFJS_FONTS_URL = `http://127.0.0.1:${assetPort}/standard_fonts/`;
