@@ -1,0 +1,11 @@
+Ls #62-0
+
+"fuzzy". STEINAU called attention to the fact that the dot appearing in the picture which was termed a "flying saucer" by HIXENBAUGH appears in sharp detail. This, according to STEINAU, would indicate that the disk was closer to the camera then either the trees or airplane. Although the pictures were taken at 64 frames per second, which is calculated, according to STEINAU, to produce slow motion action, the airplane appears in only the first few frames of the negative and then disappears. The "saucer" appears stationary during most of the frames but eventually appears to be growing smaller in the distance.
+
+STEINAU says he does not know how HIXENBAUGH performed the "trick photography" but suggests that it could be done easily by focusing the camera at a spot on a window and then moving the camera in a straight line away from the window, thus giving the illusion that the spot was disappearing into the distance.
+
+For the further information of the Bureau it should be noted that the photographic department of the Courier-Journal and The Louisville Times, under the direction of WILLIAM DAVIS, furnishes staff photographs for both the Courier-Journal and the Louisville Times, which newspapers are operated under one ownership.
+
+The above is furnished for the Bureau's information.
+
+- 3 -

@@ -1,0 +1,11 @@
+CI. 100-11671
+
+Mr. STRINGFIELD furnished the letter to this office but desired the same be returned to him and it should be noted that Dr. REICH speaks of STRINGFIELD testifying before some Congressional committee in connection with flying saucers and his publication. She further speaks of events designated "OROP Desert Ea" which STRINGFIELD knows nothing about.
+
+In the first paragraph of page 2 in speaking of the above event, she makes reference that there is evidence for espionage against this work and later adds that the FBI so far has declined to investigate as the subject is "not within their jurisdiction". It is further noted that she also speaks of the evidence of the "orgone energy motor", which STRINGFIELD has no knowledge of. Dr. REICH mentions a number of people as being former members on the staff of the expedition "OROP Desert Ea".
+
+For the information of the Bureau and Norfolk, persons mentioned by Dr. REICH in her letter have been checked through the Cincinnati indices with negative results.
+
+There are attached hereto two autostatic copies of Dr. REICH's letter to Mr. STRINGFIELD dated March 19, 1957, for the Bureau, and one copy for the Norfolk Office. The Norfolk Office is requested to check their indices on Dr. REICH and furnish the Bureau with any identifiable data concerning her and persons mentioned in her letter of March 19, 1957. This office is returning the original to Mr. STRINGFIELD and is not maintaining a copy of the same in this office.
+
+-2-

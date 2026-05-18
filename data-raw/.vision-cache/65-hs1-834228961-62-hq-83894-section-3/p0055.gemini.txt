@@ -1,0 +1,13 @@
+Page #4
+
+Friday the 1st: At approximately 8 o'clock in the morning, Mr. Crismon called up our hotel room and acquainted us with the fact that the B-25 had crashed. Also that he had called McChord Field and from information he received also verified the fact that the two men in the ship were Capt. Davidson and Lieut. Brown, plus a flight engineer and a hitch-hiker. This left both Mr. Arnold and myself in a very bad state of concern. Approximately an hour later Mr. Crismon and Mr. Dahl made their appearance in the hotel room. I still wasn't sure that this was the same B-25 that the two Intelligence officers had left in last night. Mr. Crismon then again called McChord Field and talked to a Colonel Gregg and the fact was verified again that the two pilots were Davidson and Brown.
+
+After an hour or so Mr. Crismon and Mr. Dahl left the hotel room with a plan in mind of the four of us meeting the next morning (Saturday) for breakfast and going out to Maury Island.
+
+That evening (Friday) there was a message for me to call this particular telephone number that was on the message. I called this number and was asked by the party to please call them from a paystation. This party was a Mr. Lantz, a reporter on the Tacoma Times. He told me, "I most certainly am doing myself out of a good story but I thought you ought to know that somebody has been calling this paper and giving us a blow-by-blow description of all that has taken place in your room since you arrived." To verify this, Mr. Lantz repeated back to me discussions that I felt had only been taking place in our room.
+
+Mr. Lantz also made the statement that there was a leak either from the switchboard operator or our room had been tapped. I asked Mr. Lantz why he was tipping us off with this information. He made the statement that he didn't mind doing this if in return that any information that I may let out would be given to him. After this conversation with Mr. Lantz I went back to our room and told Mr. Arnold what took place on the telephone.
+
+Saturday morning: Mr. Arnold and I met Mr. Dahl and Fred Crismon for breakfast. We then drove out to the boat to go to the island. The boat was unserviceable at the time so we went back to the hotel. Mr. Crismon said that he would call later on in the day and let us know when the boat would be repaired. That was the last time I saw Mr. Crismon.
+
+Approximately 11 o'clock Saturday morning Mr. Crismon phoned me and made the statement it would be impossible for him to keep this appointment with me. We were cut off by the switchboard operator as this was classified as not an emergency call. The reason we were cut off was due to a strike in all the Tacoma hotels.

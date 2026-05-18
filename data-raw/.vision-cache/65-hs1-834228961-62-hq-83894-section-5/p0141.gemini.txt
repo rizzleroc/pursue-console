@@ -1,0 +1,32 @@
+[Top Left]
+- cable anchor
+- Turnbuckle
+- cable anchor
+- cable
+
+[Top Right]
+- does not revolve with shaft
+- does not revolve with shaft
+- floor
+- thrust spring
+
+[Center]
+- revolves with shaft on sliding keys & ways
+- Key ways & Keys
+- Key ways & Keys
+- does not revolve with shaft
+- ball bearings
+
+[Bottom Left]
+- cable anchor in turnbuckle
+- cable anchor
+- cable
+- Turnbuckle
+
+[Bottom Right]
+- This thrust bar cannot revolve it is shown bolted to floor but can slide back and ahead with thrust.
+- floor
+
+[Bottom Center (on tape)]
+- drawing # 7
+- La ward

@@ -1,0 +1,10 @@
+This page is a meteorological synoptic chart (weather map) containing various station models, isobars, and handwritten annotations.
+
+**Bottom Left:**
+Incl 6³
+
+**Bottom Right:**
+251200Z
+
+**General Description:**
+The map features a grid with numerical coordinates along the edges (18, 16, 14, 12, 10, 14, 16, 18, 58, 56, 14, 62). It includes numerous station model plots (circles with associated numerical data and wind barbs) and hand-drawn colored shading in green, yellow, and red/brown.

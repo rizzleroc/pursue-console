@@ -1,0 +1,28 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 8 October 2025
+
+~~SECRET//NOFORN~~
+
+* **Coords End:** [1.4a]
+* **Altitude:** FL210
+* **Duration:**
+* **Lateral CPA:**
+* **Horizontal CPA:**
+* **Aircraft Type:** BALLOON
+* **Aircraft Number:**
+* **Country of Origin:**
+
+### GENTEXT/AIRSIGHT
+
+* **Gentext:** ~~S/REL TO USA, FVEY~~ 0135Z-[1.4a] OBS 1X POSS BALLOON IVO SHADDADI [1.4a] [1.4a] AT FL210. WSV PRODUCED. NFTR.
+
+### WEATHER
+
+* **Weather:** CLOUDY
+
+> 3.5c, FOIA Exemption (b)(6)
+
+~~SECRET//NOFORN~~
+
+MDR 25-0094 thru MDR 25-0099 / JS-250710-TM8S  &

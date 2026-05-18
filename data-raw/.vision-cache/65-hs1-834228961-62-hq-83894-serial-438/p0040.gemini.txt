@@ -1,0 +1,30 @@
+# Page 40 of 40
+
+**Description:** Hand-drawn diagram depicting four numbered locations (#1, #2, #3, #4) and associated burn areas with measurements.
+
+**Diagram Elements:**
+
+*   **Locations:**
+    *   #1 (Bottom left)
+    *   #2 (Top left)
+    *   #3 (Top center)
+    *   #4 (Bottom right)
+
+*   **Burn Areas:**
+    *   "Burn Area #1" (Circle near #2)
+    *   "#2 Burn" (Circle near #1)
+    *   "#3 Burn" (Circle near #3)
+    *   "#4 Burn" (Circle near #3)
+
+*   **Measurements and Annotations:**
+    *   "9'4"" (Line connecting #2 and Burn Area #1)
+    *   "6'4"" (Line connecting #3 and #4 Burn)
+    *   "8'6"" (Line connecting #3 and #2 Burn)
+    *   "20'" (Line connecting #1 and #4 Burn)
+    *   "6'8"" (Line connecting #1 and #2 Burn)
+    *   "10'8"" (Line connecting #1 and #3 Burn)
+    *   "5'4"" (Line connecting #3 and #3 Burn)
+    *   "APPARENT DIRECTION OF BURN OR HEAT" (Text with arrow pointing toward #3 Burn)
+
+*   **Marginalia:**
+    *   Left margin: "RAS" [handwritten]

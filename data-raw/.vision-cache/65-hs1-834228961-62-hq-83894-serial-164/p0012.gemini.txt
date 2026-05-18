@@ -1,0 +1,13 @@
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5

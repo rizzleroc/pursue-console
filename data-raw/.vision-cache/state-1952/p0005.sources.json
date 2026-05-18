@@ -4,13 +4,31 @@
     "gpt-vision": {
       "chars": 2245,
       "imported_at": null,
-      "note": "seeded from pre-existing canonical"
+      "note": "seeded from pre-existing canonical",
+      "text_file": "p0005.gpt-vision.txt"
     },
     "gemini": {
       "chars": 2237,
-      "imported_at": "2026-05-17T22:41:07.017Z",
+      "imported_at": "2026-05-18T01:48:57.147Z",
       "model": "gemini-3.1-flash-lite",
-      "generated_at": "2026-05-08T16:09:41.974987+00:00"
+      "generated_at": "2026-05-08T16:09:41.974987+00:00",
+      "text_file": "p0005.gemini.txt"
     }
+  },
+  "comparison": {
+    "computed_at": "2026-05-18T01:49:03.519Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.967,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.967
+      }
+    ],
+    "confidence": "high",
+    "needs_review": false
   }
 }

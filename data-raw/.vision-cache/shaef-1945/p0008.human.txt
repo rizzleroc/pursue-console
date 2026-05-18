@@ -1,0 +1,38 @@
+R.A.F. Form 96.        (?)        MESSAGE FORM        (?)riginal Office File No.        (?)
+IN
+MESSAGE
+OUT
+HEADING
+No. of
+Groups
+GR
+Office Date Stamp
+(Above this line is for Signals use only)
+FROM
+TO
+
+
+PAGE 2 -
+REPEATED
+Originator's Number        Date        (Write horizontally)
+AI.        4 MARCH
+PHOTOS TO        AIR MINISTRY        COMMA        USSTAF        AND        A.C.I.U.
+ALSO FULL        WRITTEN        REPORT BY        PILOTS        CONCERNED
+-(.) ANY        FURTHER        INSTANCES        ALSO TO        BE
+REPORTED (.)
+4:48
+May be sent AS WRITTEN *(1) By ANY Signal Method        Send in CYPHER *(1) By ANY Signal Method        Date-Time Group
+*(2) NOT by Wireless        *(2) NOT by Wireless        041745A
+(3) But if liable to Interception
+or Capture SEND IN CYPHER
+Signature Sinclair        Signature 2363
+Rank A/Cdr        Rank
+( Strike out methods which do not apply. Below this line is for Signals use only)
+Originator's Instructions
+Degree of Priority
+SECRET
+IMMEDIATE
+System in        Time in        Reader        Sender        System out        Time out        Reader        Sender        System out        Time out        Reader        Sender        T.O.R.
+Smith
+187
+7:4899 Wt. 49687/03734 497,000 Pads 3/44 MP 51-8336

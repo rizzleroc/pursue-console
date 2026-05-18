@@ -1,0 +1,14 @@
+SF 62-2927
+DET:lms
+
+documents many reports throughout the world of UFOs since that date, and claims that 1965 was the year of the greatest number of UFO sightings and that these were observed by multiple witnesses. It is author Edwards' contention that UFOs are space vehicles sent to observe activities on earth and the Air Force, which is charged with the responsibility of investigating UFOs, has deliberately withheld information and given misleading explanations because it fears a mass panic by the public if the public were told the truth.
+
+The book describes UFOs as polished metal objects, radiating heat and light (sufficient to have burned witnesses who were too near), and emitting some force field that interferes with electromagnetic instruments and power sources. Colors range from brilliant white to dull reds and brilliant orange. Some objects have carried blinking lights. There are three basic shapes: 1) zeppelin-shaped ships up to 300 feet long; 2) disk-shaped objects ranging from a few feet in diameter to 100 feet, with many reported at about 30 feet diameter; and 3) egg-shaped objects, which according to the author are the ones most recently sighted.
+
+According to the book, the objects move silently and attain fantastic speeds, yet can hover motionless in mid-air; they have been reported to land and to take off with great speed, usually with a burst of light from the underside, which in some cases has left the ground beneath them scorched.
+
+Many of the persons named in the book who have reported them are reliable individuals, including law enforcement officers, military personnel on official duty, military pilots, commercial airline pilots, civilian defense officials, etc. A number of photographs of the objects have been reproduced in the book, some reportedly taken by reputable persons. Many reported sightings are from atomic and missile research areas.
+
+Wreckage of crashed saucers has been reportedly recovered on at least three occasions, in one case described as a magnesium alloy, in another as pure magnesium, and in a third case, attributed to an official of the Canadian government, the material was described as an exceptionally hard unknown metal, actually a matrix of magnesium orthosilicate which contained thousands of 15-micron metal spheres throughout, and showing evidence of micro-meteorites on its surface.
+
+- 2 -

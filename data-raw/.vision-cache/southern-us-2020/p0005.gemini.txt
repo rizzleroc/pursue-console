@@ -1,0 +1,51 @@
+~~SECRET//NOFORN~~
+
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 8 October 2025
+
+* **Additional Avionics:** HTS-P R7.85
+* **Data Link:** LINK 16
+* **Gentext:**
+
+# Timeline
+
+## Takeoff
+* **Callsign:** 1.4a
+* **Number of Aircraft:** 2
+* **Asset Type (Aircraft):** 1.4a, 1.4g
+* **Aircraft Tail Number(s):** 1.4a, 1.4g
+* **Takeoff Location (ICAO Code):** OEPS
+* **Takeoff Time DTG:** 311901:00ZMAR23
+* **Mode 3 (IFF Codes):** 6266
+* **Gentext/Additional Details:** (U) NSTR.
+* **Mission Canceled:**
+
+## Landing
+* **Last Land Location (ICAO Code):** OEPS
+* **Last Land Time:** 010148:00ZAPR23
+* **Last Engine Shutdown Time:** 010215:00ZAPR23
+* **Total Mission Time:** 6 hours 47 minutes
+* **Gentext/Additional Details:** (U) NSTR.
+
+## On Station
+* **Time On Station DTG:** 312058:00ZMAR23
+* **Callsign:** 1.4a
+* **JTAR Number:** -
+* **Killbox (Location):** ESSA
+* **Mission Type:** DCA
+* **JTAC Callsign:** KINGPIN
+* **Gentext/Additional Details:** (U) NSTR.
+* **Did not Arrive On Station:**
+
+## Off Station
+* **Time Off Station DTG:** 010000:00ZAPR23
+* **Total Time On Station:** 3 hours 2 minutes
+* **Gentext/Additional Details:**
+
+
+3.5c, FOIA Exemption (b)(6)
+
+~~SECRET//NOFORN~~
+
+MDR 25-0094 thru MDR 25-0099 / JS-250710-TM8S  &nbsp

@@ -155,36 +155,52 @@ for (const folder of folders) {
 
     const txtPath = path.join(dstDir, `p${pad4}.txt`);
     const sidecarPath = path.join(dstDir, `p${pad4}.sources.json`);
+    const geminiPath = path.join(dstDir, `p${pad4}.gemini.txt`);
 
     // Read existing sidecar (or seed it from whatever's currently in .txt)
     const sidecar = await readSidecar(sidecarPath);
     if (Object.keys(sidecar.sources).length === 0 && existsSync(txtPath)) {
-      // We don't know who wrote the existing canonical — tag it as
-      // "gpt-vision" since that's our default OCR source for this project.
+      // Pre-existing canonical with no sidecar — tag as gpt-vision (our
+      // default machine source) and stash it as its own per-source file
+      // so future re-imports don't lose it.
       const existing = (await readFile(txtPath, "utf8")).trim();
       if (existing.length >= 30) {
-        sidecar.sources["gpt-vision"] = { chars: existing.length, imported_at: null, note: "seeded from pre-existing canonical" };
+        const gptPath = path.join(dstDir, `p${pad4}.gpt-vision.txt`);
+        if (!existsSync(gptPath)) await writeFile(gptPath, existing + "\n", "utf8");
+        sidecar.sources["gpt-vision"] = {
+          chars: existing.length, imported_at: null,
+          text_file: `p${pad4}.gpt-vision.txt`,
+          note: "seeded from pre-existing canonical",
+        };
       }
     }
 
-    // Record / update Gemini's contribution
+    // Always persist Gemini's text as its own file, never to be overwritten.
+    await writeFile(geminiPath, cleaned + "\n", "utf8");
     sidecar.sources.gemini = {
       chars: cleaned.length,
       imported_at: importedAt,
       model: meta.model || "gemini",
       generated_at: meta.generated_at || null,
+      text_file: `p${pad4}.gemini.txt`,
     };
 
-    // Decide canonical
+    // Decide canonical and sync p<NNN>.txt to the winning source's file
     const newBest = pickBest(sidecar.sources);
     const oldBest = sidecar.best;
     sidecar.best = newBest;
+    const winnerInfo = sidecar.sources[newBest];
+    if (winnerInfo?.text_file) {
+      const winnerPath = path.join(dstDir, winnerInfo.text_file);
+      if (existsSync(winnerPath)) {
+        const winnerText = await readFile(winnerPath, "utf8");
+        await writeFile(txtPath, winnerText, "utf8");
+      }
+    }
 
-    // Write canonical text if Gemini won
     if (newBest === "gemini") {
-      await writeFile(txtPath, cleaned + "\n", "utf8");
-      if (oldBest && oldBest !== "gemini") evStat.promoted++, stats.pages_promoted_to_best++;
-      else stats.pages_imported++, evStat.imported++;
+      if (oldBest && oldBest !== "gemini") { evStat.promoted++; stats.pages_promoted_to_best++; }
+      else { stats.pages_imported++; evStat.imported++; }
     } else {
       stats.pages_already_better++;
     }

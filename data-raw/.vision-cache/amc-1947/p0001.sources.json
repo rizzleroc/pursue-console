@@ -8,14 +8,45 @@
     },
     "gemini": {
       "chars": 1361,
-      "imported_at": "2026-05-17T22:41:07.017Z",
+      "imported_at": "2026-05-18T01:48:57.147Z",
       "model": "gemini-3.1-flash-lite",
-      "generated_at": "2026-05-08T15:53:46.101637+00:00"
+      "generated_at": "2026-05-08T15:53:46.101637+00:00",
+      "text_file": "p0001.gemini.txt"
     },
     "human": {
       "chars": 2017,
-      "imported_at": "2026-05-17T22:45:41.228Z",
-      "handle": "Rizzleroc"
+      "imported_at": "2026-05-18T01:49:02.901Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0001.human.txt"
+    }
+  },
+  "comparison": {
+    "computed_at": "2026-05-18T01:49:03.280Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 3,
+    "canonical": "human",
+    "agreement_score": 0.675,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.675
+      },
+      {
+        "a": "gpt-vision",
+        "b": "human",
+        "score": 1
+      },
+      {
+        "a": "gemini",
+        "b": "human",
+        "score": 0.87
+      }
+    ],
+    "confidence": "medium",
+    "needs_review": false,
+    "against_human": {
+      "gemini": 0.87
     }
   }
 }

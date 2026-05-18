@@ -1,0 +1,52 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 24 October 2025
+
+SECRET//REL TO USA, FVEY
+
+* Operations Center: Other
+
+### APPROVER
+* Rank: SSgt
+* Full Name: [redacted]
+* Unit: Unavailable
+* Wing: Other
+* Phone Number: [redacted]
+* Email: [redacted]
+* Service: Air Force
+* Operations Center: 609 CAOC
+
+### INGEST
+* Rank:
+* Full Name:
+* Unit:
+* Wing:
+* Phone Number:
+* Email:
+* Service:
+* Operations Center:
+
+### ACEQUIP
+
+### ACEQUIP
+* Aircraft Callsign: [redacted]
+* Radar Name or Destination:
+* Radar Software Load or Mission Data:
+* Radar Warning Receiver (RWR) Name or Designator:
+* RWR Software Load or Mission Data:
+* MWS Name or Designator:
+* MWS Software Load or Mission Data:
+* IRCM Name or Designator:
+* IRCM Software Load or Mission Data:
+* ECM Name or Designator:
+* ECM Software Load or Mission Data:
+* CMD Name or Designator:
+* Chaff Designator:
+* Num Chaff or Cartridges:
+
+[redacted]
+
+SECRET//REL TO USA, FVEY
+USCENTCOM MDR 25-0100 thru 25-0103 / JS-250710-TM8S
+10/28/25 003
+Approved for Release to AARO

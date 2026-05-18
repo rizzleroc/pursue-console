@@ -1,0 +1,14 @@
+[Stamp, rotated 90 degrees counter-clockwise, located on the left side]:
+RECEIVED
+P 10 9 01 AM
+INTERNAL SECURITY
+F.B.I.
+
+[Stamp, rotated 90 degrees counter-clockwise, located at the bottom]:
+RECEIVED-LAD
+FBI
+SEP 9 3 01 PM '47
+
+[A rectangular piece of brown tape is affixed to the bottom center of the page.]
+
+[The remainder of the page is blank, with faint, [illegible] bleed-through text from the reverse side.]

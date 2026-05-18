@@ -1,0 +1,7 @@
+McRae advised the veterinarian would not commit himself but the veterinarian pointed out he had never seen an animal in the monkey family without hair nor had he ever seen a dead animal that did not turn pale at death. According to McRae, the veterinarian stated the animal's tail was missing and that when he had questioned Waters about the missing tail Waters had seemed somewhat surprised and indicated it had possibly been cut off in the accident. McRae stated there was blood around the mouth of the animal, which resembled human blood.
+
+At the time McRae furnished the above information to the Atlanta Office of this Bureau, he stated neither he nor any member of the "Atlanta Constitution" newspaper staff had been drinking but had witnessed the above. McRae stated he first thought Waters had tried to pull a publicity gag in this matter; however, it was McRae's opinion if this had been Waters' motive, Waters would have timed his visit to the newspaper office better as the newspaper was unable to print anything on the story after midnight. McRae informed the Atlanta Office of this Bureau the "Atlanta Constitution" newspaper would probably run a story concerning the information set forth above.
+
+It is noted your office was telephonically contacted on the morning of July 9, 1953, by a Liaison representative of this Bureau concerning the above matter. The above is furnished for your information and no investigation is being conducted in this matter by this Bureau.
+
+- 2 -

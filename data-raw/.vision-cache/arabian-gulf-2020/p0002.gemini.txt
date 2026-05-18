@@ -1,0 +1,47 @@
+(b)(1)1.4a
+
+MSNID
+
+* Tasking Order (ATO): (b)(1)1.4a
+* Mission Type: (b)(1)1.4a
+* ATO Mission Number: (b)(1)1.4a
+* Country Tasked: US - UNITED STATES
+* Service Tasked: A - AIR FORCE
+
+Poc
+
+POC
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b@mail.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+QC
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b@mail.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+APPROVER
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+(b)(1)1.4a
+[redacted]

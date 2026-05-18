@@ -1,0 +1,38 @@
+# HÉLIEE
+# CAPTI - AEREI - FUERZA
+
+---
+
+**Propiedades:**
+Capta - Corta y expulsa.
+
+---
+
+### [Top Diagram Labels]
+
+*   **Direccion de las corrientes del aire.**
+*   **Capta**
+*   **Corta**
+*   **Expulsa**
+*   **Aspas**
+*   **Direccion de las**
+
+---
+
+### [Bottom Diagram Labels]
+
+*   **Fuerza Clomica**
+*   **Vacio**
+*   **Plano**
+*   **Camara de Oxigeno**
+*   **Plano**
+*   **Entrada**
+*   **de las**
+*   **Corrientes de aire**
+*   **1er**
+*   **2o**
+*   **3er**
+*   **Helice**
+*   **Capta-Aereo Fuerza**
+*   **Salidas de las Corrientes de aire**
+*   **Expulsión del Aire**

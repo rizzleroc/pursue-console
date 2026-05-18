@@ -1,0 +1,14 @@
+This page contains a hand-drawn diagram.
+
+*   **Center:** A sketch of a twin-engine airplane.
+*   **Compass Directions:**
+    *   W (Top)
+    *   N (Right)
+    *   E (Bottom)
+    *   S (Left)
+*   **Annotations:**
+    *   (1) [Circled] in the upper right quadrant.
+    *   (2) [Circled] in the lower right quadrant.
+    *   "SUN" written in the bottom left corner, accompanied by a faint sketch of a sun.
+    *   A checkmark in the bottom right corner.
+*   **Page Number:** 113 (bottom right corner).

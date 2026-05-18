@@ -1,0 +1,55 @@
+~~SECRET//NOFORN~~
+
+Recommendation by MG Brandon R. Tegtmeier
+USCENTCOM Chief of Staff
+Recommended on: 2 June 2025
+~~FOUO / Privacy Act applies~~
+
+*   **Aircraft Tail Number(s):** [1.4a]
+*   **Takeoff Location (ICAO Code):** [1.4a]
+*   **Takeoff Time DTG:** 090217:00ZNOV23
+*   **Mode 3 (IFF Codes):** [1.4a]
+*   **Gentext/Additional Details:**
+*   **Mission Canceled:**
+
+### Landing
+
+*   **Last Land Location (ICAO Code):** [1.4a]
+*   **Last Land Time:** [1.4a]
+*   **Last Engine Shutdown Time:** [1.4a]
+*   **Total Mission Time:** [1.4a]
+*   **Gentext/Additional Details:**
+
+### On Station
+
+*   **Time On Station DTG:**
+*   **Callsign:** [1.4a]
+*   **JTAR Number:** -
+*   **Killbox (Location):** -
+*   **Mission Type:** ISR
+*   **JTAC Callsign:** [1.4a]
+*   **Gentext/Additional Details:**
+*   **Did not Arrive On Station:** On
+
+### Off Station
+
+*   **Time Off Station DTG:**
+*   **Total Time On Station:**
+*   **Gentext/Additional Details:**
+
+### On Station
+
+*   **Time On Station DTG:** 090431:00ZNOV23
+*   **Callsign:** [1.4a]
+*   **JTAR Number:** -
+*   **Killbox (Location):** -
+*   **Mission Type:** ISR
+*   **JTAC Callsign:** [1.4a]
+*   **Gentext/Additional Details:**
+*   **Did not Arrive On Station:**
+
+[ 3.5c, (b)(6) ]
+
+USCENTCOM MDR 25-0072  ~~SECRET//NOFORN~~  06/02/2025 000005
+
+Approved for Release to AARO ~~FOUO/PA~~

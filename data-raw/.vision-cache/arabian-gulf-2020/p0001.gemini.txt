@@ -1,0 +1,35 @@
+(b)(1)1.4a [redacted]
+
+# Misrep 8799515
+
+## Narrative
+(b)(1)1.4a (b)(1)1.4a, (b)(1)1.4c [redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+
+## Admin
+
+### CLASSIFICATION
+* **Classification:** SECRET
+* **Associated Caveats:** (b)(1)1.4a [redacted]
+* **Classification Source (MS or Classification Guide ID):** (b)(1)1.4a [redacted]
+* **Declassification Date (YYYYMMDD):** 20480603
+
+### OPERATION
+* **Operation:** (b)(1)1.4a [redacted]
+* **Domain:** (b)(1)1.4a [redacted]
+* **Operations Center:** (b)(1)1.4a [redacted]
+* **Major Command (MAJCOM):** AFCENT
+* **Combatant Command (COCOM):** (b)(1)1.4a [redacted]
+
+### MSGID
+* **Report Type:** MISREP
+* **Originator (Unit or Squadron):** (b)(1)1.4a [redacted]
+* **Submit Date (Auto-generated):**
+
+(b)(1)1.4a [redacted]

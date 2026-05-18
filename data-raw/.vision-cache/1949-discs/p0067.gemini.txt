@@ -1,0 +1,28 @@
+MFSC MARCH AIR FORCE BASE, CALIFORNIA                               UNCLASSIFIED
+
+COMMANDER, MATS                                                     ROUTINE
+WASH DC                                                             X
+ATTN: STAT CONTROL SECTION
+
+CO FLIGHT SERVICE WASH DC
+
+DMZ 0004 C PD RCS AF-SC-A1A AS OF 28 FEB 49 SUBMITTED CLN
+
+| | A | B | C | D | E | F | G | H | I | K | L | M | N | P | Q | R |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| B-25J | C1 | 1 | 672 | 378 | 294 | 168 | 0 | 126 | 56 | 11 | 1 | 12 | 68 | 7513 | 0 |
+| C-47B | C1 | 1 | 672 | 366 | 306 | 72 | 0 | 254 | 80 | 22 | 3 | 28 | 57 | 6848 | 0 |
+| C-45F | C1 | 2 | 1176 | 360 | 816 | 072 | 0 | 144 | 69 | 21 | 2 | 16 | 62 | 2636 | 0 |
+| TOTAL | C1 | 4 | 2520 | 1104 | 1416 | 912 | 0 | 504 | 205 | 54 | 6 | 56 | 187 | 17047 | 0 |
+
+PD END
+
+REEVE CO MFSC
+
+[Marginalia on right edge: MATS]
+
+UNCLASSIFIED
+
+LT COL R A REEVE EXT 4247                                           1500 02 MAR 49                                          1 1
+
+[Faint red stamp at bottom: [illegible]]

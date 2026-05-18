@@ -91,18 +91,30 @@ for (const handleEnt of await listDirs(CONTRIB)) {
       // machine versions in the sidecar so we can compare.
       const importedAt = new Date().toISOString();
 
-      // Update sidecar provenance: this page was transcribed by a human.
+      // Persist human text as its own per-source file so future re-imports
+      // don't lose it. Canonical p<NNN>.txt is a copy of the winner.
+      const humanTextPath = path.join(dstDir, `p${pad4(pageNum)}.human.txt`);
+      await writeFile(humanTextPath, srcText + "\n", "utf8");
+
       const sidecarPath = path.join(dstDir, `p${pad4(pageNum)}.sources.json`);
       let sidecar = { best: null, sources: {} };
       if (existsSync(sidecarPath)) {
         try { sidecar = JSON.parse(await readFile(sidecarPath, "utf8")); } catch {}
       } else if (existingText.length >= 30) {
-        // Seed: the existing canonical was a machine transcription with
-        // unknown lineage. Tag it as gpt-vision (our default machine source
-        // for the project, pre-Gemini-merge).
-        sidecar.sources["gpt-vision"] = { chars: existingText.length, imported_at: null, note: "seeded from pre-existing canonical" };
+        // Seed: previous canonical was a machine transcription with
+        // unknown lineage. Save it as gpt-vision per-source file too.
+        const gptPath = path.join(dstDir, `p${pad4(pageNum)}.gpt-vision.txt`);
+        if (!existsSync(gptPath)) await writeFile(gptPath, existingText + "\n", "utf8");
+        sidecar.sources["gpt-vision"] = {
+          chars: existingText.length, imported_at: null,
+          text_file: `p${pad4(pageNum)}.gpt-vision.txt`,
+          note: "seeded from pre-existing canonical",
+        };
       }
-      sidecar.sources.human = { chars: srcText.length, imported_at: importedAt, handle };
+      sidecar.sources.human = {
+        chars: srcText.length, imported_at: importedAt, handle,
+        text_file: `p${pad4(pageNum)}.human.txt`,
+      };
       sidecar.best = "human";
       await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
 

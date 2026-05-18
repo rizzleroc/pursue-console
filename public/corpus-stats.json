@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T22:45:41.354Z",
+  "generatedAt": "2026-05-18T01:49:04.446Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 162,
@@ -50,13 +50,27 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-17T22:45:41.354Z",
+      "ts": "2026-05-18T01:49:04.446Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1063,
+      "duration_ms": 927,
       "note": "events=121 inventory=162 contributions=18"
     },
     "recent": [
+      {
+        "ts": "2026-05-18T01:49:04.446Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 927,
+        "note": "events=121 inventory=162 contributions=18"
+      },
+      {
+        "ts": "2026-05-18T01:48:19.099Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2351,
+        "note": "events=121 inventory=162 contributions=18"
+      },
       {
         "ts": "2026-05-17T22:45:41.354Z",
         "kind": "db-rebuild",
@@ -105,5 +119,43 @@
     "uncataloguedRecords": 41,
     "cataloguedButNoPages": 56,
     "partialOcrNeedsVision": 2
+  },
+  "review": {
+    "pagesNeedingReview": 22,
+    "pagesHighConfidence": 365,
+    "pagesMediumConfidence": 38,
+    "pagesLowConfidence": 22,
+    "topEventsByReviewQueue": [
+      {
+        "event_id": "1949-discs",
+        "n": 13
+      },
+      {
+        "event_id": "incident-summaries",
+        "n": 4
+      },
+      {
+        "event_id": "krasuski-1944",
+        "n": 2
+      },
+      {
+        "event_id": "gemini-7",
+        "n": 1
+      },
+      {
+        "event_id": "general-1948",
+        "n": 1
+      },
+      {
+        "event_id": "netherlands-1948",
+        "n": 1
+      }
+    ]
+  },
+  "sourceQuality": {
+    "gemini": {
+      "samples": 18,
+      "meanScoreVsHuman": 0.866
+    }
   }
 }

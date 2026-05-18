@@ -1,0 +1,7 @@
+[Image: A meteorological weather map of Japan and surrounding regions, featuring isobars, weather station data points, and handwritten annotations including green shading and lines.]
+
+**Annotations:**
+
+*   Bottom left: "Incl 5"
+*   Bottom right: "250600Z"
+*   Grid markings: 16, 14, 12, 10, 08, 14, 16, 18, 20

@@ -1,0 +1,33 @@
+C
+O
+P
+Y
+
+Ltr. to Mr. G. J. Rathman, Chief, Investigation Section, U. S. AEC, dated 10 February 1949, Re Photographs
+
+of the negative. In other words, there is a trail of that section of the negative which was not exposed in the camera. This effect shows up in one negative and not in the other because the negative in question is fogged; therefore, this irregularity was developed.
+
+"Still further proof of these defects lies in the number of unevenly developed sections of the negative."
+
+In view of the above, it is recommended that this entire matter be declassified and that Mr. Presley be advised of the nature of the images, if and when the negatives are returned to him by your office.
+
+For your information, this office is taking the liberty of furnishing a copy of this communication to Mr. C. C. McSwain, Special Agent, FBI, because of official interest evidenced by his office in the matter.
+
+Your cooperation in furnishing photographs and negatives, together with information contained in your letter of 16 December 1948 to Major Grant, is sincerely appreciated.
+
+Very truly yours,
+
+C. D. GASSER
+Colonel, USAF
+AMC Engineering Field Officer
+
+3 Incls.
+2 Negatives
+1 Photostat
+
+cc - Mr. C. C. McSwain
+
+C
+O
+P
+Y

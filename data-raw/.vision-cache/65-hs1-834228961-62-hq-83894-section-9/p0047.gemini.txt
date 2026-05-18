@@ -1,0 +1,12 @@
+Major Donald E. Keyhoe
+
+flying objects prove to be extraterrestrial, is not a function of the Federal Bureau of Investigation. This Bureau is, of course, interested in any aspect of any development which would affect the internal security of the United States.
+
+Your letter of September 22, 1958, requested an interview with an official of this Bureau concerning the matter of unidentified flying objects and this Bureau's policy in connection therewith. Since this Bureau's policy in connection with unidentified flying objects has been fully set forth above, you may feel that the requested interview is not now necessary.
+
+Sincerely yours,
+
+John Edgar Hoover
+Director
+
+- 2 -

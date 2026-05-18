@@ -99,6 +99,12 @@ CREATE TABLE IF NOT EXISTS pages (
   best_source     TEXT,        -- 'human' | 'gpt-vision' | 'gemini' | 'ocr' | 'pdfjs' | NULL
   chars           INTEGER NOT NULL DEFAULT 0,
   contributor     TEXT,        -- handle if a volunteer's page outranks/equals canonical
+  -- Cross-source comparison (filled by scripts/compare-sources.mjs from
+  -- sidecar.comparison). agreement_score is 0..1 token-jaccard+length;
+  -- needs_review=1 when sources disagree enough to warrant human eyes.
+  agreement_score REAL,
+  confidence      TEXT,        -- 'high' | 'medium' | 'low' | NULL
+  needs_review    INTEGER NOT NULL DEFAULT 0,
   last_updated    TEXT,
   PRIMARY KEY (event_id, page_num)
 );
@@ -235,6 +241,7 @@ CREATE TABLE pages (
   has_vision INTEGER NOT NULL DEFAULT 0, has_visuals INTEGER NOT NULL DEFAULT 0,
   has_gemini INTEGER NOT NULL DEFAULT 0, has_gpt_vision INTEGER NOT NULL DEFAULT 0,
   has_human INTEGER NOT NULL DEFAULT 0,
+  agreement_score REAL, confidence TEXT, needs_review INTEGER NOT NULL DEFAULT 0,
   best_source TEXT, chars INTEGER NOT NULL DEFAULT 0,
   contributor TEXT, last_updated TEXT,
   PRIMARY KEY (event_id, page_num)
@@ -245,10 +252,12 @@ const insPage = db.prepare(`
   INSERT OR REPLACE INTO pages
     (event_id, page_num, has_pdfjs, has_ocr, has_vision, has_visuals,
      has_gemini, has_gpt_vision, has_human,
+     agreement_score, confidence, needs_review,
      best_source, chars, contributor, last_updated)
   VALUES
     (@event_id, @page_num, @has_pdfjs, @has_ocr, @has_vision, @has_visuals,
      @has_gemini, @has_gpt_vision, @has_human,
+     @agreement_score, @confidence, @needs_review,
      @best_source, @chars, @contributor, @last_updated)
 `);
 
@@ -350,6 +359,11 @@ for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : [
       row._hasGemini    = sc.sources?.gemini      ? 1 : 0;
       row._hasGptVision = sc.sources?.["gpt-vision"] ? 1 : 0;
       row._hasHuman     = sc.sources?.human       ? 1 : 0;
+      if (sc.comparison) {
+        row._agreementScore = sc.comparison.agreement_score ?? null;
+        row._confidence     = sc.comparison.confidence ?? null;
+        row._needsReview    = sc.comparison.needs_review ? 1 : 0;
+      }
     } catch {}
   }
 }
@@ -367,6 +381,9 @@ for (const [eid, m] of pageMap) {
       has_gemini: r._hasGemini || 0,
       has_gpt_vision: r._hasGptVision || (r.has_vision && !r._hasGemini && !r._hasHuman ? 1 : 0),
       has_human: r._hasHuman || 0,
+      agreement_score: r._agreementScore ?? null,
+      confidence: r._confidence ?? null,
+      needs_review: r._needsReview || 0,
       best_source: best, chars: r.chars,
       contributor: r._contributor || null,
       last_updated: new Date(r.mtime || Date.now()).toISOString(),
@@ -473,6 +490,27 @@ const stats = {
       WHERE p.has_ocr=1 AND p.has_vision=0
     `).n,
   },
+  // Cross-source iteration loop: pages with 2+ transcription sources
+  // where the agreement score is low enough to warrant human eyes.
+  review: {
+    pagesNeedingReview: q("SELECT COUNT(*) AS n FROM pages WHERE needs_review=1").n,
+    pagesHighConfidence: q("SELECT COUNT(*) AS n FROM pages WHERE confidence='high'").n,
+    pagesMediumConfidence: q("SELECT COUNT(*) AS n FROM pages WHERE confidence='medium'").n,
+    pagesLowConfidence: q("SELECT COUNT(*) AS n FROM pages WHERE confidence='low'").n,
+    topEventsByReviewQueue: qAll(`
+      SELECT event_id, COUNT(*) AS n FROM pages WHERE needs_review=1
+      GROUP BY event_id ORDER BY n DESC LIMIT 10
+    `),
+  },
+  // Per-source quality vs human (from scripts/compare-sources.mjs ->
+  // data-raw/.source-quality.json). Surfaces "how accurate is each
+  // transcription source against human-typed truth?" as a sorted list.
+  sourceQuality: await (async () => {
+    try {
+      const q = JSON.parse(await readFile(path.join(RAW_DIR, ".source-quality.json"), "utf8"));
+      return q.summary || {};
+    } catch { return {}; }
+  })(),
 };
 
 await mkdir(path.dirname(STATS_OUT), { recursive: true });

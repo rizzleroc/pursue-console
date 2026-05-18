@@ -1,0 +1,5 @@
+AQ 62-1028
+
+Calls concerning subject matter are being referred immediately to Major WILLIAM R. CONNER, Safety Officer, Kirtland Air Force Base, Albuquerque.
+
+-2-

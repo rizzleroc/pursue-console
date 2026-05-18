@@ -60,9 +60,28 @@ async function visionPageCount(eid) {
   return set;
 }
 
+// Per-event review-queue page numbers — read sidecars for pages flagged
+// needs_review by scripts/compare-sources.mjs (cross-source disagreement
+// loud enough to warrant human eyes).
+async function reviewPagesForEvent(eid) {
+  const dir = path.join(VIS, eid);
+  if (!existsSync(dir)) return [];
+  const out = [];
+  for (const f of await readdir(dir)) {
+    const m = f.match(/^p(\d+)\.sources\.json$/);
+    if (!m) continue;
+    try {
+      const sc = JSON.parse(await readFile(path.join(dir, f), "utf8"));
+      if (sc.comparison?.needs_review) out.push(Number(m[1]));
+    } catch {}
+  }
+  return out.sort((a, b) => a - b);
+}
+
 const byEvent = {};
 let totalPagesNeeded = 0;
 let totalDocsRemaining = 0;
+let totalPagesNeedingReview = 0;
 
 for (const ev of EVENTS) {
   // Only care about events whose source is OCR/mixed (i.e., scanned PDFs needing
@@ -78,7 +97,14 @@ for (const ev of EVENTS) {
   for (let p = 1; p <= totalPages; p++) {
     if (!visionPages.has(p)) queue.push(p);
   }
-  if (queue.length === 0) continue;  // doc is fully vision-OCR'd
+  // Pages where Gemini + GPT-vision (or any 2 sources) disagree enough
+  // to warrant a human typing it up. These are higher-leverage than
+  // "more OCR" — fixing one disputed page improves canonical quality
+  // forever, vs adding one more sometimes-wrong machine pass.
+  const reviewQueue = await reviewPagesForEvent(ev.id);
+
+  // If a doc has no work AND no review queue, skip.
+  if (queue.length === 0 && reviewQueue.length === 0) continue;
 
   byEvent[ev.id] = {
     title: ev.title,
@@ -88,16 +114,20 @@ for (const ev of EVENTS) {
     totalPages,
     pagesCompleted: visionPages.size,
     pagesNeeded: queue.length,
+    pagesNeedingReview: reviewQueue.length,
     queue,
+    reviewQueue,
   };
   totalPagesNeeded += queue.length;
-  totalDocsRemaining++;
+  totalPagesNeedingReview += reviewQueue.length;
+  if (queue.length > 0) totalDocsRemaining++;
 }
 
 const out = {
   generatedAt: new Date().toISOString(),
   totalPagesNeeded,
   totalDocsRemaining,
+  totalPagesNeedingReview,
   inventoryTotal: 162,
   cataloguedTotal: EVENTS.length,
   byEvent,
@@ -106,7 +136,7 @@ const out = {
 await writeFile(OUT, JSON.stringify(out));
 const { stat } = await import("node:fs/promises");
 const sz = (await stat(OUT)).size;
-console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR`);
+console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR · ${totalPagesNeedingReview} pages need human review`);
 // Top 5 biggest remaining
 const top = Object.entries(byEvent).sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded).slice(0,5);
 for (const [eid, w] of top) {
