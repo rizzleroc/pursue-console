@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 76,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.901Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.132,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.132
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "PROJECT 10073 RECORD\nATIC NO.\nAF NO.\nREPORT NO.\nDATE OF REPORT 23 Feb 49\nTIME OF SIGHTING 1840 local\nSHAPE\nSIZE\nCOURSE\nNO. IN GROUP one\nSOUND \"Slow running A/C\"\nPHOTOS\nSKETCHES\nTemporary ATIC Form 329\n(2 Jan 52)\nDATE OF INFO 19 Feb 49\nLOCATION Goose Bay, Labrador\nSOURCE Wife\nDATE IN TO ATIC\nCOLOR\nSPEED\nALTITUDE\nLENGTH OF TIME OBSERVED 15-20 Min\nTYPE OF OBSERVATION heard engines\nMANEUVERS\nREMARKS: Not in file\n6792-15\n12 1 2 3 4 5 6 7 8 9 10 11\nDISPATCHED\n18 FEB 1949\nHEADQUARTERS\n6th Weather\nSquadron",
+    "gemini": "[Top center, faint stamp]\nRESTRICTED\n\n[Bottom center, circular stamp]\nDISPATCHED\n18 FEB 1949\nHEADQUARTERS\n6th Weather\nSquadron\n"
+  }
+}

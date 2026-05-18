@@ -1,0 +1,25 @@
+{
+  "eventId": "incident-summaries",
+  "page": 1,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:53.260Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.297,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.297
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "DECLASSIFIED\nAuthority:\nNND 917033\nPapiers sur\n00/80\nCONFIDENTIAL\nSECRET\nSECRET\nSECRET\nSECRET\nSECRET\nSECRET\n(?)\n(?)2024° 30014\nS78-1 (126)\nCONFIDENTIAL\nSECRET\nSECRET\nSECRET\nSECRET\n613\n(?)",
+    "gemini": "+--------------------------------------------------+\n| DECLASSIFIED                                     |\n| Authority:                                       |\n| NND 917033                                       |\n+--------------------------------------------------+\n\nBuller ser\n00185\n\n[Stamp: CONFIDENTIAL with SECRET stamped over and crossed out]\n\n[Redacted] [Redacted] [Redacted]\n\n920249 30014\nS78-1(126)\n\n[Stamp: CONFIDENTIAL with SECRET stamped over and crossed out] 615\n\nEncl 1 24\n[Faint text: Copy 1948]\n"
+  }
+}

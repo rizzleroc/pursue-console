@@ -1,0 +1,25 @@
+{
+  "eventId": "gemini-7",
+  "page": 3,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:53.243Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.006,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.006
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "I don’t see an image attached.",
+    "gemini": "Houston:\nbogey on the left at what distance?\n\nS/C:- Bowman\n- garbled - 4 miles. It looks like a [crossed out: round] vehicle [crossed out: faulty] painted on about - garbled -\nit looks like a path of the vehicle at 90 degrees\nHouston:- Roger. understand they're about 3 to 4 miles away\nS/C:- Bowman they passed now - they're going into polar orbit\nHouston:- Roger understand they were 3-4 miles away.\nS/C:- that's what it appeared like. that's roger.\nHouston:- Gemini-7- Houston - were these particles in\naddition to the booster and the bogey at 10 o'clock high\n[crossed out text]\n\nS/C:- (Lovell):- Roger. I have the booster myself\nit's a brilliant body in the sun against a black\nbackground with millions of particles on it.\nHouston:- roger what direction is it from you.\nS/C:- (Lovell) it's about at my 2 o'clock position.\nHouston:- does that mean that it's ahead of you?\nS/C:- (Lovell) it's ahead of us at 2 o'clock slowly [crossed out: tumbling]\nHouston- roger.\n[long pause - two garbled transmissions] tumbling\n[crossed out: Gemini Control] PAO: Gemini Control here again the reference\nin that conversation to the third and unidentified\nobject of course - was [arrow pointing to 'the'] the third object was\na bogey\n"
+  }
+}

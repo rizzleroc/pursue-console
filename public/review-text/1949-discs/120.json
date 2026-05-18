@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 120,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.911Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.409,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.409
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "(?)\nRESTRICTED\n10 ft\n60 ft\n10 ft\nRear View\nINCL 2\nRESTRICTED",
+    "gemini": "RESTRICTED\n\n[Hand-drawn sketch of a long, tapered object]\n10 ft\n60 ft\n\n[Hand-drawn sketch of an oval]\n10 ft\nRear View\n\nINCL 2\n\nRESTRICTED\n"
+  }
+}

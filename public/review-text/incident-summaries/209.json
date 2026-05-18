@@ -1,0 +1,25 @@
+{
+  "eventId": "incident-summaries",
+  "page": 209,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:53.368Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.131,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.131
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "CONFIDENTIAL\nCONFIDENTIAL\nRECEIVED\nHQ USAFE\n18 FEB 1948\nDCS/INTEL",
+    "gemini": "This page is a blank folder cover.\n"
+  }
+}

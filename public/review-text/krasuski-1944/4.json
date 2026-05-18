@@ -1,0 +1,25 @@
+{
+  "eventId": "krasuski-1944",
+  "page": 4,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:53.374Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.275,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.275
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "WA 27516 -        11/7/51\n5457 (?) Canyon\nColby pd\ngolden rule     min or 44\ngolden is 45\nHOO\n50' water\n100'-150 drop\n50-55 min\nBoulder\n15\n44-45\n2 min\nSaltillo\nGolden\n55 min\n59\nALL INFORMATION CONTAINED\nHEREIN IS UNCLASSIFIED\nDATE 2/23/95 BY (?)\nNW 90290\nDocId:34714592 Page 4",
+    "gemini": "WA 27516 - 11/7/57\n5457 [illegible]\n\n[Sketch of circle with crosshair]\n\nRot [illegible] seen in 44\ngone in 45\n\n[Sketches of ovals]\n5 1/2\n3\n5 1/2\nDk gray\n(55)\n25-35 mi\nBerlin\n\n[Sketch of vertical line with dot]\n44-45\n2 mi\n\n50' high\n100-150 yds\n\n[Sketch of spiral/target]\n\n[Sketch of oval with zigzag]\n\nGueltlt\n55 Major Golssen\n\n[Sketch of small rectangle]\n55\n\nALL INFORMATION CONTAINED\nHEREIN IS UNCLASSIFIED\nDATE 5/22/85 BY SP6 [illegible]\n\nBLURZ\n\nNW 90290\nDocId:34714592 Page 4\n"
+  }
+}

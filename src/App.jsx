@@ -14,6 +14,7 @@ import SearchView from "./views/SearchView.jsx";
 import LiveFeedView from "./views/LiveFeedView.jsx";
 import HelpView from "./views/HelpView.jsx";
 import DossierView from "./views/DossierView.jsx";
+import ReviewView from "./views/ReviewView.jsx";
 
 // Semantic search pulls in transformers.js (~25MB INT8 model + ORT wasm) —
 // lazy-load it so first paint isn't gated on that bundle.
@@ -117,6 +118,7 @@ export default function App() {
           {view === "constellation" && <ConstellationView events={filtered} onSelect={handleSelect} />}
           {view === "search" && <SearchView onSelect={handleSelect} />}
           {view === "live" && <LiveFeedView onSelect={handleSelect} />}
+          {view === "review" && <ReviewView />}
           {view === "help" && <HelpView />}
           {view === "semantic" && (
             <Suspense fallback={

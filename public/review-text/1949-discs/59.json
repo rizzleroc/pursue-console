@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 59,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.895Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.338,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.338
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "(?)\nAPR 11 12 40 PM '49\nCARSWELL\nFLIGHT SERVICE CENTER\n(?)\nDECLASSIFIED",
+    "gemini": "Reference                                                                    B\nTRANSMISSION\n\nAPR 14 12 40 PM '49\n\nCARSWELL\nFLIGHT SERVICE CENTER\n\n[The body of the document is illegible due to fading and scan quality]\n\n[illegible]\n\nDECLASSIFIED\n"
+  }
+}

@@ -217,7 +217,36 @@ try {
   }
 } catch {}
 
-// Placeholder rows for the uncatalogued remainder
+// Add un-catalogued PDFs from the Denis manifest sync (real war.gov URLs,
+// real filenames, real upstream bytes). Each becomes an inventory row
+// with is_curated=0 — when someone writes an events.js entry pointing
+// at the same URL, the next rebuild flips is_curated=1.
+const inventoryByUrl = new Map(inventoryRows.filter(r => r.url).map(r => [r.url.toLowerCase(), r]));
+let syncedUncatalogued = 0;
+try {
+  const sync = JSON.parse(await readFile(path.join(RAW_DIR, "inventory-sync.json"), "utf8"));
+  for (const r of sync.rows || []) {
+    const u = r.url.toLowerCase();
+    if (inventoryByUrl.has(u)) continue;  // already catalogued; nothing to add
+    inventoryRows.push({
+      id: `upstream-${r.filename.replace(/\.pdf$/i, "").toLowerCase()}`,
+      url: r.url,
+      filename: r.filename,
+      content_type: "pdf",
+      bytes: null,
+      num_pages: null,
+      first_seen: sync.generatedAt,
+      last_checked: sync.generatedAt,
+      is_curated: 0,
+      is_placeholder: 0,
+    });
+    syncedUncatalogued++;
+  }
+} catch {}
+
+// Pure placeholder rows for the press-release residual (videos + images
+// + any PDFs not in either Denis's sync or our events.js). Only fired
+// when even after the sync we're under the press-release total of 162.
 const placeholdersNeeded = Math.max(0, PRESS_RELEASE_TOTAL - inventoryRows.length);
 for (let i = 0; i < placeholdersNeeded; i++) {
   inventoryRows.push({

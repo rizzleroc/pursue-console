@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 68,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.899Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.483,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.483
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "(?)\nTRANSMITTED\nMAR 2 1 16 PM '49\nMARCH\nFLIGHT SERVICE CENTER\n(?)",
+    "gemini": "TRANSMITTED\n\nMAR 2 1 16 PM '49\nMARCH\nFLIGHT SERVICE CENTER\n\n[The remainder of the page contains faint, illegible text.]\n"
+  }
+}

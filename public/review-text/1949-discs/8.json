@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 8,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.880Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.062,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.062
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "SEP 23  2:31 PM '49\n(?)\nSEP 27 1949\n(?)",
+    "gemini": "This page is mostly blank, containing only administrative stamps and faint markings.\n\n**Bottom Left:**\n[Circular stamp with \"MIN\" in the center]\nSEP 27 1949\n\n**Bottom Left (above stamp):**\nANS [faint]\n\n**Bottom Center/Right:**\n[illegible handwritten note]\n\n**Bottom Right:**\nSEP 23 2 31 PM '49\n"
+  }
+}

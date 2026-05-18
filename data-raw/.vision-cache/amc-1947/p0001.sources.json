@@ -8,20 +8,20 @@
     },
     "gemini": {
       "chars": 1361,
-      "imported_at": "2026-05-18T01:48:57.147Z",
+      "imported_at": "2026-05-18T01:53:49.564Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:53:46.101637+00:00",
       "text_file": "p0001.gemini.txt"
     },
     "human": {
       "chars": 2017,
-      "imported_at": "2026-05-18T01:49:02.901Z",
+      "imported_at": "2026-05-18T01:53:52.808Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.human.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-18T01:49:03.280Z",
+    "computed_at": "2026-05-18T01:53:53.159Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "human",

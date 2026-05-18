@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 70,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.899Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.355,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.355
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "Chance-Vought V-173 or XF5U-1\nU.S.Navy\nIncl. 1",
+    "gemini": "[Hand-drawn sketch of a disc-shaped aircraft with two propellers and U.S. insignia]\n\nChance-Vought V-173 or XF5U-1\nU.S.Navy\n\nIncl. 1\n"
+  }
+}

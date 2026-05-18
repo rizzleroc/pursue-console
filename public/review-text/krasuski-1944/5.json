@@ -1,0 +1,25 @@
+{
+  "eventId": "krasuski-1944",
+  "page": 5,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:53.375Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.289,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.289
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "NW 90290\nDocId:34714592 Page 5\n(?)\nInterview w/ WLADYSLAW KRASUSKI 11/7/57\n100-26505",
+    "gemini": "NW 90290 DocId:34714592 Page 5\n\n[Inverted stamp: DATE: [illegible] BY [illegible] ALL INFORMATION CONTAINED HEREIN IS UNCLASSIFIED]\n\n[Faint, illegible pencil sketches and doodles]\n\nInterview w/ WLADYSLAW KRASUSKI 11/7/57\n100-26505\n"
+  }
+}

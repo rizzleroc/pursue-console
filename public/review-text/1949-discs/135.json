@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 135,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.919Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.298,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.298
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "TRANSMITTED\nDec 13    3 53 PM '48\n(?)",
+    "gemini": "[illegible text]\n\n[Handwritten signature: Joseph [illegible]]\n\n[illegible text]\n\nTRANSMITTED\nDEC 13 3 53 PM '48\n"
+  }
+}

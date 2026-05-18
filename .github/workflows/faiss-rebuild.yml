@@ -1,0 +1,95 @@
+name: FAISS rebuild (4h cadence)
+
+# Rebuilds the dense semantic index when the input data has actually
+# changed. Runs every 4 hours: if the SHA-256 of the input files matches
+# what's in public/embeddings-input-hash.txt, exits without spending the
+# ~3 min on encoding. Otherwise rebuilds, commits, and pushes.
+#
+# Why: embeddings need Python + sentence-transformers (~250 MB models)
+# and ~3 min of CPU. Re-running on every push wasted CI minutes when the
+# corpus hadn't changed. Re-running on a fixed cron without a freshness
+# check was worse — it would commit identical artifacts every 4h and
+# pollute git history.
+
+on:
+  schedule:
+    - cron: "15 */4 * * *"   # every 4 hours, at :15 past
+  workflow_dispatch:         # manual trigger from the Actions UI
+
+permissions:
+  contents: write
+
+concurrency:
+  group: faiss-rebuild
+  cancel-in-progress: false   # don't kill a rebuild that's mid-encode
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # need full history for git diff against prior state
+
+      - name: Compute current input hash
+        id: hash
+        run: |
+          set -euo pipefail
+          # Inputs that should trigger a rebuild when changed:
+          #   - public/text/*.txt    (the per-event flat files the script reads)
+          #   - public/visuals.json  (visual descriptions fed into embeddings)
+          #   - scripts/build-embeddings.py  (the script itself)
+          #   - src/data/events.js   (event metadata is embedded as synthetic chunks)
+          {
+            find public/text -name "*.txt" -type f 2>/dev/null | sort | xargs -r sha256sum
+            sha256sum public/visuals.json scripts/build-embeddings.py src/data/events.js 2>/dev/null
+          } | sha256sum | cut -d' ' -f1 > /tmp/current.hash
+          echo "current=$(cat /tmp/current.hash)" >> $GITHUB_OUTPUT
+          if [ -f public/embeddings-input-hash.txt ]; then
+            echo "previous=$(cat public/embeddings-input-hash.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "previous=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Decide whether to rebuild
+        id: decide
+        run: |
+          if [ "${{ steps.hash.outputs.current }}" = "${{ steps.hash.outputs.previous }}" ]; then
+            echo "rebuild=no" >> $GITHUB_OUTPUT
+            echo "::notice::FAISS inputs unchanged since last rebuild — skipping ($(echo ${{ steps.hash.outputs.current }} | cut -c1-12))"
+          else
+            echo "rebuild=yes" >> $GITHUB_OUTPUT
+            echo "::notice::FAISS inputs changed (${{ steps.hash.outputs.previous }} -> ${{ steps.hash.outputs.current }}) — rebuilding"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.decide.outputs.rebuild == 'yes'
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        if: steps.decide.outputs.rebuild == 'yes'
+        run: |
+          pip install --quiet faiss-cpu sentence-transformers numpy
+          pip uninstall -y --quiet torchcodec || true
+
+      - name: Build embeddings
+        if: steps.decide.outputs.rebuild == 'yes'
+        run: python scripts/build-embeddings.py
+
+      - name: Persist input hash for next run's freshness check
+        if: steps.decide.outputs.rebuild == 'yes'
+        run: echo "${{ steps.hash.outputs.current }}" > public/embeddings-input-hash.txt
+
+      - name: Commit + push rebuilt artifacts
+        if: steps.decide.outputs.rebuild == 'yes'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/embeddings.bin public/embeddings-meta.json public/embeddings-info.json public/embeddings-input-hash.txt
+          if git diff --cached --quiet; then
+            echo "No artifact changes to commit (embedder produced byte-identical output)."
+          else
+            git commit -m "FAISS rebuild · scheduled · inputs ${{ steps.hash.outputs.current }}"
+            git push
+          fi

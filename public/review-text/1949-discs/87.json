@@ -1,0 +1,25 @@
+{
+  "eventId": "1949-discs",
+  "page": 87,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T01:53:52.905Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.384,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.384
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "FUKUSHIMA\nNAGANO\nTAKAYAMA\nSUWA\nIIDA\nGIFU\nLEGEND\n— OBSERVING STATION\n— PROBABLE PATH OF PHENOMENON\n— PROBABLE AREA OF EXPLOSION OR\nDISAPPEARANCE\nIncl 4³",
+    "gemini": "[Image: A map of Japan with a line drawn across the central region, connecting several cities. There are markings for observing stations, a path, and an explosion/disappearance point.]\n\n### LEGEND\n• — OBSERVING STATION\n— — PROBABLE PATH OF PHENOMENON\nX — PROBABLE AREA OF EXPLOSION OR DISAPPEARANCE\n\n**Map Labels:**\n* FUKUSHIMA\n* NAGANO\n* TAKAYAMA\n* SUWA\n* IIDA\n* GIFU\n\n**Handwritten Note (Bottom Left):**\nIncl 4^3\n"
+  }
+}
