@@ -9,6 +9,7 @@ const PRIMARY = [
   { id: "search",   label: "SEARCH",   glyph: "⌕" },
   { id: "semantic", label: "SEMANTIC", glyph: "∿" },
   { id: "review",   label: "REVIEW",   glyph: "⚖" },
+  { id: "media",    label: "MEDIA",    glyph: "▦" },
   { id: "dossier",  label: "DOSSIER",  glyph: "❒" },
 ];
 const ANALYSIS = [

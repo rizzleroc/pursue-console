@@ -3,7 +3,7 @@
   "sources": {
     "gemini": {
       "chars": 1622,
-      "imported_at": "2026-05-18T20:45:16.997Z",
+      "imported_at": "2026-05-18T21:19:10.061Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:38:50.523107+00:00",
       "text_file": "p0086.gemini.txt"

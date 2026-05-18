@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-// The primary CTA of the entire site. Two paths: machine OCR (volunteer
-// script does the work) or hand-typed (you literally type a page out).
-// Both produce PRs that go through the same validator.
+// The primary CTA of the entire site. The priority ladder up top mirrors
+// the HELP view: settle disputes first, then transcribe new pages, then
+// (next phase) extract embedded images. After the ladder, the two
+// machine-OCR vs hand-typed setup paths.
 
-export default function VolunteerModal({ open, onClose }) {
+export default function VolunteerModal({ open, onClose, onViewChange }) {
+  const [reviewCount, setReviewCount] = useState(null);
+  useEffect(() => {
+    if (!open) return;
+    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(j => setReviewCount(j?.review?.pagesNeedingReview ?? null))
+      .catch(() => {});
+  }, [open]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
@@ -18,9 +27,29 @@ export default function VolunteerModal({ open, onClose }) {
             className="text-amber-700 hover:text-amber-300 font-mono text-sm">×</button>
         </div>
 
-        <div className="px-5 py-4 space-y-5 text-emerald-300 text-[12px] leading-relaxed">
-          <p className="text-emerald-200">
-            Two ways to help, both go through the same validator and land in the search index.
+        <div className="px-5 py-4 space-y-4 text-emerald-300 text-[12px] leading-relaxed">
+          {/* Priority ladder — same shape, same wording as HELP view */}
+          {reviewCount > 0 && (
+            <div className="border border-amber-500/60 bg-amber-950/20 rounded-sm p-3">
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="font-mono text-[10px] tracking-[0.25em] text-amber-300">PRIORITY 1 · DO THIS FIRST</span>
+                <span className="font-mono text-[18px] tabular-nums text-amber-300">{reviewCount}</span>
+              </div>
+              <div className="font-mono text-emerald-100 text-[12px]">Settle the {reviewCount} disputed pages where Gemini and ChatGPT disagree.</div>
+              <div className="font-mono text-emerald-500 text-[11px] mt-1">Read both transcriptions side-by-side, type the correct version. One disputed page resolved = canonical text settled forever.</div>
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => { onClose(); onViewChange?.("review"); }}
+                  className="font-mono text-[10px] tracking-widest border border-amber-500 text-amber-200 hover:bg-amber-700/30 px-2.5 py-1 rounded-sm">
+                  OPEN REVIEW QUEUE →
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="font-mono text-[10px] tracking-[0.25em] text-emerald-700">
+            {reviewCount > 0 ? "PRIORITY 2 · ALSO OPEN" : "PRIMARY"} · TRANSCRIBE NEW PAGES
+          </div>
+          <p className="text-emerald-400 text-[11px] -mt-2">
+            Two setup paths below — both go through the same validator and land in the search index.
           </p>
 
           {/* Machine OCR path */}
@@ -67,6 +96,13 @@ npm run volunteer -- --my-handle=YOUR_NAME --slice=20`}
             </div>
           </div>
 
+          <div className="border border-cyan-800/50 bg-cyan-900/10 rounded-sm p-3">
+            <div className="font-mono text-[10px] tracking-[0.25em] text-cyan-400 mb-1">PRIORITY 3 · NEXT PHASE — PROCESS BEING DEFINED</div>
+            <div className="font-mono text-emerald-100 text-[12px]">Screenshot the visuals + context</div>
+            <div className="font-mono text-emerald-500 text-[11px] mt-1">
+              For pages containing photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams: capture the page image, identify the article / paragraph it belongs to, and return both with the surrounding context (the text that introduces the image, or the article it appears within). A claim-and-submit volunteer flow opens once the process is scoped.
+            </div>
+          </div>
           <p className="text-emerald-700 text-[10px] font-mono">
             Every contribution gets credited to your handle in the corpus DB. You stay in your own GitHub account; no central server holds your work.
           </p>

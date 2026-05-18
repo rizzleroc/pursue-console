@@ -1,6 +1,30 @@
 # How Can I Help?
 
-A SETI@home-style distributed contribution model for the PURSUE corpus. Anyone with a ChatGPT Plus account, a Chrome profile, and a few hours of idle compute can take a slice of the OCR backlog and contribute it back. The maintainer's own ChatGPT quota stops being the bottleneck.
+A SETI@home-style distributed contribution model for the PURSUE corpus.
+
+## Priority ladder — pick the highest open priority
+
+> The corpus has three contribution paths. Please don't skip ahead — the lower numbers settle work that's blocking everything downstream.
+
+### 1. Settle the review queue *(open now · highest leverage)*
+
+Pages where Gemini and ChatGPT disagree on the transcription. Read both side-by-side and type the correct version. **One disputed page resolved = canonical text settled forever, used as gold to grade every machine source going forward.**
+
+→ Open [the REVIEW tab](https://rizzleroc.github.io/pursue-console/) on the live console. The current count is shown in the nav as `⚖ N`.
+
+To submit a settlement: drop the corrected `.txt` into `contributions/<your-handle>/human/<eid>/p<NNNN>.txt` and open a PR. No tooling required — just type the page out word-for-word from the source PDF.
+
+### 2. Transcribe new pages *(open now · ChatGPT Plus or Gemini needed)*
+
+Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini, opens a PR with the transcripts. The setup is below.
+
+### 3. Screenshot the visuals + context *(next phase · process being defined)*
+
+Pages containing photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams need to be captured as images alongside the documentary context that frames them. See [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md) for the full spec; the volunteer flow opens once the importer + validator + claim API are in place.
+
+---
+
+## Quick-start for Priority 2 (transcribe new pages)
 
 This document is the **architecture spec + quick-start.** If you just want to volunteer:
 

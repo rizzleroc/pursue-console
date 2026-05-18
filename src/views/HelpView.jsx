@@ -17,8 +17,9 @@ const C = {
   rose:     "#FF6B9D",
 };
 
-export default function HelpView() {
+export default function HelpView({ onViewChange }) {
   const [queue, setQueue] = useState(null);
+  const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");  // "all" | "small" | "big"
   const [copied, setCopied] = useState("");
@@ -28,6 +29,8 @@ export default function HelpView() {
       .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(setQueue)
       .catch(e => setError(e.message));
+    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
+      .then(r => r.ok ? r.json() : null).then(setStats).catch(() => {});
   }, []);
 
   const docs = useMemo(() => {
@@ -89,6 +92,45 @@ export default function HelpView() {
         </div>
       </div>
 
+      {/* ============ PRIORITY LADDER ============ */}
+      <div className="grid lg:grid-cols-3 gap-3 mb-6">
+        {/* Priority 1 — REVIEW disputes */}
+        <PriorityCard
+          rank="1"
+          status="OPEN NOW"
+          color="amber"
+          count={stats?.review?.pagesNeedingReview ?? "—"}
+          unit="DISPUTED PAGES"
+          title="Settle the review queue"
+          body={<>Pages where Gemini and ChatGPT disagree. Read both, type the correct version. <span className="text-amber-200">One disputed page resolved = canonical text settled forever.</span></>}
+          action={onViewChange ? { label: "OPEN REVIEW →", onClick: () => onViewChange("review") } : null}
+        />
+
+        {/* Priority 2 — Transcribe new pages */}
+        <PriorityCard
+          rank="2"
+          status="OPEN NOW"
+          color="emerald"
+          count={queue?.totalPagesNeeded ?? "—"}
+          unit="PAGES NEED OCR"
+          title="Transcribe new pages"
+          body={<>Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini. Picks unclaimed pages, opens a PR.</>}
+          action={{ label: "QUICKSTART ↓", onClick: () => document.getElementById("quickstart")?.scrollIntoView({ behavior: "smooth" }) }}
+        />
+
+        {/* Priority 3 — Image extraction (coming) */}
+        <PriorityCard
+          rank="3"
+          status="NEXT PHASE · PROCESS BEING DEFINED"
+          color="cyan"
+          count="—"
+          unit="IMAGES TO EXTRACT"
+          title="Screenshot the visuals + context"
+          body={<>For pages containing photographs, sketches, newspaper clippings, maps, or diagrams: capture the page as an image, identify the article/paragraph it belongs to, return both with the surrounding context. Volunteer flow opens once the process is scoped.</>}
+          action={null}
+        />
+      </div>
+
       {/* ============ HERO PITCH ============ */}
       <div className="border-2 border-dashed border-amber-700/50 bg-gradient-to-b from-amber-950/30 to-transparent rounded-sm p-5 mb-6">
         <div className="grid sm:grid-cols-[1fr,auto] gap-4 items-center">
@@ -110,7 +152,7 @@ export default function HelpView() {
       </div>
 
       {/* ============ QUICK START ============ */}
-      <div className="grid lg:grid-cols-2 gap-4 mb-6">
+      <div id="quickstart" className="grid lg:grid-cols-2 gap-4 mb-6">
         <QuickStart os="MACOS · LINUX" snippet={QUICKSTART_BASH} id="bash" copied={copied} onCopy={copy} />
         <QuickStart os="WINDOWS · POWERSHELL" snippet={QUICKSTART_PS} id="ps" copied={copied} onCopy={copy} />
       </div>
@@ -248,6 +290,41 @@ function QuickStart({ os, snippet, id, copied, onCopy }) {
         </button>
       </div>
       <pre className="font-mono text-[11px] text-emerald-200 p-3 leading-relaxed overflow-x-auto whitespace-pre">{snippet}</pre>
+    </div>
+  );
+}
+
+// One of the priority cards at the top — same shape regardless of rank
+// so the visual ladder is obvious at a glance. Status / color signals
+// open-now (amber, emerald) vs not-yet (cyan, dimmed).
+function PriorityCard({ rank, status, color, count, unit, title, body, action }) {
+  // Static class lookups (Tailwind v3 strips template strings).
+  const palette = {
+    amber:   { border: "border-amber-500/60",   ring: "hover:border-amber-300",   ranknum: "text-amber-300",   chip: "border-amber-700/60 text-amber-300 bg-amber-900/20",   bigNum: "text-amber-300",   unit: "text-amber-700",   title: "text-emerald-100", body: "text-emerald-400", btn: "border-amber-500 text-amber-200 hover:bg-amber-700/30" },
+    emerald: { border: "border-emerald-500/60", ring: "hover:border-emerald-300", ranknum: "text-emerald-300", chip: "border-emerald-700/60 text-emerald-300 bg-emerald-900/20", bigNum: "text-emerald-300", unit: "text-emerald-700", title: "text-emerald-100", body: "text-emerald-400", btn: "border-emerald-500 text-emerald-200 hover:bg-emerald-700/30" },
+    cyan:    { border: "border-cyan-700/40",    ring: "",                          ranknum: "text-cyan-500",    chip: "border-cyan-800/60 text-cyan-400 bg-cyan-900/10",          bigNum: "text-cyan-500",    unit: "text-cyan-800",    title: "text-emerald-200", body: "text-emerald-600", btn: "" },
+  };
+  const c = palette[color] || palette.emerald;
+  return (
+    <div className={`relative border ${c.border} ${c.ring} bg-black/40 rounded-sm p-4 transition-colors`}>
+      <div className="flex items-baseline justify-between mb-2">
+        <div className="flex items-baseline gap-2">
+          <span className={`font-mono text-3xl font-semibold ${c.ranknum}`}>{rank}</span>
+          <span className={`font-mono text-[9px] tracking-[0.25em] px-1.5 py-0.5 rounded-sm border ${c.chip}`}>{status}</span>
+        </div>
+        <div className="text-right">
+          <div className={`font-mono text-2xl tabular-nums ${c.bigNum}`}>{count}</div>
+          <div className={`font-mono text-[9px] tracking-widest ${c.unit}`}>{unit}</div>
+        </div>
+      </div>
+      <div className={`font-mono text-[13px] ${c.title} mb-1.5`}>{title}</div>
+      <div className={`font-mono text-[11px] leading-snug ${c.body} mb-3`}>{body}</div>
+      {action && (
+        <button onClick={action.onClick}
+          className={`font-mono text-[10px] tracking-widest px-2.5 py-1 rounded-sm border ${c.btn}`}>
+          {action.label}
+        </button>
+      )}
     </div>
   );
 }
