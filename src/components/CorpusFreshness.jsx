@@ -71,6 +71,23 @@ export default function CorpusFreshness({ compact = false }) {
 
   if (compact) {
     return (
+      <div className="px-3 sm:px-6 py-1.5 border-b border-emerald-900/40 bg-black/30 flex items-center justify-between gap-3 flex-wrap">
+        <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          {catalogued}/{inventoryTotal} records · {pagesIndexed?.toLocaleString()} pages · refreshed {ago}
+        </span>
+        <button onClick={() => refresh(true)} disabled={refreshing}
+          className="text-emerald-600 hover:text-amber-300 px-1.5 py-0.5 font-mono text-[10px] tracking-widest disabled:opacity-40">
+          {refreshing ? "◌" : "↻"}
+        </button>
+      </div>
+    );
+  }
+
+  // Legacy expanded compact mode kept as a fallback — never rendered now
+  // that App uses compact={true} everywhere.
+  if (false) {
+    return (
       <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
         {ago}

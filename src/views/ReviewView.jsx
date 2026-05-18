@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { sourceStyle, confidenceStyle, SourceLegend } from "../components/SourceMix.jsx";
 
 // REVIEW — cross-source disagreement queue.
 //
@@ -8,31 +9,21 @@ import React, { useEffect, useMemo, useState } from "react";
 // <page>.json → renders every source's text in a side-by-side grid with
 // the comparison metadata and a CTA to fix it via the volunteer flow.
 //
-// No backend writes. "Mark canonical" is encoded as a copy-able
-// snippet a reviewer pastes into a contribution PR.
-
-const SOURCE_COLORS = {
-  gemini:        { dot: "bg-cyan-400",   ring: "border-cyan-700/60",   text: "text-cyan-300",   label: "GEMINI"  },
-  "gpt-vision":  { dot: "bg-emerald-400",ring: "border-emerald-700/60",text: "text-emerald-300",label: "GPT-VISION" },
-  human:         { dot: "bg-amber-400",  ring: "border-amber-700/60",  text: "text-amber-300",  label: "HUMAN"   },
-  ocr:           { dot: "bg-rose-400",   ring: "border-rose-700/60",   text: "text-rose-300",   label: "OCR"     },
-};
-
-function sourceMeta(name) {
-  return SOURCE_COLORS[name] || { dot: "bg-zinc-400", ring: "border-zinc-700/60", text: "text-zinc-300", label: name.toUpperCase() };
-}
+// Confidence + source colors come from SourceMix's static lookup map so
+// the badges actually render colored (the previous template-string
+// approach was stripped by Tailwind v3 at build time).
 
 function ConfidenceBadge({ confidence, agreement }) {
-  const c = confidence === "low" ? "rose" : confidence === "medium" ? "amber" : "emerald";
+  const c = confidenceStyle(confidence);
   return (
-    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border border-${c}-700/60 text-${c}-300 text-[9px] tracking-widest font-mono`}>
-      <span className={`w-1 h-1 rounded-full bg-${c}-400`} />
-      {String(confidence || "?").toUpperCase()} · {(agreement ?? 0).toFixed(2)}
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border ${c.ring} ${c.text} text-[9px] tracking-widest font-mono`}>
+      <span className={`w-1 h-1 rounded-full ${c.dot}`} />
+      {c.label} · {(agreement ?? 0).toFixed(2)}
     </span>
   );
 }
 
-export default function ReviewView() {
+export default function ReviewView({ onSelect }) {
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -85,16 +76,19 @@ export default function ReviewView() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-3 p-3 min-h-[calc(100vh-200px)]">
+    <div className="flex flex-col gap-3 p-3 min-h-[calc(100vh-200px)]">
+      <div className="flex items-baseline justify-between flex-wrap gap-2 px-1">
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-xl tracking-[0.2em]">⚖ REVIEW QUEUE</h2>
+        <SourceLegend />
+      </div>
+      <div className="flex flex-col lg:flex-row gap-3">
       {/* Left rail — queue list */}
       <aside className="lg:w-72 shrink-0 border border-emerald-900/50 bg-black/40 rounded-sm">
         <div className="px-3 py-2 border-b border-emerald-900/50 flex items-center justify-between">
           <div className="font-mono text-[10px] tracking-widest text-emerald-400">
-            REVIEW QUEUE · {queue.total}
+            {queue.total} PAGES
           </div>
-          <div className="font-mono text-[9px] text-emerald-700">
-            worst first
-          </div>
+          <div className="font-mono text-[9px] text-emerald-700">worst first</div>
         </div>
         <ul className="max-h-[60vh] lg:max-h-[calc(100vh-280px)] overflow-y-auto">
           {queue.queue.map((r, i) => (
@@ -141,6 +135,13 @@ export default function ReviewView() {
                 </div>
                 <div className="flex items-center gap-2">
                   <ConfidenceBadge confidence={selected.confidence} agreement={selected.agreement} />
+                  {onSelect && (
+                    <button
+                      onClick={() => onSelect({ id: selected.eventId, title: selected.title }, { page: selected.page })}
+                      className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
+                      OPEN DOSSIER →
+                    </button>
+                  )}
                   <a
                     href={`https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md`}
                     target="_blank" rel="noreferrer"
@@ -155,9 +156,9 @@ export default function ReviewView() {
                   <span className="text-emerald-700/70">pairwise:</span>
                   {selected.pairs.map(p => (
                     <span key={`${p.a}-${p.b}`}>
-                      <span className={sourceMeta(p.a).text}>{sourceMeta(p.a).label}</span>
+                      <span className={sourceStyle(p.a).text}>{sourceStyle(p.a).label}</span>
                       <span className="text-emerald-700"> ↔ </span>
-                      <span className={sourceMeta(p.b).text}>{sourceMeta(p.b).label}</span>
+                      <span className={sourceStyle(p.b).text}>{sourceStyle(p.b).label}</span>
                       <span className="text-emerald-500"> {p.score.toFixed(2)}</span>
                     </span>
                   ))}
@@ -167,7 +168,7 @@ export default function ReviewView() {
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px]">
                   <span className="text-amber-500/80">vs human (gold):</span>
                   {Object.entries(selected.againstHuman).map(([n, s]) => (
-                    <span key={n} className={sourceMeta(n).text}>{sourceMeta(n).label} {s.toFixed(2)}</span>
+                    <span key={n} className={sourceStyle(n).text}>{sourceStyle(n).label} {s.toFixed(2)}</span>
                   ))}
                 </div>
               )}
@@ -179,7 +180,7 @@ export default function ReviewView() {
             {pageData && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {Object.entries(pageData.sources).map(([name, text]) => {
-                  const meta = sourceMeta(name);
+                  const meta = sourceStyle(name);
                   const isBest = pageData.best === name;
                   return (
                     <div key={name}
@@ -203,6 +204,7 @@ export default function ReviewView() {
           </>
         )}
       </main>
+      </div>
     </div>
   );
 }

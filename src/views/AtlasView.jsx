@@ -1,6 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
+import SourceMix from "../components/SourceMix.jsx";
+
+let _byEventP = null;
+function useByEvent() {
+  const [be, setBe] = useState(null);
+  useEffect(() => {
+    if (!_byEventP) {
+      _byEventP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json`)
+        .then(r => r.ok ? r.json() : null)
+        .then(j => j?.byEvent || {}).catch(() => ({}));
+    }
+    _byEventP.then(setBe);
+  }, []);
+  return be;
+}
 
 const ERAS = [
   { id: "40s", label: "1944—49" }, { id: "50s", label: "1950—59" },
@@ -13,6 +28,7 @@ const AGENCIES = ["Department of War", "FBI", "NASA", "Department of State"];
 
 export default function AtlasView({ events, onSelect }) {
   const [activeCell, setActiveCell] = useState(null);
+  const byEvent = useByEvent();
   const cell = (agency, era) => events.filter(e => e.agency === agency && e.era === era);
   const max = Math.max(...AGENCIES.flatMap(a => ERAS.map(e => cell(a, e.id).length)));
   const cellEvents = activeCell ? cell(activeCell.agency, activeCell.era) : [];
@@ -62,7 +78,20 @@ export default function AtlasView({ events, onSelect }) {
             ▌ CELL: {activeCell.agency.toUpperCase()} × {ERAS.find(e=>e.id===activeCell.era)?.label}
             <span className="text-emerald-700 ml-2">— {cellEvents.length} record{cellEvents.length !== 1 && "s"}</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">{cellEvents.map(e => <MiniChip key={e.id} event={e} onClick={onSelect} />)}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {cellEvents.map(e => {
+              const stat = byEvent?.[e.id];
+              return (
+                <div key={e.id} className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0"><MiniChip event={e} onClick={onSelect} /></div>
+                  {stat?.sources?.length > 0 && <SourceMix sources={stat.sources} size="xs" />}
+                  {stat?.needsReview > 0 && (
+                    <span className="text-amber-300 text-[9px] font-mono" title={`${stat.needsReview} pages need review`}>⚖{stat.needsReview}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">

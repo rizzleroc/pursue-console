@@ -1,15 +1,12 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS } from "./data/events.js";
-import { ScanlineOverlay, GrainOverlay, VignetteOverlay, RadarSweep } from "./components/Primitives.jsx";
+import { ScanlineOverlay } from "./components/Primitives.jsx";
 import CorpusFreshness from "./components/CorpusFreshness.jsx";
 import Header from "./components/Header.jsx";
+import VolunteerModal from "./components/VolunteerModal.jsx";
 import TimelineView from "./views/TimelineView.jsx";
-import GlobeView from "./views/GlobeView.jsx";
 import AtlasView from "./views/AtlasView.jsx";
 import NetworkView from "./views/NetworkView.jsx";
-import PatternsView from "./views/PatternsView.jsx";
-import ThreadsView from "./views/ThreadsView.jsx";
-import ConstellationView from "./views/ConstellationView.jsx";
 import SearchView from "./views/SearchView.jsx";
 import LiveFeedView from "./views/LiveFeedView.jsx";
 import HelpView from "./views/HelpView.jsx";
@@ -21,16 +18,13 @@ import ReviewView from "./views/ReviewView.jsx";
 const SemanticSearchView = lazy(() => import("./views/SemanticSearchView.jsx"));
 
 export default function App() {
-  const [view, setView] = useState("timeline");
+  // LIVE is home — it's where the freshly-arrived data shows up, and it's
+  // the view that carries the hero band. Every other view is "instrument."
+  const [view, setView] = useState("live");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
-  const [selectionPage, setSelectionPage] = useState(null);  // deep-link target page in dossier
-  const [tickerIdx, setTickerIdx] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setTickerIdx(i => (i + 1) % EVENTS.length), 3500);
-    return () => clearInterval(id);
-  }, []);
+  const [selectionPage, setSelectionPage] = useState(null);
+  const [volunteerOpen, setVolunteerOpen] = useState(false);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return EVENTS;
@@ -44,8 +38,6 @@ export default function App() {
     );
   }, [query]);
 
-  // handleSelect(event)             — open dossier on that event
-  // handleSelect(event, { page })   — open dossier + scroll/expand to that page
   const handleSelect = (event, opts) => {
     setSelected(event);
     setSelectionPage(opts?.page ?? null);
@@ -55,7 +47,12 @@ export default function App() {
     setView(v);
     if (v !== "dossier") { setSelected(null); setSelectionPage(null); }
   };
-  const tickerEvent = EVENTS[tickerIdx];
+
+  // Help link survives as a tab even after we cleaned up the nav — it's
+  // just not in the analysis bar. Treat it like a primary so the user can
+  // get to it from anywhere.
+  const showHero  = view === "live";
+  const showFooter = view === "live" || view === "help";
 
   return (
     <div className="min-h-screen bg-[#020806] text-emerald-300 relative overflow-x-hidden" style={{
@@ -69,57 +66,24 @@ export default function App() {
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         body { background: #020806; }
-        @keyframes flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.97; } }
-        .crt-flicker { animation: flicker 5s infinite; }
       `}</style>
 
+      {/* One overlay layer. Vignette + grain are gone — they made everything
+          look foggy and inverted the legibility-first principle. */}
       <ScanlineOverlay />
-      <GrainOverlay />
-      <VignetteOverlay />
 
-      <div className="crt-flicker relative z-10">
-        <Header
-          ticker={tickerEvent ? `LIVE: ${tickerEvent.title.slice(0,40)}…` : ""}
-          view={view} onViewChange={handleViewChange} onSearch={setQuery} query={query}
-        />
-        <CorpusFreshness />
-
-        {view !== "dossier" && (
-          <div className="px-3 sm:px-8 pt-6 pb-4 border-b border-emerald-700/20">
-            <div className="grid lg:grid-cols-[1fr,auto] gap-5 items-start">
-              <div>
-                <div className="font-mono text-[10px] text-amber-400 tracking-[0.4em] mb-2">
-                  ◊ PRESIDENTIAL UNSEALING & REPORTING SYSTEM FOR UAP ENCOUNTERS ◊
-                </div>
-                <h1 className="font-mono text-emerald-100 text-2xl sm:text-4xl lg:text-5xl leading-none tracking-tight" style={{
-                  fontFamily: "'Major Mono Display', monospace",
-                  textShadow: "0 0 30px rgba(124,255,178,0.3)",
-                }}>
-                  CONSOLE<span className="text-amber-400 ml-2">/</span>
-                  <span className="text-emerald-500 text-base sm:text-2xl"> RELEASE 01</span>
-                </h1>
-                <div className="font-mono text-[11px] text-emerald-500 mt-3 max-w-2xl leading-relaxed">
-                  Department of War. May 8, 2026. 162 records released — 120 PDFs, 28 videos, 14 images. All cases UNRESOLVED.
-                  This console adds connective tissue: <span className="text-amber-300">NETWORK</span> shows the entity graph, <span className="text-amber-300">PATTERNS</span> the recurring signatures, <span className="text-amber-300">THREADS</span> the curated narrative arcs. Tap any record to read the dossier.
-                </div>
-              </div>
-              <div className="hidden lg:block"><RadarSweep size={120} /></div>
-            </div>
-          </div>
-        )}
+      <div className="relative z-10">
+        <Header view={view} onViewChange={handleViewChange} onVolunteer={() => setVolunteerOpen(true)} />
+        {!showHero && <CorpusFreshness compact />}
 
         <main>
           {view === "timeline" && <TimelineView events={filtered} onSelect={handleSelect} />}
-          {view === "globe" && <GlobeView events={filtered} onSelect={handleSelect} />}
-          {view === "atlas" && <AtlasView events={filtered} onSelect={handleSelect} />}
-          {view === "network" && <NetworkView events={filtered} onSelect={handleSelect} />}
-          {view === "patterns" && <PatternsView events={filtered} onSelect={handleSelect} />}
-          {view === "threads" && <ThreadsView events={filtered} onSelect={handleSelect} />}
-          {view === "constellation" && <ConstellationView events={filtered} onSelect={handleSelect} />}
-          {view === "search" && <SearchView onSelect={handleSelect} />}
-          {view === "live" && <LiveFeedView onSelect={handleSelect} />}
-          {view === "review" && <ReviewView />}
-          {view === "help" && <HelpView />}
+          {view === "atlas"    && <AtlasView    events={filtered} onSelect={handleSelect} />}
+          {view === "network"  && <NetworkView  events={filtered} onSelect={handleSelect} />}
+          {view === "search"   && <SearchView   onSelect={handleSelect} />}
+          {view === "live"     && <LiveFeedView onSelect={handleSelect} />}
+          {view === "review"   && <ReviewView   onSelect={handleSelect} />}
+          {view === "help"     && <HelpView />}
           {view === "semantic" && (
             <Suspense fallback={
               <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest">
@@ -132,22 +96,30 @@ export default function App() {
           {view === "dossier" && (
             <DossierView event={selected}
               selectionPage={selectionPage}
-              onClose={() => { setSelected(null); setSelectionPage(null); setView("timeline"); }}
+              onClose={() => { setSelected(null); setSelectionPage(null); setView("live"); }}
               onSelect={handleSelect}
-              onJumpThread={() => setView("threads")}
               allEvents={EVENTS} />
           )}
         </main>
 
-        <footer className="border-t border-emerald-700/30 mt-10 px-3 sm:px-8 py-6">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest space-y-1">
-            <div>▌ SOURCE: WAR.GOV/UFO RELEASE 01 // CLEARED MAY 8, 2026</div>
-            <div>▌ ALL CASES UNRESOLVED — GOVERNMENT UNABLE TO MAKE DEFINITIVE DETERMINATION</div>
-            <div>▌ INTERAGENCY: WHITE HOUSE / ODNI / DOE / AARO / NASA / FBI / DOW</div>
-            <div>▌ CONSOLE BUILT FROM OFFICIAL INVENTORY MIRROR — ENTITIES + THREADS HAND-CURATED FROM PRIMARY DOCS</div>
-          </div>
-        </footer>
+        {showFooter ? (
+          <footer className="border-t border-emerald-700/30 mt-10 px-3 sm:px-8 py-6">
+            <div className="font-mono text-[9px] text-emerald-700 tracking-widest space-y-1">
+              <div>▌ SOURCE: WAR.GOV/UFO RELEASE 01 // CLEARED MAY 8, 2026</div>
+              <div>▌ ALL CASES UNRESOLVED — GOVERNMENT UNABLE TO MAKE DEFINITIVE DETERMINATION</div>
+              <div>▌ INTERAGENCY: WHITE HOUSE / ODNI / DOE / AARO / NASA / FBI / DOW</div>
+            </div>
+          </footer>
+        ) : (
+          <footer className="border-t border-emerald-900/30 mt-6 px-3 sm:px-8 py-3 text-center">
+            <span className="font-mono text-[9px] text-emerald-800 tracking-widest">
+              ▌ war.gov/UFO · release 01 · all cases unresolved
+            </span>
+          </footer>
+        )}
       </div>
+
+      <VolunteerModal open={volunteerOpen} onClose={() => setVolunteerOpen(false)} />
     </div>
   );
 }

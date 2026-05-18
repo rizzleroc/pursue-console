@@ -369,81 +369,47 @@ export default function LiveFeedView({ onSelect }) {
   }, [feed, now]);
 
   return (
-    <div className="relative overflow-hidden" style={{ backgroundColor: "#020806" }}>
-      {/* CRT scanlines overlay (view-scoped) */}
-      <div className="pointer-events-none absolute inset-0 z-10 opacity-60"
-        style={{
-          backgroundImage: "repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 2px)",
-        }} />
-      {/* radial vignette */}
-      <div className="pointer-events-none absolute inset-0 z-10"
-        style={{ background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%)" }} />
-      {/* faint grain */}
-      <div className="pointer-events-none absolute inset-0 z-10 opacity-[0.04]"
-        style={{
-          backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }} />
-
-      <div className="relative z-20 px-6 sm:px-12 py-8">
-        {/* ============ TOP HEADER BAND ============ */}
-        <div className="text-center mb-2">
-          <div className="font-mono text-[10px] tracking-[0.4em] text-amber-700/80">
-            ◇ &nbsp; P R E S I D E N T I A L &nbsp; U N S E A L I N G &nbsp;·&nbsp; R E P O R T I N G &nbsp; S Y S T E M &nbsp; F O R &nbsp; U A P &nbsp; E N C O U N T E R S &nbsp; ◇
-          </div>
-          <div className="mt-2 mx-auto h-px w-72 bg-emerald-900/60" />
-        </div>
-
-        <div className="grid grid-cols-3 items-start mb-1">
-          <div className="font-mono text-[12px] text-emerald-400 tracking-[0.3em] mt-3">
-            <div>P U R S U E &nbsp;//&nbsp; W A T C H</div>
-            <div className="text-emerald-700 text-[9px] tracking-[0.4em] mt-1">
-              S E C T I O N &nbsp;A &nbsp;·&nbsp; L I N K &nbsp;N O M I N A L
-            </div>
-          </div>
-
-          {/* Monumental room name */}
-          <div className="flex items-center justify-center gap-4 mt-1">
+    <div className="relative" style={{ backgroundColor: "#020806" }}>
+      <div className="relative z-20 px-4 sm:px-8 py-6">
+        {/* ── HERO (LIVE is home; this is the only view that carries it) ── */}
+        <div className="flex items-baseline justify-between flex-wrap gap-3 mb-2">
+          <div className="flex items-center gap-3">
             <LivePulse active />
-            <h1 className="font-mono font-bold text-emerald-300 tracking-[0.4em] text-2xl sm:text-4xl"
-              style={{ textShadow: `0 0 18px ${COLORS.green}55, 0 0 4px ${COLORS.green}aa` }}>
-              L I V E &nbsp; W A T C H
+            <h1 className="font-mono font-semibold text-emerald-200 tracking-[0.25em] text-xl sm:text-3xl"
+              style={{ textShadow: `0 0 12px ${COLORS.green}44` }}>
+              LIVE WATCH
             </h1>
           </div>
-
-          {/* UTC clock + channel */}
-          <div className="font-mono text-[12px] text-emerald-400 tracking-[0.25em] mt-3 text-right">
-            <UtcClock />
-            <div className="text-emerald-700 text-[9px] tracking-[0.4em] mt-1">
-              C H A N N E L &nbsp; R E L E A S E &nbsp; 0 1
-            </div>
+          <div className="font-mono text-[11px] text-emerald-500 tracking-[0.2em]">
+            <UtcClock /> <span className="text-emerald-800 mx-2">·</span> WAR.GOV / UFO / RELEASE 01
           </div>
         </div>
+        <div className="font-mono text-[11px] text-emerald-700 max-w-2xl leading-relaxed mb-6">
+          Pages stream in as machine + volunteer transcriptions land. Each event below carries a
+          source-mix dot row showing which engines have transcribed it. Click any to open the dossier.
+        </div>
 
-        {/* full-width rule */}
-        <div className="h-px bg-emerald-900/60 mt-6 mb-8" />
-
-        {/* ============ TELEMETRY STRATUM ============ */}
+        {/* ── TELEMETRY ── halved scale, no more billboard ── */}
         {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 mb-2 relative">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 mb-6 border-y border-emerald-900/40">
             {[
-              { label: "P A G E S",        value: stats.totalPages.toLocaleString(),         sub: "decoded · cumulative", color: COLORS.green },
-              { label: "C H A R A C T E R S", value: stats.totalChars >= 1e6 ? `${(stats.totalChars/1e6).toFixed(2)}M` : `${(stats.totalChars/1000).toFixed(0)}K`, sub: "indexed corpus text", color: COLORS.green },
-              { label: "V I S I O N",      value: (stats.bySource.vision || 0).toLocaleString(), sub: "GPT-transcribed pages", color: COLORS.green },
-              { label: "T E S S E R A C T", value: (stats.bySource.ocr || 0).toLocaleString(),    sub: "awaiting vision re-pass", color: COLORS.amber },
+              { label: "PAGES",      value: stats.totalPages.toLocaleString(),    sub: "indexed",       color: COLORS.green },
+              { label: "CHARS",      value: stats.totalChars >= 1e6 ? `${(stats.totalChars/1e6).toFixed(2)}M` : `${(stats.totalChars/1000).toFixed(0)}K`,
+                                                                                  sub: "corpus text",   color: COLORS.green },
+              { label: "VISION",     value: (stats.bySource.vision || 0).toLocaleString(), sub: "machine OCR",  color: COLORS.green },
+              { label: "TESSERACT",  value: (stats.bySource.ocr || 0).toLocaleString(),    sub: "needs re-pass", color: COLORS.amber },
             ].map((c, i) => (
-              <div key={c.label} className={`relative px-4 sm:px-6 ${i > 0 ? "border-l border-emerald-950" : ""}`}>
-                <div className="font-mono text-[9px] tracking-[0.35em] text-emerald-700/80">{c.label}</div>
-                <div className="font-mono font-bold tabular-nums leading-none mt-3 text-5xl sm:text-7xl"
-                  style={{ color: c.color, textShadow: `0 0 18px ${c.color}33` }}>
+              <div key={c.label} className={`px-4 py-3 ${i > 0 ? "border-l border-emerald-950" : ""}`}>
+                <div className="font-mono text-[9px] tracking-[0.3em] text-emerald-700/80">{c.label}</div>
+                <div className="font-mono font-semibold tabular-nums leading-none mt-2 text-2xl sm:text-3xl"
+                  style={{ color: c.color }}>
                   {c.value}
                 </div>
-                <div className="font-mono text-[9px] tracking-widest text-emerald-700 mt-4">{c.sub}</div>
+                <div className="font-mono text-[9px] tracking-widest text-emerald-700 mt-2">{c.sub}</div>
               </div>
             ))}
           </div>
         )}
-
-        <div className="h-px bg-emerald-900/60 mt-10 mb-6" />
 
         {/* ============ DOCUMENT PROGRESS STRIP ============ */}
         {docProgress && (() => {

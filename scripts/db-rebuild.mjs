@@ -540,6 +540,38 @@ const stats = {
       return q.summary || {};
     } catch { return {}; }
   })(),
+  // Per-event source mix + canonical best, for the NETWORK view's
+  // color-by-source encoding and the ATLAS/TIMELINE row badges. Keyed
+  // by event_id, lightweight enough to ship in the same JSON.
+  byEvent: Object.fromEntries(qAll(`
+    SELECT
+      event_id,
+      COUNT(*)              AS pages,
+      SUM(has_gemini)       AS gemini,
+      SUM(has_gpt_vision)   AS gptVision,
+      SUM(has_human)        AS human,
+      SUM(has_ocr)          AS ocr,
+      SUM(needs_review)     AS needsReview,
+      SUM(CASE WHEN best_source='human'      THEN 1 ELSE 0 END) AS bestHuman,
+      SUM(CASE WHEN best_source='gpt-vision' THEN 1 ELSE 0 END) AS bestGptVision,
+      SUM(CASE WHEN best_source='gemini'     THEN 1 ELSE 0 END) AS bestGemini,
+      SUM(CASE WHEN best_source='ocr'        THEN 1 ELSE 0 END) AS bestOcr,
+      SUM(chars)            AS chars
+    FROM pages GROUP BY event_id
+  `).map(r => {
+    // Determine the dominant best_source for the whole event (used as
+    // the event node's color in NETWORK).
+    const counts = { human: r.bestHuman, "gpt-vision": r.bestGptVision, gemini: r.bestGemini, ocr: r.bestOcr };
+    let dominantBest = null, max = 0;
+    for (const [k, v] of Object.entries(counts)) if (v > max) { dominantBest = k; max = v; }
+    return [r.event_id, {
+      pages: r.pages, chars: r.chars,
+      sources: Object.entries({ gemini: r.gemini, "gpt-vision": r.gptVision, human: r.human, ocr: r.ocr })
+        .filter(([, n]) => n > 0).map(([k]) => k),
+      dominantBest,
+      needsReview: r.needsReview,
+    }];
+  })),
 };
 
 await mkdir(path.dirname(STATS_OUT), { recursive: true });

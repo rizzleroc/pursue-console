@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AGENCY_COLORS } from "../data/events.js";
 import { ENTITIES, ENTITY_KIND, EVENT_ENTITIES } from "../data/entities.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
+import { sourceStyle, SourceLegend } from "../components/SourceMix.jsx";
 
 // FAISS-derived event-event similarity, loaded once and cached.
 let _simP = null;
@@ -17,6 +18,33 @@ function useSimilarity() {
   }, []);
   return sim;
 }
+
+// Patterns (shapes / behaviors / sensors) + per-event source mix.
+// Loaded once. Patterns gives us a separate spine of nodes from the
+// hand-curated entities — the corpus's own text-mined vocabulary.
+let _patP = null, _statsP = null;
+function useCorpusData() {
+  const [data, setData] = useState({ patterns: null, byEvent: null });
+  useEffect(() => {
+    if (!_patP) _patP = fetch(`${import.meta.env.BASE_URL}patterns.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+    if (!_statsP) _statsP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+    Promise.all([_patP, _statsP]).then(([patterns, stats]) => {
+      setData({ patterns, byEvent: stats?.byEvent || {} });
+    });
+  }, []);
+  return data;
+}
+
+// How many pattern terms per kind to put on the canvas. Higher = richer
+// graph but more visual hairball. 8 keeps shape/behavior/sensor
+// individually readable while still letting the cluster shape emerge.
+const TOP_N_PER_PATTERN_KIND = 8;
+
+const PATTERN_KIND_STYLE = {
+  shape:    { label: "SHAPE",    color: "#82B6FF", glyph: "◆" },   // blue
+  behavior: { label: "BEHAVIOR", color: "#FFD93D", glyph: "↯" },   // amber
+  sensor:   { label: "SENSOR",   color: "#FF87B7", glyph: "◉" },   // pink
+};
 
 // Simple force-directed simulator. No deps.
 // Nodes have {id, x, y, vx, vy, kind, ref}. Links {a, b}.
@@ -78,19 +106,23 @@ function useForceLayout(nodes, links, opts = {}) {
   }, [nodes, links, width, height, iterations]);
 }
 
-const KIND_FILTERS = ["person","program","command","platform","weapon","sensor","morphology","behavior"];
+const ENTITY_KIND_FILTERS = ["person","program","command","platform","weapon","morphology"];
+const PATTERN_KIND_FILTERS = ["shape", "behavior", "sensor"];
 
 export default function NetworkView({ events, onSelect }) {
-  const [activeKinds, setActiveKinds] = useState(new Set(KIND_FILTERS));
+  const [activeEntityKinds, setActiveEntityKinds] = useState(new Set(ENTITY_KIND_FILTERS));
+  const [activePatternKinds, setActivePatternKinds] = useState(new Set(PATTERN_KIND_FILTERS));
   const [hover, setHover] = useState(null);
   const [pinnedId, setPinnedId] = useState(null);
-  // entity = bipartite events↔entities (legacy default)
+  // entity   = bipartite events↔entities
   // semantic = event↔event edges from FAISS cosine
-  // both = overlay of the two
-  const [graphMode, setGraphMode] = useState("both");
+  // patterns = events↔shapes/behaviors/sensors (text-mined)
+  // all      = everything overlaid
+  const [graphMode, setGraphMode] = useState("all");
   // Minimum cosine for a semantic edge to appear (tunable)
-  const [minCos, setMinCos] = useState(0.50);
+  const [minCos, setMinCos] = useState(0.55);
   const sim = useSimilarity();
+  const { patterns, byEvent } = useCorpusData();
   const svgRef = useRef(null);
   const [size, setSize] = useState({ w: 900, h: 620 });
 
@@ -108,16 +140,16 @@ export default function NetworkView({ events, onSelect }) {
 
   const eventIds = new Set(events.map(e => e.id));
 
-  // Build nodes/links scoped to filtered events + visible entity kinds.
-  // Edges carry an optional `kind` ('entity' | 'semantic') and `weight` (cosine).
+  // Build nodes/links scoped to filtered events + visible entity/pattern
+  // kinds. Edge `kind` ∈ {'entity', 'pattern', 'semantic'}.
   const { nodes, links } = useMemo(() => {
     const nodes = [];
     const links = [];
     for (const ev of events) nodes.push({ id: `e:${ev.id}`, kind: "event", ref: ev });
 
     // Entity edges
-    if (graphMode !== "semantic") {
-      const ents = ENTITIES.filter(e => activeKinds.has(e.kind) && e.events.some(id => eventIds.has(id)));
+    if (graphMode === "entity" || graphMode === "all") {
+      const ents = ENTITIES.filter(e => activeEntityKinds.has(e.kind) && e.events.some(id => eventIds.has(id)));
       for (const en of ents) {
         nodes.push({ id: `n:${en.id}`, kind: en.kind, ref: en });
         for (const evId of en.events)
@@ -125,8 +157,27 @@ export default function NetworkView({ events, onSelect }) {
             links.push({ a: `n:${en.id}`, b: `e:${evId}`, kind: "entity", weight: 1 });
       }
     }
+    // Pattern edges — text-mined shape/behavior/sensor vocabulary
+    if ((graphMode === "patterns" || graphMode === "all") && patterns?.byKind) {
+      for (const pk of PATTERN_KIND_FILTERS) {
+        if (!activePatternKinds.has(pk)) continue;
+        const top = (patterns.byKind[pk] || []).slice(0, TOP_N_PER_PATTERN_KIND);
+        for (const row of top) {
+          const linked = (row.events || []).filter(e => eventIds.has(e.eid));
+          if (!linked.length) continue;
+          const nid = `p:${pk}:${row.term}`;
+          nodes.push({
+            id: nid, kind: `pattern:${pk}`,
+            ref: { name: row.term, kind: `pattern:${pk}`, docCount: row.docCount, total: row.total },
+          });
+          for (const e of linked) {
+            links.push({ a: nid, b: `e:${e.eid}`, kind: "pattern", weight: Math.min(1, e.count / 50) });
+          }
+        }
+      }
+    }
     // Semantic edges — FAISS event↔event, dedup undirected pairs
-    if (graphMode !== "entity" && sim?.events) {
+    if ((graphMode === "semantic" || graphMode === "all") && sim?.events) {
       const seen = new Set();
       for (const ev of events) {
         const ns = sim.events[ev.id]?.neighbors || [];
@@ -140,7 +191,7 @@ export default function NetworkView({ events, onSelect }) {
       }
     }
     return { nodes, links };
-  }, [events, activeKinds, graphMode, sim, minCos]);
+  }, [events, activeEntityKinds, activePatternKinds, graphMode, sim, minCos, patterns]);
 
   const positioned = useForceLayout(nodes, links, { width: size.w, height: size.h });
   const posIdx = useMemo(() => Object.fromEntries(positioned.map(n => [n.id, n])), [positioned]);
@@ -156,20 +207,39 @@ export default function NetworkView({ events, onSelect }) {
     return set;
   }, [focusedId, links]);
 
-  const toggleKind = k => {
-    const next = new Set(activeKinds);
+  const toggleEntityKind = k => {
+    const next = new Set(activeEntityKinds);
     next.has(k) ? next.delete(k) : next.add(k);
-    setActiveKinds(next);
+    setActiveEntityKinds(next);
+  };
+  const togglePatternKind = k => {
+    const next = new Set(activePatternKinds);
+    next.has(k) ? next.delete(k) : next.add(k);
+    setActivePatternKinds(next);
   };
 
   // Side panel info
   const focused = focusedId ? posIdx[focusedId]?.ref : null;
   const focusedKind = focusedId ? posIdx[focusedId]?.kind : null;
-  const focusedEvents = focusedKind && focusedKind !== "event" && focused
-    ? focused.events.map(id => events.find(e => e.id === id)).filter(Boolean)
-    : [];
+  const isPatternNode = focusedKind?.startsWith("pattern:");
+
+  // Events connected to a focused entity/pattern node
+  const focusedEvents = useMemo(() => {
+    if (!focused || focusedKind === "event") return [];
+    if (isPatternNode) {
+      // pull from links
+      const evIds = new Set();
+      for (const l of links) {
+        if (l.a === focusedId && l.b.startsWith("e:")) evIds.add(l.b.slice(2));
+        if (l.b === focusedId && l.a.startsWith("e:")) evIds.add(l.a.slice(2));
+      }
+      return events.filter(e => evIds.has(e.id));
+    }
+    return (focused.events || []).map(id => events.find(e => e.id === id)).filter(Boolean);
+  }, [focused, focusedKind, focusedId, isPatternNode, links, events]);
+
   const focusedEntities = focusedKind === "event" && focused
-    ? (EVENT_ENTITIES[focused.id] || []).filter(e => activeKinds.has(e.kind))
+    ? (EVENT_ENTITIES[focused.id] || []).filter(e => activeEntityKinds.has(e.kind))
     : [];
 
   return (
@@ -184,12 +254,13 @@ export default function NetworkView({ events, onSelect }) {
       </div>
 
       {/* Graph mode + semantic threshold */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="font-mono text-[9px] text-emerald-700 tracking-widest mr-1">MODE</span>
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        <span className="font-mono text-[9px] text-emerald-700 tracking-widest mr-1">EDGES</span>
         {[
           { id: "entity",   label: "ENTITY",   c: "#7CFFB2" },
+          { id: "patterns", label: "PATTERNS", c: "#FFD93D" },
           { id: "semantic", label: "SEMANTIC", c: "#82B6FF" },
-          { id: "both",     label: "BOTH",     c: "#FFD93D" },
+          { id: "all",      label: "ALL",      c: "#7CFFB2" },
         ].map(m => (
           <button key={m.id} onClick={() => setGraphMode(m.id)}
             style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)", borderColor: graphMode === m.id ? m.c : "#16382A", color: graphMode === m.id ? m.c : "#549A76" }}
@@ -197,32 +268,53 @@ export default function NetworkView({ events, onSelect }) {
             {m.label}
           </button>
         ))}
-        {graphMode !== "entity" && (
+        {(graphMode === "semantic" || graphMode === "all") && (
           <span className="font-mono text-[10px] text-emerald-700 ml-3 flex items-center gap-2">
-            <span className="tracking-widest text-[9px]">EDGE THRESHOLD cos ≥</span>
-            <input type="range" min="0.30" max="0.85" step="0.05" value={minCos}
+            <span className="tracking-widest text-[9px]">SIM ≥</span>
+            <input type="range" min="0.40" max="0.85" step="0.05" value={minCos}
               onChange={(e) => setMinCos(Number(e.target.value))}
-              className="accent-cyan-400 w-32" />
+              className="accent-cyan-400 w-24" />
             <span className="text-cyan-400 tabular-nums">{minCos.toFixed(2)}</span>
           </span>
         )}
       </div>
 
-      {/* Kind filters */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        {KIND_FILTERS.map(k => {
-          const meta = ENTITY_KIND[k];
-          const active = activeKinds.has(k);
-          return (
-            <button key={k} onClick={() => toggleKind(k)}
-              className={`px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-all ${
-                active ? "border-current" : "border-emerald-900/50 opacity-30"}`}
-              style={{ color: meta.color }}>
-              {meta.glyph} {meta.label}
-            </button>
-          );
-        })}
+      {/* Kind filters — entities + patterns side by side */}
+      <div className="flex flex-wrap gap-x-3 gap-y-2 mb-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">ENT</span>
+          {ENTITY_KIND_FILTERS.map(k => {
+            const meta = ENTITY_KIND[k];
+            const active = activeEntityKinds.has(k);
+            return (
+              <button key={k} onClick={() => toggleEntityKind(k)}
+                className={`px-2 py-0.5 rounded-sm border font-mono text-[10px] tracking-wider transition-all ${
+                  active ? "border-current" : "border-emerald-900/50 opacity-30"}`}
+                style={{ color: meta.color }}>
+                {meta.glyph} {meta.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">PAT</span>
+          {PATTERN_KIND_FILTERS.map(k => {
+            const meta = PATTERN_KIND_STYLE[k];
+            const active = activePatternKinds.has(k);
+            return (
+              <button key={k} onClick={() => togglePatternKind(k)}
+                className={`px-2 py-0.5 rounded-sm border font-mono text-[10px] tracking-wider transition-all ${
+                  active ? "border-current" : "border-emerald-900/50 opacity-30"}`}
+                style={{ color: meta.color }}>
+                {meta.glyph} {meta.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Source legend — event color encoding key */}
+      <div className="mb-3"><SourceLegend /></div>
 
       <div className="grid lg:grid-cols-[1fr,320px] gap-4">
         <div className="border border-emerald-700/40 bg-black/40 rounded-sm relative overflow-hidden">
@@ -232,12 +324,15 @@ export default function NetworkView({ events, onSelect }) {
               const a = posIdx[l.a], b = posIdx[l.b];
               if (!a || !b) return null;
               const dim = focusedId && !(adjacent.has(l.a) && adjacent.has(l.b));
-              // Semantic edges: cyan, width + opacity scale with cosine.
-              // Entity edges: emerald, uniform.
-              const isSem = l.kind === "semantic";
-              const stroke = isSem ? "#82B6FF" : "#7CFFB2";
-              const width = isSem ? Math.max(0.4, (l.weight - 0.4) * 4) : 0.8;
-              const baseOp = isSem ? Math.min(0.7, l.weight * 0.7) : 0.45;
+              const isSem  = l.kind === "semantic";
+              const isPat  = l.kind === "pattern";
+              const stroke = isSem ? "#82B6FF" : isPat ? "#FFD93D" : "#7CFFB2";
+              const width  = isSem ? Math.max(0.4, (l.weight - 0.4) * 4)
+                           : isPat ? Math.max(0.4, l.weight * 1.6)
+                           : 0.8;
+              const baseOp = isSem ? Math.min(0.7, l.weight * 0.7)
+                           : isPat ? Math.min(0.55, 0.25 + l.weight * 0.4)
+                           : 0.45;
               return (
                 <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
                   stroke={dim ? "#0f3a2c" : stroke}
@@ -248,9 +343,30 @@ export default function NetworkView({ events, onSelect }) {
             {/* Nodes */}
             {positioned.map(n => {
               const isEvent = n.kind === "event";
+              const isPattern = n.kind?.startsWith("pattern:");
               const dim = focusedId && !adjacent.has(n.id);
-              const fill = isEvent ? (AGENCY_COLORS[n.ref.agency] || "#7CFFB2") : ENTITY_KIND[n.kind].color;
-              const r = isEvent ? (n.ref.flag === "anchor" ? 7 : 5) : 4;
+
+              // Event node: color by dominant best_source, size by chars
+              // (log-scaled), ring if any pages need review.
+              let fill, r, reviewRing = false;
+              if (isEvent) {
+                const ev = n.ref;
+                const stat = byEvent?.[ev.id];
+                const src = stat?.dominantBest;
+                fill = src ? sourceStyle(src).hex : (AGENCY_COLORS[ev.agency] || "#7CFFB2");
+                const chars = stat?.chars || 0;
+                // 4–10 px; log scale so a 200k-char event isn't 30x bigger than a 2k one.
+                r = Math.max(4, Math.min(10, 3 + Math.log10(Math.max(1, chars / 200))));
+                if (ev.flag === "anchor") r = Math.max(r, 7.5);
+                reviewRing = (stat?.needsReview || 0) > 0;
+              } else if (isPattern) {
+                const pk = n.kind.split(":")[1];
+                fill = PATTERN_KIND_STYLE[pk]?.color || "#FFD93D";
+                r = 4 + Math.min(3, Math.log10(Math.max(1, n.ref.docCount || 1)));
+              } else {
+                fill = ENTITY_KIND[n.kind]?.color || "#7CFFB2";
+                r = 4;
+              }
               return (
                 <g key={n.id}
                   onMouseEnter={() => setHover(n.id)}
@@ -260,6 +376,11 @@ export default function NetworkView({ events, onSelect }) {
                   <circle cx={n.x} cy={n.y} r={r+4} fill={fill} opacity={isEvent ? 0.15 : 0.1} />
                   <circle cx={n.x} cy={n.y} r={r} fill={fill} stroke={isEvent ? "#020806" : "transparent"} strokeWidth={isEvent ? 1 : 0} />
                   {(isEvent && n.ref.flag === "anchor") && <circle cx={n.x} cy={n.y} r={r+2} fill="none" stroke={fill} strokeWidth="0.5" />}
+                  {/* Review ring — amber dashed outline when this event has
+                      pages needing human review. Loud on purpose. */}
+                  {isEvent && reviewRing && (
+                    <circle cx={n.x} cy={n.y} r={r+2.5} fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2 2" opacity="0.85" />
+                  )}
                   {focusedId === n.id && (
                     <text x={n.x + r + 4} y={n.y + 3} fill={fill} fontSize="10" fontFamily="monospace" pointerEvents="none">
                       {isEvent ? n.ref.title.slice(0, 36) : n.ref.name}
@@ -274,16 +395,58 @@ export default function NetworkView({ events, onSelect }) {
         {/* Side panel */}
         <aside className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 min-h-[280px]">
           {!focused && (
-            <div className="font-mono text-[11px] text-emerald-700 leading-relaxed">
-              <div className="text-amber-400 tracking-wider mb-2">▌ HOW TO READ</div>
-              Each <span className="text-emerald-300">circle</span> is an event or entity. Edges connect entities to the events that reference them. Hover to highlight, click an entity to pin, click an event to open its dossier. Toggle kinds above to peel back layers.
-              <div className="mt-3 text-emerald-600">The cluster you see in the middle is what the corpus actually <span className="text-amber-400">connects through</span> — the names that recur, the morphologies that reappear, the commands that file the same kinds of reports.</div>
+            <div className="font-mono text-[11px] text-emerald-700 leading-relaxed space-y-3">
+              <div>
+                <div className="text-amber-400 tracking-wider mb-1">▌ HOW TO READ</div>
+                Each circle is an <span className="text-emerald-300">event</span>, hand-curated <span className="text-emerald-300">entity</span>, or text-mined <span style={{color: "#FFD93D"}}>pattern</span> (shape, behavior, sensor). Hover to highlight; click an event to open its dossier.
+              </div>
+              <div className="border-t border-emerald-900/40 pt-2">
+                <div className="text-emerald-700 tracking-wider mb-1 text-[10px]">▌ EVENT NODES</div>
+                <div className="text-emerald-700 text-[10px]">
+                  Colored by <span className="text-emerald-300">dominant best source</span>. Sized by char count (log scale). <span className="text-amber-300">Amber dashed ring</span> = pages need human review.
+                </div>
+              </div>
+              {patterns?.byKind && (
+                <div className="border-t border-emerald-900/40 pt-2">
+                  <div className="text-emerald-700 tracking-wider mb-2 text-[10px]">▌ TOP PATTERNS</div>
+                  {PATTERN_KIND_FILTERS.map(pk => (
+                    <div key={pk} className="mb-1.5">
+                      <div className="text-[9px] tracking-widest" style={{color: PATTERN_KIND_STYLE[pk].color}}>
+                        {PATTERN_KIND_STYLE[pk].glyph} {PATTERN_KIND_STYLE[pk].label}
+                      </div>
+                      <div className="text-emerald-700 text-[10px] mt-0.5">
+                        {(patterns.byKind[pk] || []).slice(0, 5).map(r => (
+                          <span key={r.term} className="mr-2"><span className="text-emerald-300">{r.term}</span><span className="opacity-50">·{r.docCount}d</span></span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {focused && focusedKind === "event" && (
             <div>
               <div className="font-mono text-[9px] tracking-widest text-amber-400 mb-1">▌ EVENT</div>
-              <div className="font-mono text-emerald-100 text-sm leading-tight mb-2">{focused.title}</div>
+              <div className="font-mono text-emerald-100 text-sm leading-tight mb-1">{focused.title}</div>
+              {(() => {
+                const stat = byEvent?.[focused.id];
+                if (!stat) return null;
+                return (
+                  <div className="font-mono text-[10px] text-emerald-700 mb-2 flex items-center gap-1.5 flex-wrap">
+                    {stat.sources.map(s => (
+                      <span key={s} className={`inline-flex items-center gap-1 ${sourceStyle(s).text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${sourceStyle(s).dot}`} />{sourceStyle(s).label}
+                      </span>
+                    ))}
+                    <span className="opacity-50">·</span>
+                    <span>{stat.pages}p</span>
+                    <span className="opacity-50">·</span>
+                    <span>{(stat.chars/1000).toFixed(0)}K</span>
+                    {stat.needsReview > 0 && <span className="text-amber-300">· {stat.needsReview} need review</span>}
+                  </div>
+                );
+              })()}
               <button onClick={() => onSelect(focused)} className="font-mono text-[10px] text-amber-300 hover:text-amber-100 mb-3">→ OPEN DOSSIER</button>
               <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-2">▌ CONNECTS THROUGH ({focusedEntities.length})</div>
               <div className="space-y-1">
@@ -296,7 +459,22 @@ export default function NetworkView({ events, onSelect }) {
               </div>
             </div>
           )}
-          {focused && focusedKind && focusedKind !== "event" && (
+          {focused && isPatternNode && (
+            <div>
+              <div className="font-mono text-[9px] tracking-widest mb-1" style={{ color: PATTERN_KIND_STYLE[focusedKind.split(":")[1]].color }}>
+                ▌ {PATTERN_KIND_STYLE[focusedKind.split(":")[1]].label}
+              </div>
+              <div className="font-mono text-emerald-100 text-base leading-tight mb-1">{focused.name}</div>
+              <div className="font-mono text-[10px] text-emerald-700 mb-3">
+                in {focused.docCount} events · {focused.total?.toLocaleString()} total mentions
+              </div>
+              <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-2">▌ APPEARS IN ({focusedEvents.length})</div>
+              <div className="space-y-1.5">
+                {focusedEvents.map(ev => <MiniChip key={ev.id} event={ev} onClick={onSelect} />)}
+              </div>
+            </div>
+          )}
+          {focused && focusedKind && focusedKind !== "event" && !isPatternNode && (
             <div>
               <div className="font-mono text-[9px] tracking-widest mb-1" style={{ color: ENTITY_KIND[focusedKind].color }}>
                 ▌ {ENTITY_KIND[focusedKind].label}

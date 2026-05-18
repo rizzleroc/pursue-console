@@ -3,7 +3,7 @@
   "page": 8,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-18T02:14:53.200Z",
+    "computed_at": "2026-05-18T06:18:07.951Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
