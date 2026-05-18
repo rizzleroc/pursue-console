@@ -135,6 +135,7 @@ export class ChatGPTDriver {
           '[data-testid="file-attachment"]',
           '[data-testid^="file-attachment"]',
           'button[aria-label*="Remove attachment"]',
+          'button[aria-label*="Remove file"]',   // ChatGPT UI ≥ May 2026: "Remove file N: name.png"
           'div[aria-label*="attachment"]',
         ];
         for (const s of sels) {
