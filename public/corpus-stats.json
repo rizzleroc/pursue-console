@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-18T20:21:21.980Z",
+  "generatedAt": "2026-05-18T20:45:24.553Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -23,7 +23,7 @@
     "vision": 3372,
     "ocrOnly": 4,
     "visualsAnnotated": 309,
-    "totalChars": 7001448
+    "totalChars": 7001332
   },
   "bySource": {
     "gemini": 3370,
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-18T20:21:21.980Z",
+      "ts": "2026-05-18T20:45:24.553Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1720,
+      "duration_ms": 1146,
       "note": "events=121 inventory=173 contributions=18"
     },
     "recent": [
+      {
+        "ts": "2026-05-18T20:45:24.553Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1146,
+        "note": "events=121 inventory=173 contributions=18"
+      },
       {
         "ts": "2026-05-18T20:21:21.980Z",
         "kind": "db-rebuild",
@@ -119,13 +126,6 @@
         "outcome": "ok",
         "duration_ms": 1028,
         "note": "events=121 inventory=173 contributions=18"
-      },
-      {
-        "ts": "2026-05-18T01:49:04.446Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 927,
-        "note": "events=121 inventory=162 contributions=18"
       }
     ]
   },
@@ -135,10 +135,10 @@
     "partialOcrNeedsVision": 2
   },
   "review": {
-    "pagesNeedingReview": 19,
-    "pagesHighConfidence": 370,
+    "pagesNeedingReview": 22,
+    "pagesHighConfidence": 367,
     "pagesMediumConfidence": 36,
-    "pagesLowConfidence": 19,
+    "pagesLowConfidence": 22,
     "topEventsByReviewQueue": [
       {
         "event_id": "1949-discs",
@@ -146,7 +146,7 @@
       },
       {
         "event_id": "incident-summaries",
-        "n": 2
+        "n": 4
       },
       {
         "event_id": "krasuski-1944",
@@ -159,10 +159,14 @@
       {
         "event_id": "general-1948",
         "n": 1
+      },
+      {
+        "event_id": "netherlands-1948",
+        "n": 1
       }
     ],
-    "reevaluated": 3,
-    "resolvedByPromptStandard": 3,
+    "reevaluated": 0,
+    "resolvedByPromptStandard": 0,
     "pageIntrinsicDisputes": 0,
     "partialImprovementByReeval": 0
   },
@@ -529,14 +533,14 @@
     },
     "incident-summaries": {
       "pages": 209,
-      "chars": 228786,
+      "chars": 228771,
       "sources": [
         "gemini",
         "gpt-vision",
         "ocr"
       ],
       "dominantBest": "gpt-vision",
-      "needsReview": 2
+      "needsReview": 4
     },
     "indopacom-april-2025": {
       "pages": 2,
@@ -633,14 +637,14 @@
     },
     "netherlands-1948": {
       "pages": 7,
-      "chars": 9141,
+      "chars": 9040,
       "sources": [
         "gemini",
         "gpt-vision",
         "ocr"
       ],
       "dominantBest": "gpt-vision",
-      "needsReview": 0
+      "needsReview": 1
     },
     "papua-1985": {
       "pages": 3,

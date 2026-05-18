@@ -28,6 +28,7 @@ import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { ChatGPTDriver } from "./chatgpt-driver.mjs";
+import { GeminiDriver }  from "./gemini-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -57,15 +58,25 @@ async function loadToken() {
 }
 const TOKEN = await loadToken();
 
-const driver = new ChatGPTDriver({ cdpPort: CDP_PORT });
-
-// Single-slot serial queue — only one ChatGPT round-trip at a time.
-let queue = Promise.resolve();
-function enqueue(fn) {
-  const next = queue.then(fn, fn);
-  // Don't propagate rejections to the head of the queue.
-  queue = next.catch(() => {});
+// Two driver instances, two single-slot queues — one per provider. That
+// way a /fanout-style "send to both at the same time" call can really
+// run in parallel (different browser tabs, different network paths).
+const drivers = {
+  chatgpt: new ChatGPTDriver({ cdpPort: CDP_PORT }),
+  gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
+};
+const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve() };
+function enqueue(provider, fn) {
+  const cur = queues[provider] ?? Promise.resolve();
+  const next = cur.then(fn, fn);
+  queues[provider] = next.catch(() => {});
   return next;
+}
+function normalizeProvider(p) {
+  const v = (p || "chatgpt").toLowerCase();
+  if (v === "openai" || v === "gpt" || v === "chatgpt") return "chatgpt";
+  if (v === "gemini" || v === "google" || v === "bard") return "gemini";
+  throw new Error(`unknown provider: ${p}`);
 }
 
 function sendJson(res, status, body) {
@@ -105,9 +116,10 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         port: PORT,
         cdpPort: CDP_PORT,
-        connected: driver.isConnected(),
-        queueDepth: driver.pendingCount() + (queue ? 1 : 0),
-        history: driver.callCount,
+        providers: {
+          chatgpt: { connected: drivers.chatgpt.isConnected(), history: drivers.chatgpt.callCount },
+          gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
+        },
       });
     }
     if (req.method === "POST" && req.url === "/chat-with-files") {
@@ -116,20 +128,54 @@ const server = http.createServer(async (req, res) => {
       if (!Array.isArray(filePaths) || !filePaths.length || !prompt) {
         return sendJson(res, 400, { error: "filePaths[] (non-empty) + prompt required" });
       }
+      let provider;
+      try { provider = normalizeProvider(body.provider); }
+      catch (e) { return sendJson(res, 400, { error: e.message }); }
       let validated;
       try { validated = filePaths.map(jailPath); }
       catch (e) { return sendJson(res, 403, { error: e.message }); }
       const t0 = Date.now();
-      enqueue(async () => {
+      enqueue(provider, async () => {
         try {
-          const { text } = await driver.chatWithFiles({ filePaths: validated, prompt, timeoutMs, freshChat });
-          sendJson(res, 200, { text, durationMs: Date.now() - t0, fileCount: validated.length });
+          const { text } = await drivers[provider].chatWithFiles({ filePaths: validated, prompt, timeoutMs, freshChat });
+          sendJson(res, 200, { provider, text, durationMs: Date.now() - t0, fileCount: validated.length });
         } catch (e) {
-          console.error(`[/chat-with-files] ${e.message}`);
-          sendJson(res, 500, { error: e.message });
+          console.error(`[/chat-with-files ${provider}] ${e.message}`);
+          sendJson(res, 500, { provider, error: e.message });
         }
       });
       return;
+    }
+
+    // /fanout — send the SAME prompt + files to BOTH providers in parallel
+    // and return both responses for side-by-side comparison. The maintainer
+    // uses this for re-evaluating disputed pages with a standardized prompt.
+    if (req.method === "POST" && req.url === "/fanout") {
+      const body = await readBody(req);
+      const { filePaths, prompt, timeoutMs, freshChat = true } = body;
+      if (!Array.isArray(filePaths) || !filePaths.length || !prompt) {
+        return sendJson(res, 400, { error: "filePaths[] (non-empty) + prompt required" });
+      }
+      const requested = Array.isArray(body.providers) && body.providers.length
+        ? body.providers.map(normalizeProvider)
+        : ["chatgpt", "gemini"];
+      let validated;
+      try { validated = filePaths.map(jailPath); }
+      catch (e) { return sendJson(res, 403, { error: e.message }); }
+      const t0 = Date.now();
+      const results = await Promise.all(requested.map(provider => new Promise(resolve => {
+        const pt0 = Date.now();
+        enqueue(provider, async () => {
+          try {
+            const { text } = await drivers[provider].chatWithFiles({ filePaths: validated, prompt, timeoutMs, freshChat });
+            resolve({ provider, ok: true, text, durationMs: Date.now() - pt0 });
+          } catch (e) {
+            console.error(`[/fanout ${provider}] ${e.message}`);
+            resolve({ provider, ok: false, error: e.message, durationMs: Date.now() - pt0 });
+          }
+        });
+      })));
+      return sendJson(res, 200, { results, totalDurationMs: Date.now() - t0 });
     }
     sendJson(res, 404, { error: "not found" });
   } catch (e) {

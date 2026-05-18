@@ -1,0 +1,25 @@
+{
+  "eventId": "incident-summaries",
+  "page": 8,
+  "best": "gpt-vision",
+  "comparison": {
+    "computed_at": "2026-05-18T20:45:23.506Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.043,
+    "pairs": [
+      {
+        "a": "gpt-vision",
+        "b": "gemini",
+        "score": 0.043
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gpt-vision": "CONFIDENTIAL\nCHECK-LIST - UNIDENTIFIED FLYING OBJECTS\n\n\nDate  8 July 1947                                      Incident #    2.\n\n\nTime  Approximately noon\n\n\nLocation Muroc Army Air Field, Muroc, California.\n\n\nName of observer Major Richard R. Shoop\n\n\nOccupation of observer Employed in Office of Chief of Tech. Engineering Div\nMajor -\n\n\nAddress of observer Muroc Army Air Field, Muroc, California.\n\n\nPlace of observation Ground\n\n\nNumber of objects One (1)\n\n\nDistance of object from observer  Five (5) to eight (8) miles.\n\n\nTime in sight  Eight (8) minutes\n\n\nAltitude fairly high altitude\n\n\nSpeed slowly\n\n\nDirection of flight North\nThe object moved from an intermediate altitude in an oscillating\n\n\nTactics fashion, almost to the surface of the ground and then started\nclimbing again.\n\n\nSound  not stated\n\n\nSize pursuit airplane\n\n\nColor aluminum colored surface\n\n\nShape unconventional shape\n\n\nOdor detected  not stated\n\n\nApparent construction  apparently metallic\n\n\nExhaust trails  not stated\n\n\nWeather conditions  not stated\n\n\nEffect on clouds  not stated\n\n\nSketches or photographs  none\n\n\nManner of disappearance  moved off slowly in the distance\n\n\nRemarks:  At approximately noon on 8 Jul 1947, Major Shoops, at the\nattention of Col. Gilkey observed five (5) to eight (8) miles to the north\nwhat appeared to be a thin metallic object. It appeared to be metallic\nbecause the method in which it was flying the sun was reflected from an\napparently aluminium colored surface.\n\n\n7",
+    "gemini": "CONFIDENTIAL\n\nCHECK-LIST - UNIDENTIFIED FLYING OBJECTS\n"
+  }
+}

@@ -10,9 +10,13 @@
 //
 // Options:
 //     --my-handle=<handle>         GitHub handle (no @, used for path + PR author)
+//     --provider=chatgpt|gemini    Vision model (default chatgpt). Writes to
+//                                  contributions/<handle>/gpt-vision/  or
+//                                  contributions/<handle>/gemini/        accordingly.
+//                                  Requires the matching tab logged-in in your Chrome.
 //     --slice=20                   Max pages to claim this run (default 20)
 //     --eid=<event-id>             Restrict to a single event (else picks deterministically)
-//     --batch-pages=4              Pages per ChatGPT batch (default 4)
+//     --batch-pages=4              Pages per batch (default 4)
 //     --daemon=http://127.0.0.1:9223   pursue-vision-mcp address
 //     --token-file=~/.pursue-vision-token
 //     --queue-url=https://rizzleroc.github.io/pursue-console/work-available.json
@@ -65,11 +69,18 @@ const NO_PR = !!args["no-pr"];
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volunteer"));
-// Volunteer flow writes through ChatGPT vision via the MCP daemon — so
-// the source of every page this script produces is `gpt-vision`, NOT
-// `human`. The `human` slot in the corpus is reserved for transcriptions
-// that someone literally typed word-for-word; see HOW-CAN-I-HELP.md.
-const CONTRIB_SOURCE = "gpt-vision";
+// Provider (--provider=chatgpt|gemini, default chatgpt). The MCP daemon
+// routes the request to the matching driver. The `<source>` segment of
+// the contribution path is the same string the corpus uses (gpt-vision
+// for chatgpt, gemini for gemini), so a re-run on the other provider
+// adds a second source to the same page rather than overwriting it.
+const PROVIDER = (args.provider || "chatgpt").toLowerCase();
+const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini" };
+const CONTRIB_SOURCE = PROVIDER_TO_SOURCE[PROVIDER];
+if (!CONTRIB_SOURCE) {
+  console.error(`error: --provider must be 'chatgpt' or 'gemini' (got '${PROVIDER}')`);
+  process.exit(1);
+}
 const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);
 const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/, os.homedir());
 
@@ -281,7 +292,7 @@ async function callDaemon(filePaths) {
   const r = await fetch(`${DAEMON}/chat-with-files`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
-    body: JSON.stringify({ filePaths, prompt, freshChat: true, timeoutMs: 600_000 }),
+    body: JSON.stringify({ provider: PROVIDER, filePaths, prompt, freshChat: true, timeoutMs: 600_000 }),
   });
   if (!r.ok) throw new Error(`daemon HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
   const j = await r.json();

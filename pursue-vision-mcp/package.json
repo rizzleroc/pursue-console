@@ -1,10 +1,10 @@
 {
   "name": "pursue-vision-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "license": "MIT",
   "type": "module",
-  "description": "Minimal daemon that drives an already-logged-in ChatGPT browser tab to OCR pages of documents. Drop-in compatible with the pursue-console vision-OCR pipeline.",
+  "description": "Minimal daemon that drives already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents. Drop-in compatible with the pursue-console vision-OCR pipeline; supports /chat-with-files (one provider) and /fanout (both in parallel).",
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node start.mjs",
