@@ -73,7 +73,10 @@ export default function App() {
       <ScanlineOverlay />
 
       <div className="relative z-10">
-        <Header view={view} onViewChange={handleViewChange} onVolunteer={() => setVolunteerOpen(true)} />
+        <Header
+          view={view} onViewChange={handleViewChange}
+          query={query} onSearch={setQuery}
+          onVolunteer={() => setVolunteerOpen(true)} />
         {!showHero && <CorpusFreshness compact />}
 
         <main>

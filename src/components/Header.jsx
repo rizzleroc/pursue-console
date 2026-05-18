@@ -26,7 +26,7 @@ function loadStats() {
   return _statsP;
 }
 
-export default function Header({ view, onViewChange, onVolunteer }) {
+export default function Header({ view, onViewChange, onVolunteer, query, onSearch }) {
   const [stats, setStats] = useState(null);
   useEffect(() => { loadStats().then(setStats); }, []);
 
@@ -53,12 +53,25 @@ export default function Header({ view, onViewChange, onVolunteer }) {
             </span>
           )}
         </button>
-        <button
-          onClick={onVolunteer}
-          className="font-mono text-[11px] tracking-[0.2em] px-3 py-1 rounded-sm border border-amber-500/70 bg-amber-900/20 text-amber-200 hover:bg-amber-700/30 hover:border-amber-300 transition-colors"
-          title="Help transcribe a page">
-          + VOLUNTEER
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Top search — filters the EVENTS feed via App.filtered. Lightweight
+              substring match against title/summary/loc/agency/tags; SEARCH and
+              SEMANTIC tabs do the heavier full-text + dense work. */}
+          {onSearch && (
+            <input
+              value={query || ""}
+              onChange={(e) => onSearch(e.target.value)}
+              placeholder="› grep corpus"
+              aria-label="Filter events"
+              className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 placeholder-emerald-800 font-mono text-xs w-36 sm:w-56 focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
+          )}
+          <button
+            onClick={onVolunteer}
+            className="font-mono text-[11px] tracking-[0.2em] px-3 py-1 rounded-sm border border-amber-500/70 bg-amber-900/20 text-amber-200 hover:bg-amber-700/30 hover:border-amber-300 transition-colors"
+            title="Help transcribe a page">
+            + VOLUNTEER
+          </button>
+        </div>
       </div>
 
       {/* primary nav */}
