@@ -96,12 +96,25 @@ npm run volunteer -- --my-handle=YOUR_NAME --slice=20`}
             </div>
           </div>
 
-          <div className="border border-cyan-800/50 bg-cyan-900/10 rounded-sm p-3">
-            <div className="font-mono text-[10px] tracking-[0.25em] text-cyan-400 mb-1">PRIORITY 3 · NEXT PHASE — PROCESS BEING DEFINED</div>
+          <div className="border border-cyan-700/60 bg-cyan-900/10 rounded-sm p-3">
+            <div className="font-mono text-[10px] tracking-[0.25em] text-cyan-300 mb-1">PRIORITY 3 · OPEN NOW</div>
             <div className="font-mono text-emerald-100 text-[12px]">Screenshot the visuals + context</div>
-            <div className="font-mono text-emerald-500 text-[11px] mt-1">
-              For pages containing photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams: capture the page image, identify the article / paragraph it belongs to, and return both with the surrounding context (the text that introduces the image, or the article it appears within). A claim-and-submit volunteer flow opens once the process is scoped.
+            <div className="font-mono text-emerald-400 text-[11px] mt-1">
+              For pages with photographs, hand-drawings, newspaper clippings, maps, or diagrams: capture the page image and write the documentary context (verbatim quotes from the surrounding pages). Two-phase: claim → fill template → commit.
             </div>
+            <pre className="bg-black/60 border border-cyan-900/50 rounded-sm p-3 text-cyan-200 text-[11px] overflow-x-auto mt-2">
+{`# Claim 5 pages → renders them locally + drops markdown templates
+node scripts/volunteer-media.mjs --my-handle=YOU --slice=5
+
+# Fill in Title / Context per page in ~/.pursue-helper/media-staging/
+# Then:
+node scripts/volunteer-media.mjs --my-handle=YOU --commit`}
+            </pre>
+            <a href="https://github.com/rizzleroc/pursue-console/blob/main/VISUAL-EXTRACTION-PROCESS.md"
+               target="_blank" rel="noreferrer"
+               className="inline-block font-mono text-[10px] tracking-widest text-cyan-400 hover:text-cyan-200 underline underline-offset-2 mt-2">
+              full visual-extraction spec →
+            </a>
           </div>
           <p className="text-emerald-700 text-[10px] font-mono">
             Every contribution gets credited to your handle in the corpus DB. You stay in your own GitHub account; no central server holds your work.

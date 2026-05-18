@@ -39,6 +39,7 @@
     "corpus:version": "node scripts/build-corpus-version.mjs",
     "corpus:rebuild": "npm run corpus:texts && npm run corpus:embed && npm run corpus:similarity && npm run corpus:extracts && npm run corpus:patterns && npm run corpus:workqueue && npm run corpus:feed && npm run corpus:version",
     "volunteer": "node scripts/volunteer.mjs",
+    "volunteer:media": "node scripts/volunteer-media.mjs",
     "contrib:validate": "node scripts/validate-contribution.mjs",
     "contrib:validate:semantic": "python scripts/validate-contribution-semantic.py",
     "contrib:validate:all": "npm run contrib:validate && npm run contrib:validate:semantic"

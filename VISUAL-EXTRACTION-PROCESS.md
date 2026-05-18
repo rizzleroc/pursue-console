@@ -1,7 +1,7 @@
 # Visual Extraction — Process Spec
 
-> **Status:** PROCESS BEING DEFINED · volunteer flow not yet open.
-> Until this is finalized, please help with [the REVIEW queue](https://rizzleroc.github.io/pursue-console/) first (disputed pages).
+> **Status:** OPEN NOW — `node scripts/volunteer-media.mjs --my-handle=YOU --slice=5`.
+> Please help with [the REVIEW queue](https://rizzleroc.github.io/pursue-console/) first (disputed pages) since those settle canonical text for the whole corpus. Then come back here.
 
 ## What this job is
 
@@ -79,18 +79,35 @@ The image lives next to the JSON at `p<NNNN>.jpg`.
 - **Pick the most specific kind.** A hand-drawn map is `hand-drawing`, not `map`, if the page caption calls it a "sketch by witness."
 - **Mark unreadable text** in any transcription block as `[illegible]`, same convention as text-only transcription.
 
-## What's blocking the volunteer flow opening
+## Pipeline status
+
+All five blockers are landed:
 
 | Block | Status |
 |---|---|
-| Page classifier identifies which pages have visuals | ✓ working (maintainer batch in progress) |
-| `contributions/<handle>/media/<eid>/` path convention in the importer | not yet |
-| Validator gate for media submissions (schema, image present, image readable) | not yet |
-| Claim API — work-available.json publishes a `visualsNeedingContext` array | not yet |
-| Per-page context-capture UI in the volunteer flow | not yet |
+| Page classifier identifies which pages have visuals | ✓ `scripts/classify-visuals.mjs` |
+| `contributions/<handle>/media/<eid>/` importer | ✓ `scripts/import-contributions.mjs` (media branch) |
+| Validator gate for media submissions | ✓ `scripts/validate-contribution.mjs` (`validateMediaItem`) |
+| Claim API — `work-available.json` publishes `visualsNeedingContext` | ✓ `scripts/build-work-available.mjs` |
+| Per-page context-capture flow | ✓ `scripts/volunteer-media.mjs` (claim / fill template / commit) |
 
-When all five are in place, the +VOLUNTEER button gets a new Path C: **Image extraction + context capture**.
+The volunteer two-phase flow:
+
+```bash
+# 1. CLAIM — picks N pages off the queue, downloads the PDFs,
+#    renders each page as a JPEG, drops a markdown template alongside.
+node scripts/volunteer-media.mjs --my-handle=YOU --slice=5
+# Templates land in ~/.pursue-helper/media-staging/YOU/<eid>/
+
+# 2. (You fill in Title / Context / (Article text) in each p<NNN>.md)
+
+# 3. COMMIT — parses your templates, writes the canonical
+#    contributions/<handle>/media/<eid>/p<NNN>.{json,jpg}, opens a PR.
+node scripts/volunteer-media.mjs --my-handle=YOU --commit
+```
+
+Validator runs automatically on every PR (CI: `validate-contribution.yml`). Verdicts post as a PR comment.
 
 ---
 
-Until then: please help with [the REVIEW queue](https://rizzleroc.github.io/pursue-console/) or [transcribe new pages](HOW-CAN-I-HELP.md) first. Both are open now.
+Order of priorities for new helpers: settle the [REVIEW queue](https://rizzleroc.github.io/pursue-console/) first, transcribe new pages (`npm run volunteer`), then this.

@@ -118,16 +118,16 @@ export default function HelpView({ onViewChange }) {
           action={{ label: "QUICKSTART ↓", onClick: () => document.getElementById("quickstart")?.scrollIntoView({ behavior: "smooth" }) }}
         />
 
-        {/* Priority 3 — Image extraction (coming) */}
+        {/* Priority 3 — Image + context capture (now open) */}
         <PriorityCard
           rank="3"
-          status="NEXT PHASE · PROCESS BEING DEFINED"
+          status="OPEN NOW"
           color="cyan"
-          count="—"
-          unit="IMAGES TO EXTRACT"
+          count={queue?.totalPagesNeedingVisualContext ?? "—"}
+          unit="VISUALS NEED CONTEXT"
           title="Screenshot the visuals + context"
-          body={<>For pages containing photographs, sketches, newspaper clippings, maps, or diagrams: capture the page as an image, identify the article/paragraph it belongs to, return both with the surrounding context. Volunteer flow opens once the process is scoped.</>}
-          action={null}
+          body={<>For pages containing photographs, sketches, newspaper clippings, maps, or diagrams: capture the page image and write the documentary context (verbatim from the surrounding pages). Two-phase flow: claim → fill template → commit.</>}
+          action={{ label: "QUICKSTART ↓", onClick: () => document.getElementById("media-quickstart")?.scrollIntoView({ behavior: "smooth" }) }}
         />
       </div>
 
@@ -152,9 +152,31 @@ export default function HelpView({ onViewChange }) {
       </div>
 
       {/* ============ QUICK START ============ */}
-      <div id="quickstart" className="grid lg:grid-cols-2 gap-4 mb-6">
+      <div id="quickstart" className="grid lg:grid-cols-2 gap-4 mb-4">
         <QuickStart os="MACOS · LINUX" snippet={QUICKSTART_BASH} id="bash" copied={copied} onCopy={copy} />
         <QuickStart os="WINDOWS · POWERSHELL" snippet={QUICKSTART_PS} id="ps" copied={copied} onCopy={copy} />
+      </div>
+
+      {/* ============ MEDIA QUICK START (Priority 3) ============ */}
+      <div id="media-quickstart" className="mb-6 border border-cyan-800/50 bg-cyan-900/10 rounded-sm p-4">
+        <div className="font-mono text-[10px] tracking-[0.3em] text-cyan-300 mb-2">▌ PRIORITY 3 · IMAGE + CONTEXT CAPTURE</div>
+        <div className="font-mono text-emerald-300 text-[12px] mb-3 leading-relaxed">
+          Two-phase. The script renders the pages locally so you can read them while writing the context — no in-terminal typing of paragraphs.
+        </div>
+        <QuickStart os="CLAIM → FILL → COMMIT" id="media-cli" copied={copied} onCopy={copy} snippet={[
+          "# 1. Claim 5 pages (downloads PDFs, renders each page, drops a markdown template):",
+          `node scripts/volunteer-media.mjs --my-handle=YOUR_NAME --slice=5`,
+          "",
+          "# 2. Open ~/.pursue-helper/media-staging/YOUR_NAME/<eid>/",
+          "#    Each p<NNN>.jpg has a sibling p<NNN>.md — fill in Title / Context / (Article text).",
+          "#    Quote verbatim from the document; don't summarize.",
+          "",
+          "# 3. Commit + open a PR:",
+          `node scripts/volunteer-media.mjs --my-handle=YOUR_NAME --commit`,
+        ].join("\n")} />
+        <div className="font-mono text-[10px] text-cyan-700 mt-2">
+          Full spec: <a className="text-cyan-300 hover:text-cyan-100 underline-offset-2 hover:underline" href="https://github.com/rizzleroc/pursue-console/blob/main/VISUAL-EXTRACTION-PROCESS.md" target="_blank" rel="noreferrer">VISUAL-EXTRACTION-PROCESS.md</a>
+        </div>
       </div>
 
       {/* ============ THE WORK QUEUE ============ */}

@@ -78,10 +78,41 @@ async function reviewPagesForEvent(eid) {
   return out.sort((a, b) => a - b);
 }
 
+// Per-event visuals-needing-context queue. A page qualifies when the
+// classifier has tagged it non-text-only AND no human contributor has
+// supplied title+context yet (classifier still starts with "chatgpt"/
+// "gemini" — not "human:<handle>"). Each entry carries the kind so the
+// volunteer flow can present the right capture template.
+const VISUALS_DIR = path.join(ROOT, "data-raw", ".visuals");
+const VISIBLE_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
+async function visualsNeedingContextForEvent(eid) {
+  const dir = path.join(VISUALS_DIR, eid);
+  if (!existsSync(dir)) return [];
+  const out = [];
+  for (const f of await readdir(dir)) {
+    const m = f.match(/^p(\d+)\.json$/);
+    if (!m) continue;
+    try {
+      const sc = JSON.parse(await readFile(path.join(dir, f), "utf8"));
+      if (!VISIBLE_KINDS.has(sc.kind)) continue;
+      const classifier = sc.classifier || "";
+      if (classifier.startsWith("human:")) continue;  // already has human-curated context
+      out.push({
+        page: Number(m[1]),
+        kind: sc.kind,
+        suggestedTitle: sc.title || "",
+        suggestedDescription: sc.description || "",
+      });
+    } catch {}
+  }
+  return out.sort((a, b) => a.page - b.page);
+}
+
 const byEvent = {};
 let totalPagesNeeded = 0;
 let totalDocsRemaining = 0;
 let totalPagesNeedingReview = 0;
+let totalPagesNeedingVisualContext = 0;
 
 for (const ev of EVENTS) {
   // Only care about events whose source is OCR/mixed (i.e., scanned PDFs needing
@@ -102,9 +133,10 @@ for (const ev of EVENTS) {
   // "more OCR" — fixing one disputed page improves canonical quality
   // forever, vs adding one more sometimes-wrong machine pass.
   const reviewQueue = await reviewPagesForEvent(ev.id);
+  const visualsQueue = await visualsNeedingContextForEvent(ev.id);
 
-  // If a doc has no work AND no review queue, skip.
-  if (queue.length === 0 && reviewQueue.length === 0) continue;
+  // If a doc has no work AND no review queue AND no visuals queue, skip.
+  if (queue.length === 0 && reviewQueue.length === 0 && visualsQueue.length === 0) continue;
 
   byEvent[ev.id] = {
     title: ev.title,
@@ -115,11 +147,14 @@ for (const ev of EVENTS) {
     pagesCompleted: visionPages.size,
     pagesNeeded: queue.length,
     pagesNeedingReview: reviewQueue.length,
+    pagesNeedingVisualContext: visualsQueue.length,
     queue,
     reviewQueue,
+    visualsNeedingContext: visualsQueue,
   };
   totalPagesNeeded += queue.length;
   totalPagesNeedingReview += reviewQueue.length;
+  totalPagesNeedingVisualContext += visualsQueue.length;
   if (queue.length > 0) totalDocsRemaining++;
 }
 
@@ -128,6 +163,7 @@ const out = {
   totalPagesNeeded,
   totalDocsRemaining,
   totalPagesNeedingReview,
+  totalPagesNeedingVisualContext,
   inventoryTotal: 162,
   cataloguedTotal: EVENTS.length,
   byEvent,
@@ -136,7 +172,7 @@ const out = {
 await writeFile(OUT, JSON.stringify(out));
 const { stat } = await import("node:fs/promises");
 const sz = (await stat(OUT)).size;
-console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR · ${totalPagesNeedingReview} pages need human review`);
+console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR · ${totalPagesNeedingReview} pages need human review · ${totalPagesNeedingVisualContext} pages need visual context`);
 // Top 5 biggest remaining
 const top = Object.entries(byEvent).sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded).slice(0,5);
 for (const [eid, w] of top) {

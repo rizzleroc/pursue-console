@@ -57,6 +57,53 @@ await mkdir(VIS_CACHE, { recursive: true });
 // can be added here as their importers come online.
 const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
 
+// Media submissions live at contributions/<handle>/media/<eid>/p<NNN>.{jpg,json}
+// — image + context capture, NOT a text transcription. They land in
+// data-raw/.visuals/<eid>/p<NNN>.json with classifier="human:<handle>"
+// and the JPEG goes to public/media/<eid>/p<NNN>.jpg, identical layout
+// to what the classifier produces so the MEDIA view doesn't care which
+// path created the row.
+const MEDIA_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
+async function importMediaFolder(handle, eidDir) {
+  const eid = path.basename(eidDir);
+  const visualsDir = path.join(ROOT, "data-raw", ".visuals", eid);
+  const mediaDir = path.join(ROOT, "public", "media", eid);
+  await mkdir(visualsDir, { recursive: true });
+  await mkdir(mediaDir, { recursive: true });
+  const { copyFile } = await import("node:fs/promises");
+  let imported = 0, skipped = 0, badSchema = 0, missingImage = 0;
+  for (const f of await readdir(eidDir)) {
+    if (!/\.json$/i.test(f)) continue;
+    const pad4Match = f.match(/^p(\d+)\.json$/);
+    if (!pad4Match) { skipped++; continue; }
+    const pad4 = pad4Match[1].padStart(4, "0");
+    const pageNum = Number(pad4Match[1]);
+    const jsonPath = path.join(eidDir, f);
+    const jpgPath = path.join(eidDir, `p${pad4Match[1]}.jpg`);
+    const jpgPathAlt = path.join(eidDir, `p${pad4}.jpg`);
+    const realJpg = existsSync(jpgPath) ? jpgPath : (existsSync(jpgPathAlt) ? jpgPathAlt : null);
+    if (!realJpg) { missingImage++; continue; }
+    let meta;
+    try { meta = JSON.parse(await readFile(jsonPath, "utf8")); } catch { badSchema++; continue; }
+    if (!meta.kind || !MEDIA_KINDS.has(meta.kind)) { badSchema++; continue; }
+    if (!meta.title && !meta.context) { badSchema++; continue; }
+    // Write sidecar in the same shape the classifier produces.
+    const sidecar = {
+      kind: meta.kind,
+      title: String(meta.title || "").slice(0, 200),
+      description: String(meta.context || meta.description || "").slice(0, 1500),
+      article_text: meta.article_text ? String(meta.article_text) : undefined,
+      classifier: `human:${handle}`,
+      classifiedAt: meta.captured_at || new Date().toISOString(),
+      contributor: handle,
+    };
+    await writeFile(path.join(visualsDir, `p${pad4}.json`), JSON.stringify(sidecar, null, 2) + "\n", "utf8");
+    await copyFile(realJpg, path.join(mediaDir, `p${pad4}.jpg`));
+    imported++;
+  }
+  return { imported, skipped, badSchema, missingImage };
+}
+
 // Path convention: contributions/<handle>/<source>/<eid>/p<NNN>.txt
 //
 // Backward-compat: if a directory directly under <handle>/ is NOT one
@@ -74,6 +121,17 @@ for (const handleEnt of await listDirs(CONTRIB)) {
   // Build a flat list of (source, eid, srcDir) triples to import.
   const importTargets = [];
   for (const child of await listDirs(hDir)) {
+    if (child.name === "media") {
+      // <handle>/media/<eid>/p<NNN>.{jpg,json} — image + context job
+      const mediaRoot = path.join(hDir, child.name);
+      for (const eidEnt of await listDirs(mediaRoot)) {
+        const res = await importMediaFolder(handle, path.join(mediaRoot, eidEnt.name));
+        if (res.imported) console.log(`[import] media ${handle}/${eidEnt.name}: ${res.imported} imported${res.badSchema ? `, ${res.badSchema} bad-schema` : ""}${res.missingImage ? `, ${res.missingImage} missing-image` : ""}`);
+        stats.imported += res.imported;
+        stats.skipped_empty += res.skipped + res.badSchema + res.missingImage;
+      }
+      continue;
+    }
     if (KNOWN_SOURCES.has(child.name)) {
       // New shape: <handle>/<source>/<eid>/files
       const srcLabel = child.name;

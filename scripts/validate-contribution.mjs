@@ -94,6 +94,23 @@ async function collectContributions() {
     for (const child of await readdir(hdir)) {
       const childPath = path.join(hdir, child);
       if (!(await stat(childPath)).isDirectory()) continue;
+
+      // <handle>/media/<eid>/p<NNN>.{jpg,json} — image-extraction submissions
+      if (child === "media") {
+        for (const eid of await readdir(childPath)) {
+          const edir = path.join(childPath, eid);
+          if (!(await stat(edir)).isDirectory()) continue;
+          for (const f of await readdir(edir)) {
+            out.push({
+              handle, source: "media", eid, file: f, fullPath: path.join(edir, f),
+              relPath: `contributions/${handle}/media/${eid}/${f}`,
+              isMedia: true,
+            });
+          }
+        }
+        continue;
+      }
+
       if (KNOWN_SOURCES.has(child)) {
         const source = child;
         for (const eid of await readdir(childPath)) {
@@ -119,6 +136,57 @@ async function collectContributions() {
     }
   }
   return out;
+}
+
+// ---- Media submission validation (PR-side gate) ----
+// Schema: { kind ∈ MEDIA_KINDS, title (≤200), context (≤1500),
+//   article_text? (only for newspaper-clipping) }
+// Each .json must have a sibling .jpg of reasonable size (5KB–5MB).
+const MEDIA_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
+
+async function validateMediaItem(file) {
+  const issues = [];
+  const isJson = file.file.endsWith(".json");
+  const isJpg  = /\.(jpg|jpeg)$/i.test(file.file);
+  if (!isJson && !isJpg) {
+    issues.push(`unrecognized media file extension (expected .json or .jpg)`);
+    return issues;
+  }
+  if (isJpg) {
+    // Image-only entry: every .jpg must have a matching .json sibling.
+    const jsonSibling = file.fullPath.replace(/\.jpe?g$/i, ".json");
+    if (!existsSync(jsonSibling)) issues.push(`${file.relPath}: no matching .json sibling`);
+    try {
+      const sz = (await stat(file.fullPath)).size;
+      if (sz < 5_000)      issues.push(`${file.relPath}: image too small (${sz} bytes — likely empty/corrupt)`);
+      if (sz > 5_000_000)  issues.push(`${file.relPath}: image too large (${(sz/1e6).toFixed(1)} MB — please compress to <5MB JPEG)`);
+    } catch { issues.push(`${file.relPath}: cannot stat image`); }
+    return issues;
+  }
+  // JSON entry: schema + matching .jpg.
+  let meta;
+  try { meta = JSON.parse(await readFile(file.fullPath, "utf8")); }
+  catch (e) { return [`${file.relPath}: invalid JSON — ${e.message}`]; }
+  if (!meta.kind || !MEDIA_KINDS.has(meta.kind)) {
+    issues.push(`${file.relPath}: kind must be one of ${[...MEDIA_KINDS].join(", ")} (got "${meta.kind}")`);
+  }
+  if (!meta.title || meta.title.trim().length < 4) {
+    issues.push(`${file.relPath}: title is required (≥4 chars)`);
+  } else if (meta.title.length > 200) {
+    issues.push(`${file.relPath}: title too long (${meta.title.length} chars, max 200)`);
+  }
+  if (!meta.context || meta.context.trim().length < 20) {
+    issues.push(`${file.relPath}: context is required (≥20 chars — verbatim quote from preceding/following page)`);
+  } else if (meta.context.length > 1500) {
+    issues.push(`${file.relPath}: context too long (${meta.context.length} chars, max 1500)`);
+  }
+  if (meta.kind === "newspaper-clipping" && meta.article_text && meta.article_text.length > 50_000) {
+    issues.push(`${file.relPath}: article_text > 50,000 chars — please paste just the article, not the whole edition`);
+  }
+  // Matching image
+  const jpgSibling = file.fullPath.replace(/\.json$/, ".jpg");
+  if (!existsSync(jpgSibling)) issues.push(`${file.relPath}: no matching .jpg sibling at ${path.basename(jpgSibling)}`);
+  return issues;
 }
 
 // ---- 3. Lightweight cosine on token-set overlap (proxy for embedding sim) ----
@@ -149,6 +217,28 @@ const out = { pass: [], review: [], reject: [] };
 
 for (const c of contribs) {
   const issues = [];
+
+  // Media submission — separate validator (schema + image presence + safety)
+  if (c.isMedia) {
+    const mediaIssues = await validateMediaItem(c);
+    if (mediaIssues.length) {
+      reject++;
+      out.reject.push({ ...c, quality: 0, vsCanonical: null, issues: mediaIssues });
+    } else {
+      // Run the existing safety check on title/context text if json
+      if (c.file.endsWith(".json")) {
+        try {
+          const meta = JSON.parse(await readFile(c.fullPath, "utf8"));
+          const safety = safetyCheck(`${meta.title || ""}\n${meta.context || ""}\n${meta.article_text || ""}`);
+          if (safety.length) { reject++; out.reject.push({ ...c, quality: 0, vsCanonical: null, issues: safety }); continue; }
+        } catch {}
+      }
+      pass++;
+      out.pass.push({ ...c, quality: 1, vsCanonical: null, issues: [], note: "media:ok" });
+    }
+    continue;
+  }
+
   // 1. SCHEMA
   // Accept two file types per page:
   //   p<NNN>.txt  — transcript (goes into search index, runs full gates)
