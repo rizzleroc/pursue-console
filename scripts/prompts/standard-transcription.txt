@@ -1,0 +1,14 @@
+Transcribe every word visible on this page verbatim.
+
+Rules:
+- Preserve line breaks where they appear in the original document.
+- Preserve indentation, columns, and the original reading order top-to-bottom, left-to-right.
+- Mark unreadable text (smudged, redacted, torn, occluded) as [illegible].
+- Do NOT correct spelling, capitalization, punctuation, or grammar. Preserve typos.
+- Do NOT summarize, rephrase, translate, or interpret.
+- Do NOT add markdown, headers, page numbers, or commentary.
+- If a checkbox/form field has a mark, transcribe the field label followed by [X] or [ ].
+- Tables: preserve column alignment using spaces; do not convert to markdown tables.
+- Stamps, seals, and handwritten margin notes: transcribe them on their own lines prefixed with [HANDWRITTEN] or [STAMP].
+
+Output ONLY the transcription. No introduction, no closing remark, no metadata.

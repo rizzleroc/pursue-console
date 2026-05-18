@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-18T15:25:50.124Z",
+  "generatedAt": "2026-05-18T19:33:07.284Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-18T15:25:50.124Z",
+      "ts": "2026-05-18T19:33:07.284Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 993,
+      "duration_ms": 1904,
       "note": "events=121 inventory=173 contributions=18"
     },
     "recent": [
+      {
+        "ts": "2026-05-18T19:33:07.284Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1904,
+        "note": "events=121 inventory=173 contributions=18"
+      },
       {
         "ts": "2026-05-18T15:25:50.124Z",
         "kind": "db-rebuild",
@@ -119,13 +126,6 @@
         "outcome": "ok",
         "duration_ms": 2351,
         "note": "events=121 inventory=162 contributions=18"
-      },
-      {
-        "ts": "2026-05-17T22:45:41.354Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1063,
-        "note": "events=121 inventory=162 contributions=18"
       }
     ]
   },
@@ -164,7 +164,11 @@
         "event_id": "netherlands-1948",
         "n": 1
       }
-    ]
+    ],
+    "reevaluated": 0,
+    "resolvedByPromptStandard": 0,
+    "pageIntrinsicDisputes": 0,
+    "partialImprovementByReeval": 0
   },
   "sourceQuality": {},
   "byEvent": {

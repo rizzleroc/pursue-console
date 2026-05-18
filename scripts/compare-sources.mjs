@@ -181,6 +181,62 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
       }
     }
 
+    // Re-evaluation pass: if scripts/reevaluate-disputed.mjs has dropped
+    // .v2 files via the standardized prompt across both providers, score
+    // them and decide whether the original mismatch was prompt-variance
+    // (settled by re-eval) or page-intrinsic (still disagreeing, needs
+    // human eyes).
+    const reeval = sidecar.comparison?.reevaluation;
+    if (reeval?.providers) {
+      const v2Text = {};
+      for (const [src, info] of Object.entries(reeval.providers)) {
+        if (!info?.text_file) continue;
+        try { v2Text[src] = (await readFile(path.join(dir, info.text_file), "utf8")).trim(); } catch {}
+      }
+      const v2Names = Object.keys(v2Text);
+      if (v2Names.length >= 2) {
+        // Min pairwise agreement across re-evaluated sources
+        let v2Min = 1;
+        const v2Pairs = [];
+        for (let i = 0; i < v2Names.length; i++) {
+          for (let j = i + 1; j < v2Names.length; j++) {
+            const a = v2Names[i], b = v2Names[j];
+            const score = agreementScore(v2Text[a], v2Text[b]);
+            v2Pairs.push({ a, b, score });
+            if (score < v2Min) v2Min = score;
+          }
+        }
+        cmp.reeval_agreement = v2Min;
+        cmp.reeval_pairs = v2Pairs;
+        const v1Score = cmp.agreement_score;
+        const delta = v2Min - v1Score;
+        cmp.reeval_delta = Math.round(delta * 1000) / 1000;
+        // Classify the dispute
+        if (v2Min >= HIGH_CONFIDENCE) {
+          cmp.dispute_kind = "prompt-variance";   // standardized prompt resolved it
+          cmp.needs_review = false;
+          cmp.confidence = "high";
+          stats.disputes_resolved_by_reeval = (stats.disputes_resolved_by_reeval || 0) + 1;
+          // Promote the longest v2 text as canonical
+          const winner = v2Names.sort((a, b) => v2Text[b].length - v2Text[a].length)[0];
+          sidecar.best = winner;
+          // Write canonical p<NNN>.txt to the winning v2 text
+          try {
+            const pn = Number(m[1]);
+            const padPN = String(pn).padStart(4, "0");
+            await writeFile(path.join(dir, `p${padPN}.txt`), v2Text[winner] + "\n", "utf8");
+          } catch {}
+        } else if (v2Min < REVIEW_THRESHOLD) {
+          cmp.dispute_kind = "page-intrinsic";    // same prompt, still disagreeing → human
+          cmp.needs_review = true;
+          stats.disputes_page_intrinsic = (stats.disputes_page_intrinsic || 0) + 1;
+        } else {
+          cmp.dispute_kind = "partial-improvement";
+          stats.disputes_partial = (stats.disputes_partial || 0) + 1;
+        }
+      }
+    }
+
     sidecar.comparison = cmp;
     await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
     stats.pages_compared++;
@@ -200,6 +256,12 @@ console.log(`[compare] compared ${stats.pages_compared} multi-source pages`);
 console.log(`[compare]   high confidence  ${stats.high_confidence}`);
 console.log(`[compare]   medium           ${stats.medium_confidence}`);
 console.log(`[compare]   needs review     ${stats.needs_review}`);
+if (stats.disputes_resolved_by_reeval || stats.disputes_page_intrinsic || stats.disputes_partial) {
+  console.log(`[compare] re-evaluation outcomes:`);
+  console.log(`            resolved by reeval     ${stats.disputes_resolved_by_reeval || 0}  (prompt-variance: same prompt across both providers now agrees)`);
+  console.log(`            still page-intrinsic   ${stats.disputes_page_intrinsic || 0}  (handwriting / damage / redaction — needs human)`);
+  console.log(`            partial improvement    ${stats.disputes_partial || 0}  (helped a bit but still in medium band)`);
+}
 if (stats.human_vs_machine_pairs) {
   console.log(`[compare] human-vs-machine comparisons: ${stats.human_vs_machine_pairs}`);
   for (const [k, v] of Object.entries(summary)) {

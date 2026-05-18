@@ -105,6 +105,13 @@ CREATE TABLE IF NOT EXISTS pages (
   agreement_score REAL,
   confidence      TEXT,        -- 'high' | 'medium' | 'low' | NULL
   needs_review    INTEGER NOT NULL DEFAULT 0,
+  -- Re-evaluation outcome (from scripts/reevaluate-disputed.mjs):
+  --   'prompt-variance'      — standardized prompt across both providers resolved it
+  --   'page-intrinsic'       — still disagreeing after standardized re-eval, needs human
+  --   'partial-improvement'  — middle band, no clear verdict yet
+  --   NULL                   — never re-evaluated
+  reeval_agreement REAL,
+  dispute_kind     TEXT,
   last_updated    TEXT,
   PRIMARY KEY (event_id, page_num)
 );
@@ -271,6 +278,7 @@ CREATE TABLE pages (
   has_gemini INTEGER NOT NULL DEFAULT 0, has_gpt_vision INTEGER NOT NULL DEFAULT 0,
   has_human INTEGER NOT NULL DEFAULT 0,
   agreement_score REAL, confidence TEXT, needs_review INTEGER NOT NULL DEFAULT 0,
+  reeval_agreement REAL, dispute_kind TEXT,
   best_source TEXT, chars INTEGER NOT NULL DEFAULT 0,
   contributor TEXT, last_updated TEXT,
   PRIMARY KEY (event_id, page_num)
@@ -282,11 +290,13 @@ const insPage = db.prepare(`
     (event_id, page_num, has_pdfjs, has_ocr, has_vision, has_visuals,
      has_gemini, has_gpt_vision, has_human,
      agreement_score, confidence, needs_review,
+     reeval_agreement, dispute_kind,
      best_source, chars, contributor, last_updated)
   VALUES
     (@event_id, @page_num, @has_pdfjs, @has_ocr, @has_vision, @has_visuals,
      @has_gemini, @has_gpt_vision, @has_human,
      @agreement_score, @confidence, @needs_review,
+     @reeval_agreement, @dispute_kind,
      @best_source, @chars, @contributor, @last_updated)
 `);
 
@@ -392,6 +402,8 @@ for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : [
         row._agreementScore = sc.comparison.agreement_score ?? null;
         row._confidence     = sc.comparison.confidence ?? null;
         row._needsReview    = sc.comparison.needs_review ? 1 : 0;
+        row._reevalAgreement = sc.comparison.reeval_agreement ?? null;
+        row._disputeKind    = sc.comparison.dispute_kind ?? null;
       }
     } catch {}
   }
@@ -413,6 +425,8 @@ for (const [eid, m] of pageMap) {
       agreement_score: r._agreementScore ?? null,
       confidence: r._confidence ?? null,
       needs_review: r._needsReview || 0,
+      reeval_agreement: r._reevalAgreement ?? null,
+      dispute_kind: r._disputeKind ?? null,
       best_source: best, chars: r.chars,
       contributor: r._contributor || null,
       last_updated: new Date(r.mtime || Date.now()).toISOString(),
@@ -530,6 +544,11 @@ const stats = {
       SELECT event_id, COUNT(*) AS n FROM pages WHERE needs_review=1
       GROUP BY event_id ORDER BY n DESC LIMIT 10
     `),
+    // Re-evaluation outcomes (from scripts/reevaluate-disputed.mjs)
+    reevaluated:               q("SELECT COUNT(*) AS n FROM pages WHERE dispute_kind IS NOT NULL").n,
+    resolvedByPromptStandard:  q("SELECT COUNT(*) AS n FROM pages WHERE dispute_kind='prompt-variance'").n,
+    pageIntrinsicDisputes:     q("SELECT COUNT(*) AS n FROM pages WHERE dispute_kind='page-intrinsic'").n,
+    partialImprovementByReeval:q("SELECT COUNT(*) AS n FROM pages WHERE dispute_kind='partial-improvement'").n,
   },
   // Per-source quality vs human (from scripts/compare-sources.mjs ->
   // data-raw/.source-quality.json). Surfaces "how accurate is each
