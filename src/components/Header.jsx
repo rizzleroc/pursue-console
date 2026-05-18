@@ -14,6 +14,7 @@ const PRIMARY = [
 const ANALYSIS = [
   { id: "timeline", label: "TIMELINE", glyph: "▬" },
   { id: "atlas",    label: "ATLAS",    glyph: "▦" },
+  { id: "globe",    label: "GLOBE",    glyph: "◉" },
   { id: "network",  label: "NETWORK",  glyph: "✦" },
 ];
 

@@ -6,6 +6,7 @@ import Header from "./components/Header.jsx";
 import VolunteerModal from "./components/VolunteerModal.jsx";
 import TimelineView from "./views/TimelineView.jsx";
 import AtlasView from "./views/AtlasView.jsx";
+import GlobeView from "./views/GlobeView.jsx";
 import NetworkView from "./views/NetworkView.jsx";
 import SearchView from "./views/SearchView.jsx";
 import LiveFeedView from "./views/LiveFeedView.jsx";
@@ -82,6 +83,7 @@ export default function App() {
         <main>
           {view === "timeline" && <TimelineView events={filtered} onSelect={handleSelect} />}
           {view === "atlas"    && <AtlasView    events={filtered} onSelect={handleSelect} />}
+          {view === "globe"    && <GlobeView    events={filtered} onSelect={handleSelect} />}
           {view === "network"  && <NetworkView  events={filtered} onSelect={handleSelect} />}
           {view === "search"   && <SearchView   onSelect={handleSelect} />}
           {view === "live"     && <LiveFeedView onSelect={handleSelect} />}
