@@ -1,7 +1,7 @@
 {
   "model": "sentence-transformers/all-MiniLM-L6-v2",
   "dim": 384,
-  "count": 5555,
+  "count": 5556,
   "minQuality": 0.25,
   "rejectedByQuality": {
     "ocr": 1,
@@ -14,9 +14,9 @@
       "meanQuality": 1.0
     },
     "vision": {
-      "count": 5503,
+      "count": 5504,
       "meanQuality": 0.553
     }
   },
-  "generatedAt": "2026-05-19T05:46:27Z"
+  "generatedAt": "2026-05-19T09:34:17Z"
 }
