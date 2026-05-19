@@ -2,6 +2,16 @@
 
 A SETI@home-style distributed contribution model for the PURSUE corpus.
 
+## Right now (live counts)
+
+| Priority | Open | Concentrated in |
+|---|---:|---|
+| **P1** Settle disputed pages | **19** | `1949-discs` (13) · `incident-summaries` (2) · `krasuski-1944` (2) |
+| **P2** Transcribe new pages | **28** | scattered across 12 events |
+| **P3** Image + context capture | **16** | `1949-discs` (16 — witness sketches, maps, photographs from Project SIGN) |
+
+Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (with a badge in the nav) and the [HELP tab](https://rizzleroc.github.io/pursue-console/) (with per-event breakdown).
+
 ## Priority ladder — pick the highest open priority
 
 > The corpus has three contribution paths. Please don't skip ahead — the lower numbers settle work that's blocking everything downstream.
@@ -18,9 +28,19 @@ To submit a settlement: drop the corrected `.txt` into `contributions/<your-hand
 
 Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini, opens a PR with the transcripts. The setup is below.
 
-### 3. Screenshot the visuals + context *(next phase · process being defined)*
+### 3. Screenshot the visuals + context *(open now · ~1 hour per slice)*
 
-Pages containing photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams need to be captured as images alongside the documentary context that frames them. See [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md) for the full spec; the volunteer flow opens once the importer + validator + claim API are in place.
+Pages classified as containing visuals — photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams — need page screenshots **plus the verbatim documentary context from the surrounding pages**. What introduces this image? What's the caption? What does the page after say about it?
+
+For newspaper clippings, also transcribe the article body so it becomes its own searchable doc in the corpus.
+
+```bash
+node scripts/volunteer-media.mjs --my-handle=YOU --slice=5     # claim + render
+# (fill in the markdown templates at ~/.pursue-helper/media-staging/)
+node scripts/volunteer-media.mjs --my-handle=YOU --commit      # commit + PR
+```
+
+Full spec: [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md). The two-phase flow exists because typing rich context in a terminal is miserable; doing it in a text editor with the rendered page open alongside is not.
 
 ---
 

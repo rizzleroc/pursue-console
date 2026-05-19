@@ -93,8 +93,10 @@ export default function HelpView({ onViewChange }) {
       </div>
 
       {/* ============ PRIORITY LADDER ============ */}
+      {/* Per-event breakdowns from stats + queue — volunteers can see
+          "13 in 1949-discs, 2 in incident-summaries" and pick a slice
+          instead of asking "which one should I work on?" */}
       <div className="grid lg:grid-cols-3 gap-3 mb-6">
-        {/* Priority 1 — REVIEW disputes */}
         <PriorityCard
           rank="1"
           status="OPEN NOW"
@@ -103,10 +105,10 @@ export default function HelpView({ onViewChange }) {
           unit="DISPUTED PAGES"
           title="Settle the review queue"
           body={<>Pages where Gemini and ChatGPT disagree. Read both, type the correct version. <span className="text-amber-200">One disputed page resolved = canonical text settled forever.</span></>}
+          breakdown={(stats?.review?.topEventsByReviewQueue || []).map(r => ({ eid: r.event_id, n: r.n }))}
           action={onViewChange ? { label: "OPEN REVIEW →", onClick: () => onViewChange("review") } : null}
         />
 
-        {/* Priority 2 — Transcribe new pages */}
         <PriorityCard
           rank="2"
           status="OPEN NOW"
@@ -114,11 +116,15 @@ export default function HelpView({ onViewChange }) {
           count={queue?.totalPagesNeeded ?? "—"}
           unit="PAGES NEED OCR"
           title="Transcribe new pages"
-          body={<>Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini. Picks unclaimed pages, opens a PR.</>}
+          body={<>Your own logged-in browser does the OCR via ChatGPT or Gemini. The volunteer script picks unclaimed pages, opens a PR.</>}
+          breakdown={Object.entries(queue?.byEvent || {})
+            .filter(([, d]) => d.pagesNeeded > 0)
+            .map(([eid, d]) => ({ eid, n: d.pagesNeeded }))
+            .sort((a, b) => b.n - a.n)
+            .slice(0, 5)}
           action={{ label: "QUICKSTART ↓", onClick: () => document.getElementById("quickstart")?.scrollIntoView({ behavior: "smooth" }) }}
         />
 
-        {/* Priority 3 — Image + context capture (now open) */}
         <PriorityCard
           rank="3"
           status="OPEN NOW"
@@ -126,7 +132,12 @@ export default function HelpView({ onViewChange }) {
           count={queue?.totalPagesNeedingVisualContext ?? "—"}
           unit="VISUALS NEED CONTEXT"
           title="Screenshot the visuals + context"
-          body={<>For pages containing photographs, sketches, newspaper clippings, maps, or diagrams: capture the page image and write the documentary context (verbatim from the surrounding pages). Two-phase flow: claim → fill template → commit.</>}
+          body={<>Photographs, sketches, newspaper clippings, maps, diagrams: capture the page image and write the documentary context (verbatim from surrounding pages). Two-phase: claim → fill template → commit.</>}
+          breakdown={Object.entries(queue?.byEvent || {})
+            .filter(([, d]) => (d.pagesNeedingVisualContext || 0) > 0)
+            .map(([eid, d]) => ({ eid, n: d.pagesNeedingVisualContext }))
+            .sort((a, b) => b.n - a.n)
+            .slice(0, 5)}
           action={{ label: "QUICKSTART ↓", onClick: () => document.getElementById("media-quickstart")?.scrollIntoView({ behavior: "smooth" }) }}
         />
       </div>
@@ -319,7 +330,7 @@ function QuickStart({ os, snippet, id, copied, onCopy }) {
 // One of the priority cards at the top — same shape regardless of rank
 // so the visual ladder is obvious at a glance. Status / color signals
 // open-now (amber, emerald) vs not-yet (cyan, dimmed).
-function PriorityCard({ rank, status, color, count, unit, title, body, action }) {
+function PriorityCard({ rank, status, color, count, unit, title, body, breakdown, action }) {
   // Static class lookups (Tailwind v3 strips template strings).
   const palette = {
     amber:   { border: "border-amber-500/60",   ring: "hover:border-amber-300",   ranknum: "text-amber-300",   chip: "border-amber-700/60 text-amber-300 bg-amber-900/20",   bigNum: "text-amber-300",   unit: "text-amber-700",   title: "text-emerald-100", body: "text-emerald-400", btn: "border-amber-500 text-amber-200 hover:bg-amber-700/30" },
@@ -341,6 +352,19 @@ function PriorityCard({ rank, status, color, count, unit, title, body, action })
       </div>
       <div className={`font-mono text-[13px] ${c.title} mb-1.5`}>{title}</div>
       <div className={`font-mono text-[11px] leading-snug ${c.body} mb-3`}>{body}</div>
+      {breakdown && breakdown.length > 0 && (
+        <div className="border-t border-emerald-900/30 pt-2 mb-3">
+          <div className={`font-mono text-[9px] tracking-widest ${c.unit} mb-1`}>BY EVENT</div>
+          <ul className="font-mono text-[10px] space-y-0.5">
+            {breakdown.map(b => (
+              <li key={b.eid} className="flex items-baseline justify-between gap-2">
+                <span className={`${c.body} truncate`} title={b.eid}>{b.eid}</span>
+                <span className={`${c.title} tabular-nums shrink-0`}>{b.n}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {action && (
         <button onClick={action.onClick}
           className={`font-mono text-[10px] tracking-widest px-2.5 py-1 rounded-sm border ${c.btn}`}>
