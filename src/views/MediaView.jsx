@@ -181,7 +181,17 @@ export default function MediaView({ onSelect }) {
               <div className="flex items-center gap-2 shrink-0">
                 {onSelect && (
                   <button
-                    onClick={() => onSelect({ id: focused.eventId, title: focused.eventTitle }, { page: focused.page })}
+                    onClick={() => onSelect(
+                      // Pass the full EVENTS-table entry so the dossier
+                      // renders with date/agency/coords/etc. The MEDIA
+                      // tile only carries id+title; the dossier wants
+                      // the rest. The lookup falls back to the partial
+                      // object if the eid isn't in EVENTS (shouldn't
+                      // happen since media is keyed off catalogued
+                      // events, but cheap to guard).
+                      (window.__EVENTS_BY_ID || {})[focused.eventId] || { id: focused.eventId, title: focused.eventTitle },
+                      { page: focused.page }
+                    )}
                     className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
                     OPEN IN DOSSIER →
                   </button>

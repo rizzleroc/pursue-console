@@ -97,6 +97,29 @@ async function loadToken() {
 }
 const TOKEN = await loadToken();
 
+// Pre-check gh CLI auth so we don't OCR pages for 30 minutes only to
+// fail at the PR step. Skipped under --no-pr (volunteer wants to PR
+// by hand) and under --dry-run.
+async function checkGhAuth() {
+  if (NO_PR || DRY) return;
+  const { spawn } = await import("node:child_process");
+  await new Promise(resolve => {
+    const p = spawn("gh", ["auth", "status"], { stdio: "ignore", shell: process.platform === "win32" });
+    p.on("close", code => {
+      if (code !== 0) {
+        console.error("error: GitHub CLI is not authenticated. Run `gh auth login` (or pass --no-pr to skip the PR step).");
+        process.exit(1);
+      }
+      resolve();
+    });
+    p.on("error", () => {
+      console.error("error: `gh` not found in PATH. Install GitHub CLI from https://cli.github.com (or pass --no-pr).");
+      process.exit(1);
+    });
+  });
+}
+await checkGhAuth();
+
 // ----- step 1: fetch the work queue -----
 console.log(`[volunteer] fetching ${QUEUE_URL}`);
 const queueRes = await fetch(QUEUE_URL);
@@ -116,8 +139,10 @@ if (ONLY_EID) {
 } else {
   // Stable rotation: start from hash(handle) % length, but always rotate
   // to favor pdfjs-render-friendly docs over the known-bad ones.
-  const KNOWN_RENDER_HARD = new Set(["fbi-62hq83894", "skylab"]);
-  candidateEids = candidateEids.filter(e => !KNOWN_RENDER_HARD.has(e));
+  // Removed in 2.1 — KNOWN_RENDER_HARD used to block fbi-62hq83894 and
+  // skylab because of the Windows pdfjs file-URL bug. That was fixed
+  // weeks ago by the pathToFileURL refactor; the block was stale code
+  // keeping those 185 + 11 pages out of the volunteer rotation.
   const start = hash(HANDLE) % Math.max(1, candidateEids.length);
   candidateEids = candidateEids.slice(start).concat(candidateEids.slice(0, start));
 }

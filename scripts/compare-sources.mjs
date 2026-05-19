@@ -276,10 +276,10 @@ console.log(`[compare] scanned ${stats.pages_scanned} sidecars across ${stats.ev
 console.log(`[compare] compared ${stats.pages_compared} multi-source pages`);
 console.log(`[compare]   high confidence  ${stats.high_confidence}`);
 console.log(`[compare]   medium           ${stats.medium_confidence}`);
-// Note: stats.needs_review counts pages flagged before the re-evaluation
-// branch settles them. The DB-side query in scripts/db-rebuild.mjs and the
-// public review-queue.json reflect the FINAL count (this minus
-// disputes_resolved_by_reeval).
+// Final count is just review-flagged minus reeval-settled. Computed
+// once at the end so the number always agrees with the DB query in
+// db-rebuild.mjs and with public/review-queue.json. (Earlier this
+// log incremented as-we-went and disagreed with the DB by 3.)
 const finalNeedsReview = stats.needs_review - (stats.disputes_resolved_by_reeval || 0);
 console.log(`[compare]   needs review     ${finalNeedsReview} (${stats.needs_review} initially flagged · ${stats.disputes_resolved_by_reeval || 0} settled by reeval)`);
 if (stats.disputes_resolved_by_reeval || stats.disputes_page_intrinsic || stats.disputes_partial) {

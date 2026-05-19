@@ -64,6 +64,11 @@ const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
 // to what the classifier produces so the MEDIA view doesn't care which
 // path created the row.
 const MEDIA_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
+// @unverified — has never run against an actual contributor media PR.
+// JSON-parse, image-copy, kind-enum validation are syntactically
+// correct but a real submission could surface edge cases (BOM in JSON,
+// trailing commas, JPEG with EXIF orientation flags, missing required
+// fields). First real PR is the live test.
 async function importMediaFolder(handle, eidDir) {
   const eid = path.basename(eidDir);
   const visualsDir = path.join(ROOT, "data-raw", ".visuals", eid);

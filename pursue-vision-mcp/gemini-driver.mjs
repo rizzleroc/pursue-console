@@ -1,5 +1,12 @@
 // pursue-vision-mcp · Gemini driver
 //
+// @unverified — ported from upstream whipgen-mcp slim, never run
+// end-to-end against gemini.google.com through this bundled daemon.
+// The reeval smoke test went via the upstream MCP, not this one. The
+// selectors are pinned to a specific DOM snapshot; Gemini changes
+// silently. First volunteer who runs `npm start --prefix pursue-vision-mcp`
+// is the live test.
+//
 // Connects to a logged-in Chrome via CDP, finds an open gemini.google.com
 // tab, and runs single chat-with-files round-trips against it. Minimal
 // — only what the vision-OCR contributor flow needs (uploadFiles +

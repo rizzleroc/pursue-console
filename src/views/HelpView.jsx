@@ -144,21 +144,15 @@ export default function HelpView({ onViewChange }) {
 
       {/* ============ HERO PITCH ============ */}
       <div className="border-2 border-dashed border-amber-700/50 bg-gradient-to-b from-amber-950/30 to-transparent rounded-sm p-5 mb-6">
-        <div className="grid sm:grid-cols-[1fr,auto] gap-4 items-center">
-          <div>
-            <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300 mb-2">▌ THE MAINTAINER'S CHATGPT QUOTA IS THE BOTTLENECK</div>
-            <div className="font-mono text-emerald-100 text-sm leading-relaxed">
-              We've got <span className="text-amber-300 tabular-nums">{totalPagesNeeded}</span> pages of scanned documents waiting for vision OCR.
-              At one ChatGPT Plus account, that's roughly <span className="text-amber-300">{Math.round(hoursEstimate)} hours</span> of work to clear.
-              With a dozen volunteers turning their own otherwise-idle compute on it, it's done in an evening.
-              <br/><br/>
-              Your transcriptions get auto-validated against the <a className="text-cyan-300 hover:text-cyan-100 underline-offset-2 hover:underline" href="https://github.com/rizzleroc/pursue-console/blob/main/JUDGE-STANDARD.md" target="_blank" rel="noopener noreferrer">JUDGE-STANDARD</a> (schema · safety · lexical quality · FAISS semantic authenticity), then merged into the canonical corpus on the next deploy. Credit lands in commit history and CONTRIBUTORS.md.
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="font-mono text-7xl text-amber-300 tabular-nums leading-none">{totalPagesNeeded}</div>
-            <div className="font-mono text-[10px] text-amber-700 tracking-widest mt-1">PAGES NEED VOLUNTEERS</div>
-          </div>
+        <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300 mb-2">▌ WHAT'S BLOCKING THE CORPUS RIGHT NOW</div>
+        <div className="font-mono text-emerald-100 text-sm leading-relaxed">
+          The Denis Gemini sync filled in most of the OCR backlog — that bottleneck is largely past.
+          What's left is <span className="text-amber-300">three open priorities</span> above, in order:
+          settle the <span className="text-amber-300">{stats?.review?.pagesNeedingReview ?? "—"} disputed pages</span> (your eyes resolve them forever),
+          transcribe the <span className="text-amber-300">{totalPagesNeeded} pages</span> still in single-source state,
+          and capture context for the <span className="text-amber-300">{queue?.totalPagesNeedingVisualContext ?? 0} classified visuals</span>.
+          <br/><br/>
+          Every contribution is auto-validated against <a className="text-cyan-300 hover:text-cyan-100 underline-offset-2 hover:underline" href="https://github.com/rizzleroc/pursue-console/blob/main/JUDGE-STANDARD.md" target="_blank" rel="noopener noreferrer">JUDGE-STANDARD</a> on the PR, merged into the canonical corpus, and credited in the auto-generated <a className="text-cyan-300 hover:text-cyan-100 underline-offset-2 hover:underline" href="https://github.com/rizzleroc/pursue-console/blob/main/CONTRIBUTORS.md" target="_blank" rel="noopener noreferrer">CONTRIBUTORS.md</a>.
         </div>
       </div>
 

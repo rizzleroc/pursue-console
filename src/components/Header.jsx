@@ -47,7 +47,12 @@ export default function Header({ view, onViewChange, onVolunteer, query, onSearc
           aria-label="Go to LIVE">
           <span className="text-emerald-400 text-xs tracking-[0.3em] font-mono">
             <span className="text-amber-400">▶</span> PURSUE
-            <span className="ml-2 text-emerald-800 text-[10px] tracking-[0.25em]">release 2.0</span>
+            <a href="https://github.com/rizzleroc/pursue-console/blob/main/CHANGELOG.md"
+               target="_blank" rel="noreferrer"
+               title="View 2.0 changelog"
+               className="ml-2 text-emerald-800 hover:text-emerald-400 text-[10px] tracking-[0.25em] underline-offset-2 hover:underline">
+              release 2.1
+            </a>
           </span>
           {catalogued != null && totalInv != null && (
             <span className="hidden sm:inline text-emerald-700 text-[10px] font-mono">
@@ -64,8 +69,9 @@ export default function Header({ view, onViewChange, onVolunteer, query, onSearc
             <input
               value={query || ""}
               onChange={(e) => onSearch(e.target.value)}
-              placeholder="› grep corpus"
-              aria-label="Filter events"
+              placeholder="› filter events"
+              title="Filters the catalogued events list (title/agency/loc/tags). For full-text page search use the SEARCH or SEMANTIC tabs."
+              aria-label="Filter events list"
               className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 placeholder-emerald-800 font-mono text-xs w-36 sm:w-56 focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
           )}
           <button

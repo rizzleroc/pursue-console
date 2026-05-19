@@ -38,10 +38,11 @@ const CONTRIB_DIR = path.join(ROOT, "contributions");
 const RAW_DIR = path.join(ROOT, "data-raw");
 const STATS_OUT = path.join(ROOT, "public", "corpus-stats.json");
 
-// War.gov press-release claim — we record it as a known external truth
-// that the scrape is reconciling against. When the scraper lands, this
-// constant goes away and inventory.is_press_release_claim rows get
-// replaced by real scraped rows.
+// War.gov press-release claim — kept for the corpus-stats output (so the
+// UI can show "X catalogued of Y press-release-claimed") but no longer
+// drives placeholder rows now that sync-inventory.mjs pulls a real
+// manifest. If a future upstream scrape exceeds this number, we'll
+// just stop reporting the constant.
 const PRESS_RELEASE_TOTAL = 162;
 
 await mkdir(path.dirname(DB_PATH), { recursive: true });

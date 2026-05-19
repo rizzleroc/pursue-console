@@ -117,7 +117,10 @@ node scripts/volunteer-media.mjs --my-handle=YOU --commit`}
             </a>
           </div>
           <p className="text-emerald-700 text-[10px] font-mono">
-            Every contribution gets credited to your handle in the corpus DB. You stay in your own GitHub account; no central server holds your work.
+            Every contribution gets credited to your handle in <a href="https://github.com/rizzleroc/pursue-console/blob/main/CONTRIBUTORS.md" target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline text-emerald-500">CONTRIBUTORS.md</a> (auto-generated). The handle you pass to <code>--my-handle</code> becomes <strong>public in the corpus DB and in the PR you open</strong> — use whatever you'd want shown. You stay in your own GitHub account; no central server holds your work.
+          </p>
+          <p className="text-emerald-700 text-[10px] font-mono">
+            Before your first run, sanity-check your setup in 30 seconds: <code className="text-amber-300">npm run corpus:setup -- --my-handle=YOU</code>
           </p>
         </div>
       </div>

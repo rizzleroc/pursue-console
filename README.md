@@ -9,6 +9,8 @@
 [![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Live site](https://img.shields.io/badge/live-rizzleroc.github.io%2Fpursue--console-FFD93D)](https://rizzleroc.github.io/pursue-console/)
+[![Changelog](https://img.shields.io/badge/changelog-2.1-7CFFB2)](./CHANGELOG.md)
+[![Roadmap](https://img.shields.io/badge/roadmap-open-82B6FF)](./ROADMAP.md)
 
 **Live:** https://rizzleroc.github.io/pursue-console/
 

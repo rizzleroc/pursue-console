@@ -197,9 +197,26 @@ for (let i = 0; i < queue.length; i++) {
   const stagedPath = path.join(STAGE, `${eid}-p${pad4}.png`);
   await writeFile(stagedPath, png);
 
-  let res;
-  try { res = await fanout(stagedPath); }
-  catch (e) { console.log(`FAIL (fanout): ${e.message}`); failed++; continue; }
+  // Retry the whole fanout once if it errored OR if any provider partial-
+  // succeeded — the most common failure mode is one provider hitting the
+  // 180s timeout while the other was fine. Cheaper to retry than to leave
+  // the page partially settled.
+  let res = null;
+  for (let attempt = 0; attempt < 2 && !res; attempt++) {
+    try {
+      const r = await fanout(stagedPath);
+      const anyOk = (r.byProvider ? Object.values(r.byProvider) : []).filter(p => p?.ok && p.text?.trim().length >= 20).length;
+      if (anyOk === PROVIDERS.length) { res = r; break; }
+      if (attempt === 0) { process.stdout.write(`retry... `); continue; }
+      res = r;  // accept partial on second attempt
+    } catch (e) {
+      if (attempt === 0) { process.stdout.write(`retry... `); continue; }
+      console.log(`FAIL (fanout): ${e.message}`);
+      failed++;
+      res = null;
+    }
+  }
+  if (!res) continue;
 
   const dstDir = path.join(VIS, eid);
   await mkdir(dstDir, { recursive: true });

@@ -19,7 +19,6 @@ dist-ssr
 data-raw/*
 !data-raw/.vision-cache/
 !data-raw/.ocr-cache/
-!data-raw/.vision-visuals-cache/
 !data-raw/.visuals/
 !data-raw/.contributions-manifest.json
 !data-raw/corpus.sqlite

@@ -1,5 +1,12 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS } from "./data/events.js";
+
+// Global handle for cross-view event lookups (MediaView, ReviewView use
+// this when their deep-link buttons only have eid + title, but the
+// DossierView wants the full event metadata).
+if (typeof window !== "undefined") {
+  window.__EVENTS_BY_ID = Object.fromEntries(EVENTS.map(e => [e.id, e]));
+}
 import { ScanlineOverlay } from "./components/Primitives.jsx";
 import CorpusFreshness from "./components/CorpusFreshness.jsx";
 import Header from "./components/Header.jsx";
@@ -93,8 +100,17 @@ export default function App() {
           {view === "help"     && <HelpView onViewChange={handleViewChange} />}
           {view === "semantic" && (
             <Suspense fallback={
-              <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest">
-                ◌ loading semantic search engine…
+              <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  LOADING SEMANTIC SEARCH ENGINE
+                </div>
+                <div className="text-emerald-800 text-[10px] tracking-widest">
+                  ~25 MB ORT WASM + INT8 model (first visit only — cached in IndexedDB after)
+                </div>
+                <div className="text-emerald-800 text-[10px] tracking-widest">
+                  on a slow connection this can take 30+ seconds. SEARCH (lexical) is available now if you'd rather not wait.
+                </div>
               </div>
             }>
               <SemanticSearchView onSelect={handleSelect} />

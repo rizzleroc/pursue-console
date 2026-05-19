@@ -1,23 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, flagBg, DocTypeBadge } from "../components/Primitives.jsx";
 import SourceMix from "../components/SourceMix.jsx";
-
-// Per-event source mix from corpus-stats.json (DB-backed). Cached.
-let _byEventP = null;
-function useByEvent() {
-  const [be, setBe] = useState(null);
-  useEffect(() => {
-    if (!_byEventP) {
-      _byEventP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json`)
-        .then(r => r.ok ? r.json() : null)
-        .then(j => j?.byEvent || {})
-        .catch(() => ({}));
-    }
-    _byEventP.then(setBe);
-  }, []);
-  return be;
-}
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 const ERAS = [
   { id: "40s", label: "1944–1949" }, { id: "50s", label: "1950–1959" },
@@ -29,7 +14,8 @@ const ERAS = [
 
 export default function TimelineView({ events, onSelect }) {
   const sorted = [...events].sort((a,b) => a.sort - b.sort);
-  const byEvent = useByEvent();
+  const { stats } = useCorpusStats();
+  const byEvent = stats?.byEvent || null;
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">

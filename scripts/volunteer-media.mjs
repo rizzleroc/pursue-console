@@ -1,3 +1,9 @@
+// @unverified — claim and commit phases have never been run against
+// a real third-party contribution. The markdown template parser
+// (parseTemplate) hasn't been tested on CRLF, BOM, comments-with-#,
+// or word-processor curly quotes. The gh pr create step assumes auth
+// is good. First real volunteer is the live test.
+//
 // Media-context volunteer flow.
 //
 // Two phases:
@@ -205,9 +211,12 @@ Skip this section for all other kinds.
 // COMMIT PHASE
 // =====================================================================
 function parseTemplate(md) {
+  // Strip BOM (U+FEFF) if present — some editors prepend it on save-as-
+  // UTF-8 and it silently breaks the first heading match. See
+  // scripts/test-parse-template.mjs for the regression test.
   const sections = {};
   let current = null, buf = [];
-  for (const line of md.split(/\r?\n/)) {
+  for (const line of md.replace(/^﻿/, "").split(/\r?\n/)) {
     const h = line.match(/^# (.+?)\s*$/);
     if (h) {
       if (current) sections[current] = buf.join("\n").trim();
@@ -223,8 +232,30 @@ function parseTemplate(md) {
   return sections;
 }
 
+// Pre-check gh CLI auth at the start of the commit phase — same
+// reasoning as volunteer.mjs: don't bail at the PR step after a
+// volunteer has filled in 5+ templates.
+async function checkGhAuth() {
+  if (NO_PR) return;
+  await new Promise(resolve => {
+    const p = spawn("gh", ["auth", "status"], { stdio: "ignore", shell: process.platform === "win32" });
+    p.on("close", code => {
+      if (code !== 0) {
+        console.error("error: GitHub CLI is not authenticated. Run `gh auth login` (or pass --no-pr to skip the PR step).");
+        process.exit(1);
+      }
+      resolve();
+    });
+    p.on("error", () => {
+      console.error("error: `gh` not found in PATH. Install GitHub CLI from https://cli.github.com (or pass --no-pr).");
+      process.exit(1);
+    });
+  });
+}
+
 async function commitPhase() {
   if (!existsSync(STAGING)) { console.error(`error: nothing staged at ${STAGING}`); process.exit(1); }
+  await checkGhAuth();
   const eids = (await readdir(STAGING, { withFileTypes: true })).filter(d => d.isDirectory()).map(d => d.name);
   if (!eids.length) { console.error("error: staging has no event folders"); process.exit(1); }
 

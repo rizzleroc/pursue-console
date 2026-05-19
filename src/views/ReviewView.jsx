@@ -137,7 +137,10 @@ export default function ReviewView({ onSelect }) {
                   <ConfidenceBadge confidence={selected.confidence} agreement={selected.agreement} />
                   {onSelect && (
                     <button
-                      onClick={() => onSelect({ id: selected.eventId, title: selected.title }, { page: selected.page })}
+                      onClick={() => onSelect(
+                        (window.__EVENTS_BY_ID || {})[selected.eventId] || { id: selected.eventId, title: selected.title },
+                        { page: selected.page }
+                      )}
                       className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
                       OPEN DOSSIER →
                     </button>

@@ -164,7 +164,9 @@ const out = {
   totalDocsRemaining,
   totalPagesNeedingReview,
   totalPagesNeedingVisualContext,
-  inventoryTotal: 162,
+  // inventoryTotal removed in 2.1 — used to ship a hardcoded 162 that
+  // nothing consumed. The live count comes from corpus-stats.json's
+  // inventory.total (synced from Denis's manifest).
   cataloguedTotal: EVENTS.length,
   byEvent,
 };

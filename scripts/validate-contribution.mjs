@@ -66,11 +66,21 @@ const HALLUCINATION_MARKERS = [
 ];
 const SCRIPT_MARKERS = [/<script\b/i, /<iframe\b/i, /javascript:/i, /data:text\/html/i];
 
-function safetyCheck(text) {
+function safetyCheck(text, mode = "transcription") {
   const issues = [];
+  // Script injection / HTML smuggling — always checked regardless of mode.
   for (const re of SCRIPT_MARKERS) if (re.test(text)) issues.push(`embedded script: /${re.source}/`);
-  for (const re of HALLUCINATION_MARKERS) if (re.test(text)) issues.push(`possible LLM commentary: /${re.source}/`);
-  // single-token spam
+  // Hallucination markers are scoped to transcription mode only. For
+  // media-context contributions a human will naturally write things
+  // like "the document appears to be a memo from August 1947" —
+  // false-positive territory. Media-mode skips these and only flags
+  // hard tells (the explicit "as an AI" or "I cannot view" patterns,
+  // which a human would never write about a page they're holding).
+  const markers = mode === "media"
+    ? HALLUCINATION_MARKERS.slice(0, 3)   // only the explicit AI-confession ones
+    : HALLUCINATION_MARKERS;
+  for (const re of markers) if (re.test(text)) issues.push(`possible LLM commentary: /${re.source}/`);
+  // single-token spam (URL / base64 dumps)
   const longToks = (text.match(/\S{40,}/g) || []).length;
   if (longToks > 5) issues.push(`${longToks} suspiciously long tokens (URL/base64 dump?)`);
   return issues;
@@ -229,7 +239,7 @@ for (const c of contribs) {
       if (c.file.endsWith(".json")) {
         try {
           const meta = JSON.parse(await readFile(c.fullPath, "utf8"));
-          const safety = safetyCheck(`${meta.title || ""}\n${meta.context || ""}\n${meta.article_text || ""}`);
+          const safety = safetyCheck(`${meta.title || ""}\n${meta.context || ""}\n${meta.article_text || ""}`, "media");
           if (safety.length) { reject++; out.reject.push({ ...c, quality: 0, vsCanonical: null, issues: safety }); continue; }
         } catch {}
       }
