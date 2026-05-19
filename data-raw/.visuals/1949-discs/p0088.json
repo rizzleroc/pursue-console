@@ -1,0 +1,8 @@
+{
+  "kind": "map",
+  "title": "Annotated weather map of Japan",
+  "description": "A scanned map of Japan and nearby regions with hand-drawn weather symbols, isobars, grid lines, and shaded storm areas.",
+  "classifiedAt": "2026-05-19T07:12:49.934Z",
+  "classifier": "chatgpt",
+  "promptSha": "7de22f386e66"
+}

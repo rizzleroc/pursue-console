@@ -1,0 +1,8 @@
+{
+  "kind": "map",
+  "title": "Annotated weather map of Japan",
+  "description": "A geographic map of Japan with grid lines, contour/isobar curves, station markings, and handwritten weather annotations.",
+  "classifiedAt": "2026-05-19T07:13:05.733Z",
+  "classifier": "chatgpt",
+  "promptSha": "7de22f386e66"
+}
