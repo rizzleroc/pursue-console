@@ -3,7 +3,7 @@
   "page": 76,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-19T22:56:06.878Z",
+    "computed_at": "2026-05-19T23:56:32.240Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -16,7 +16,32 @@
       }
     ],
     "confidence": "low",
-    "needs_review": true
+    "needs_review": true,
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0076.gpt-vision.v2.txt",
+          "chars": 80,
+          "imported_at": "2026-05-19T23:56:32.107Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      },
+      "asymmetric": {
+        "v2": "gpt-vision",
+        "vsV1Of": "gemini",
+        "score": 0.447
+      }
+    },
+    "reeval_agreement": 0.447,
+    "reeval_pairs": [
+      {
+        "a": "gpt-vision-v2",
+        "b": "gemini-v1",
+        "score": 0.447
+      }
+    ],
+    "dispute_kind": "page-intrinsic"
   },
   "sources": {
     "gpt-vision": "PROJECT 10073 RECORD\nATIC NO.\nAF NO.\nREPORT NO.\nDATE OF REPORT 23 Feb 49\nTIME OF SIGHTING 1840 local\nSHAPE\nSIZE\nCOURSE\nNO. IN GROUP one\nSOUND \"Slow running A/C\"\nPHOTOS\nSKETCHES\nTemporary ATIC Form 329\n(2 Jan 52)\nDATE OF INFO 19 Feb 49\nLOCATION Goose Bay, Labrador\nSOURCE Wife\nDATE IN TO ATIC\nCOLOR\nSPEED\nALTITUDE\nLENGTH OF TIME OBSERVED 15-20 Min\nTYPE OF OBSERVATION heard engines\nMANEUVERS\nREMARKS: Not in file\n6792-15\n12 1 2 3 4 5 6 7 8 9 10 11\nDISPATCHED\n18 FEB 1949\nHEADQUARTERS\n6th Weather\nSquadron",

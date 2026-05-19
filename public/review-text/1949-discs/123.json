@@ -3,7 +3,7 @@
   "page": 123,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-19T22:56:06.895Z",
+    "computed_at": "2026-05-19T23:56:32.256Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -16,7 +16,32 @@
       }
     ],
     "confidence": "low",
-    "needs_review": true
+    "needs_review": true,
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0123.gpt-vision.v2.txt",
+          "chars": 216,
+          "imported_at": "2026-05-19T23:56:32.110Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      },
+      "asymmetric": {
+        "v2": "gpt-vision",
+        "vsV1Of": "gemini",
+        "score": 0.286
+      }
+    },
+    "reeval_agreement": 0.286,
+    "reeval_pairs": [
+      {
+        "a": "gpt-vision-v2",
+        "b": "gemini-v1",
+        "score": 0.286
+      }
+    ],
+    "dispute_kind": "page-intrinsic"
   },
   "sources": {
     "gpt-vision": "Hq MAMA Form No. 10-530\n(Rev. 23 Apr. 48)\n(?)\nH.\nAL\nOLMSTED FLIGHT SERVICE CENTER\nOlmsted Air Force Base\nMIDDLETOWN, PENNSYLVANIA\nOperating Location 33-8\nTRANSMITTED\nDec 13 3 53 PM '48",

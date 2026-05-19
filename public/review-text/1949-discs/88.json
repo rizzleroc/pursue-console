@@ -3,7 +3,7 @@
   "page": 88,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-19T22:56:06.884Z",
+    "computed_at": "2026-05-19T23:56:32.246Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -16,7 +16,32 @@
       }
     ],
     "confidence": "low",
-    "needs_review": true
+    "needs_review": true,
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0088.gpt-vision.v2.txt",
+          "chars": 648,
+          "imported_at": "2026-05-19T23:56:32.109Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      },
+      "asymmetric": {
+        "v2": "gpt-vision",
+        "vsV1Of": "gemini",
+        "score": 0.148
+      }
+    },
+    "reeval_agreement": 0.148,
+    "reeval_pairs": [
+      {
+        "a": "gpt-vision-v2",
+        "b": "gemini-v1",
+        "score": 0.148
+      }
+    ],
+    "dispute_kind": "page-intrinsic"
   },
   "sources": {
     "gpt-vision": "16\n16\n14\n12\n10\n08\n12\n32 106\n40 -9\n5\n23 H 093\n65\n23 4\n24 0-9*\n83 (?)\n19 6\n33 107\n75 -6\n245\n0/0\n36 099\n83 -18\n205 110\n11\n36 129\n62 ->12\n236 2\n87\n26\n14\nIII\n36 143\n23 (?) -3\n14 6\n51 148\n82 (?)\n31 7\n6\n40 138\n44 (?)\n42 50\n44 162\n51 (?)\n5 1\n46 (?) 157\n41 -29\n50\n53 159\n83 -24\n29 9\n031 164\n83 -15\n425\n25 059\n50 34\n36 17\n55 175\n82 -24\n3 5 2\n4\n55 177\n82 -26\n40 9\n56 172\n00 -26\n33 5\n64 189\n29\n51 143\n75 033\n41 9\n183\n42\n26\n55 166\n31 -13\n46\n54 107\n63 +11\n35\n2 5\n54 164\n38 183\n82 -21\n35 4\n16\n14\n18\n250600Z\n20\nIncl 5°",

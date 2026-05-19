@@ -205,6 +205,47 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
     // durations) if it exists, so we can show provenance even after later
     // recomputes.
     const priorReeval = sidecar.comparison?.reevaluation;
+
+    // Asymmetric re-evaluation: if exactly ONE v2 source exists (e.g.
+    // a volunteer re-ran via volunteer.mjs --review which is ChatGPT-only),
+    // score it against the OTHER provider's v1 text. Same intent: "the
+    // disputed page was re-run with a standardized prompt; does it now
+    // agree with what the other source originally said?"
+    if (Object.keys(v2Text).length === 1) {
+      const v2Src = Object.keys(v2Text)[0];           // e.g. "gpt-vision"
+      const v2Body = v2Text[v2Src];
+      const otherSrc = Object.keys(textBySource).find(n => n !== v2Src);  // e.g. "gemini"
+      if (otherSrc && textBySource[otherSrc]) {
+        const asym = agreementScore(v2Body, textBySource[otherSrc]);
+        cmp.reevaluation = priorReeval || { providers: {} };
+        cmp.reevaluation.providers[v2Src] ||= {
+          text_file: `p${padForReeval}.${v2Src}.v2.txt`, chars: v2Body.length,
+        };
+        cmp.reevaluation.asymmetric = { v2: v2Src, vsV1Of: otherSrc, score: asym };
+        cmp.reeval_agreement = asym;
+        cmp.reeval_pairs = [{ a: `${v2Src}-v2`, b: `${otherSrc}-v1`, score: asym }];
+        if (asym >= HIGH_CONFIDENCE) {
+          cmp.dispute_kind = "prompt-variance";
+          cmp.needs_review = false;
+          cmp.confidence = "high";
+          stats.disputes_resolved_by_reeval = (stats.disputes_resolved_by_reeval || 0) + 1;
+          // Promote v2 (the re-OCR'd version) as canonical — it's the
+          // more careful read of the page.
+          sidecar.best = v2Src;
+          try {
+            await writeFile(path.join(dir, `p${padForReeval}.txt`), v2Body + "\n", "utf8");
+          } catch {}
+        } else if (asym < REVIEW_THRESHOLD) {
+          cmp.dispute_kind = "page-intrinsic";
+          cmp.needs_review = true;
+          stats.disputes_page_intrinsic = (stats.disputes_page_intrinsic || 0) + 1;
+        } else {
+          cmp.dispute_kind = "partial-improvement";
+          stats.disputes_partial = (stats.disputes_partial || 0) + 1;
+        }
+      }
+    }
+
     if (Object.keys(v2Text).length >= 2) {
       const reeval = priorReeval || { providers: {} };
       for (const src of Object.keys(v2Text)) {

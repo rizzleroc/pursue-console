@@ -3,7 +3,7 @@
   "page": 127,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-19T22:56:06.898Z",
+    "computed_at": "2026-05-19T23:56:32.260Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -16,7 +16,32 @@
       }
     ],
     "confidence": "low",
-    "needs_review": true
+    "needs_review": true,
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0127.gpt-vision.v2.txt",
+          "chars": 40,
+          "imported_at": "2026-05-19T23:56:32.112Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      },
+      "asymmetric": {
+        "v2": "gpt-vision",
+        "vsV1Of": "gemini",
+        "score": 0.19
+      }
+    },
+    "reeval_agreement": 0.19,
+    "reeval_pairs": [
+      {
+        "a": "gpt-vision-v2",
+        "b": "gemini-v1",
+        "score": 0.19
+      }
+    ],
+    "dispute_kind": "page-intrinsic"
   },
   "sources": {
     "gpt-vision": "TRANSMITTED\nDEC 13   3 53 PM '48\n(?)",

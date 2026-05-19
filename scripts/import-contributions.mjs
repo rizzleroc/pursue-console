@@ -57,6 +57,16 @@ await mkdir(VIS_CACHE, { recursive: true });
 // can be added here as their importers come online.
 const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
 
+// Review-mode sources: a volunteer re-ran a disputed page through the
+// standardized prompt via volunteer.mjs --review. These do NOT replace
+// the original p<NNN>.<source>.txt (the disagreement evidence) — they
+// land as p<NNN>.<base>.v2.txt so compare-sources detects them as the
+// v2 reeval result for that page and re-scores the dispute.
+const REVIEW_SOURCES = new Map([
+  ["gpt-vision-review", "gpt-vision"],
+  ["gemini-review",     "gemini"],
+]);
+
 // Media submissions live at contributions/<handle>/media/<eid>/p<NNN>.{jpg,json}
 // — image + context capture, NOT a text transcription. They land in
 // data-raw/.visuals/<eid>/p<NNN>.json with classifier="human:<handle>"
@@ -126,6 +136,54 @@ for (const handleEnt of await listDirs(CONTRIB)) {
   // Build a flat list of (source, eid, srcDir) triples to import.
   const importTargets = [];
   for (const child of await listDirs(hDir)) {
+    // <handle>/<source>-review/<eid>/p<NNN>.txt — volunteer re-OCR via
+    // the --review flow. Land as v2 alongside the original; let
+    // compare-sources promote canonical if the new v2 + the other
+    // provider's v1 now agree.
+    if (REVIEW_SOURCES.has(child.name)) {
+      const baseSource = REVIEW_SOURCES.get(child.name);
+      const reviewRoot = path.join(hDir, child.name);
+      for (const eidEnt of await listDirs(reviewRoot)) {
+        const eid = eidEnt.name;
+        const srcDir = path.join(reviewRoot, eid);
+        const dstDir = path.join(VIS_CACHE, eid);
+        await mkdir(dstDir, { recursive: true });
+        for (const f of await readdir(srcDir)) {
+          const pageNum = await pageNumFromName(f);
+          if (pageNum == null) continue;
+          stats.scanned++;
+          const srcText = (await readFile(path.join(srcDir, f), "utf8")).trim();
+          if (srcText.length < MIN_CHARS) { stats.skipped_empty++; continue; }
+          const pad = pad4(pageNum);
+          const v2Path = path.join(dstDir, `p${pad}.${baseSource}.v2.txt`);
+          await writeFile(v2Path, srcText + "\n", "utf8");
+          // Update sidecar reevaluation block so compare-sources can
+          // find the v2 file by metadata too (filesystem-glob also
+          // catches it, but this preserves attribution).
+          const sidecarPath = path.join(dstDir, `p${pad}.sources.json`);
+          let sidecar = { best: null, sources: {} };
+          if (existsSync(sidecarPath)) {
+            try { sidecar = JSON.parse(await readFile(sidecarPath, "utf8")); } catch {}
+          }
+          sidecar.comparison ||= {};
+          sidecar.comparison.reevaluation ||= { providers: {} };
+          sidecar.comparison.reevaluation.providers[baseSource] = {
+            text_file: `p${pad}.${baseSource}.v2.txt`,
+            chars: srcText.length,
+            imported_at: new Date().toISOString(),
+            contributor: handle,
+            via: "volunteer-review",
+          };
+          await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
+          stats.imported++;
+          manifest[`${eid}/p${pad}.txt`] = {
+            handle, importedAt: new Date().toISOString(),
+            chars: srcText.length, source: `${baseSource}-review`,
+          };
+        }
+      }
+      continue;
+    }
     if (child.name === "media") {
       // <handle>/media/<eid>/p<NNN>.{jpg,json} — image + context job
       const mediaRoot = path.join(hDir, child.name);
