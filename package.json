@@ -17,6 +17,7 @@
     "corpus:media": "node scripts/build-media-index.mjs",
     "corpus:coverage": "node scripts/diagnose-coverage.mjs",
     "corpus:alignment": "node scripts/diagnose-page-alignment.mjs",
+    "corpus:sync-check": "node scripts/diagnose-deploy-sync.mjs",
     "corpus:migrate-per-source": "node scripts/migrate-per-source-text.mjs",
     "corpus:db": "node scripts/db-rebuild.mjs",
     "lint": "eslint .",

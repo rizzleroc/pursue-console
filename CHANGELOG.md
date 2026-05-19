@@ -55,6 +55,20 @@ The reframing release. The console stops being "twelve visualizations over a sha
 - **Path-aware walker** in both Node + Python validators accepts the new `<handle>/<source>/<eid>/` and `<handle>/media/<eid>/` shapes; legacy `<handle>/<eid>/` still accepted, labeled `gpt-vision`.
 - **`actions/setup-python@v5 cache: pip` removed** from `validate-contribution.yml` — it required a manifest we don't ship and was silently failing every validator run before any gate fired.
 
+### Post-2.0 patch (2026-05-19)
+
+- **fix: reeval block was being wiped from sidecars on every recompute.**
+  `compare-sources.mjs` read `sidecar.comparison.reevaluation` then overwrote
+  the whole `comparison` object without restoring the field. The .v2.txt
+  files stayed on disk but the metadata pointer was lost, so subsequent
+  builds couldn't re-detect the resolved disputes — REVIEW kept showing 22
+  instead of 19. Fix: detect .v2 files directly via filesystem glob (idempotent),
+  preserve + write back the reevaluation block.
+- **new: `npm run corpus:sync-check`** (`scripts/diagnose-deploy-sync.mjs`).
+  Diffs every count + freshness signal between local build artifacts and the
+  live github.io deploy. One-screen audit so "the numbers aren't going down"
+  is a 2-second check, not a manual `curl` exercise.
+
 ### Stats at release
 
 - 173 records inventoried · 121 catalogued · 3,376 pages transcribed

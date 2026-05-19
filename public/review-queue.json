@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-19T00:55:07.428Z",
-  "total": 22,
+  "generatedAt": "2026-05-19T05:28:46.216Z",
+  "total": 19,
   "queue": [
     {
       "eventId": "gemini-7",
@@ -26,81 +26,6 @@
       ],
       "againstHuman": null,
       "textUrl": "review-text/gemini-7/3.json"
-    },
-    {
-      "eventId": "incident-summaries",
-      "title": "Project Blue Book–era Incident Summaries (#1–233)",
-      "agency": "Department of War",
-      "page": 140,
-      "agreement": 0.019,
-      "confidence": "low",
-      "sources": {
-        "gpt-vision": {
-          "chars": 111
-        },
-        "gemini": {
-          "chars": 2016
-        }
-      },
-      "pairs": [
-        {
-          "a": "gpt-vision",
-          "b": "gemini",
-          "score": 0.019
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/incident-summaries/140.json"
-    },
-    {
-      "eventId": "netherlands-1948",
-      "title": "Netherlands Air Force Intel Report",
-      "agency": "Department of War",
-      "page": 3,
-      "agreement": 0.032,
-      "confidence": "low",
-      "sources": {
-        "gpt-vision": {
-          "chars": 582
-        },
-        "gemini": {
-          "chars": 46
-        }
-      },
-      "pairs": [
-        {
-          "a": "gpt-vision",
-          "b": "gemini",
-          "score": 0.032
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/netherlands-1948/3.json"
-    },
-    {
-      "eventId": "incident-summaries",
-      "title": "Project Blue Book–era Incident Summaries (#1–233)",
-      "agency": "Department of War",
-      "page": 8,
-      "agreement": 0.043,
-      "confidence": "low",
-      "sources": {
-        "gpt-vision": {
-          "chars": 1477
-        },
-        "gemini": {
-          "chars": 54
-        }
-      },
-      "pairs": [
-        {
-          "a": "gpt-vision",
-          "b": "gemini",
-          "score": 0.043
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/incident-summaries/8.json"
     },
     {
       "eventId": "1949-discs",

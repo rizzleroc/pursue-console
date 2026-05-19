@@ -264,6 +264,7 @@ npm run corpus:classify           # per-page visual kind classification
 npm run corpus:reeval             # re-run disputed pages through /fanout
 npm run corpus:coverage           # per-event matrix (complete · gap · mismatch)
 npm run corpus:alignment          # page-numbering sanity check across sources
+npm run corpus:sync-check         # diff every count between local build + live github.io
 ```
 
 Stack: Vite + React 19 + Tailwind v3 + better-sqlite3. No chart libraries; the network view is a hand-rolled force-directed layout, the globe is an orthographic projection, the heatmap is CSS grid. FAISS runs in browser via `@huggingface/transformers` + ORT WASM (~25 MB INT8 model, cached in IndexedDB after first download).

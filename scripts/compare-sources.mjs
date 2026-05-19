@@ -186,13 +186,34 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
     // them and decide whether the original mismatch was prompt-variance
     // (settled by re-eval) or page-intrinsic (still disagreeing, needs
     // human eyes).
-    const reeval = sidecar.comparison?.reevaluation;
-    if (reeval?.providers) {
-      const v2Text = {};
-      for (const [src, info] of Object.entries(reeval.providers)) {
-        if (!info?.text_file) continue;
-        try { v2Text[src] = (await readFile(path.join(dir, info.text_file), "utf8")).trim(); } catch {}
+    //
+    // The reeval block on the sidecar is metadata that points at .v2.txt
+    // files. But sidecar.comparison gets fully replaced at the end of
+    // this function, so any reevaluation block we read but don't write
+    // back gets wiped. Trigger off the FILES on disk so this stays
+    // idempotent across runs even if the metadata pointer is lost.
+    const pnumForReeval = Number(m[1]);
+    const padForReeval = String(pnumForReeval).padStart(4, "0");
+    const reevalCandidates = (await readdir(dir)).filter(f => new RegExp(`^p${padForReeval}\\.[a-z-]+\\.v2\\.txt$`).test(f));
+    const v2Text = {};
+    for (const f of reevalCandidates) {
+      const sm = f.match(/^p\d+\.([a-z-]+)\.v2\.txt$/);
+      if (!sm) continue;
+      try { v2Text[sm[1]] = (await readFile(path.join(dir, f), "utf8")).trim(); } catch {}
+    }
+    // Preserve the existing reevaluation metadata (computed_at, prompt sha,
+    // durations) if it exists, so we can show provenance even after later
+    // recomputes.
+    const priorReeval = sidecar.comparison?.reevaluation;
+    if (Object.keys(v2Text).length >= 2) {
+      const reeval = priorReeval || { providers: {} };
+      for (const src of Object.keys(v2Text)) {
+        if (!reeval.providers[src]) {
+          reeval.providers[src] = { text_file: `p${padForReeval}.${src}.v2.txt`, chars: v2Text[src].length };
+        }
       }
+      // Round-trip the block so it survives the cmp overwrite
+      cmp.reevaluation = reeval;
       const v2Names = Object.keys(v2Text);
       if (v2Names.length >= 2) {
         // Min pairwise agreement across re-evaluated sources
@@ -255,7 +276,12 @@ console.log(`[compare] scanned ${stats.pages_scanned} sidecars across ${stats.ev
 console.log(`[compare] compared ${stats.pages_compared} multi-source pages`);
 console.log(`[compare]   high confidence  ${stats.high_confidence}`);
 console.log(`[compare]   medium           ${stats.medium_confidence}`);
-console.log(`[compare]   needs review     ${stats.needs_review}`);
+// Note: stats.needs_review counts pages flagged before the re-evaluation
+// branch settles them. The DB-side query in scripts/db-rebuild.mjs and the
+// public review-queue.json reflect the FINAL count (this minus
+// disputes_resolved_by_reeval).
+const finalNeedsReview = stats.needs_review - (stats.disputes_resolved_by_reeval || 0);
+console.log(`[compare]   needs review     ${finalNeedsReview} (${stats.needs_review} initially flagged · ${stats.disputes_resolved_by_reeval || 0} settled by reeval)`);
 if (stats.disputes_resolved_by_reeval || stats.disputes_page_intrinsic || stats.disputes_partial) {
   console.log(`[compare] re-evaluation outcomes:`);
   console.log(`            resolved by reeval     ${stats.disputes_resolved_by_reeval || 0}  (prompt-variance: same prompt across both providers now agrees)`);

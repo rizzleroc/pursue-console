@@ -1,5 +1,5 @@
 {
-  "best": "gpt-vision",
+  "best": "gemini",
   "sources": {
     "gpt-vision": {
       "chars": 111,
@@ -9,14 +9,14 @@
     },
     "gemini": {
       "chars": 2016,
-      "imported_at": "2026-05-19T00:54:57.420Z",
+      "imported_at": "2026-05-19T05:28:36.209Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T16:08:48.167872+00:00",
       "text_file": "p0140.gemini.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T00:55:04.523Z",
+    "computed_at": "2026-05-19T05:28:43.565Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -28,7 +28,29 @@
         "score": 0.019
       }
     ],
-    "confidence": "low",
-    "needs_review": true
+    "confidence": "high",
+    "needs_review": false,
+    "reevaluation": {
+      "providers": {
+        "gemini": {
+          "text_file": "p0140.gemini.v2.txt",
+          "chars": 2075
+        },
+        "gpt-vision": {
+          "text_file": "p0140.gpt-vision.v2.txt",
+          "chars": 2075
+        }
+      }
+    },
+    "reeval_agreement": 0.989,
+    "reeval_pairs": [
+      {
+        "a": "gemini",
+        "b": "gpt-vision",
+        "score": 0.989
+      }
+    ],
+    "reeval_delta": 0.97,
+    "dispute_kind": "prompt-variance"
   }
 }
