@@ -1,6 +1,14 @@
-# SQL Migration Roadmap (Phase 2)
+# SQL Migration Roadmap (Phase 2) — DONE in 2.0
 
-This document scopes the work to consolidate the corpus's many static JSON artifacts into a single in-browser SQLite database. **Not built yet** — this is a spec so the work has a known shape when we pick it up.
+> **Status: shipped in Release 2.0.** This document is kept as historical scope. The migration landed via `scripts/db-rebuild.mjs` writing `data-raw/corpus.sqlite` on every build, with five tables (`inventory`, `events`, `pages`, `contributions`, `runs`). Every dashboard count now derives from a SQL query against this file; the per-view JSON files in `public/` are auto-generated projections of that DB.
+>
+> See the **Single source of truth** section of [README.md](./README.md) and the **Data architecture** section of [CHANGELOG.md](./CHANGELOG.md).
+>
+> The original scope below is preserved for context.
+
+---
+
+
 
 ## Why move to SQL
 

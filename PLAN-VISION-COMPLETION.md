@@ -1,6 +1,16 @@
-# Plan: Complete the Vision-OCR Conversion
+# Plan: Complete the Vision-OCR Conversion — DONE in 2.0
 
-**Goal:** replace tesseract-grade OCR with ChatGPT-vision transcription on every page where it'll meaningfully improve search precision. Ship the cleaner corpus to the live deploy in regular increments so progress is visible.
+> **Status: substantially complete in Release 2.0.** This document is kept as historical scope.
+>
+> The 597 tesseract pages this plan was scoped against now have vision-quality coverage from two sources: 3,370 Gemini transcriptions (from the upstream sync of [DenisSergeevitch/UFO-USA](https://github.com/DenisSergeevitch/UFO-USA)) and 427 ChatGPT-vision transcriptions (from the maintainer's batches + 18 volunteer submissions). 425 pages now have both, and `compare-sources.mjs` cross-checks them. Only 4 pages remain as OCR-canonical, all of which the classifier or volunteer flow can lift over time.
+>
+> The next-phase work (handwritten witness statements like 1949-discs pages 7+, where machines disagree) is now tracked in the REVIEW queue rather than this document. See [README.md § Cross-source iteration loop](./README.md#cross-source-iteration-loop-20-architecture) and the per-event coverage report at `npm run corpus:coverage`.
+>
+> The original goal + plan below is preserved for context.
+
+---
+
+
 
 ## State as of this plan
 

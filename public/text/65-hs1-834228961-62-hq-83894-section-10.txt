@@ -5,7 +5,7 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 178 pages
+Source extraction: VISION · 179 pages
 
 ---
 
@@ -1822,6 +1822,26 @@ REC 53
 51 OCT 31 1966
 EX-114
 NAT. INT. SEC.
+
+
+=== Page 26 (vision) ===
+
+OPTIONAL FORM NO. 10
+UNITED STATES GOVERNMENT
+Memorandum
+
+TO: (?) DATE: (?)
+FROM: (?)
+SUBJECT: (?)
+
+(?)
+
+REC'D
+DOM INTELL DIV.
+
+Oct 21 12 17 PM '66
+
+(?)
 
 
 === Page 27 (vision) ===

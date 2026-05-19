@@ -1,98 +1,120 @@
 # Contributing to PURSUE Console
 
-**This is an open investigation. Pull requests are encouraged.** You don't need to be a developer to contribute — most of the highest-value contributions are sourcing claims to primary documents and adding to the entity graph.
+**This is an open investigation. Pull requests are encouraged.** Most of the highest-value contributions are reading the actual primary documents and improving the data — you don't need to be a developer.
+
+Before anything else, please read [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md). It documents the **three-priority ladder**: settle the REVIEW queue first, then transcribe new pages, then image + context capture. The order matters because lower-numbered priorities settle work that's blocking everything downstream.
+
+---
+
+## Quick reference — where contributions land
+
+```
+contributions/<your-handle>/
+├── human/<eid>/p<NNNN>.txt              ← hand-typed transcription (always wins canonical)
+├── gpt-vision/<eid>/p<NNNN>.txt         ← ChatGPT OCR via scripts/volunteer.mjs
+├── gemini/<eid>/p<NNNN>.txt             ← Gemini OCR via scripts/volunteer.mjs
+└── media/<eid>/p<NNNN>.{json,jpg}       ← image + verbatim context
+```
+
+The validator runs on every PR. Verdicts post as a PR comment. See [JUDGE-STANDARD.md](./JUDGE-STANDARD.md) for the gates.
+
+---
 
 ## What needs contributors
 
-### 1. Read the source documents and improve the data
+### 1. Settle a disputed page *(highest leverage · no tooling)*
 
-The full release is at https://www.war.gov/UFO. We currently have **51 of the 162 records** catalogued.
+Open the [REVIEW tab](https://rizzleroc.github.io/pursue-console/). Pick a page where machine sources disagree. Read the source PDF (linked from DOSSIER). Type the correct version. Drop it at `contributions/<your-handle>/human/<eid>/p<NNNN>.txt` and open a PR.
 
-- **Add a missing record.** Open `src/data/events.js`, follow the shape of an existing entry, link the primary PDF, and add it.
-- **Improve a summary.** If the current summary misses something important from the PDF, edit it. Keep it source-grounded — no speculation beyond what the document says.
-- **Add or correct entities.** `src/data/entities.js` is hand-curated. If you spot a person/program/platform/morphology that recurs and isn't indexed, add it. If you spot an event referencing an existing entity that isn't linked, add the event id to that entity's `events` array.
+**Why this is the highest-leverage thing you can do:** a human-typed page becomes the canonical text for that page no matter what any machine produced, AND becomes gold against which every machine source is scored going forward. One disputed page resolved → calibrates the whole pipeline.
 
-### 2. Curate a new narrative thread
+### 2. Transcribe new pages *(needs ChatGPT Plus or Gemini · ~30 min)*
 
-`src/data/threads.js` holds the curated arcs. A good thread:
+Anyone with a logged-in browser tab can OCR a slice of unprocessed pages.
 
-- has a clear thesis (1–3 sentences) the documents collectively support
-- is an **ordered** sequence of event ids
-- doesn't repeat existing threads' territory
+```bash
+curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash    # macOS/Linux
+iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex            # Windows
+cd pursue-helper
+npm start --prefix pursue-vision-mcp
+npm run volunteer -- --my-handle=YOU --slice=20                                    # ChatGPT
+npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini                  # or Gemini
+```
 
-Open an issue first if you're not sure the thread is non-redundant.
+The script claims pages off the live queue (`public/work-available.json`), runs them through your own browser tab, opens a PR.
 
-### 3. Build a new view
+### 3. Image + context capture *(NEW in 2.0 · ~1 hour)*
 
-The view modules in `src/views/` are intentionally small and independent. Some ideas open for grabs:
+For pages with photographs, hand-drawings, newspaper clippings, maps, or diagrams. Two-phase script:
 
-- **Search view** — full-text search over event summaries with snippet highlighting
-- **Compare view** — pick 2–3 events side-by-side and surface shared entities
-- **Timeline-by-entity** — pick an entity, see only events that reference it on a temporal axis
-- **Witness reliability matrix** — flag/elevate/anchor against agency type
-- **Sensor modality matrix** — IR/EO/SWIR/radar/visual breakdown
+```bash
+node scripts/volunteer-media.mjs --my-handle=YOU --slice=5         # claim + render
+# (fill the per-page markdown templates at ~/.pursue-helper/media-staging/)
+node scripts/volunteer-media.mjs --my-handle=YOU --commit          # commit + PR
+```
 
-To add a view: drop a `FooView.jsx` in `src/views/`, import it in `src/App.jsx`, and add an entry to the `VIEWS` array in `src/components/Header.jsx`.
+Spec: [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md).
 
-### 4. Polish + accessibility
+### 4. Add a missing record from the official inventory
 
-- Keyboard navigation (the views are click/touch-heavy)
-- Reduced-motion preference (CRT flicker, radar sweep, anchor pulse)
-- Screen-reader labels on the SVG graph and globe
+We have 121 of 173 records catalogued. The remaining 52 have URLs (from the Denis manifest sync) but no metadata. Edit [`src/data/events.js`](./src/data/events.js):
+
+```js
+{
+  id: "kebab-case-id",
+  title: "Short human title",
+  date: "1948-03-14",          // or "1947–1949" for ranges
+  era: "40s",                  // 40s|50s|...|20s
+  agency: "FBI",               // FBI · NASA · Department of War · Department of State
+  loc: "Roswell, NM",
+  region: "Americas",          // or Europe/Asia/MidEast/Africa/Oceania/ExtraPlanetary
+  coords: [33.39, -104.52],    // [lat, lon], or null for extra-planetary
+  type: "Mission Report",      // free-form
+  flag: "anchor",              // "anchor" for the highest-impact items, else omit
+  summary: "Two paragraphs grounded to the PDF. No speculation beyond the document.",
+  tags: ["disc", "radar", "witness"],
+  url: "https://www.war.gov/medialink/ufo/release_1/<file>.pdf",
+}
+```
+
+Run `npm run dev` to verify the record renders, then PR.
+
+### 5. Add or correct entities in the connective-tissue index
+
+[`src/data/entities.js`](./src/data/entities.js) is hand-curated. If you spot a person/program/platform/morphology/behavior that recurs and isn't indexed, add it. If you spot an event referencing an existing entity that isn't linked, add the event id to that entity's `events` array.
+
+### 6. Build a new view
+
+Add a file under `src/views/`, import it in `src/App.jsx`, register it in `src/components/Header.jsx`. The deploy ships in ~40 seconds after merge.
+
+---
 
 ## Ground rules
 
-- **Cite the document.** Every claim added to `events.js` or `threads.js` should be supported by the linked PDF. We don't add speculation, theories of origin, or claims the release itself does not make.
-- **All cases are UNRESOLVED.** The government's words. The console should not present any record as "confirmed" anything.
-- **Don't add UFO-community lore** that isn't in Release 01. Future tranches will arrive every few weeks; that's where new material comes from.
-- **Be kind in code review.** See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+- **Source every claim to the primary documents.** No speculation beyond what the PDFs say.
+- **Discuss claims, not contributors.** See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+- **Don't paste model speculation into transcripts.** The validator looks for telltale LLM-commentary patterns ("I would interpret this as…", "this appears to show…") and rejects them.
+- **Match the existing path convention** for transcriptions. `human` is reserved for hand-typed text — never write to it from an automated script.
 
-## Dev setup
+---
+
+## Run locally
 
 ```bash
 git clone https://github.com/rizzleroc/pursue-console
 cd pursue-console
 npm install
 npm run dev          # http://localhost:5173
-npm run build        # production build to dist/
 ```
 
-Stack: Vite + React 19 + Tailwind v3. No graph or chart libraries — the network view is a ~70-line force layout, the globe is a hand-rolled orthographic projection.
+The build pipeline (`npm run build`) runs the full data chain — synced inventory, imported transcripts, cross-source comparison, DB rebuild, search index, embeddings, dossier extracts, MEDIA index — then `vite build`. See [`package.json`](./package.json) for the full chain and [README.md](./README.md) for the architecture diagram.
 
-## Project layout
+For maintainer batches (vision OCR via the MCP, FAISS rebuild, visual classification, re-evaluation), see the **Maintainer batches** section of the README.
 
-```
-src/
-  data/
-    events.js       ← 51 records — the corpus
-    entities.js     ← people, programs, commands, platforms, sensors,
-                      morphologies, behaviors. The graph.
-    threads.js      ← 8 curated narrative arcs
-  views/
-    TimelineView.jsx
-    GlobeView.jsx
-    AtlasView.jsx
-    NetworkView.jsx      ← force-directed graph of events ↔ entities
-    PatternsView.jsx     ← ranked signatures across the corpus
-    ThreadsView.jsx      ← curated arcs
-    ConstellationView.jsx
-    DossierView.jsx      ← per-record with cross-links
-  components/
-    Header.jsx
-    Primitives.jsx       ← scanlines, grain, glitch text, radar sweep, MiniChip
-  App.jsx
-  main.jsx
-```
+---
 
-## Pull request flow
+## Asking before building
 
-1. Fork the repo and create a topic branch (`feature/add-roswell`, `fix/globe-touch`, …).
-2. Run `npm run build` locally — it should pass without warnings.
-3. Open a PR with a clear title and a 1–3 sentence "why."
-4. For data PRs, link the primary document(s) in the PR description.
+If you're not sure your contribution fits, open an issue first. The [`good first issue`](https://github.com/rizzleroc/pursue-console/labels/good%20first%20issue) and [`data`](https://github.com/rizzleroc/pursue-console/labels/data) labels are good starting points.
 
-Tiny PRs are great. Don't bundle a data correction with a new view.
-
-## Anything else?
-
-Open an issue. There's no central maintainer cabal — this is an open investigation. The point is to read the documents together.
+**Thank you for helping.** Every record catalogued, every page transcribed, every disputed page settled improves what a person looking at this corpus can find.

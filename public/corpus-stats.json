@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-18T21:25:01.410Z",
+  "generatedAt": "2026-05-19T00:55:05.946Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -18,45 +18,52 @@
     "fullyVision": 63
   },
   "pages": {
-    "totalKnown": 3376,
-    "totalIndexed": 3376,
-    "vision": 3372,
+    "totalKnown": 3377,
+    "totalIndexed": 3377,
+    "vision": 3373,
     "ocrOnly": 4,
     "visualsAnnotated": 309,
-    "totalChars": 7001332
+    "totalChars": 7001499
   },
   "bySource": {
     "gemini": 3370,
-    "gptVision": 427,
+    "gptVision": 428,
     "human": 0,
     "ocr": 693,
     "pagesWithMultipleSources": 425
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 421,
+    "gptVision": 422,
     "gemini": 2951,
     "ocr": 4
   },
   "contributions": {
-    "total": 18,
+    "total": 19,
     "contributors": [
       {
         "handle": "Rizzleroc",
-        "pages": 18,
-        "chars": 24246
+        "pages": 19,
+        "chars": 24413
       }
     ]
   },
   "runs": {
     "last": {
-      "ts": "2026-05-18T21:25:01.410Z",
+      "ts": "2026-05-19T00:55:05.946Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1041,
-      "note": "events=121 inventory=173 contributions=18"
+      "duration_ms": 1048,
+      "note": "events=121 inventory=173 contributions=19"
     },
     "recent": [
+      {
+        "ts": "2026-05-19T00:55:05.946Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1048,
+        "note": "events=121 inventory=173 contributions=19"
+      },
       {
         "ts": "2026-05-18T21:25:01.410Z",
         "kind": "db-rebuild",
@@ -119,13 +126,6 @@
         "outcome": "ok",
         "duration_ms": 984,
         "note": "events=121 inventory=173 contributions=18"
-      },
-      {
-        "ts": "2026-05-18T06:18:09.222Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1029,
-        "note": "events=121 inventory=173 contributions=18"
       }
     ]
   },
@@ -184,10 +184,11 @@
       "needsReview": 13
     },
     "65-hs1-834228961-62-hq-83894-section-10": {
-      "pages": 178,
-      "chars": 692705,
+      "pages": 179,
+      "chars": 692872,
       "sources": [
-        "gemini"
+        "gemini",
+        "gpt-vision"
       ],
       "dominantBest": "gemini",
       "needsReview": 0

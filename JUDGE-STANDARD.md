@@ -2,6 +2,8 @@
 
 **The standard a contributed transcription must meet to be merged into the canonical corpus.**
 
+> Updated for 2.0: covers four submission paths (`human` / `gpt-vision` / `gemini` text transcriptions + `media` image-and-context submissions). Media submissions get a separate schema gate (`kind` enum, `title` ≥4 chars, `context` ≥20 chars verbatim, image present + 5KB–5MB) plus the same safety scan on text fields.
+
 This document is the source of truth. The validators in `scripts/validate-contribution.mjs` (fast, lexical + safety) and `scripts/validate-contribution-semantic.py` (FAISS-based, semantic) implement it exactly. The GitHub Action `validate-contribution.yml` runs both on every PR touching `contributions/`.
 
 If the validators say "pass," your work goes in. If they say "review," a maintainer reads it. If they say "reject," the standard below tells you why and how to fix it.
@@ -26,8 +28,8 @@ A submission passes when it crosses all five. Any gate below the floor and the f
 
 | Check | Required | How to fix |
 |---|---|---|
-| Path matches `contributions/<your-github-handle>/<event-id>/p<NNNN>.txt` | yes | rename / move |
-| Filename matches `p\d{1,4}\.txt` | yes | zero-pad page numbers |
+| Path matches `contributions/<handle>/<source>/<eid>/p<NNNN>.txt` where `<source>` ∈ `human` / `gpt-vision` / `gemini`, OR `contributions/<handle>/media/<eid>/p<NNNN>.{json,jpg}` for image contributions | yes | rename / move |
+| Filename matches `p\d{1,4}\.txt` (or `.json`/`.jpg` for media) | yes | zero-pad page numbers |
 | Encoding is UTF-8 | yes | save as UTF-8 |
 | File ≤ 256 KB | yes | one page per file; split if larger |
 | `<event-id>` appears in `src/data/events.js` | yes | open an issue to catalog the event first |
