@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T11:10:49.526Z",
+  "generatedAt": "2026-05-20T11:25:57.282Z",
   "total": 205,
   "byKind": {
     "diagram": 16,
@@ -28,7 +28,7 @@
       "title": "of kite-shaped object with lights",
       "description": "Diagram of kite-shaped object with lights",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:49.040Z",
+      "classifiedAt": "2026-05-20T11:25:56.625Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -43,7 +43,7 @@
       "title": "A horizontal line with a red circle on the left labeled \"Red light\" and a white",
       "description": "Diagram: A horizontal line with a red circle on the left labeled \"Red light\" and a white square on the right labeled \"White light\"",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.993Z",
+      "classifiedAt": "2026-05-20T11:25:56.571Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -58,7 +58,7 @@
       "title": "Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619,",
       "description": "Image: Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619, (RUS) KUZNETSOV CV-063 (RUS) CHILIKIN AOR, (RUS) KALININGRADNET AD, (RUS) KIROV CON 099, (RUS) INGUL ARS",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.866Z",
+      "classifiedAt": "2026-05-20T11:25:56.424Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -73,7 +73,7 @@
       "title": "of mummified figure",
       "description": "Image of mummified figure",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.739Z",
+      "classifiedAt": "2026-05-20T11:25:56.280Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -88,7 +88,7 @@
       "title": "A grainy, black-and-white sensor feed showing a landscape. A red circle is drawn",
       "description": "Image: A grainy, black-and-white sensor feed showing a landscape. A red circle is drawn around a small, bright, elongated object in the upper-left quadrant. There are four corner brackets (L-shaped) and a central crosshair. The letter \"N\" is visible near the bottom center.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.545Z",
+      "classifiedAt": "2026-05-20T11:25:56.071Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -103,7 +103,7 @@
       "title": "of circle with crosshair",
       "description": "Sketch of circle with crosshair",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.544Z",
+      "classifiedAt": "2026-05-20T11:25:56.067Z",
       "imagePath": "media/krasuski-1944/p0004.png",
       "thumbnailPath": "media/krasuski-1944/p0004.png"
     },
@@ -118,7 +118,7 @@
       "title": "of flight path with points labeled 1, 2, 3, 4, and 5",
       "description": "Diagram of flight path with points labeled 1, 2, 3, 4, and 5",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.531Z",
+      "classifiedAt": "2026-05-20T11:25:56.043Z",
       "imagePath": "media/incident-summaries/p0178.png",
       "thumbnailPath": "media/incident-summaries/p0178.png"
     },
@@ -133,7 +133,7 @@
       "title": "Hand-drawn sketch of a disc-shaped object with a dome on top",
       "description": "Hand-drawn sketch of a disc-shaped object with a dome on top",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.527Z",
+      "classifiedAt": "2026-05-20T11:25:56.038Z",
       "imagePath": "media/incident-summaries/p0162.png",
       "thumbnailPath": "media/incident-summaries/p0162.png"
     },
@@ -148,7 +148,7 @@
       "title": "of object with \"Side View\" label on the left and \"Top\" label in the center",
       "description": "Sketch of object with \"Side View\" label on the left and \"Top\" label in the center",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.499Z",
+      "classifiedAt": "2026-05-20T11:25:56.001Z",
       "imagePath": "media/incident-summaries/p0037.png",
       "thumbnailPath": "media/incident-summaries/p0037.png"
     },
@@ -163,7 +163,7 @@
       "title": "A photograph of a dark, elongated object against a lighter background",
       "description": "Image: A photograph of a dark, elongated object against a lighter background",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.480Z",
+      "classifiedAt": "2026-05-20T11:25:55.972Z",
       "imagePath": "media/fbi-62hq83894/p0185.png",
       "thumbnailPath": "media/fbi-62hq83894/p0185.png"
     },
@@ -178,7 +178,7 @@
       "title": "A photograph of a boy (Bill Turrentine) and a reporter (George Herbert) looking",
       "description": "Image: A photograph of a boy (Bill Turrentine) and a reporter (George Herbert) looking at a photograph.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.473Z",
+      "classifiedAt": "2026-05-20T11:25:55.964Z",
       "imagePath": "media/fbi-62hq83894/p0160.png",
       "thumbnailPath": "media/fbi-62hq83894/p0160.png"
     },
@@ -193,7 +193,7 @@
       "title": "of Father Joseph Brasky holding a circular saw blade, pointing to a lightning ro",
       "description": "Image of Father Joseph Brasky holding a circular saw blade, pointing to a lightning rod on a church roof",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.451Z",
+      "classifiedAt": "2026-05-20T11:25:55.933Z",
       "imagePath": "media/fbi-62hq83894/p0056.png",
       "thumbnailPath": "media/fbi-62hq83894/p0056.png"
     },
@@ -208,24 +208,9 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.449Z",
+      "classifiedAt": "2026-05-20T11:25:55.931Z",
       "imagePath": "media/fbi-62hq83894/p0051.png",
       "thumbnailPath": "media/fbi-62hq83894/p0051.png"
-    },
-    {
-      "id": "fbi-62hq83894-p0049",
-      "eventId": "fbi-62hq83894",
-      "eventTitle": "FBI Flying Discs Case File 62-HQ-83894",
-      "agency": "FBI",
-      "era": "40s",
-      "page": 49,
-      "kind": "photograph",
-      "title": "of a person kneeling and inspecting the landing gear of an aircraft",
-      "description": "Photograph of a person kneeling and inspecting the landing gear of an aircraft",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.448Z",
-      "imagePath": "media/fbi-62hq83894/p0049.png",
-      "thumbnailPath": "media/fbi-62hq83894/p0049.png"
     },
     {
       "id": "fbi-62hq83894-p0048",
@@ -238,9 +223,24 @@
       "title": "A photograph of a man holding a large circular saw blade.",
       "description": "Image: A photograph of a man holding a large circular saw blade.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.447Z",
+      "classifiedAt": "2026-05-20T11:25:55.929Z",
       "imagePath": "media/fbi-62hq83894/p0048.png",
       "thumbnailPath": "media/fbi-62hq83894/p0048.png"
+    },
+    {
+      "id": "fbi-62hq83894-p0049",
+      "eventId": "fbi-62hq83894",
+      "eventTitle": "FBI Flying Discs Case File 62-HQ-83894",
+      "agency": "FBI",
+      "era": "40s",
+      "page": 49,
+      "kind": "photograph",
+      "title": "of a person kneeling and inspecting the landing gear of an aircraft",
+      "description": "Photograph of a person kneeling and inspecting the landing gear of an aircraft",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.929Z",
+      "imagePath": "media/fbi-62hq83894/p0049.png",
+      "thumbnailPath": "media/fbi-62hq83894/p0049.png"
     },
     {
       "id": "fbi-62hq83894-p0036",
@@ -253,7 +253,7 @@
       "title": "Graphic of building with flag",
       "description": "Graphic of building with flag",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.445Z",
+      "classifiedAt": "2026-05-20T11:25:55.925Z",
       "imagePath": "media/fbi-62hq83894/p0036.png",
       "thumbnailPath": "media/fbi-62hq83894/p0036.png"
     },
@@ -268,7 +268,7 @@
       "title": "pasted to page",
       "description": "Newspaper clipping pasted to page",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.439Z",
+      "classifiedAt": "2026-05-20T11:25:55.918Z",
       "imagePath": "media/fbi-62hq83894/p0015.png",
       "thumbnailPath": "media/fbi-62hq83894/p0015.png"
     },
@@ -283,7 +283,7 @@
       "title": "of 5-cent United States Postage stamp featuring James Monroe",
       "description": "Image of 5-cent United States Postage stamp featuring James Monroe",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.437Z",
+      "classifiedAt": "2026-05-20T11:25:55.915Z",
       "imagePath": "media/fbi-62hq83894/p0005.png",
       "thumbnailPath": "media/fbi-62hq83894/p0005.png"
     },
@@ -298,7 +298,7 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.436Z",
+      "classifiedAt": "2026-05-20T11:25:55.914Z",
       "imagePath": "media/fbi-62hq83894/p0004.png",
       "thumbnailPath": "media/fbi-62hq83894/p0004.png"
     },
@@ -313,7 +313,7 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.435Z",
+      "classifiedAt": "2026-05-20T11:25:55.913Z",
       "imagePath": "media/fbi-62hq83894/p0002.png",
       "thumbnailPath": "media/fbi-62hq83894/p0002.png"
     },
@@ -328,7 +328,7 @@
       "title": "A large artistic illustration of space, planets, and stars. The word \"ncept\" is",
       "description": "Image: A large artistic illustration of space, planets, and stars. The word \"ncept\" is printed in large white letters at the top left of the image.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.431Z",
+      "classifiedAt": "2026-05-20T11:25:55.909Z",
       "imagePath": "media/cometa/p0088.png",
       "thumbnailPath": "media/cometa/p0088.png"
     },
@@ -343,7 +343,7 @@
       "title": "Photo",
       "description": "Photo",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.421Z",
+      "classifiedAt": "2026-05-20T11:25:55.895Z",
       "imagePath": "media/cometa/p0046.png",
       "thumbnailPath": "media/cometa/p0046.png"
     },
@@ -358,7 +358,7 @@
       "title": "Description: A schematic drawing showing a railway track running horizontally. A",
       "description": "Diagram Description: A schematic drawing showing a railway track running horizontally. A dashed rectangular box labeled \"BUILDING OUTLINE ---- WITH SIDING INSIDE\" surrounds a section of the track. Inside this box is a \"PIT UNDER TRACKS\".",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.410Z",
+      "classifiedAt": "2026-05-20T11:25:55.879Z",
       "imagePath": "media/azerbaijan-1955/p0010.png",
       "thumbnailPath": "media/azerbaijan-1955/p0010.png"
     },
@@ -373,7 +373,7 @@
       "title": "1: A square grid antenna on a pole",
       "description": "Sketch 1: A square grid antenna on a pole",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.408Z",
+      "classifiedAt": "2026-05-20T11:25:55.877Z",
       "imagePath": "media/azerbaijan-1955/p0006.png",
       "thumbnailPath": "media/azerbaijan-1955/p0006.png"
     },
@@ -388,7 +388,7 @@
       "title": "of two dots with arrows pointing to them",
       "description": "Sketch of two dots with arrows pointing to them",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.407Z",
+      "classifiedAt": "2026-05-20T11:25:55.876Z",
       "imagePath": "media/azerbaijan-1955/p0005.png",
       "thumbnailPath": "media/azerbaijan-1955/p0005.png"
     },
@@ -403,7 +403,7 @@
       "title": "of a plane",
       "description": "Image of a plane",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.379Z",
+      "classifiedAt": "2026-05-20T11:25:55.850Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -418,7 +418,7 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.373Z",
+      "classifiedAt": "2026-05-20T11:25:55.846Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -433,22 +433,7 @@
       "title": "of David Atamian",
       "description": "Photo of David Atamian",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.369Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-sub-a-p0104",
-      "eventId": "65-hs1-834228961-62-hq-83894-sub-a",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 SUB A",
-      "agency": "FBI",
-      "era": null,
-      "page": 104,
-      "kind": "newspaper-clipping",
-      "title": "Center",
-      "description": "Newspaper Clipping - Center",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.367Z",
+      "classifiedAt": "2026-05-20T11:25:55.844Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -463,7 +448,22 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.366Z",
+      "classifiedAt": "2026-05-20T11:25:55.843Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-sub-a-p0104",
+      "eventId": "65-hs1-834228961-62-hq-83894-sub-a",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 SUB A",
+      "agency": "FBI",
+      "era": null,
+      "page": 104,
+      "kind": "newspaper-clipping",
+      "title": "Center",
+      "description": "Newspaper Clipping - Center",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.843Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -478,7 +478,7 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.365Z",
+      "classifiedAt": "2026-05-20T11:25:55.842Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -493,7 +493,7 @@
       "title": "Photograph of a damaged aircraft with a person standing near it",
       "description": "Image: Photograph of a damaged aircraft with a person standing near it",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.364Z",
+      "classifiedAt": "2026-05-20T11:25:55.841Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -508,7 +508,7 @@
       "title": "A photograph of Jonathan E. Caldwell's \"Gray Goose\" helicopter, which features a",
       "description": "Image: A photograph of Jonathan E. Caldwell's \"Gray Goose\" helicopter, which features a large circular wing.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.363Z",
+      "classifiedAt": "2026-05-20T11:25:55.840Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -523,7 +523,7 @@
       "title": "A newspaper clipping containing three photographs",
       "description": "Image: A newspaper clipping containing three photographs",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.362Z",
+      "classifiedAt": "2026-05-20T11:25:55.839Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -538,7 +538,7 @@
       "title": "Center Newspaper Clipping",
       "description": "Center Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.359Z",
+      "classifiedAt": "2026-05-20T11:25:55.837Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -553,7 +553,7 @@
       "title": "of aircraft",
       "description": "Image of aircraft",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.354Z",
+      "classifiedAt": "2026-05-20T11:25:55.832Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -568,7 +568,7 @@
       "title": ", center",
       "description": "Newspaper clipping, center",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.351Z",
+      "classifiedAt": "2026-05-20T11:25:55.830Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -583,7 +583,7 @@
       "title": "of a disc-shaped object",
       "description": "Image of a disc-shaped object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.350Z",
+      "classifiedAt": "2026-05-20T11:25:55.829Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -598,7 +598,7 @@
       "title": "of Drew Pearson",
       "description": "Photo of Drew Pearson",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.346Z",
+      "classifiedAt": "2026-05-20T11:25:55.827Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -613,7 +613,7 @@
       "title": "of Devon area showing: Ilfracombe, Woolacombe, Cullompton, Exeter, Sidmouth, Exm",
       "description": "Map of Devon area showing: Ilfracombe, Woolacombe, Cullompton, Exeter, Sidmouth, Exmouth, Torquay, Paignton",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.345Z",
+      "classifiedAt": "2026-05-20T11:25:55.826Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -628,7 +628,7 @@
       "title": "A black and white sketch of a dome-shaped flying saucer with a fin on top, porth",
       "description": "Image: A black and white sketch of a dome-shaped flying saucer with a fin on top, portholes, and a rim.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.336Z",
+      "classifiedAt": "2026-05-20T11:25:55.820Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -643,7 +643,7 @@
       "title": "of a man",
       "description": "Image of a man",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.325Z",
+      "classifiedAt": "2026-05-20T11:25:55.813Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -658,7 +658,7 @@
       "title": "Photograph of three men",
       "description": "Image: Photograph of three men",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.324Z",
+      "classifiedAt": "2026-05-20T11:25:55.812Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -673,7 +673,7 @@
       "title": "of GEORG KLEIN",
       "description": "Image of GEORG KLEIN",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.322Z",
+      "classifiedAt": "2026-05-20T11:25:55.810Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -688,7 +688,7 @@
       "title": "Newspaper clipping",
       "description": "Newspaper clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.318Z",
+      "classifiedAt": "2026-05-20T11:25:55.805Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -703,7 +703,7 @@
       "title": "of a light streak in the sky",
       "description": "Image of a light streak in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.317Z",
+      "classifiedAt": "2026-05-20T11:25:55.803Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -718,7 +718,7 @@
       "title": "Schmidt (left) and Kearney Police Chief Nelson . . . In \"heart-to-heart\" talk.",
       "description": "Photo: Schmidt (left) and Kearney Police Chief Nelson . . . In \"heart-to-heart\" talk.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.316Z",
+      "classifiedAt": "2026-05-20T11:25:55.802Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -733,7 +733,7 @@
       "title": "Newspaper Clipping",
       "description": "Newspaper Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.315Z",
+      "classifiedAt": "2026-05-20T11:25:55.800Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -748,7 +748,7 @@
       "title": "GARY WILCOX",
       "description": "Image: GARY WILCOX",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.313Z",
+      "classifiedAt": "2026-05-20T11:25:55.798Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -763,7 +763,7 @@
       "title": "of UFO with labels: \"LIGHT\", \"LIGHT\", \"DUNTED SURFACE\", \"LIGHT\", \"ANTENA\"",
       "description": "Diagram of UFO with labels: \"LIGHT\", \"LIGHT\", \"DUNTED SURFACE\", \"LIGHT\", \"ANTENA\"",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.311Z",
+      "classifiedAt": "2026-05-20T11:25:55.796Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -778,7 +778,7 @@
       "title": "of a person looking at a UFO in the sky",
       "description": "Illustration of a person looking at a UFO in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.310Z",
+      "classifiedAt": "2026-05-20T11:25:55.795Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -793,7 +793,7 @@
       "title": "Top Right Clipping",
       "description": "Top Right Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.308Z",
+      "classifiedAt": "2026-05-20T11:25:55.793Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -808,7 +808,7 @@
       "title": "of UFO",
       "description": "Image of UFO",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.306Z",
+      "classifiedAt": "2026-05-20T11:25:55.791Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -823,7 +823,7 @@
       "title": "A black and white photograph of a disc-shaped object hovering above a forest can",
       "description": "Image: A black and white photograph of a disc-shaped object hovering above a forest canopy.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.304Z",
+      "classifiedAt": "2026-05-20T11:25:55.789Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -838,7 +838,7 @@
       "title": "Hand-drawn diagram of a site layout",
       "description": "Hand-drawn diagram of a site layout",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.302Z",
+      "classifiedAt": "2026-05-20T11:25:55.786Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -853,7 +853,7 @@
       "title": "of Gray Barker",
       "description": "Image of Gray Barker",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.291Z",
+      "classifiedAt": "2026-05-20T11:25:55.772Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -868,22 +868,7 @@
       "title": "Silhouettes of three men in hats standing in front of several flying saucers",
       "description": "Image: Silhouettes of three men in hats standing in front of several flying saucers",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.290Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-serial-220-p0012",
-      "eventId": "65-hs1-834228961-62-hq-83894-serial-220",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Serial 220",
-      "agency": "FBI",
-      "era": null,
-      "page": 12,
-      "kind": "diagram",
-      "title": "Labels",
-      "description": "Top Diagram Labels",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.288Z",
+      "classifiedAt": "2026-05-20T11:25:55.771Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -898,7 +883,22 @@
       "title": "A blurry, dark photograph of a circular object in the sky on the left. On the ri",
       "description": "Image: A blurry, dark photograph of a circular object in the sky on the left. On the right, a diagram of a UFO shaped like two cones joined at the base, with horizontal lines labeled \"3er Plano\", \"2do Plano\", and \"1er Plano\".",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.288Z",
+      "classifiedAt": "2026-05-20T11:25:55.770Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-serial-220-p0012",
+      "eventId": "65-hs1-834228961-62-hq-83894-serial-220",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Serial 220",
+      "agency": "FBI",
+      "era": null,
+      "page": 12,
+      "kind": "diagram",
+      "title": "Labels",
+      "description": "Top Diagram Labels",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.769Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -913,7 +913,7 @@
       "title": "A technical diagram depicting a craft with geometric grid lines and propulsion p",
       "description": "Image: A technical diagram depicting a craft with geometric grid lines and propulsion plumes.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.287Z",
+      "classifiedAt": "2026-05-20T11:25:55.768Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -928,7 +928,7 @@
       "title": "A photograph showing a landscape with a blurry object in the sky",
       "description": "Image: A photograph showing a landscape with a blurry object in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.246Z",
+      "classifiedAt": "2026-05-20T11:25:55.719Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -943,7 +943,7 @@
       "title": "of constellation",
       "description": "Drawing of constellation",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.239Z",
+      "classifiedAt": "2026-05-20T11:25:55.709Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -958,7 +958,7 @@
       "title": "of a shape with \"Top\" written inside",
       "description": "Drawing of a shape with \"Top\" written inside",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.238Z",
+      "classifiedAt": "2026-05-20T11:25:55.707Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -973,22 +973,7 @@
       "title": "A path with numbered positions 1 through 5. Positions 1, 2, and 3 are circles co",
       "description": "Diagram: A path with numbered positions 1 through 5. Positions 1, 2, and 3 are circles connected by a dotted line. Position 4 is an elongated oval. Position 5 is an arrow pointing to the right.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.235Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-serial-130-p0064",
-      "eventId": "65-hs1-834228961-62-hq-83894-serial-130",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Serial 130",
-      "agency": "FBI",
-      "era": null,
-      "page": 64,
-      "kind": "hand-drawing",
-      "title": "of two shapes",
-      "description": "Sketch of two shapes",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.227Z",
+      "classifiedAt": "2026-05-20T11:25:55.703Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1003,7 +988,22 @@
       "title": "of room layout",
       "description": "Diagram of room layout",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.227Z",
+      "classifiedAt": "2026-05-20T11:25:55.692Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-serial-130-p0064",
+      "eventId": "65-hs1-834228961-62-hq-83894-serial-130",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Serial 130",
+      "agency": "FBI",
+      "era": null,
+      "page": 64,
+      "kind": "hand-drawing",
+      "title": "of two shapes",
+      "description": "Sketch of two shapes",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.691Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1018,7 +1018,7 @@
       "title": "of a flying disc with labels \"10FT\" and \"20FT\"",
       "description": "Image of a flying disc with labels \"10FT\" and \"20FT\"",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.220Z",
+      "classifiedAt": "2026-05-20T11:25:55.680Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1033,7 +1033,7 @@
       "title": "of a dark sky with a faint streak of light",
       "description": "Image of a dark sky with a faint streak of light",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.211Z",
+      "classifiedAt": "2026-05-20T11:25:55.667Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1048,7 +1048,7 @@
       "title": "Hand-drawn diagram of a propulsion system",
       "description": "Hand-drawn diagram of a propulsion system",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.190Z",
+      "classifiedAt": "2026-05-20T11:25:55.637Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1063,7 +1063,7 @@
       "title": "of a man standing next to a telescope. The telescope has \"PERRY\" written on the",
       "description": "Image of a man standing next to a telescope. The telescope has \"PERRY\" written on the side.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.165Z",
+      "classifiedAt": "2026-05-20T11:25:55.603Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1078,22 +1078,7 @@
       "title": "Seal of the State of Florida",
       "description": "Seal of the State of Florida",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.125Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-8-p0159",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-8",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 8",
-      "agency": "FBI",
-      "era": null,
-      "page": 159,
-      "kind": "hand-drawing",
-      "title": "Hand-drawn sketch of two circular objects with motion lines and smoke trails",
-      "description": "Hand-drawn sketch of two circular objects with motion lines and smoke trails",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.122Z",
+      "classifiedAt": "2026-05-20T11:25:55.536Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1108,7 +1093,22 @@
       "title": "of a cloud, a wheel, and a saucer-shaped object",
       "description": "Drawing of a cloud, a wheel, and a saucer-shaped object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.121Z",
+      "classifiedAt": "2026-05-20T11:25:55.530Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-8-p0159",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-8",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 8",
+      "agency": "FBI",
+      "era": null,
+      "page": 159,
+      "kind": "hand-drawing",
+      "title": "Hand-drawn sketch of two circular objects with motion lines and smoke trails",
+      "description": "Hand-drawn sketch of two circular objects with motion lines and smoke trails",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.530Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1123,7 +1123,7 @@
       "title": "Five semi-circles labeled 1 through 5, with 'S' at the top and 'N' at the bottom",
       "description": "Diagram: Five semi-circles labeled 1 through 5, with 'S' at the top and 'N' at the bottom of each. A horizontal arrow spans the middle with the text '1081 MILES'.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.094Z",
+      "classifiedAt": "2026-05-20T11:25:55.492Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1138,7 +1138,7 @@
       "title": "Graphic: Flying saucer",
       "description": "Graphic: Flying saucer",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.089Z",
+      "classifiedAt": "2026-05-20T11:25:55.486Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1153,22 +1153,7 @@
       "title": "of a man holding a small, creature-like object",
       "description": "Image of a man holding a small, creature-like object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.071Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-7-p0081",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-7",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 7",
-      "agency": "FBI",
-      "era": null,
-      "page": 81,
-      "kind": "photograph",
-      "title": "of a shoe",
-      "description": "Image of a shoe",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.053Z",
+      "classifiedAt": "2026-05-20T11:25:55.458Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1183,7 +1168,22 @@
       "title": "of Rum Carioca bottle",
       "description": "Image of Rum Carioca bottle",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.052Z",
+      "classifiedAt": "2026-05-20T11:25:55.430Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-7-p0081",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-7",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 7",
+      "agency": "FBI",
+      "era": null,
+      "page": 81,
+      "kind": "photograph",
+      "title": "of a shoe",
+      "description": "Image of a shoe",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.430Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1198,7 +1198,7 @@
       "title": "of Highboy Desk",
       "description": "Image of Highboy Desk",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.051Z",
+      "classifiedAt": "2026-05-20T11:25:55.429Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1213,7 +1213,7 @@
       "title": "of record player",
       "description": "Image of record player",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.050Z",
+      "classifiedAt": "2026-05-20T11:25:55.428Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1228,7 +1228,7 @@
       "title": "of a man with a broom over his shoulder looking up",
       "description": "Illustration of a man with a broom over his shoulder looking up",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.048Z",
+      "classifiedAt": "2026-05-20T11:25:55.427Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1243,7 +1243,7 @@
       "title": "Seal of the Department of the Air Force",
       "description": "Seal of the Department of the Air Force",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.046Z",
+      "classifiedAt": "2026-05-20T11:25:55.424Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1258,7 +1258,7 @@
       "title": "Caption",
       "description": "Top Left Image Caption",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.029Z",
+      "classifiedAt": "2026-05-20T11:25:55.398Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1273,7 +1273,7 @@
       "title": "showing light refraction",
       "description": "Diagram showing light refraction",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.028Z",
+      "classifiedAt": "2026-05-20T11:25:55.397Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1288,7 +1288,7 @@
       "title": "of a man looking at a chart",
       "description": "Image of a man looking at a chart",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.028Z",
+      "classifiedAt": "2026-05-20T11:25:55.397Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1303,7 +1303,7 @@
       "title": "of a man looking through a telescope/binoculars",
       "description": "Image of a man looking through a telescope/binoculars",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.027Z",
+      "classifiedAt": "2026-05-20T11:25:55.396Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1318,7 +1318,7 @@
       "title": "of a light source",
       "description": "Image of a light source",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.026Z",
+      "classifiedAt": "2026-05-20T11:25:55.395Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1333,7 +1333,7 @@
       "title": "A circle with lines pointing to it. Annotations include \"of\" written above \"plan",
       "description": "Diagram: A circle with lines pointing to it. Annotations include \"of\" written above \"plane\", \"not\" written above \"approach\", \"only\" written to the right of the circle, and \"not\" written below the circle.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.021Z",
+      "classifiedAt": "2026-05-20T11:25:55.392Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1348,7 +1348,7 @@
       "title": "Portrait of Thomas Jefferson",
       "description": "Portrait of Thomas Jefferson",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.019Z",
+      "classifiedAt": "2026-05-20T11:25:55.388Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1363,7 +1363,7 @@
       "title": "Caption: Australia's Ken McGregor (left) covers Frank Sedgman The world's greate",
       "description": "Photo Caption: Australia's Ken McGregor (left) covers Frank Sedgman The world's greatest doubles pair easily won another title.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.005Z",
+      "classifiedAt": "2026-05-20T11:25:55.371Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1378,7 +1378,7 @@
       "title": "of a flying saucer in a forest clearing with two figures standing beside it",
       "description": "Illustration of a flying saucer in a forest clearing with two figures standing beside it",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.004Z",
+      "classifiedAt": "2026-05-20T11:25:55.370Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1393,7 +1393,7 @@
       "title": "Hand-drawn sketch of a saucer-shaped object",
       "description": "Image: Hand-drawn sketch of a saucer-shaped object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:48.002Z",
+      "classifiedAt": "2026-05-20T11:25:55.367Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1408,7 +1408,7 @@
       "title": "of train",
       "description": "Image of train",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.991Z",
+      "classifiedAt": "2026-05-20T11:25:55.351Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1423,7 +1423,7 @@
       "title": "of King Blended Whisky bottle",
       "description": "Image of King Blended Whisky bottle",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.990Z",
+      "classifiedAt": "2026-05-20T11:25:55.350Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1438,7 +1438,7 @@
       "title": "A black square representing a photograph of a luminous object in the night sky",
       "description": "Image: A black square representing a photograph of a luminous object in the night sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.971Z",
+      "classifiedAt": "2026-05-20T11:25:55.322Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1453,7 +1453,7 @@
       "title": "Seal of Department of Defense",
       "description": "Seal of Department of Defense",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.965Z",
+      "classifiedAt": "2026-05-20T11:25:55.314Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1468,7 +1468,7 @@
       "title": "A composite image. The left side depicts a drawing of two flying saucers hoverin",
       "description": "Image: A composite image. The left side depicts a drawing of two flying saucers hovering over a church (Marktkirche in Wiesbaden). The right side depicts a photograph of two military police officers standing next to a small, alien-like figure.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.950Z",
+      "classifiedAt": "2026-05-20T11:25:55.291Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1483,7 +1483,7 @@
       "title": "A composite image consisting of two parts. On the left, a black-and-white illust",
       "description": "Image: A composite image consisting of two parts. On the left, a black-and-white illustration of a church (Marktkirche) with two flying saucers hovering above it. On the right, a black-and-white photograph of two military policemen escorting a small, alien-like figure.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.949Z",
+      "classifiedAt": "2026-05-20T11:25:55.289Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1498,7 +1498,7 @@
       "title": "Hand-drawn sketch of a cylindrical object",
       "description": "Hand-drawn sketch of a cylindrical object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.945Z",
+      "classifiedAt": "2026-05-20T11:25:55.285Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1513,7 +1513,7 @@
       "title": "of a mechanical diagram showing a central axis, cables, and weights",
       "description": "Sketch of a mechanical diagram showing a central axis, cables, and weights",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.944Z",
+      "classifiedAt": "2026-05-20T11:25:55.284Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1528,22 +1528,7 @@
       "title": "of a saucer-shaped object with labels: 2, 30', 10', 1, 3",
       "description": "Sketch of a saucer-shaped object with labels: 2, 30', 10', 1, 3",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.943Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-5-p0127",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
-      "agency": "FBI",
-      "era": null,
-      "page": 127,
-      "kind": "hand-drawing",
-      "title": "of a saucer-shaped object",
-      "description": "Sketch of a saucer-shaped object",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.940Z",
+      "classifiedAt": "2026-05-20T11:25:55.283Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1558,7 +1543,22 @@
       "title": "labels, from left to right and top to bottom",
       "description": "Diagram labels, from left to right and top to bottom",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.940Z",
+      "classifiedAt": "2026-05-20T11:25:55.280Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-5-p0127",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
+      "agency": "FBI",
+      "era": null,
+      "page": 127,
+      "kind": "hand-drawing",
+      "title": "of a saucer-shaped object",
+      "description": "Sketch of a saucer-shaped object",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.279Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1573,22 +1573,7 @@
       "title": "of mechanism",
       "description": "Sketch of mechanism",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.939Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-5-p0122",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
-      "agency": "FBI",
-      "era": null,
-      "page": 122,
-      "kind": "diagram",
-      "title": "Annotations",
-      "description": "Diagram Annotations",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.938Z",
+      "classifiedAt": "2026-05-20T11:25:55.278Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1603,7 +1588,7 @@
       "title": "s containing labels: bearing, 2, 3, shaft, shaft support, one, 4, cable, engine",
       "description": "Diagrams containing labels: bearing, 2, 3, shaft, shaft support, one, 4, cable, engine shaft",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.938Z",
+      "classifiedAt": "2026-05-20T11:25:55.277Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1618,7 +1603,22 @@
       "title": "of saucer mechanism with the following labels:",
       "description": "Diagram of saucer mechanism with the following labels:",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.937Z",
+      "classifiedAt": "2026-05-20T11:25:55.276Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-5-p0122",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
+      "agency": "FBI",
+      "era": null,
+      "page": 122,
+      "kind": "diagram",
+      "title": "Annotations",
+      "description": "Diagram Annotations",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.276Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1633,22 +1633,7 @@
       "title": "A tripod-like machine",
       "description": "Image: A tripod-like machine",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.932Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-5-p0099",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
-      "agency": "FBI",
-      "era": null,
-      "page": 99,
-      "kind": "photograph",
-      "title": "of a circular aircraft on the ground with people standing near it",
-      "description": "Image of a circular aircraft on the ground with people standing near it",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.931Z",
+      "classifiedAt": "2026-05-20T11:25:55.269Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1663,7 +1648,22 @@
       "title": "of a disk-shaped aircraft",
       "description": "Image of a disk-shaped aircraft",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.931Z",
+      "classifiedAt": "2026-05-20T11:25:55.268Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-5-p0099",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-5",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 5",
+      "agency": "FBI",
+      "era": null,
+      "page": 99,
+      "kind": "photograph",
+      "title": "of a circular aircraft on the ground with people standing near it",
+      "description": "Image of a circular aircraft on the ground with people standing near it",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.267Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1678,7 +1678,7 @@
       "title": "Negative-inverted portrait of Speaker Sam Rayburn",
       "description": "Image: Negative-inverted portrait of Speaker Sam Rayburn",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.929Z",
+      "classifiedAt": "2026-05-20T11:25:55.266Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1693,7 +1693,7 @@
       "title": "Graphic: FOR VICTORY BUY UNITED STATES WAR BONDS AND STAMPS",
       "description": "Graphic: FOR VICTORY BUY UNITED STATES WAR BONDS AND STAMPS",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.902Z",
+      "classifiedAt": "2026-05-20T11:25:55.223Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1708,7 +1708,7 @@
       "title": "Two people throwing a saucer back and forth",
       "description": "Illustration: Two people throwing a saucer back and forth",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.897Z",
+      "classifiedAt": "2026-05-20T11:25:55.217Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1723,7 +1723,7 @@
       "title": "A photograph of various debris fragments, including a circular object, coils, an",
       "description": "Image: A photograph of various debris fragments, including a circular object, coils, and a small box-like component.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.849Z",
+      "classifiedAt": "2026-05-20T11:25:55.139Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1738,7 +1738,7 @@
       "title": "of a saucer-shaped object with a red line through the center",
       "description": "Drawing of a saucer-shaped object with a red line through the center",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.842Z",
+      "classifiedAt": "2026-05-20T11:25:55.127Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1753,7 +1753,7 @@
       "title": "of a man with a pipe holding a rope",
       "description": "Image of a man with a pipe holding a rope",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.841Z",
+      "classifiedAt": "2026-05-20T11:25:55.126Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1768,7 +1768,7 @@
       "title": "of a flying saucer with dimensions: 10FT height, 20FT width",
       "description": "Image of a flying saucer with dimensions: 10FT height, 20FT width",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.840Z",
+      "classifiedAt": "2026-05-20T11:25:55.124Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1783,37 +1783,7 @@
       "title": "of a shape",
       "description": "Drawing of a shape",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.835Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-3-p0025",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-3",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 3",
-      "agency": "FBI",
-      "era": null,
-      "page": 25,
-      "kind": "photograph",
-      "title": "of two dark, irregular, porous rock-like specimens. A small, dark, oval object i",
-      "description": "Photograph of two dark, irregular, porous rock-like specimens. A small, dark, oval object is visible to the left of the bottom specimen.",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.815Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-3-p0023",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-3",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 3",
-      "agency": "FBI",
-      "era": null,
-      "page": 23,
-      "kind": "photograph",
-      "title": "Two dark, textured fragments/shards of material",
-      "description": "Image: Two dark, textured fragments/shards of material",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.814Z",
+      "classifiedAt": "2026-05-20T11:25:55.119Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1828,7 +1798,37 @@
       "title": "A black and white photograph of a piece of irregular, metallic-looking debris or",
       "description": "Image: A black and white photograph of a piece of irregular, metallic-looking debris or slag.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.814Z",
+      "classifiedAt": "2026-05-20T11:25:55.078Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-3-p0025",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-3",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 3",
+      "agency": "FBI",
+      "era": null,
+      "page": 25,
+      "kind": "photograph",
+      "title": "of two dark, irregular, porous rock-like specimens. A small, dark, oval object i",
+      "description": "Photograph of two dark, irregular, porous rock-like specimens. A small, dark, oval object is visible to the left of the bottom specimen.",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.078Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-3-p0023",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-3",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 3",
+      "agency": "FBI",
+      "era": null,
+      "page": 23,
+      "kind": "photograph",
+      "title": "Two dark, textured fragments/shards of material",
+      "description": "Image: Two dark, textured fragments/shards of material",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:55.077Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1843,7 +1843,7 @@
       "title": "A black and white photograph of a piece of irregular, metallic-looking debris or",
       "description": "Image: A black and white photograph of a piece of irregular, metallic-looking debris or slag.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.813Z",
+      "classifiedAt": "2026-05-20T11:25:55.076Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1858,7 +1858,7 @@
       "title": "containing two photographs of rock/slag-like specimens. The top specimen is poro",
       "description": "Image containing two photographs of rock/slag-like specimens. The top specimen is porous and rough; the bottom specimen is dark and glassy. A small oval object is positioned to the left of the gap between the two specimens.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.812Z",
+      "classifiedAt": "2026-05-20T11:25:55.075Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1873,7 +1873,7 @@
       "title": "of a shape with \"Top\" written inside",
       "description": "Drawing of a shape with \"Top\" written inside",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.801Z",
+      "classifiedAt": "2026-05-20T11:25:55.055Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1888,7 +1888,7 @@
       "title": "Graphic",
       "description": "Graphic",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.739Z",
+      "classifiedAt": "2026-05-20T11:25:54.955Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1903,7 +1903,7 @@
       "title": "A grainy, high-contrast illustration or photograph of a skeletal figure with arm",
       "description": "Image: A grainy, high-contrast illustration or photograph of a skeletal figure with arms raised above its head.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.735Z",
+      "classifiedAt": "2026-05-20T11:25:54.948Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1918,7 +1918,7 @@
       "title": "Fresco in the Dechany Monastery",
       "description": "Image: Fresco in the Dechany Monastery",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.731Z",
+      "classifiedAt": "2026-05-20T11:25:54.944Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1933,7 +1933,7 @@
       "title": "Still photographs from 8mm film",
       "description": "Image: Still photographs from 8mm film",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.730Z",
+      "classifiedAt": "2026-05-20T11:25:54.941Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1948,7 +1948,7 @@
       "title": "Graphic: Abstract geometric design with a circular symbol containing stylized ch",
       "description": "Graphic: Abstract geometric design with a circular symbol containing stylized characters",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.728Z",
+      "classifiedAt": "2026-05-20T11:25:54.936Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1963,7 +1963,7 @@
       "title": "High-contrast photograph of a disc-shaped object in the sky",
       "description": "Image: High-contrast photograph of a disc-shaped object in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.726Z",
+      "classifiedAt": "2026-05-20T11:25:54.932Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1978,7 +1978,7 @@
       "title": "A photograph of a disc-shaped object in the sky",
       "description": "Image: A photograph of a disc-shaped object in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.725Z",
+      "classifiedAt": "2026-05-20T11:25:54.931Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -1993,22 +1993,7 @@
       "title": "A photograph of a cloud-like or disc-shaped object in the sky",
       "description": "Image: A photograph of a cloud-like or disc-shaped object in the sky",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.723Z",
-      "imagePath": null,
-      "thumbnailPath": null
-    },
-    {
-      "id": "65-hs1-834228961-62-hq-83894-section-10-p0029",
-      "eventId": "65-hs1-834228961-62-hq-83894-section-10",
-      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 10",
-      "agency": "FBI",
-      "era": null,
-      "page": 29,
-      "kind": "photograph",
-      "title": "of a man with glasses",
-      "description": "Image of a man with glasses",
-      "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.714Z",
+      "classifiedAt": "2026-05-20T11:25:54.929Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2023,7 +2008,22 @@
       "title": "of a UFO",
       "description": "Drawing of a UFO",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.714Z",
+      "classifiedAt": "2026-05-20T11:25:54.911Z",
+      "imagePath": null,
+      "thumbnailPath": null
+    },
+    {
+      "id": "65-hs1-834228961-62-hq-83894-section-10-p0029",
+      "eventId": "65-hs1-834228961-62-hq-83894-section-10",
+      "eventTitle": "65 HS1 834228961 62 HQ 83894 Section 10",
+      "agency": "FBI",
+      "era": null,
+      "page": 29,
+      "kind": "photograph",
+      "title": "of a man with glasses",
+      "description": "Image of a man with glasses",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T11:25:54.910Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2038,7 +2038,7 @@
       "title": "A stylized flying saucer with a trail, and a smaller object below it.",
       "description": "Image: A stylized flying saucer with a trail, and a smaller object below it.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.710Z",
+      "classifiedAt": "2026-05-20T11:25:54.904Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2053,7 +2053,7 @@
       "title": "Top Left Clipping",
       "description": "Top Left Clipping",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.709Z",
+      "classifiedAt": "2026-05-20T11:25:54.903Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2068,7 +2068,7 @@
       "title": "Cartoon image of a man looking at a flying saucer",
       "description": "Cartoon image of a man looking at a flying saucer",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.708Z",
+      "classifiedAt": "2026-05-20T11:25:54.902Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2083,7 +2083,7 @@
       "title": "Caption",
       "description": "Photo Caption",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.707Z",
+      "classifiedAt": "2026-05-20T11:25:54.900Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2098,7 +2098,7 @@
       "title": "1: Top Right",
       "description": "Clipping 1: Top Right",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.706Z",
+      "classifiedAt": "2026-05-20T11:25:54.898Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2113,7 +2113,7 @@
       "title": "of UFO",
       "description": "Image of UFO",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.705Z",
+      "classifiedAt": "2026-05-20T11:25:54.896Z",
       "imagePath": null,
       "thumbnailPath": null
     },
@@ -2128,7 +2128,7 @@
       "title": "Hand-drawn sketch of an egg-shaped object with a tail",
       "description": "Hand-drawn sketch of an egg-shaped object with a tail",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.696Z",
+      "classifiedAt": "2026-05-20T11:25:54.881Z",
       "imagePath": "media/1949-discs/p0121.png",
       "thumbnailPath": "media/1949-discs/p0121.png"
     },
@@ -2143,7 +2143,7 @@
       "title": "Hand-drawn sketch of a long, tapered object",
       "description": "Hand-drawn sketch of a long, tapered object",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.695Z",
+      "classifiedAt": "2026-05-20T11:25:54.880Z",
       "imagePath": "media/1949-discs/p0120.png",
       "thumbnailPath": "media/1949-discs/p0120.png"
     },
@@ -2158,7 +2158,7 @@
       "title": "Aerial photograph of an airfield with two aircraft on the tarmac in the foregrou",
       "description": "Aerial photograph of an airfield with two aircraft on the tarmac in the foreground. The image contains the following handwritten annotations:",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.694Z",
+      "classifiedAt": "2026-05-20T11:25:54.878Z",
       "imagePath": "media/1949-discs/p0114.png",
       "thumbnailPath": "media/1949-discs/p0114.png"
     },
@@ -2173,7 +2173,7 @@
       "title": "of a circle with rays radiating outward and a horizontal line through the center",
       "description": "Drawing of a circle with rays radiating outward and a horizontal line through the center labeled \"30\"\"",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.693Z",
+      "classifiedAt": "2026-05-20T11:25:54.876Z",
       "imagePath": "media/1949-discs/p0112.png",
       "thumbnailPath": "media/1949-discs/p0112.png"
     },
@@ -2188,7 +2188,7 @@
       "title": "A circle with radiating lines and \"30\"\" written inside",
       "description": "Sketch: A circle with radiating lines and \"30\"\" written inside",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.690Z",
+      "classifiedAt": "2026-05-20T11:25:54.873Z",
       "imagePath": "media/1949-discs/p0105.png",
       "thumbnailPath": "media/1949-discs/p0105.png"
     },
@@ -2203,7 +2203,7 @@
       "title": "of Fairfield-Suisun Air Force Base",
       "description": "Map of Fairfield-Suisun Air Force Base",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.688Z",
+      "classifiedAt": "2026-05-20T11:25:54.870Z",
       "imagePath": "media/1949-discs/p0101.png",
       "thumbnailPath": "media/1949-discs/p0101.png"
     },
@@ -2218,7 +2218,7 @@
       "title": "A meteorological weather map of Japan and surrounding regions, featuring isobars",
       "description": "Image: A meteorological weather map of Japan and surrounding regions, featuring isobars, weather station data points, and handwritten annotations including green shading and lines.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.684Z",
+      "classifiedAt": "2026-05-20T11:25:54.864Z",
       "imagePath": "media/1949-discs/p0088.png",
       "thumbnailPath": "media/1949-discs/p0088.png"
     },
@@ -2233,7 +2233,7 @@
       "title": "A map of Japan with a line drawn across the central region, connecting several c",
       "description": "Image: A map of Japan with a line drawn across the central region, connecting several cities. There are markings for observing stations, a path, and an explosion/disappearance point.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.683Z",
+      "classifiedAt": "2026-05-20T11:25:54.863Z",
       "imagePath": "media/1949-discs/p0087.png",
       "thumbnailPath": "media/1949-discs/p0087.png"
     },
@@ -2248,7 +2248,7 @@
       "title": "Hand-drawn sketch of a disc-shaped aircraft with two propellers and U.S. insigni",
       "description": "Hand-drawn sketch of a disc-shaped aircraft with two propellers and U.S. insignia",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.679Z",
+      "classifiedAt": "2026-05-20T11:25:54.856Z",
       "imagePath": "media/1949-discs/p0070.png",
       "thumbnailPath": "media/1949-discs/p0070.png"
     },
@@ -2263,7 +2263,7 @@
       "title": "Annotations",
       "description": "Map Annotations",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.676Z",
+      "classifiedAt": "2026-05-20T11:25:54.851Z",
       "imagePath": "media/1949-discs/p0057.png",
       "thumbnailPath": "media/1949-discs/p0057.png"
     },
@@ -2278,7 +2278,7 @@
       "title": "of coastline with the following annotations:",
       "description": "Map of coastline with the following annotations:",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.673Z",
+      "classifiedAt": "2026-05-20T11:25:54.848Z",
       "imagePath": "media/1949-discs/p0053.png",
       "thumbnailPath": "media/1949-discs/p0053.png"
     },
@@ -2293,7 +2293,7 @@
       "title": "of a radar scope containing the following labels:",
       "description": "Diagram of a radar scope containing the following labels:",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-20T11:10:47.670Z",
+      "classifiedAt": "2026-05-20T11:25:54.845Z",
       "imagePath": "media/1949-discs/p0050.png",
       "thumbnailPath": "media/1949-discs/p0050.png"
     },
