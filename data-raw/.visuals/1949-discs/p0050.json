@@ -1,8 +1,8 @@
 {
   "kind": "diagram",
-  "title": "Radar scope interference near Guam and Rota",
-  "description": "Typewritten schematic of a 100-mile scope display showing Guam, Rota Island, a lubber line, and interference arcs.",
-  "classifiedAt": "2026-05-19T06:53:49.003Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "title": "of a radar scope containing the following labels:",
+  "description": "Diagram of a radar scope containing the following labels:",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.809Z"
 }

@@ -1,8 +1,8 @@
 {
-  "kind": "map",
-  "title": "Map of Japan observing stations",
-  "description": "Hand-drawn map of Japan showing observing stations, probable path, and probable explosion or disappearance area.",
-  "classifiedAt": "2026-05-19T07:12:18.261Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "kind": "photograph",
+  "title": "A map of Japan with a line drawn across the central region, connecting several c",
+  "description": "Image: A map of Japan with a line drawn across the central region, connecting several cities. There are markings for observing stations, a path, and an explosion/disappearance point.",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.820Z"
 }

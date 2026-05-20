@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of a flying saucer in a forest clearing with two figures standing beside it",
+  "description": "Illustration of a flying saucer in a forest clearing with two figures standing beside it",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of a man and a young girl looking at a document"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.006Z"
+}

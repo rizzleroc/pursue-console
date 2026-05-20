@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of David Atamian",
+  "description": "Photo of David Atamian",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of a Vought V-173 \"Flying Pancake\" aircraft"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.188Z"
+}

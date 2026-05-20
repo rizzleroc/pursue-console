@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "Description: A schematic drawing showing a railway track running horizontally. A",
+  "description": "Diagram Description: A schematic drawing showing a railway track running horizontally. A dashed rectangular box labeled \"BUILDING OUTLINE ---- WITH SIDING INSIDE\" surrounds a section of the track. Inside this box is a \"PIT UNDER TRACKS\".",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.205Z"
+}

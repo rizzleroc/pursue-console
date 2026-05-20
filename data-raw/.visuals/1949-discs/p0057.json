@@ -1,8 +1,13 @@
 {
   "kind": "map",
-  "title": "Hand-drawn Kodiak sighting map",
-  "description": "A copied hand-drawn map marks islands, lights, flight paths, sighting ranges, and observer notes around Kodiak, Alaska.",
-  "classifiedAt": "2026-05-19T06:56:21.086Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "title": "Annotations",
+  "description": "Map Annotations",
+  "additional_markers": [
+    {
+      "kind": "diagram",
+      "title": "Bottom Left Diagram"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.813Z"
 }

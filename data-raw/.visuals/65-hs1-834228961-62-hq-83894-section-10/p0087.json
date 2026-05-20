@@ -1,0 +1,17 @@
+{
+  "kind": "photograph",
+  "title": "Still photographs from 8mm film",
+  "description": "Image: Still photographs from 8mm film",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Film exposure from train"
+    },
+    {
+      "kind": "photograph",
+      "title": "Aerial armada"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.853Z"
+}

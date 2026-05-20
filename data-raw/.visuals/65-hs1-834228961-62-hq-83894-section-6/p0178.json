@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "Caption: Australia's Ken McGregor (left) covers Frank Sedgman The world's greate",
+  "description": "Photo Caption: Australia's Ken McGregor (left) covers Frank Sedgman The world's greatest doubles pair easily won another title.",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Caption: The Saucer begins to take off: the outer disk whirls faster and faster,"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.006Z"
+}

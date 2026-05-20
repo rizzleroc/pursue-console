@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619,",
+  "description": "Image: Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619, (RUS) KUZNETSOV CV-063 (RUS) CHILIKIN AOR, (RUS) KALININGRADNET AD, (RUS) KIROV CON 099, (RUS) INGUL ARS",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Sensor footage showing \"U/I OBJ\", \"(RUS) INGUL ARS\", and \"U/I VESSEL\""
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.606Z"
+}

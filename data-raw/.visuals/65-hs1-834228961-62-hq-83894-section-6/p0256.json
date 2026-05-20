@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of a light source",
+  "description": "Image of a light source",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of Dr. Donald H. Menzel"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.016Z"
+}

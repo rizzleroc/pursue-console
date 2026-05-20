@@ -1,0 +1,17 @@
+{
+  "kind": "photograph",
+  "title": "of train",
+  "description": "Image of train",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of logo"
+    },
+    {
+      "kind": "photograph",
+      "title": "of Skyhook"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.998Z"
+}

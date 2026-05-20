@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "A photograph of a dark, elongated object against a lighter background",
+  "description": "Image: A photograph of a dark, elongated object against a lighter background",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "A photograph of a dark, somewhat triangular or cigar-shaped object against a lig"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.246Z"
+}

@@ -1,0 +1,21 @@
+{
+  "kind": "photograph",
+  "title": "Two people throwing a saucer back and forth",
+  "description": "Illustration: Two people throwing a saucer back and forth",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Person throwing saucer, curved path"
+    },
+    {
+      "kind": "photograph",
+      "title": "Person throwing saucer into the wind, returning path"
+    },
+    {
+      "kind": "photograph",
+      "title": "Person throwing saucer at ground, skipping path"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.944Z"
+}

@@ -139,8 +139,22 @@ export default function MediaView({ onSelect }) {
             <button key={it.id} onClick={() => setFocused(it)}
               className={`group block text-left bg-black/40 border border-emerald-900/40 hover:${c.ring} hover:ring-2 hover:border-transparent rounded-sm overflow-hidden transition-all`}>
               <div className="aspect-[3/4] bg-black overflow-hidden">
-                <img src={`${import.meta.env.BASE_URL}${it.thumbnailPath}`} alt={it.title || it.kind}
-                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100" loading="lazy" />
+                {it.thumbnailPath ? (
+                  <img src={`${import.meta.env.BASE_URL}${it.thumbnailPath}`} alt={it.title || it.kind}
+                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100" loading="lazy" />
+                ) : (
+                  // No local render available (e.g. extracted from a Gemini
+                  // transcript marker for an event we don't have the PDF
+                  // for). Show a placeholder + the description so the
+                  // metadata is still useful.
+                  <div className={`w-full h-full flex flex-col items-center justify-center p-3 ${c.bg || "bg-emerald-950/30"}`}>
+                    <span className={`w-2 h-2 rounded-full ${c.dot} mb-2`} />
+                    <span className={`font-mono text-[9px] tracking-widest ${c.text} opacity-70 mb-1`}>NO LOCAL IMAGE</span>
+                    <span className={`font-mono text-[10px] ${c.text} opacity-90 text-center line-clamp-4`}>
+                      {it.description || it.title || it.kind}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="px-2 py-1.5">
                 <div className="flex items-center gap-1.5">
@@ -200,9 +214,26 @@ export default function MediaView({ onSelect }) {
                   className="text-emerald-700 hover:text-amber-300 font-mono text-sm px-2">×</button>
               </div>
             </div>
-            <div className="flex-1 overflow-auto bg-black flex items-center justify-center p-2">
-              <img src={`${import.meta.env.BASE_URL}${focused.imagePath}`} alt={focused.title || focused.kind}
-                className="max-w-full max-h-[70vh] object-contain" />
+            <div className="flex-1 overflow-auto bg-black flex items-center justify-center p-6 min-h-[40vh]">
+              {focused.imagePath ? (
+                <img src={`${import.meta.env.BASE_URL}${focused.imagePath}`} alt={focused.title || focused.kind}
+                  className="max-w-full max-h-[70vh] object-contain" />
+              ) : (
+                <div className="text-center max-w-xl">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-sm border ${KIND_COLORS[focused.kind].ring} mb-4`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${KIND_COLORS[focused.kind].dot}`} />
+                    <span className={`font-mono text-[10px] tracking-widest ${KIND_COLORS[focused.kind].text}`}>
+                      {KIND_LABELS[focused.kind]} · NO LOCAL RENDER
+                    </span>
+                  </div>
+                  <div className="font-mono text-emerald-300 text-sm leading-relaxed text-left">
+                    {focused.description || focused.title}
+                  </div>
+                  <div className="font-mono text-emerald-700 text-[10px] mt-4 leading-relaxed">
+                    This visual reference was extracted from Gemini's transcript of the source PDF. We don't have the PDF locally to render it. Open the original document at war.gov/UFO to view the actual image; the OPEN IN DOSSIER button above jumps to this event's record.
+                  </div>
+                </div>
+              )}
             </div>
             {(focused.title || focused.description) && (
               <div className="px-4 py-3 border-t border-emerald-900/50">

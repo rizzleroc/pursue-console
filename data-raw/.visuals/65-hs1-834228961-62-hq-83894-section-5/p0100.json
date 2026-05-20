@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of a disk-shaped aircraft",
+  "description": "Image of a disk-shaped aircraft",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of a model in a wind tunnel"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.963Z"
+}

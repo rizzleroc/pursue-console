@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of a man looking through a telescope/binoculars",
+  "description": "Image of a man looking through a telescope/binoculars",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of the Lubbock Lights"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.017Z"
+}

@@ -1,0 +1,13 @@
+{
+  "kind": "hand-drawing",
+  "title": "1: A square grid antenna on a pole",
+  "description": "Sketch 1: A square grid antenna on a pole",
+  "additional_markers": [
+    {
+      "kind": "hand-drawing",
+      "title": "2: A rectangular/slotted antenna on a pole"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.204Z"
+}

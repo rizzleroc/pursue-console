@@ -1,0 +1,17 @@
+{
+  "kind": "photograph",
+  "title": "Schmidt (left) and Kearney Police Chief Nelson . . . In \"heart-to-heart\" talk.",
+  "description": "Photo: Schmidt (left) and Kearney Police Chief Nelson . . . In \"heart-to-heart\" talk.",
+  "additional_markers": [
+    {
+      "kind": "diagram",
+      "title": "of saucer-shaped object"
+    },
+    {
+      "kind": "diagram",
+      "title": "of floor plan"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.166Z"
+}

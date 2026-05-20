@@ -9,7 +9,7 @@
     },
     "gemini": {
       "chars": 60,
-      "imported_at": "2026-05-20T03:30:43.022Z",
+      "imported_at": "2026-05-20T06:34:06.035Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:57:03.144270+00:00",
       "text_file": "p0008.gemini.txt"
@@ -27,7 +27,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T03:30:49.664Z",
+    "computed_at": "2026-05-20T06:34:13.960Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",

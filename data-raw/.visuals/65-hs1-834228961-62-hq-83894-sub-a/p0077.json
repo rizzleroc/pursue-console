@@ -1,0 +1,13 @@
+{
+  "kind": "newspaper-clipping",
+  "title": ", center",
+  "description": "Newspaper clipping, center",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of a swirling, circular object in the sky"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.180Z"
+}

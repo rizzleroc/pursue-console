@@ -1,0 +1,29 @@
+{
+  "kind": "hand-drawing",
+  "title": "of circle with crosshair",
+  "description": "Sketch of circle with crosshair",
+  "additional_markers": [
+    {
+      "kind": "hand-drawing",
+      "title": "es of ovals"
+    },
+    {
+      "kind": "hand-drawing",
+      "title": "of vertical line with dot"
+    },
+    {
+      "kind": "hand-drawing",
+      "title": "of spiral/target"
+    },
+    {
+      "kind": "hand-drawing",
+      "title": "of oval with zigzag"
+    },
+    {
+      "kind": "hand-drawing",
+      "title": "of small rectangle"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.288Z"
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "photograph",
+  "title": "A tripod-like machine",
+  "description": "Image: A tripod-like machine",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "A saucer opening"
+    },
+    {
+      "kind": "photograph",
+      "title": "A saucer in flight"
+    },
+    {
+      "kind": "photograph",
+      "title": "A man with a model"
+    },
+    {
+      "kind": "photograph",
+      "title": "A bug-eyed alien"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.963Z"
+}

@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "High-contrast photograph of a disc-shaped object in the sky",
+  "description": "Image: High-contrast photograph of a disc-shaped object in the sky",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Photograph of a saucer-shaped object with protrusions resting on the ground"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.850Z"
+}

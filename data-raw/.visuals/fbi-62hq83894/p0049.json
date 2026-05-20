@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of a person kneeling and inspecting the landing gear of an aircraft",
+  "description": "Photograph of a person kneeling and inspecting the landing gear of an aircraft",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of four people standing together, one woman gesturing with her hand"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.227Z"
+}

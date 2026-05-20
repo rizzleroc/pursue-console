@@ -1,0 +1,17 @@
+{
+  "kind": "photograph",
+  "title": "Fresco in the Dechany Monastery",
+  "description": "Image: Fresco in the Dechany Monastery",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "The icon, \"The Resurrection of our Lord Jesus Christ\""
+    },
+    {
+      "kind": "photograph",
+      "title": "Bottom section of religious art"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.854Z"
+}

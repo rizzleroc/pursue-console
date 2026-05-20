@@ -1,8 +1,13 @@
 {
-  "kind": "hand-drawing",
-  "title": "Paul Herring flight path sketch",
-  "description": "Hand-drawn map-like sketch showing a reported flight path and disturbance course over islands, with notes and data table.",
-  "classifiedAt": "2026-05-19T06:54:44.746Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "kind": "map",
+  "title": "of coastline with the following annotations:",
+  "description": "Map of coastline with the following annotations:",
+  "additional_markers": [
+    {
+      "kind": "diagram",
+      "title": "of trajectory and error margin:"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.812Z"
 }

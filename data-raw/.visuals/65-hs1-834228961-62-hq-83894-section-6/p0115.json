@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "of King Blended Whisky bottle",
+  "description": "Image of King Blended Whisky bottle",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of a group of people sitting in a bus, with various labels pointing to them"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.998Z"
+}

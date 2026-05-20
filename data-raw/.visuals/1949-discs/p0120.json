@@ -1,8 +1,13 @@
 {
   "kind": "hand-drawing",
-  "title": "Dimensioned craft sketch",
-  "description": "Hand-drawn side and rear views of an elongated object with dimensions marked 60 ft long and 10 ft wide.",
-  "classifiedAt": "2026-05-19T07:28:36.517Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "title": "Hand-drawn sketch of a long, tapered object",
+  "description": "Hand-drawn sketch of a long, tapered object",
+  "additional_markers": [
+    {
+      "kind": "hand-drawing",
+      "title": "Hand-drawn sketch of an oval"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.830Z"
 }

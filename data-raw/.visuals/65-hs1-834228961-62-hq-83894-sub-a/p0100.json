@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "Photograph of a damaged aircraft with a person standing near it",
+  "description": "Image: Photograph of a damaged aircraft with a person standing near it",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Photograph of two state troopers standing next to a circular, flat object"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.185Z"
+}

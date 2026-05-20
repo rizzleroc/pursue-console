@@ -58,9 +58,12 @@ for (const eid of await listDirs(VISUALS_DIR)) {
     const pngAbs = path.join(MEDIA_DIR, eid, `p${pad4}.png`);
     const jpgAbs = path.join(MEDIA_DIR, eid, `p${pad4}.jpg`);
     const imageAbsPath = existsSync(pngAbs) ? pngAbs : (existsSync(jpgAbs) ? jpgAbs : null);
-    if (!imageAbsPath) continue;   // metadata without pixels = skip
-    const ext = path.extname(imageAbsPath);
-    const imagePath = `media/${eid}/p${pad4}${ext}`;
+    // imagePath may be null — that's fine for entries derived from
+    // Denis's Gemini bracket markers where we have rich text metadata
+    // but no local PDF to render. The UI shows a placeholder tile +
+    // the description.
+    const ext = imageAbsPath ? path.extname(imageAbsPath) : null;
+    const imagePath = imageAbsPath ? `media/${eid}/p${pad4}${ext}` : null;
     items.push({
       id: `${eid}-p${pad4}`,
       eventId: eid,

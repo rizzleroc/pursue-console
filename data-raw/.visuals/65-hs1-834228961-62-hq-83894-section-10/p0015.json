@@ -1,0 +1,33 @@
+{
+  "kind": "newspaper-clipping",
+  "title": "Top Left Clipping",
+  "description": "Top Left Clipping",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Caption"
+    },
+    {
+      "kind": "newspaper-clipping",
+      "title": "Top Center Clipping"
+    },
+    {
+      "kind": "newspaper-clipping",
+      "title": "Top Right Clipping"
+    },
+    {
+      "kind": "newspaper-clipping",
+      "title": "Bottom Left Clipping"
+    },
+    {
+      "kind": "newspaper-clipping",
+      "title": "Bottom Center Clipping"
+    },
+    {
+      "kind": "newspaper-clipping",
+      "title": "Bottom Right Clipping"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.840Z"
+}

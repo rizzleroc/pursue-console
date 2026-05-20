@@ -1,8 +1,8 @@
 {
-  "kind": "map",
-  "title": "Annotated weather map of Japan",
-  "description": "A scanned map of Japan and nearby regions with hand-drawn weather symbols, isobars, grid lines, and shaded storm areas.",
-  "classifiedAt": "2026-05-19T07:12:49.934Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "kind": "photograph",
+  "title": "A meteorological weather map of Japan and surrounding regions, featuring isobars",
+  "description": "Image: A meteorological weather map of Japan and surrounding regions, featuring isobars, weather station data points, and handwritten annotations including green shading and lines.",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.821Z"
 }

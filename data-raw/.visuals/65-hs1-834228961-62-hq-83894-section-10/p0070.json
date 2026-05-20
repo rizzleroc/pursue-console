@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "A photograph of a disc-shaped object in the sky",
+  "description": "Image: A photograph of a disc-shaped object in the sky",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "A photograph of a saucer-shaped object with visible segments"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:19.850Z"
+}

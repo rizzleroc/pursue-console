@@ -1,0 +1,21 @@
+{
+  "kind": "photograph",
+  "title": "A newspaper clipping containing three photographs",
+  "description": "Image: A newspaper clipping containing three photographs",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "of two uniformed men inspecting a vehicle or object under a structure"
+    },
+    {
+      "kind": "photograph",
+      "title": "of a damaged, spherical object with visible markings \"NX89...\""
+    },
+    {
+      "kind": "photograph",
+      "title": "of a uniformed person examining an instrument panel or dashboard"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.184Z"
+}

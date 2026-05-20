@@ -1,0 +1,13 @@
+{
+  "kind": "photograph",
+  "title": "Photograph of three men",
+  "description": "Image: Photograph of three men",
+  "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "Photograph of a man pointing"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:34:20.171Z"
+}
