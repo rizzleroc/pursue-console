@@ -4,5 +4,5 @@
   "description": "Diagram: A path with numbered positions 1 through 5. Positions 1, 2, and 3 are circles connected by a dotted line. Position 4 is an elongated oval. Position 5 is an arrow pointing to the right.",
   "additional_markers": [],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T07:30:46.982Z"
+  "classifiedAt": "2026-05-20T07:50:47.013Z"
 }
