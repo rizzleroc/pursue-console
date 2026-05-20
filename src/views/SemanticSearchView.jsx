@@ -3,6 +3,7 @@ import { pipeline, env } from "@huggingface/transformers";
 import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
+import { highlightQuery } from "../lib/highlightQuery.jsx";
 
 // Fallback inventory total — only used if public/corpus-stats.json hasn't
 // loaded yet (or 404s on dev). The real number comes from the corpus DB
@@ -163,16 +164,8 @@ function strengthBand(final) {
   return                    { label: "NOISE",  pct: 20,  color: "#FF6B9D", glyph: "○○○○" };
 }
 
-function highlightQuery(text, qTerms) {
-  if (!qTerms.length) return text;
-  try {
-    const safe = qTerms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-    const re = new RegExp(`(${safe})`, "ig");
-    return text.split(re).map((s, i) =>
-      re.test(s) ? <mark key={i} className="bg-amber-400/40 text-amber-100 px-0.5 rounded-sm">{s}</mark> : <span key={i}>{s}</span>
-    );
-  } catch { return text; }
-}
+// highlightQuery lives in src/lib/highlightQuery.jsx so DossierView can
+// reuse it when rendering search-deep-link banners.
 
 const SAMPLE_QUERIES = [
   "object that materialized and disappeared instantly",
@@ -811,7 +804,20 @@ export default function SemanticSearchView({ onSelect }) {
                         const clickable = h.chunkKind !== "meta" && h.page;
                         return (
                           <button key={i}
-                            onClick={(ev) => { ev.stopPropagation(); clickable && onSelect(event, { page: h.page }); }}
+                            onClick={(ev) => {
+                              ev.stopPropagation();
+                              // Pass the matched chunk text + the active query terms
+                              // so DossierView can show "this is what your search
+                              // hit" inline on the deep-linked page. Without this
+                              // the dossier only shows its top-N curated extracts
+                              // for the page, which usually don't include the
+                              // chunk the user just clicked on.
+                              clickable && onSelect(event, {
+                                page: h.page,
+                                matchText: h.snippet,
+                                matchTerms: qTerms,
+                              });
+                            }}
                             disabled={!clickable}
                             className={`block w-full text-left border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed rounded-sm ${clickable ? "hover:bg-emerald-900/30 hover:border-amber-400 active:scale-[0.995]" : ""}`}
                             style={{ transition: "background-color 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms cubic-bezier(0.23,1,0.32,1)" }}>

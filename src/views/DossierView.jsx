@@ -4,6 +4,7 @@ import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
 import { THREADS } from "../data/threads.js";
 import { GlitchText, MiniChip, DocTypeBadge, DOC_TYPE_BADGE } from "../components/Primitives.jsx";
 import ReadingMode from "../components/ReadingMode.jsx";
+import { highlightQuery } from "../lib/highlightQuery.jsx";
 
 // Lazy-load the per-doc extracts JSON once. The DossierView renders excerpts
 // + document profile sections when the entry for this event id exists.
@@ -50,7 +51,7 @@ const FLAG_COLOR = {
 };
 const FLAG_LABELS = { date: "DATE", clock: "TIME", entity: "ENTITY", shape: "SHAPE", behavior: "BEHAVIOR", sensor: "SENSOR", number: "NUMBER" };
 
-export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents, selectionPage }) {
+export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents, selectionPage, selectionMatch }) {
   const [reading, setReading] = useState(false);
   const [expandedPages, setExpandedPages] = useState(new Set());
   const { data: extracts, loading: extractsLoading } = useExtracts(event?.id || "");
@@ -328,6 +329,27 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
                     </button>
                     {open && (
                       <div className="px-3 py-2 space-y-2 bg-emerald-950/20">
+                        {/*
+                          Search-match banner. When the user arrived here from
+                          Semantic Search, the chunk they clicked on usually
+                          ISN'T one of the curated `entry.top` excerpts below
+                          (those are scored on entity-density, not query
+                          relevance). Without this banner the user sees a page
+                          full of "top extracts" that don't match what they
+                          searched for — exactly the "deeplinking not working"
+                          complaint.
+                        */}
+                        {selectionPage === pn && selectionMatch && (
+                          <div className="border border-amber-400/60 bg-amber-400/10 rounded-sm p-2.5 mb-1">
+                            <div className="flex items-baseline justify-between gap-2 mb-1.5">
+                              <span className="font-mono text-[9px] tracking-widest text-amber-300">↪ SEARCH MATCH</span>
+                              <span className="font-mono text-[8px] tracking-widest text-emerald-700">this is the chunk your query hit</span>
+                            </div>
+                            <div className="font-mono text-[12px] text-amber-100/95 leading-relaxed pl-2 border-l-2 border-amber-400">
+                              {highlightQuery(selectionMatch.text, selectionMatch.terms)}
+                            </div>
+                          </div>
+                        )}
                         {entry.top.map((ex, i) => (
                           <div key={i} className="font-mono text-[12px] text-emerald-100 leading-relaxed">
                             <div className="flex flex-wrap gap-1 mb-1">
@@ -339,7 +361,17 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
                               ))}
                               <span className="text-[8px] text-emerald-700 ml-auto">score {ex.score}</span>
                             </div>
-                            <div className="pl-2 border-l-2 border-amber-400/30 italic">"{ex.text}"</div>
+                            {/*
+                              Also highlight query terms in the curated extracts
+                              when they happen to overlap with the search — this
+                              way the search-match banner above and the matching
+                              extracts (if any) both light up under one read.
+                            */}
+                            <div className="pl-2 border-l-2 border-amber-400/30 italic">
+                              "{selectionPage === pn && selectionMatch?.terms?.length
+                                ? highlightQuery(ex.text, selectionMatch.terms)
+                                : ex.text}"
+                            </div>
                           </div>
                         ))}
                       </div>

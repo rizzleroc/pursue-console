@@ -33,6 +33,11 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(null);
   const [selectionPage, setSelectionPage] = useState(null);
+  // When a deep-link arrives from Semantic Search, carry the matched chunk
+  // text + the active query terms so DossierView can show "this is what
+  // your search hit" inline on the deep-linked page. Cleared on close /
+  // view change so subsequent dossier visits don't show a stale banner.
+  const [selectionMatch, setSelectionMatch] = useState(null);
   const [volunteerOpen, setVolunteerOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -50,11 +55,14 @@ export default function App() {
   const handleSelect = (event, opts) => {
     setSelected(event);
     setSelectionPage(opts?.page ?? null);
+    setSelectionMatch(opts?.matchText
+      ? { text: opts.matchText, terms: opts.matchTerms || [] }
+      : null);
     setView("dossier");
   };
   const handleViewChange = (v) => {
     setView(v);
-    if (v !== "dossier") { setSelected(null); setSelectionPage(null); }
+    if (v !== "dossier") { setSelected(null); setSelectionPage(null); setSelectionMatch(null); }
   };
 
   // Help link survives as a tab even after we cleaned up the nav — it's
@@ -119,7 +127,8 @@ export default function App() {
           {view === "dossier" && (
             <DossierView event={selected}
               selectionPage={selectionPage}
-              onClose={() => { setSelected(null); setSelectionPage(null); setView("live"); }}
+              selectionMatch={selectionMatch}
+              onClose={() => { setSelected(null); setSelectionPage(null); setSelectionMatch(null); setView("live"); }}
               onSelect={handleSelect}
               allEvents={EVENTS} />
           )}
