@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T08:09:08.902Z",
+  "generatedAt": "2026-05-20T08:17:50.204Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-20T08:09:08.902Z",
+      "ts": "2026-05-20T08:17:50.204Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1140,
+      "duration_ms": 1173,
       "note": "events=121 inventory=173 contributions=54"
     },
     "recent": [
+      {
+        "ts": "2026-05-20T08:17:50.204Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1173,
+        "note": "events=121 inventory=173 contributions=54"
+      },
       {
         "ts": "2026-05-20T08:09:08.902Z",
         "kind": "db-rebuild",
@@ -118,13 +125,6 @@
         "kind": "db-rebuild",
         "outcome": "ok",
         "duration_ms": 1103,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T06:49:04.890Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1100,
         "note": "events=121 inventory=173 contributions=54"
       }
     ]
