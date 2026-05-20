@@ -9,14 +9,14 @@
     },
     "gemini": {
       "chars": 111,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:28.617175+00:00",
       "text_file": "p0135.gemini.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.267Z",
+    "computed_at": "2026-05-20T02:57:31.198Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -35,7 +35,7 @@
         "gpt-vision": {
           "text_file": "p0135.gpt-vision.v2.txt",
           "chars": 40,
-          "imported_at": "2026-05-19T23:56:32.112Z",
+          "imported_at": "2026-05-20T02:57:30.978Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }

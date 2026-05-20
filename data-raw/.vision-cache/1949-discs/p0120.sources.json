@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 137,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:14.581536+00:00",
       "text_file": "p0120.gemini.txt"
+    },
+    "judge": {
+      "chars": 60,
+      "imported_at": "2026-05-20T02:40:09.049Z",
+      "text_file": "p0120.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.254Z",
+    "computed_at": "2026-05-20T02:57:31.180Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.409,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.409
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 1
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.409
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0120.gpt-vision.v2.txt",
           "chars": 81,
-          "imported_at": "2026-05-19T23:56:32.109Z",
+          "imported_at": "2026-05-20T02:57:30.973Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.448
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "pick-source",
+      "best_source": "gpt-vision (v1)",
+      "confidence": 0.86,
+      "reasoning": "The first GPT vision candidate captures the visible restricted stamps and handwritten dimension labels, including the main 10 ft/60 ft sketch, rear-view 10 ft label, and INCL 2 note; the other candidates omit or invent non-visible stamped text.",
+      "judged_at": "2026-05-20T02:40:09.048Z",
+      "judge": "chatgpt",
+      "text_length": 60
+    }
   }
 }

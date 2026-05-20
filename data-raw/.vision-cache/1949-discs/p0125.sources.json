@@ -9,33 +9,49 @@
     },
     "gemini": {
       "chars": 98,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:18.692276+00:00",
       "text_file": "p0125.gemini.txt"
+    },
+    "judge": {
+      "chars": 146,
+      "imported_at": "2026-05-20T02:32:26.641Z",
+      "text_file": "p0125.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.259Z",
+    "computed_at": "2026-05-20T02:57:31.187Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.237,
+    "agreement_score": 0.142,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.237
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.142
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.372
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0125.gpt-vision.v2.txt",
           "chars": 40,
-          "imported_at": "2026-05-19T23:56:32.111Z",
+          "imported_at": "2026-05-20T02:57:30.975Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.252
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.92,
+      "reasoning": "The page has no substantive readable content beyond the transmitted date stamp, punch holes, and faint bleed-through, so it should be treated as blank rather than transcribed as document text.",
+      "judged_at": "2026-05-20T02:32:26.640Z",
+      "judge": "chatgpt",
+      "text_length": 146
+    }
   }
 }

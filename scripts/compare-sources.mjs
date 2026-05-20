@@ -299,6 +299,19 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
       }
     }
 
+    // Honor a prior judge verdict — once a page has been judged with
+    // high confidence, the verdict survives all subsequent re-runs of
+    // compare-sources. Without this round-trip, the next build would
+    // clobber dispute_kind="judged" and re-flag the page for review.
+    const priorJudge = sidecar.comparison?.judge;
+    if (priorJudge && priorJudge.confidence >= 0.7) {
+      cmp.judge = priorJudge;
+      cmp.dispute_kind = "judged";
+      cmp.needs_review = false;
+      cmp.confidence = "high";
+      stats.disputes_resolved_by_judge = (stats.disputes_resolved_by_judge || 0) + 1;
+    }
+
     sidecar.comparison = cmp;
     await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
     stats.pages_compared++;
@@ -317,16 +330,26 @@ console.log(`[compare] scanned ${stats.pages_scanned} sidecars across ${stats.ev
 console.log(`[compare] compared ${stats.pages_compared} multi-source pages`);
 console.log(`[compare]   high confidence  ${stats.high_confidence}`);
 console.log(`[compare]   medium           ${stats.medium_confidence}`);
-// Final count is just review-flagged minus reeval-settled. Computed
-// once at the end so the number always agrees with the DB query in
-// db-rebuild.mjs and with public/review-queue.json. (Earlier this
-// log incremented as-we-went and disagreed with the DB by 3.)
-const finalNeedsReview = stats.needs_review - (stats.disputes_resolved_by_reeval || 0);
-console.log(`[compare]   needs review     ${finalNeedsReview} (${stats.needs_review} initially flagged · ${stats.disputes_resolved_by_reeval || 0} settled by reeval)`);
-if (stats.disputes_resolved_by_reeval || stats.disputes_page_intrinsic || stats.disputes_partial) {
-  console.log(`[compare] re-evaluation outcomes:`);
+// Final count = initially-flagged minus EVERY resolution path that
+// flipped needs_review back to false. Reeval (prompt-variance) and
+// judge (vision-judge synthesis) both settle disputes; page-intrinsic
+// does NOT settle and stays in the queue (it's the "machines can't
+// resolve, needs human" verdict). Keep this in sync with the DB
+// query in db-rebuild.mjs — the two should always agree.
+const finalNeedsReview = stats.needs_review
+  - (stats.disputes_resolved_by_reeval || 0)
+  - (stats.disputes_resolved_by_judge  || 0);
+const breakdownBits = [
+  `${stats.needs_review} initially flagged`,
+  (stats.disputes_resolved_by_reeval || 0) && `${stats.disputes_resolved_by_reeval} settled by reeval`,
+  (stats.disputes_resolved_by_judge  || 0) && `${stats.disputes_resolved_by_judge} settled by judge`,
+].filter(Boolean).join(" · ");
+console.log(`[compare]   needs review     ${finalNeedsReview} (${breakdownBits})`);
+if (stats.disputes_resolved_by_reeval || stats.disputes_page_intrinsic || stats.disputes_partial || stats.disputes_resolved_by_judge) {
+  console.log(`[compare] resolution outcomes:`);
   console.log(`            resolved by reeval     ${stats.disputes_resolved_by_reeval || 0}  (prompt-variance: same prompt across both providers now agrees)`);
-  console.log(`            still page-intrinsic   ${stats.disputes_page_intrinsic || 0}  (handwriting / damage / redaction — needs human)`);
+  console.log(`            resolved by judge      ${stats.disputes_resolved_by_judge || 0}  (vision judge picked / merged / corrected / called blank)`);
+  console.log(`            still page-intrinsic   ${stats.disputes_page_intrinsic || 0}  (no resolution path worked — needs human)`);
   console.log(`            partial improvement    ${stats.disputes_partial || 0}  (helped a bit but still in medium band)`);
 }
 if (stats.human_vs_machine_pairs) {

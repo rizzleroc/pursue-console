@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 293,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:57:48.161342+00:00",
       "text_file": "p0008.gemini.txt"
+    },
+    "judge": {
+      "chars": 178,
+      "imported_at": "2026-05-20T02:52:47.921Z",
+      "text_file": "p0008.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.211Z",
+    "computed_at": "2026-05-20T02:57:31.116Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.062,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.062
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.094
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.366
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0008.gpt-vision.v2.txt",
           "chars": 47,
-          "imported_at": "2026-05-19T23:56:32.102Z",
+          "imported_at": "2026-05-20T02:57:30.961Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         },
@@ -54,6 +70,15 @@
       }
     ],
     "reeval_delta": 0.038,
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.93,
+      "reasoning": "The page has no substantive document text, only punch holes, stamps, paper texture, and faint illegible markings.",
+      "judged_at": "2026-05-20T02:52:47.920Z",
+      "judge": "chatgpt",
+      "text_length": 178
+    }
   }
 }

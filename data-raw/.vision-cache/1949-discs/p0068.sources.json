@@ -9,33 +9,49 @@
     },
     "gemini": {
       "chars": 119,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:29.269562+00:00",
       "text_file": "p0068.gemini.txt"
+    },
+    "judge": {
+      "chars": 226,
+      "imported_at": "2026-05-20T02:44:39.811Z",
+      "text_file": "p0068.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.236Z",
+    "computed_at": "2026-05-20T02:57:31.155Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.483,
+    "agreement_score": 0.222,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.483
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.222
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.33
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0068.gpt-vision.v2.txt",
           "chars": 71,
-          "imported_at": "2026-05-19T23:56:32.105Z",
+          "imported_at": "2026-05-20T02:57:30.965Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.495
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.92,
+      "reasoning": "The only legible material is the red transmission stamp and physical page marks; the remaining gray text appears to be faint bleed-through or illegible background rather than readable page content.",
+      "judged_at": "2026-05-20T02:44:39.808Z",
+      "judge": "chatgpt",
+      "text_length": 226
+    }
   }
 }

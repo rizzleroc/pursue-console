@@ -9,33 +9,49 @@
     },
     "gemini": {
       "chars": 478,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T16:09:48.638459+00:00",
       "text_file": "p0004.gemini.txt"
+    },
+    "judge": {
+      "chars": 68,
+      "imported_at": "2026-05-20T02:34:02.480Z",
+      "text_file": "p0004.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.934Z",
+    "computed_at": "2026-05-20T02:57:31.925Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.275,
+    "agreement_score": 0.053,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.275
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.093
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.053
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0004.gpt-vision.v2.txt",
           "chars": 272,
-          "imported_at": "2026-05-19T23:56:32.116Z",
+          "imported_at": "2026-05-20T02:57:30.983Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.354
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 1,
+      "reasoning": "The image is entirely blank white with no visible document content or markings, so all OCR candidates are incorrect.",
+      "judged_at": "2026-05-20T02:34:02.479Z",
+      "judge": "chatgpt",
+      "text_length": 68
+    }
   }
 }

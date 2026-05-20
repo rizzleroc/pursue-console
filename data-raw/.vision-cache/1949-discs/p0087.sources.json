@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 414,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:47.274406+00:00",
       "text_file": "p0087.gemini.txt"
+    },
+    "judge": {
+      "chars": 157,
+      "imported_at": "2026-05-20T02:39:36.558Z",
+      "text_file": "p0087.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.245Z",
+    "computed_at": "2026-05-20T02:57:31.167Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.384,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.384
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.99
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.387
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0087.gpt-vision.v2.txt",
           "chars": 184,
-          "imported_at": "2026-05-19T23:56:32.108Z",
+          "imported_at": "2026-05-20T02:57:30.971Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.397
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "corrected",
+      "best_source": null,
+      "confidence": 0.94,
+      "reasoning": "The visible page is a map with city labels, a legend, and a bottom-left handwritten note; gpt-vision v1 captured most text but omitted the legend symbols.",
+      "judged_at": "2026-05-20T02:39:36.557Z",
+      "judge": "chatgpt",
+      "text_length": 157
+    }
   }
 }

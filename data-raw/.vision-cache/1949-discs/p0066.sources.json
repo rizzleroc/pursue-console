@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 143,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:29.922537+00:00",
       "text_file": "p0066.gemini.txt"
+    },
+    "judge": {
+      "chars": 86,
+      "imported_at": "2026-05-20T02:43:21.944Z",
+      "text_file": "p0066.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.234Z",
+    "computed_at": "2026-05-20T02:57:31.150Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.421,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.421
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.889
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.478
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0066.gpt-vision.v2.txt",
           "chars": 87,
-          "imported_at": "2026-05-19T23:56:32.105Z",
+          "imported_at": "2026-05-20T02:57:30.965Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.433
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "corrected",
+      "best_source": null,
+      "confidence": 0.78,
+      "reasoning": "The March Flight Service Center transmitted stamp and declassified stamp are visible, but the body text is too faint to transcribe reliably and the other candidates hallucinate or misread dates.",
+      "judged_at": "2026-05-20T02:43:21.942Z",
+      "judge": "chatgpt",
+      "text_length": 86
+    }
   }
 }

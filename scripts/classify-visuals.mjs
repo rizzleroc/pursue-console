@@ -54,11 +54,13 @@ const SLICE = args.slice ? Number(args.slice) : null;
 const PROVIDER = (args.provider || "chatgpt").toLowerCase();
 const RECLASSIFY = !!args.reclassify;
 
-// Render at 800px max-edge so the MCP upload is small + the
-// committed JPEG fits the repo. 100 DPI ≈ 800px for letter-size.
+// PNG for the classifier upload (lossless — preserves faint stamps,
+// pencil sketches, light handwriting that JPEG would compress away
+// and cause a false "text-only" verdict). PNG-committed thumbnails
+// are bigger than JPEG (~3-5x) but still fit the repo for the
+// hundreds of pages with actual visuals.
 const RENDER_LONG_SIDE = 1100;   // classifier-pass quality
-const COMMIT_LONG_SIDE = 800;    // committed thumbnail (re-render at lower res)
-const JPEG_QUALITY = 0.70;
+const COMMIT_LONG_SIDE = 800;    // committed thumbnail
 const ALLOWED_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram", "text-only"]);
 
 const CLASSIFY_PROMPT = `Look at this scanned document page. Classify it as ONE of these categories:
@@ -123,7 +125,7 @@ async function getDoc(eid) {
   docCache.set(eid, doc);
   return doc;
 }
-async function renderJpeg(eid, pageNum, longSide, quality) {
+async function renderPng(eid, pageNum, longSide) {
   const doc = await getDoc(eid);
   if (!doc) throw new Error(`no local PDF for ${eid}`);
   const page = await doc.getPage(pageNum);
@@ -138,7 +140,7 @@ async function renderJpeg(eid, pageNum, longSide, quality) {
   // many of our scanned PDFs because the annotation references aren't
   // well-formed. We don't need annotations for visual classification.
   await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
-  const buf = cv.canvas.toBuffer("image/jpeg", { quality });
+  const buf = cv.canvas.toBuffer("image/png");
   factory.destroy(cv);
   return buf;
 }
@@ -233,16 +235,16 @@ for (let i = 0; i < queue.length; i++) {
   const pad4 = String(page).padStart(4, "0");
   process.stdout.write(`[${i+1}/${queue.length}] ${eid.padEnd(28)} p${pad4} `);
 
-  // Render at classifier-pass quality, stage for MCP
-  let classJpeg;
-  try { classJpeg = await renderJpeg(eid, page, RENDER_LONG_SIDE, JPEG_QUALITY); }
+  // Render at classifier-pass quality (PNG, lossless), stage for MCP
+  let classPng;
+  try { classPng = await renderPng(eid, page, RENDER_LONG_SIDE); }
   catch (e) {
     console.log(`SKIP (render): ${e.message}`);
     if (process.env.DEBUG_RENDER) console.log(e.stack);
     failed++; continue;
   }
-  const stagedPath = path.join(STAGE, `${eid}-p${pad4}.jpg`);
-  await writeFile(stagedPath, classJpeg);
+  const stagedPath = path.join(STAGE, `${eid}-p${pad4}.png`);
+  await writeFile(stagedPath, classPng);
 
   // Classify
   let result;
@@ -256,12 +258,14 @@ for (let i = 0; i < queue.length; i++) {
   await mkdir(path.dirname(sidecar), { recursive: true });
   await writeFile(sidecar, JSON.stringify(result, null, 2) + "\n", "utf8");
 
-  // If non-text, render the committed thumbnail to public/media/<eid>/p<NNN>.jpg
+  // If non-text, render the committed thumbnail to public/media/<eid>/p<NNN>.png
+  // PNG so the MEDIA library tiles show the page exactly as scanned,
+  // not a JPEG-crushed approximation. Trade ~3x file size for visual fidelity.
   if (result.kind !== "text-only") {
-    const mediaPath = path.join(MEDIA_DIR, eid, `p${pad4}.jpg`);
+    const mediaPath = path.join(MEDIA_DIR, eid, `p${pad4}.png`);
     await mkdir(path.dirname(mediaPath), { recursive: true });
     try {
-      const thumb = await renderJpeg(eid, page, COMMIT_LONG_SIDE, JPEG_QUALITY);
+      const thumb = await renderPng(eid, page, COMMIT_LONG_SIDE);
       await writeFile(mediaPath, thumb);
       mediaSaved++;
     } catch {}

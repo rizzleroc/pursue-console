@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 1219,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:57:14.791491+00:00",
       "text_file": "p0003.gemini.txt"
+    },
+    "judge": {
+      "chars": 67,
+      "imported_at": "2026-05-20T00:49:32.720Z",
+      "text_file": "p0003.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.675Z",
+    "computed_at": "2026-05-20T02:57:31.629Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.006,
     "pairs": [
@@ -26,9 +32,29 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.006
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.112
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.022
       }
     ],
-    "confidence": "low",
-    "needs_review": true
+    "confidence": "high",
+    "needs_review": false,
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.99,
+      "reasoning": "The image is uniformly blank white with no discernible document content or visible markings.",
+      "judged_at": "2026-05-20T00:49:32.718Z",
+      "judge": "chatgpt",
+      "text_length": 67
+    },
+    "dispute_kind": "judged"
   }
 }

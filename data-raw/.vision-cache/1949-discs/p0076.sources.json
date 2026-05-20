@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 126,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:38.139974+00:00",
       "text_file": "p0076.gemini.txt"
+    },
+    "judge": {
+      "chars": 173,
+      "imported_at": "2026-05-20T02:53:55.539Z",
+      "text_file": "p0076.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.240Z",
+    "computed_at": "2026-05-20T02:57:31.161Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.132,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.132
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.147
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.489
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0076.gpt-vision.v2.txt",
           "chars": 80,
-          "imported_at": "2026-05-19T23:56:32.107Z",
+          "imported_at": "2026-05-20T02:57:30.970Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.447
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.93,
+      "reasoning": "The page has no legible front-side body text; the apparent typing is faint bleed-through, while only the punch holes and dispatch stamp are clearly visible marks.",
+      "judged_at": "2026-05-20T02:53:55.538Z",
+      "judge": "chatgpt",
+      "text_length": 173
+    }
   }
 }

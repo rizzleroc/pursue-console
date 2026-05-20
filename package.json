@@ -13,6 +13,7 @@
     "corpus:catalogue:auto": "node scripts/auto-catalogue-from-gemini.mjs",
     "corpus:compare": "node scripts/compare-sources.mjs",
     "corpus:reeval": "node scripts/reevaluate-disputed.mjs",
+    "corpus:judge": "node scripts/judge-disputed.mjs",
     "corpus:classify": "node scripts/classify-visuals.mjs",
     "corpus:media": "node scripts/build-media-index.mjs",
     "corpus:coverage": "node scripts/diagnose-coverage.mjs",

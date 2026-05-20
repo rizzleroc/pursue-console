@@ -53,9 +53,14 @@ for (const eid of await listDirs(VISUALS_DIR)) {
     catch { continue; }
     if (!VISIBLE_KINDS.has(sc.kind)) continue;
     const pad4 = String(pageNum).padStart(4, "0");
-    const imagePath = `media/${eid}/p${pad4}.jpg`;
-    const imageAbsPath = path.join(MEDIA_DIR, eid, `p${pad4}.jpg`);
-    if (!existsSync(imageAbsPath)) continue; // metadata without pixels = skip
+    // Prefer PNG (lossless — what classify-visuals writes since 2.1).
+    // Fall back to legacy JPEG from the early batch.
+    const pngAbs = path.join(MEDIA_DIR, eid, `p${pad4}.png`);
+    const jpgAbs = path.join(MEDIA_DIR, eid, `p${pad4}.jpg`);
+    const imageAbsPath = existsSync(pngAbs) ? pngAbs : (existsSync(jpgAbs) ? jpgAbs : null);
+    if (!imageAbsPath) continue;   // metadata without pixels = skip
+    const ext = path.extname(imageAbsPath);
+    const imagePath = `media/${eid}/p${pad4}${ext}`;
     items.push({
       id: `${eid}-p${pad4}`,
       eventId: eid,

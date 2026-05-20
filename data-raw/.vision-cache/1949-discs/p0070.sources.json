@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 132,
-      "imported_at": "2026-05-19T23:56:26.479Z",
+      "imported_at": "2026-05-20T02:57:25.283Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:33.454905+00:00",
       "text_file": "p0070.gemini.txt"
+    },
+    "judge": {
+      "chars": 46,
+      "imported_at": "2026-05-20T02:38:53.121Z",
+      "text_file": "p0070.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-19T23:56:32.237Z",
+    "computed_at": "2026-05-20T02:57:31.156Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.355,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.355
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 1
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.355
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0070.gpt-vision.v2.txt",
           "chars": 62,
-          "imported_at": "2026-05-19T23:56:32.106Z",
+          "imported_at": "2026-05-20T02:57:30.967Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.367
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "pick-source",
+      "best_source": "gpt-vision (v1)",
+      "confidence": 0.97,
+      "reasoning": "The image visibly contains only these three typed text lines, while the other candidates add non-textual sketch descriptions or stamps not visible on this page.",
+      "judged_at": "2026-05-20T02:38:53.120Z",
+      "judge": "chatgpt",
+      "text_length": 46
+    }
   }
 }

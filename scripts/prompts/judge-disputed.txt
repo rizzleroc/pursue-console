@@ -1,0 +1,19 @@
+You are reviewing a disputed page transcription. The attached image is a single page from a declassified document. Below are the transcription attempts produced by different OCR engines and re-runs.
+
+Your job: compare each transcription against the image and decide which is correct, OR write the corrected canonical text yourself.
+
+If the page is essentially blank (only stamps, punch holes, page numbers, or paper texture with no actual content), the correct canonical text is `[blank page]` plus a brief one-line description of any visible marks (stamps, page numbers, handwritten margin notes).
+
+Return ONE LINE of JSON in this exact shape and nothing else:
+
+{"verdict":"<one of: pick-source / merged / corrected / blank>","best_source":"<name from candidates if verdict=pick-source, else null>","text":"<the final canonical text>","confidence":<0..1>,"reasoning":"<one sentence explaining your choice>"}
+
+Rules:
+- verdict="pick-source": one candidate is correct as-is. best_source is its label. text echoes that candidate verbatim.
+- verdict="merged": no single candidate is fully right but combining pieces of them is. text contains the merged result.
+- verdict="corrected": all candidates miss something visible in the image. text contains your fresh transcription.
+- verdict="blank": the page has no real content. text is `[blank page]` + brief description of marks.
+- Do not invent text not visible in the image. If a section is illegible, write `[illegible]` inline.
+- Preserve line breaks and reading order as they appear in the image.
+
+CANDIDATES:
