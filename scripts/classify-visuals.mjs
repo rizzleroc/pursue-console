@@ -48,6 +48,17 @@ const MEDIA_DIR = path.join(ROOT, "public", "media");
 const STAGE = path.join(os.homedir(), ".pursue-vision-staging", "classify");
 const DAEMON = process.env.DAEMON || "http://127.0.0.1:9223";
 
+// pdfjs leaks render errors as unhandled promise rejections that
+// escape our try/catch around page.render().promise — Node v24 then
+// kills the whole process. Log and keep going so a single bad page
+// doesn't murder a 7-hour batch.
+process.on("unhandledRejection", (err) => {
+  console.error("  ! unhandledRejection (continuing):", (err && (err.message || err.toString())) || err);
+});
+process.on("uncaughtException", (err) => {
+  console.error("  ! uncaughtException (continuing):", (err && (err.message || err.toString())) || err);
+});
+
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, "").split("=")).map(([k, v]) => [k, v ?? true]));
 const ONLY = args.only || null;
 const SLICE = args.slice ? Number(args.slice) : null;
