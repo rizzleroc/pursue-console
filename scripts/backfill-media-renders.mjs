@@ -13,7 +13,13 @@
 
 import { readFile, writeFile, readdir, mkdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { createCanvas } from "@napi-rs/canvas";
+// IMPORTANT: import @napi-rs/canvas from pdfjs's nested copy (0.1.x),
+// not the top-level (1.0.x). pdfjs-dist@5.7 internally uses the 0.1
+// API and trips a type mismatch ("Value is none of these types
+// String, Path") in CanvasGraphics.endPath when fed a canvas created
+// by 1.0. Most pages render fine either way, but pages with complex
+// vector path content (diagrams, photo overlays) fail under 1.0.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 

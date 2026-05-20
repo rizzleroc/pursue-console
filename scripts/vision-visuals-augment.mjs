@@ -26,7 +26,8 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
-import { createCanvas } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x); see backfill-media-renders.mjs.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 
 process.on("unhandledRejection", e => console.error("  ! unhandledRejection:", e?.message || e));
 process.on("uncaughtException",  e => console.error("  ! uncaughtException:", e?.message || e));

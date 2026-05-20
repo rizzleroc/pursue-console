@@ -25,7 +25,9 @@
 
 import { readFile, writeFile, readdir, mkdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { createCanvas } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x), not the top-level 1.0.x — see
+// backfill-media-renders.mjs for the failure mode this avoids.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 

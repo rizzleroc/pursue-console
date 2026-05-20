@@ -33,7 +33,13 @@
 
 import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { createCanvas } from "@napi-rs/canvas";
+// Use pdfjs's nested @napi-rs/canvas (0.1.x). The top-level 1.0.x has
+// an API drift that trips pdfjs's CanvasGraphics path renderer on
+// pages with complex vector content ("Value is none of these types
+// String, Path"). Most pages survive either way; some don't — and a
+// classifier that silently fails on a small set is exactly the kind
+// of bug that hides for weeks.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";

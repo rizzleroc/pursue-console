@@ -4,7 +4,8 @@
 // per dispute_kind = page-intrinsic).
 
 import Database from "better-sqlite3";
-import { createCanvas } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x); see backfill-media-renders.mjs.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";

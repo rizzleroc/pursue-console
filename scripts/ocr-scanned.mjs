@@ -15,7 +15,8 @@ import { tmpdir } from "node:os";
 import { randomBytes } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createCanvas } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x); see backfill-media-renders.mjs.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import { createWorker } from "tesseract.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

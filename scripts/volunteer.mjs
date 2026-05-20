@@ -36,7 +36,10 @@ import path from "node:path";
 import os from "node:os";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { createCanvas, Path2D, DOMMatrix } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x), not the top-level 1.0.x — keeps the
+// renderer compatible with pages that have complex vector content.
+// See backfill-media-renders.mjs for the failure mode.
+import { createCanvas, Path2D, DOMMatrix } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 
 process.on("unhandledRejection", e => console.error("  ! unhandled:", e?.message || e));
 process.on("uncaughtException",  e => console.error("  ! uncaught:",  e?.message || e));

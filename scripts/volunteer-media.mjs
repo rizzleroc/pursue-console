@@ -40,7 +40,10 @@
 import { readFile, writeFile, mkdir, readdir, stat, copyFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
-import { createCanvas } from "@napi-rs/canvas";
+// pdfjs's nested canvas (0.1.x), not the top-level 1.0.x. The 1.0
+// API drifts on Path handling and breaks pdfjs renders for pages
+// with complex vector content. See backfill-media-renders.mjs.
+import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
