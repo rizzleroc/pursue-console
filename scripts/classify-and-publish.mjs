@@ -46,10 +46,24 @@ async function publish() {
   });
   if (!NO_PUSH) {
     console.log(`[publish] committing + pushing...`);
-    await new Promise(resolve => {
-      const p = spawn("bash", ["-c", `git add -A && git -c user.name=rizzleroc -c user.email=rizzleroc@users.noreply.github.com commit -m "data: classifier batch progress · ${processed} pages processed since start" 2>&1 | tail -3 && git push origin main 2>&1 | tail -3`], { cwd: ROOT, stdio: "inherit", shell: true });
-      p.on("close", resolve);
+    // Use individual git invocations via spawn (no shell). The previous
+    // bash -c version had quoting issues with the multi-line commit
+    // message and silently failed every publish step. Three discrete
+    // commands; if any fails we log and continue.
+    const gitArgs = ["-c", "user.name=rizzleroc", "-c", "user.email=rizzleroc@users.noreply.github.com"];
+    const sh = (argv) => new Promise(res => {
+      const p = spawn("git", argv, { cwd: ROOT, stdio: "inherit" });
+      p.on("close", c => res(c));
+      p.on("error", () => res(1));
     });
+    let code = await sh(["add", "-A"]);
+    if (code === 0) {
+      code = await sh([...gitArgs, "commit", "-m", `data: classifier batch progress · ${processed} pages processed since start`]);
+    }
+    if (code === 0) {
+      code = await sh(["push", "origin", "main"]);
+    }
+    if (code !== 0) console.warn(`[publish] git step exited non-zero (${code}) — will retry at next publish boundary`);
   }
   lastPublishedAt = processed;
   publishing = false;

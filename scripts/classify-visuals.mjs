@@ -107,12 +107,36 @@ class NodeCanvasFactory {
   destroy(c) { c.canvas.width = 0; c.canvas.height = 0; c.canvas = null; c.context = null; }
 }
 const docCache = new Map();
+// Cache the list of local PDFs once at startup so we don't readdir on
+// every page (used to be a ~50ms per-page tax that compounded).
+let LOCAL_PDFS = null;
+async function listLocalPdfs() {
+  if (!LOCAL_PDFS) LOCAL_PDFS = (await readdir(RAW)).filter(f => f.toLowerCase().endsWith(".pdf"));
+  return LOCAL_PDFS;
+}
+async function findPdfFile(eid) {
+  const candidates = await listLocalPdfs();
+  const lower = eid.toLowerCase();
+  return candidates.find(f => f.toLowerCase().replace(/\.pdf$/, "") === lower)
+      || candidates.find(f => f.toLowerCase().includes(lower))
+      || null;
+}
+// Periodically recycle the docCache. pdfjs can leak state across
+// many getDocument calls (we've seen "Value is none of these types
+// String, Path" errors appear after ~2000 pages and stick). Dump
+// the cache every N pages to reset.
+const DOC_CACHE_RESET_EVERY = 200;
+let pagesSinceReset = 0;
 async function getDoc(eid) {
   if (docCache.has(eid)) return docCache.get(eid);
-  const candidates = (await readdir(RAW)).filter(f => f.toLowerCase().endsWith(".pdf"));
-  let pdfFile = candidates.find(f => f.toLowerCase().replace(/\.pdf$/, "") === eid.toLowerCase())
-             || candidates.find(f => f.toLowerCase().includes(eid.toLowerCase()))
-             || null;
+  if (pagesSinceReset >= DOC_CACHE_RESET_EVERY) {
+    for (const d of docCache.values()) {
+      try { await d?.cleanup?.(); await d?.destroy?.(); } catch {}
+    }
+    docCache.clear();
+    pagesSinceReset = 0;
+  }
+  const pdfFile = await findPdfFile(eid);
   if (!pdfFile) { docCache.set(eid, null); return null; }
   const buf = await readFile(path.join(RAW, pdfFile));
   const doc = await pdfjs.getDocument({
@@ -234,6 +258,28 @@ for (let i = 0; i < queue.length; i++) {
   const { eid, page, sidecar } = queue[i];
   const pad4 = String(page).padStart(4, "0");
   process.stdout.write(`[${i+1}/${queue.length}] ${eid.padEnd(28)} p${pad4} `);
+
+  // Fast-skip pages from events with no local PDF. Previous version
+  // attempted a render which spent 1-2s per page inside pdfjs before
+  // failing with a confusing error. ~2,200 SKIP-no-PDF pages in the
+  // FBI 65-hs1 family used to waste ~1h of throughput per batch.
+  // Now we check the filesystem once per event upfront and write a
+  // sidecar marking the page unclassifiable.
+  if (!(await findPdfFile(eid))) {
+    const sidecar = {
+      kind: "text-only",   // no kind, we couldn't see it
+      title: "",
+      description: "(no local PDF — classification skipped)",
+      classifier: "no-source",
+      classifiedAt: new Date().toISOString(),
+    };
+    await mkdir(path.dirname(queue[i].sidecar), { recursive: true });
+    await writeFile(queue[i].sidecar, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
+    console.log(`SKIP (no PDF)`);
+    failed++;
+    continue;
+  }
+  pagesSinceReset++;
 
   // Render at classifier-pass quality (PNG, lossless), stage for MCP
   let classPng;
