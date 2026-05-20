@@ -157,19 +157,22 @@ const MEDIA_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative
 async function validateMediaItem(file) {
   const issues = [];
   const isJson = file.file.endsWith(".json");
-  const isJpg  = /\.(jpg|jpeg)$/i.test(file.file);
-  if (!isJson && !isJpg) {
-    issues.push(`unrecognized media file extension (expected .json or .jpg)`);
+  const isImg  = /\.(jpg|jpeg|png)$/i.test(file.file);
+  if (!isJson && !isImg) {
+    issues.push(`unrecognized media file extension (expected .json, .png, or .jpg)`);
     return issues;
   }
-  if (isJpg) {
-    // Image-only entry: every .jpg must have a matching .json sibling.
-    const jsonSibling = file.fullPath.replace(/\.jpe?g$/i, ".json");
+  if (isImg) {
+    // Image-only entry: every image must have a matching .json sibling.
+    const jsonSibling = file.fullPath.replace(/\.(jpe?g|png)$/i, ".json");
     if (!existsSync(jsonSibling)) issues.push(`${file.relPath}: no matching .json sibling`);
     try {
       const sz = (await stat(file.fullPath)).size;
-      if (sz < 5_000)      issues.push(`${file.relPath}: image too small (${sz} bytes — likely empty/corrupt)`);
-      if (sz > 5_000_000)  issues.push(`${file.relPath}: image too large (${(sz/1e6).toFixed(1)} MB — please compress to <5MB JPEG)`);
+      const isPng = /\.png$/i.test(file.file);
+      // PNG renders of a single PDF page can be 1-3MB; raise the cap.
+      const maxBytes = isPng ? 15_000_000 : 5_000_000;
+      if (sz < 5_000)     issues.push(`${file.relPath}: image too small (${sz} bytes — likely empty/corrupt)`);
+      if (sz > maxBytes)  issues.push(`${file.relPath}: image too large (${(sz/1e6).toFixed(1)} MB — please compress)`);
     } catch { issues.push(`${file.relPath}: cannot stat image`); }
     return issues;
   }
@@ -193,9 +196,12 @@ async function validateMediaItem(file) {
   if (meta.kind === "newspaper-clipping" && meta.article_text && meta.article_text.length > 50_000) {
     issues.push(`${file.relPath}: article_text > 50,000 chars — please paste just the article, not the whole edition`);
   }
-  // Matching image
+  // Matching image (png preferred, jpg fallback)
+  const pngSibling = file.fullPath.replace(/\.json$/, ".png");
   const jpgSibling = file.fullPath.replace(/\.json$/, ".jpg");
-  if (!existsSync(jpgSibling)) issues.push(`${file.relPath}: no matching .jpg sibling at ${path.basename(jpgSibling)}`);
+  if (!existsSync(pngSibling) && !existsSync(jpgSibling)) {
+    issues.push(`${file.relPath}: no matching image sibling (.png or .jpg)`);
+  }
   return issues;
 }
 

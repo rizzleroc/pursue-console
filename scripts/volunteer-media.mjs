@@ -110,7 +110,12 @@ async function claimPhase() {
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
 
-  // pdfjs render — same approach as classify-visuals.mjs
+  // pdfjs render — matches the WORKING classify-visuals config. We
+  // pointedly do NOT pass wasmUrl or standardFontDataUrl: when those
+  // are set, napi-canvas's font loader throws "Value is none of
+  // these types String, Path" on pages with embedded font references
+  // (sketch labels, map city names, weather table annotations) —
+  // testing showed pages that worked WITHOUT the URLs fail WITH them.
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   class NodeCanvasFactory {
     create(w, h) { const cv = createCanvas(w, h); return { canvas: cv, context: cv.getContext("2d") }; }
@@ -121,6 +126,19 @@ async function claimPhase() {
   const downloadedPdf = new Map();
   async function getPdfPath(eid, url) {
     if (downloadedPdf.has(eid)) return downloadedPdf.get(eid);
+    // Prefer the maintainer's canonical copy under data-raw/ if present.
+    // The war.gov-served PDFs are sometimes a different (smaller, more
+    // aggressively encoded) revision than what the upstream sync has
+    // cached locally — the war.gov copy's font references cause
+    // napi-canvas to throw on pages with embedded text labels (witness
+    // sketches, map city names) even though the canonical copy renders
+    // fine. If the maintainer's canonical exists, use it.
+    const canonical = path.join(ROOT, "data-raw", `${eid}.pdf`);
+    if (existsSync(canonical)) {
+      downloadedPdf.set(eid, canonical);
+      return canonical;
+    }
+    // Fall back to downloading from war.gov into the volunteer scratch dir.
     const filename = path.join(PDF_ROOT, `${eid}.pdf`);
     if (!existsSync(filename)) {
       console.log(`    ↓ downloading ${url}`);
@@ -137,14 +155,22 @@ async function claimPhase() {
     const pad4 = String(c.page).padStart(4, "0");
     const outDir = path.join(STAGING, c.eid);
     await mkdir(outDir, { recursive: true });
-    const jpgPath = path.join(outDir, `p${pad4}.jpg`);
+    // PNG, not JPEG. The volunteer is going to read this image to write
+    // accurate context; JPEG compression eats faint stamps, pencil
+    // sketches, and ghosted handwriting that's the entire point of the
+    // page. ~1-3 MB per page vs ~80 KB JPEG; the staging dir is local
+    // so size doesn't matter.
+    const pngPath = path.join(outDir, `p${pad4}.png`);
     const tmplPath = path.join(outDir, `p${pad4}.md`);
     try {
       const pdfPath = await getPdfPath(c.eid, c.doc.pdfUrl);
       const buf = await readFile(pdfPath);
       const doc = await pdfjs.getDocument({
         data: new Uint8Array(buf),
-        useSystemFonts: false, disableFontFace: true,
+        useSystemFonts: false,
+        disableFontFace: true,
+        isEvalSupported: false,
+        useWorkerFetch: false,
       }).promise;
       const page = await doc.getPage(c.page);
       const baseViewport = page.getViewport({ scale: 1 });
@@ -153,9 +179,9 @@ async function claimPhase() {
       const factory = new NodeCanvasFactory();
       const cv = factory.create(Math.floor(viewport.width), Math.floor(viewport.height));
       await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
-      const jpg = cv.canvas.toBuffer("image/jpeg", 0.78);
+      const png = cv.canvas.toBuffer("image/png");
       factory.destroy(cv);
-      await writeFile(jpgPath, jpg);
+      await writeFile(pngPath, png);
     } catch (e) {
       console.log(`    ! ${c.eid} p${pad4}: render failed (${e.message})`);
       continue;
@@ -171,7 +197,7 @@ Suggested kind:        ${c.kind}
 Classifier's title:    ${c.suggestedTitle || "(none)"}
 Classifier's blurb:    ${c.suggestedDescription || "(none)"}
 
-Open p${pad4}.jpg next to this file. Fill the fields below.
+Open p${pad4}.png next to this file. Fill the fields below.
 -->
 
 # Kind
@@ -202,7 +228,7 @@ Skip this section for all other kinds.
   console.log(`\n[claim] templates written to: ${STAGING}`);
   console.log(`[claim] next steps:`);
   console.log(`         1. open ${STAGING}`);
-  console.log(`         2. open each p<NNN>.jpg + p<NNN>.md side by side`);
+  console.log(`         2. open each p<NNN>.png + p<NNN>.md side by side`);
   console.log(`         3. fill in the Title / Context / (Article text) sections`);
   console.log(`         4. run:  node scripts/volunteer-media.mjs --my-handle=${HANDLE} --commit`);
 }
@@ -275,8 +301,11 @@ async function commitPhase() {
       if (!ALLOWED_KINDS.has(sec.kind)) issues.push(`kind not in enum (got "${sec.kind}")`);
       if (!sec.title || sec.title.length < 4) issues.push("title missing or too short");
       if (!sec.context || sec.context.length < 20) issues.push("context missing or too short (≥20 chars, verbatim from page)");
+      // Accept either .png (new, lossless) or .jpg (legacy)
+      const pngSrc = path.join(dir, `p${pad}.png`);
       const jpgSrc = path.join(dir, `p${pad}.jpg`);
-      if (!existsSync(jpgSrc)) issues.push(`p${pad}.jpg missing`);
+      const imgSrc = existsSync(pngSrc) ? pngSrc : (existsSync(jpgSrc) ? jpgSrc : null);
+      if (!imgSrc) issues.push(`p${pad}.png or .jpg missing`);
       if (sec.kind === "newspaper-clipping" && sec["article text (newspaper-clipping only)"] && sec["article text (newspaper-clipping only)"].length > 50_000) {
         issues.push("article_text > 50,000 chars — paste just the article, not the whole edition");
       }
@@ -289,7 +318,8 @@ async function commitPhase() {
       const dstDir = path.join(CONTRIB_DIR, eid);
       await mkdir(dstDir, { recursive: true });
       const dstJson = path.join(dstDir, `p${pad}.json`);
-      const dstJpg  = path.join(dstDir, `p${pad}.jpg`);
+      // Preserve the source extension (png if available, jpg fallback)
+      const dstImg = path.join(dstDir, `p${pad}${path.extname(imgSrc)}`);
       const out = {
         kind: sec.kind,
         title: sec.title,
@@ -299,7 +329,7 @@ async function commitPhase() {
       const article = sec["article text (newspaper-clipping only)"];
       if (out.kind === "newspaper-clipping" && article) out.article_text = article;
       await writeFile(dstJson, JSON.stringify(out, null, 2) + "\n", "utf8");
-      await copyFile(jpgSrc, dstJpg);
+      await copyFile(imgSrc, dstImg);
       committed++;
       touchedEids.add(eid);
       console.log(`✓ ${eid} p${pad}  ${sec.kind.padEnd(20)}  "${sec.title.slice(0, 40)}"`);

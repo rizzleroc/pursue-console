@@ -94,10 +94,15 @@ async function importMediaFolder(handle, eidDir) {
     const pad4 = pad4Match[1].padStart(4, "0");
     const pageNum = Number(pad4Match[1]);
     const jsonPath = path.join(eidDir, f);
-    const jpgPath = path.join(eidDir, `p${pad4Match[1]}.jpg`);
-    const jpgPathAlt = path.join(eidDir, `p${pad4}.jpg`);
-    const realJpg = existsSync(jpgPath) ? jpgPath : (existsSync(jpgPathAlt) ? jpgPathAlt : null);
-    if (!realJpg) { missingImage++; continue; }
+    // Accept either .png (lossless, preferred since 2.1) or .jpg.
+    const candidates = [
+      path.join(eidDir, `p${pad4Match[1]}.png`),
+      path.join(eidDir, `p${pad4}.png`),
+      path.join(eidDir, `p${pad4Match[1]}.jpg`),
+      path.join(eidDir, `p${pad4}.jpg`),
+    ];
+    const realImg = candidates.find(existsSync) || null;
+    if (!realImg) { missingImage++; continue; }
     let meta;
     try { meta = JSON.parse(await readFile(jsonPath, "utf8")); } catch { badSchema++; continue; }
     if (!meta.kind || !MEDIA_KINDS.has(meta.kind)) { badSchema++; continue; }
@@ -113,7 +118,8 @@ async function importMediaFolder(handle, eidDir) {
       contributor: handle,
     };
     await writeFile(path.join(visualsDir, `p${pad4}.json`), JSON.stringify(sidecar, null, 2) + "\n", "utf8");
-    await copyFile(realJpg, path.join(mediaDir, `p${pad4}.jpg`));
+    // Preserve source extension so the MEDIA index can serve PNG when present.
+    await copyFile(realImg, path.join(mediaDir, `p${pad4}${path.extname(realImg)}`));
     imported++;
   }
   return { imported, skipped, badSchema, missingImage };
