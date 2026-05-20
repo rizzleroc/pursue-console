@@ -206,6 +206,16 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
     // recomputes.
     const priorReeval = sidecar.comparison?.reevaluation;
 
+    // If this page already has a high-confidence judge verdict, skip
+    // BOTH the asymmetric and the bidirectional reeval-promotion
+    // branches below — they would overwrite the judge-promoted
+    // canonical (or a human-merged canonical) with whichever machine
+    // text scored highest in pairwise agreement. Honor the existing
+    // verdict; only the priorJudge round-trip block at the end runs.
+    const hasJudgeVerdict = sidecar.comparison?.judge?.confidence >= 0.7;
+    if (hasJudgeVerdict) {
+      // fall through to the priorJudge block at the end; skip reeval branches
+    } else {
     // Asymmetric re-evaluation: if exactly ONE v2 source exists (e.g.
     // a volunteer re-ran via volunteer.mjs --review which is ChatGPT-only),
     // score it against the OTHER provider's v1 text. Same intent: "the
@@ -298,6 +308,7 @@ for (const eidEnt of await listDirs(VIS_CACHE)) {
         }
       }
     }
+    }   // end of `if (!hasJudgeVerdict)` from the skip-reeval guard above
 
     // Honor a prior judge verdict — once a page has been judged with
     // high confidence, the verdict survives all subsequent re-runs of

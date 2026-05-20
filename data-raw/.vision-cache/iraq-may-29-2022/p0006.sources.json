@@ -3,7 +3,7 @@
   "sources": {
     "gemini": {
       "chars": 2856,
-      "imported_at": "2026-05-20T03:03:43.295Z",
+      "imported_at": "2026-05-20T03:30:43.022Z",
       "model": "manual-local-transcription",
       "generated_at": "2026-05-08T18:33:51.649960+00:00",
       "text_file": "p0006.gemini.txt"

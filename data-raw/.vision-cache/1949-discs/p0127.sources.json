@@ -9,51 +9,62 @@
     },
     "gemini": {
       "chars": 120,
-      "imported_at": "2026-05-20T03:03:43.295Z",
+      "imported_at": "2026-05-20T03:30:43.022Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:20.114807+00:00",
       "text_file": "p0127.gemini.txt"
+    },
+    "merged": {
+      "chars": 163,
+      "imported_at": "2026-05-20T03:30:31.114Z",
+      "text_file": "p0127.merged.txt",
+      "via": "human-directed-merge",
+      "sources_used": [
+        "gpt-vision (v1)",
+        "gemini (v1)",
+        "gpt-vision (v2)"
+      ]
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T03:03:48.464Z",
+    "computed_at": "2026-05-20T03:30:49.182Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.182,
+    "agreement_score": 0.143,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.182
-      }
-    ],
-    "confidence": "low",
-    "needs_review": true,
-    "reevaluation": {
-      "providers": {
-        "gpt-vision": {
-          "text_file": "p0127.gpt-vision.v2.txt",
-          "chars": 40,
-          "imported_at": "2026-05-20T03:03:48.292Z",
-          "contributor": "Rizzleroc",
-          "via": "volunteer-review"
-        }
       },
-      "asymmetric": {
-        "v2": "gpt-vision",
-        "vsV1Of": "gemini",
-        "score": 0.19
-      }
-    },
-    "reeval_agreement": 0.19,
-    "reeval_pairs": [
       {
-        "a": "gpt-vision-v2",
-        "b": "gemini-v1",
-        "score": 0.19
+        "a": "gpt-vision",
+        "b": "merged",
+        "score": 0.143
+      },
+      {
+        "a": "gemini",
+        "b": "merged",
+        "score": 0.802
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "confidence": "high",
+    "needs_review": false,
+    "judge": {
+      "verdict": "merged",
+      "best_source": null,
+      "confidence": 1,
+      "reasoning": "Human-directed merge of 3 sources: gpt-vision (v1), gemini (v1), gpt-vision (v2)",
+      "judged_at": "2026-05-20T03:30:31.114Z",
+      "judge": "human-merge",
+      "text_length": 163,
+      "sources_merged": [
+        "gpt-vision (v1)",
+        "gemini (v1)",
+        "gpt-vision (v2)"
+      ]
+    },
+    "dispute_kind": "judged"
   }
 }

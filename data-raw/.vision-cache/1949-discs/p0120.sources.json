@@ -9,7 +9,7 @@
     },
     "gemini": {
       "chars": 137,
-      "imported_at": "2026-05-20T03:03:43.295Z",
+      "imported_at": "2026-05-20T03:30:43.022Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:14.581536+00:00",
       "text_file": "p0120.gemini.txt"
@@ -22,7 +22,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T03:03:48.456Z",
+    "computed_at": "2026-05-20T03:30:49.175Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -46,31 +46,6 @@
     ],
     "confidence": "high",
     "needs_review": false,
-    "reevaluation": {
-      "providers": {
-        "gpt-vision": {
-          "text_file": "p0120.gpt-vision.v2.txt",
-          "chars": 81,
-          "imported_at": "2026-05-20T03:03:48.289Z",
-          "contributor": "Rizzleroc",
-          "via": "volunteer-review"
-        }
-      },
-      "asymmetric": {
-        "v2": "gpt-vision",
-        "vsV1Of": "gemini",
-        "score": 0.448
-      }
-    },
-    "reeval_agreement": 0.448,
-    "reeval_pairs": [
-      {
-        "a": "gpt-vision-v2",
-        "b": "gemini-v1",
-        "score": 0.448
-      }
-    ],
-    "dispute_kind": "judged",
     "judge": {
       "verdict": "pick-source",
       "best_source": "gpt-vision (v1)",
@@ -79,6 +54,7 @@
       "judged_at": "2026-05-20T02:40:09.048Z",
       "judge": "chatgpt",
       "text_length": 60
-    }
+    },
+    "dispute_kind": "judged"
   }
 }

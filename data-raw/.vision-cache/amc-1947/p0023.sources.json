@@ -3,20 +3,20 @@
   "sources": {
     "gpt-vision": {
       "chars": 1018,
-      "imported_at": "2026-05-20T03:03:48.332Z",
+      "imported_at": "2026-05-20T03:30:49.014Z",
       "handle": "Rizzleroc",
       "text_file": "p0023.gpt-vision.txt"
     },
     "gemini": {
       "chars": 1092,
-      "imported_at": "2026-05-20T03:03:43.295Z",
+      "imported_at": "2026-05-20T03:30:43.022Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:54:22.672778+00:00",
       "text_file": "p0023.gemini.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T03:03:48.770Z",
+    "computed_at": "2026-05-20T03:30:49.551Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gemini",
