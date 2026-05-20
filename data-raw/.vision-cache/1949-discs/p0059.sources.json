@@ -9,16 +9,22 @@
     },
     "gemini": {
       "chars": 243,
-      "imported_at": "2026-05-20T02:57:25.283Z",
+      "imported_at": "2026-05-20T03:03:43.295Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:26.664913+00:00",
       "text_file": "p0059.gemini.txt"
+    },
+    "judge": {
+      "chars": 87,
+      "imported_at": "2026-05-20T03:02:37.801Z",
+      "text_file": "p0059.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T02:57:31.147Z",
+    "computed_at": "2026-05-20T03:03:48.428Z",
     "method": "token-jaccard+length-ratio",
-    "sources_count": 2,
+    "sources_count": 3,
     "canonical": "gpt-vision",
     "agreement_score": 0.338,
     "pairs": [
@@ -26,16 +32,26 @@
         "a": "gpt-vision",
         "b": "gemini",
         "score": 0.338
+      },
+      {
+        "a": "gpt-vision",
+        "b": "judge",
+        "score": 0.847
+      },
+      {
+        "a": "gemini",
+        "b": "judge",
+        "score": 0.398
       }
     ],
-    "confidence": "low",
-    "needs_review": true,
+    "confidence": "high",
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0059.gpt-vision.v2.txt",
           "chars": 82,
-          "imported_at": "2026-05-20T02:57:30.963Z",
+          "imported_at": "2026-05-20T03:03:48.282Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +70,15 @@
         "score": 0.293
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "corrected",
+      "best_source": null,
+      "confidence": 0.74,
+      "reasoning": "The date stamp and CARSWELL/FLIGHT SERVICE CENTER stamp are legible, while the surrounding typed body text is too faded to transcribe reliably and the other candidates include wrong dates or invented wording.",
+      "judged_at": "2026-05-20T03:02:37.800Z",
+      "judge": "chatgpt",
+      "text_length": 87
+    }
   }
 }

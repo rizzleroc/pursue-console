@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T02:57:32.881Z",
+  "generatedAt": "2026-05-20T03:03:49.821Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 173,
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-20T02:57:32.881Z",
+      "ts": "2026-05-20T03:03:49.821Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1227,
+      "duration_ms": 944,
       "note": "events=121 inventory=173 contributions=54"
     },
     "recent": [
+      {
+        "ts": "2026-05-20T03:03:49.821Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 944,
+        "note": "events=121 inventory=173 contributions=54"
+      },
       {
         "ts": "2026-05-20T02:57:32.881Z",
         "kind": "db-rebuild",
@@ -119,13 +126,6 @@
         "outcome": "ok",
         "duration_ms": 1118,
         "note": "events=121 inventory=173 contributions=19"
-      },
-      {
-        "ts": "2026-05-19T05:26:46.934Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1738,
-        "note": "events=121 inventory=173 contributions=19"
       }
     ]
   },
@@ -135,14 +135,14 @@
     "partialOcrNeedsVision": 2
   },
   "review": {
-    "pagesNeedingReview": 5,
-    "pagesHighConfidence": 384,
+    "pagesNeedingReview": 3,
+    "pagesHighConfidence": 386,
     "pagesMediumConfidence": 36,
-    "pagesLowConfidence": 5,
+    "pagesLowConfidence": 3,
     "topEventsByReviewQueue": [
       {
         "event_id": "1949-discs",
-        "n": 4
+        "n": 2
       },
       {
         "event_id": "general-1948",
@@ -151,7 +151,7 @@
     ],
     "reevaluated": 22,
     "resolvedByPromptStandard": 3,
-    "pageIntrinsicDisputes": 5,
+    "pageIntrinsicDisputes": 3,
     "partialImprovementByReeval": 0
   },
   "sourceQuality": {},
@@ -165,7 +165,7 @@
         "ocr"
       ],
       "dominantBest": "gemini",
-      "needsReview": 4
+      "needsReview": 2
     },
     "65-hs1-834228961-62-hq-83894-section-10": {
       "pages": 182,

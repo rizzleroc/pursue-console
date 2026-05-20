@@ -3,7 +3,7 @@
   "page": 88,
   "best": "gpt-vision",
   "comparison": {
-    "computed_at": "2026-05-20T02:57:31.170Z",
+    "computed_at": "2026-05-20T03:03:48.447Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -22,7 +22,7 @@
         "gpt-vision": {
           "text_file": "p0088.gpt-vision.v2.txt",
           "chars": 648,
-          "imported_at": "2026-05-20T02:57:30.972Z",
+          "imported_at": "2026-05-20T03:03:48.288Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }

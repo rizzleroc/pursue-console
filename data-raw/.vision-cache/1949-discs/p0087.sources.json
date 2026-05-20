@@ -9,7 +9,7 @@
     },
     "gemini": {
       "chars": 414,
-      "imported_at": "2026-05-20T02:57:25.283Z",
+      "imported_at": "2026-05-20T03:03:43.295Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:47.274406+00:00",
       "text_file": "p0087.gemini.txt"
@@ -22,7 +22,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T02:57:31.167Z",
+    "computed_at": "2026-05-20T03:03:48.446Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -36,12 +36,12 @@
       {
         "a": "gpt-vision",
         "b": "judge",
-        "score": 0.99
+        "score": 0.975
       },
       {
         "a": "gemini",
         "b": "judge",
-        "score": 0.387
+        "score": 0.394
       }
     ],
     "confidence": "high",
@@ -51,7 +51,7 @@
         "gpt-vision": {
           "text_file": "p0087.gpt-vision.v2.txt",
           "chars": 184,
-          "imported_at": "2026-05-20T02:57:30.971Z",
+          "imported_at": "2026-05-20T03:03:48.287Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }

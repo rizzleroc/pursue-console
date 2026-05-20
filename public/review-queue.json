@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-20T02:57:34.524Z",
-  "total": 5,
+  "generatedAt": "2026-05-20T03:03:51.168Z",
+  "total": 3,
   "queue": [
     {
       "eventId": "general-1948",
@@ -76,56 +76,6 @@
       ],
       "againstHuman": null,
       "textUrl": "review-text/1949-discs/88.json"
-    },
-    {
-      "eventId": "1949-discs",
-      "title": "1949 Flying Disc Incident Reports",
-      "agency": "Department of War",
-      "page": 135,
-      "agreement": 0.298,
-      "confidence": "low",
-      "sources": {
-        "gpt-vision": {
-          "chars": 37
-        },
-        "gemini": {
-          "chars": 111
-        }
-      },
-      "pairs": [
-        {
-          "a": "gpt-vision",
-          "b": "gemini",
-          "score": 0.298
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/1949-discs/135.json"
-    },
-    {
-      "eventId": "1949-discs",
-      "title": "1949 Flying Disc Incident Reports",
-      "agency": "Department of War",
-      "page": 59,
-      "agreement": 0.338,
-      "confidence": "low",
-      "sources": {
-        "gpt-vision": {
-          "chars": 71
-        },
-        "gemini": {
-          "chars": 243
-        }
-      },
-      "pairs": [
-        {
-          "a": "gpt-vision",
-          "b": "gemini",
-          "score": 0.338
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/1949-discs/59.json"
     }
   ]
 }
