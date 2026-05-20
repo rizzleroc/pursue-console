@@ -4,5 +4,5 @@
   "description": "Image: A meteorological weather map of Japan and surrounding regions, featuring isobars, weather station data points, and handwritten annotations including green shading and lines.",
   "additional_markers": [],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T09:47:48.949Z"
+  "classifiedAt": "2026-05-20T09:57:03.363Z"
 }
