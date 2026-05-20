@@ -13,6 +13,11 @@ const KIND_LABELS = {
   "newspaper-clipping":    "NEWSPAPER CLIPPING",
   "map":                   "MAP",
   "diagram":               "DIAGRAM",
+  // `table` is created by the indexer's curate() pass — it scoops up
+  // the typewritten checklists and forms that the vision classifier
+  // labels as photocopied-negative because of the inverted-tone scan
+  // style. See scripts/build-media-index.mjs.
+  "table":                 "TABLE / FORM",
 };
 
 const KIND_COLORS = {
@@ -24,6 +29,7 @@ const KIND_COLORS = {
   "newspaper-clipping":    { dot: "bg-emerald-400", text: "text-emerald-300", ring: "ring-emerald-500/40" },
   "map":                   { dot: "bg-rose-400",    text: "text-rose-300",    ring: "ring-rose-500/40" },
   "diagram":               { dot: "bg-violet-400",  text: "text-violet-300",  ring: "ring-violet-500/40" },
+  "table":                 { dot: "bg-sky-400",     text: "text-sky-300",     ring: "ring-sky-500/40" },
 };
 
 const ALL_KINDS = Object.keys(KIND_LABELS);
@@ -72,6 +78,21 @@ export default function MediaView({ onSelect }) {
     }, { withImage: 0, placeholder: 0 });
   }, [data]);
 
+  // Per-kind counts honoring the placeholder toggle. Without this, the
+  // filter pills show `data.byKind` (all items) — so PHOTOGRAPH would
+  // read "82" even when the grid is hiding 64 placeholders and only
+  // showing 18 actual photos. That mismatch is the "filter calls out
+  // images but has none attached" confusion.
+  const kindCounts = useMemo(() => {
+    if (!data?.items) return {};
+    const out = {};
+    for (const it of data.items) {
+      if (!includePlaceholders && !it.imagePath) continue;
+      out[it.kind] = (out[it.kind] || 0) + 1;
+    }
+    return out;
+  }, [data, includePlaceholders]);
+
   const eventList = useMemo(() => {
     if (!data?.items) return [];
     const map = new Map();
@@ -109,7 +130,14 @@ export default function MediaView({ onSelect }) {
           <GlitchText>▦ MEDIA</GlitchText>
         </h2>
         <div className="font-mono text-[10px] text-emerald-700">
-          {filtered.length} of {data.total} visuals · {data.eventCount} events
+          {/*
+            Denominator matches the placeholder toggle — without this,
+            "X of 198" stays static even when 115 placeholders are
+            hidden, so the user sees "18 of 198" and can't tell whether
+            their filters threw out 180 tiles or whether 115 were
+            placeholders hidden by the toggle.
+          */}
+          {filtered.length} of {includePlaceholders ? counts.withImage + counts.placeholder : counts.withImage} visuals · {data.eventCount} events
         </div>
       </div>
 
@@ -118,12 +146,24 @@ export default function MediaView({ onSelect }) {
         {ALL_KINDS.map(k => {
           const active = filterKinds.has(k);
           const c = KIND_COLORS[k];
-          const n = data.byKind?.[k] || 0;
+          // kindCounts respects the placeholder toggle so the number on
+          // each pill matches what the grid actually shows. When the
+          // user toggles "include placeholders" on, these jump to the
+          // larger raw totals.
+          const n = kindCounts[k] || 0;
+          // Kinds with zero visible tiles get dimmed even when the
+          // filter is "active" — the toggle is still meaningful (will
+          // flip them on/off when placeholders come back) but the
+          // visual weight matches the empty grid.
+          const empty = n === 0;
           return (
             <button key={k} onClick={() => toggleKind(k)}
+              title={empty ? `no ${KIND_LABELS[k]} tiles visible — try toggling "include placeholders"` : undefined}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
-                active ? `${c.text} border-current` : "text-emerald-800 border-emerald-900/50 opacity-50"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+                active && !empty ? `${c.text} border-current`
+                : active && empty ? "text-emerald-800 border-emerald-900/40 opacity-40"
+                : "text-emerald-800 border-emerald-900/50 opacity-50"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${c.dot} ${empty ? "opacity-40" : ""}`} />
               {KIND_LABELS[k]} <span className="opacity-60">{n}</span>
             </button>
           );

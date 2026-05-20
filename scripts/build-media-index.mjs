@@ -24,7 +24,78 @@ const MEDIA_DIR = path.join(ROOT, "public", "media");
 const OUT = path.join(ROOT, "public", "media.json");
 
 // Pages classified as text-only don't appear in the media library.
-const VISIBLE_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
+// `table` is the indexer's own kind (the classifier never emits it) —
+// see curate() below. It captures typewritten checklists/forms which
+// the vision pass categorized as photocopied-negative because of the
+// inverted-tone scan style, but which the user asked to see grouped
+// separately from real photo negatives.
+const VISIBLE_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram", "table"]);
+
+// Curate raw classifier output for the MEDIA grid.
+//
+// The vision classifier (chatgpt) is a strict per-kind labeler — it
+// emits photocopied-negative for any inverted-tone scan, including
+// pages that are pure typed memos with no actual photographic image.
+// That's correct from a "what does the scan look like" standpoint but
+// wrong for MEDIA, where the user wants visual artifacts (sketches,
+// photos, clippings, charts, tables, maps, handwriting) — not typed
+// documents that merely happen to be photocopied.
+//
+// This function is the one place that translates classifier output
+// into MEDIA semantics. Sidecars stay as classifier ground-truth; the
+// presentation layer applies rules. Returns { kind, reason } where
+// kind === null means "exclude from MEDIA" (treat as text-only).
+function curate(sc) {
+  const k = sc.kind;
+  const d = (sc.description || "").toLowerCase();
+  const t = (sc.title || "").toLowerCase();
+  const desc = `${d} ${t}`;
+  const has = (re) => re.test(desc);
+
+  // Visual cues — if any of these are present we're looking at real
+  // media regardless of typed-text noise on the page.
+  const hasVisual = has(/(photograph|photo of|sketch|drawing|diagram|illustration|figure|hand-?drawn|aerial view|imagery)/);
+
+  // 1. Folder covers / scanned backings — not media in any sense.
+  if (has(/^\s*(a |an )?(tan|brown|manila|scanned) (folder|backing)/) ||
+      has(/folder (or |with |cover)/) && !hasVisual) {
+    return { kind: null, reason: "folder-cover" };
+  }
+
+  // 2. Pure typed memos/reports — described as "typewritten memo /
+  //    typewritten report / typewritten page" without any visual cue.
+  //    These pages are interesting for TEXT search but they're not
+  //    media. Demote to text-only.
+  if (k === "photocopied-negative" &&
+      has(/(typewritten|typed) (memo|memorandum|report|note|page|confidential)/) &&
+      !hasVisual &&
+      !has(/(checklist|form|table|stamp|seal)/)) {
+    return { kind: null, reason: "typed-memo-only" };
+  }
+
+  // 3. Checklists / forms — typewritten structured pages with fields,
+  //    rows, columns. The user explicitly asked for "tables" in MEDIA;
+  //    this captures the FBI/AAF incident checklists that dominate the
+  //    photocopied-negative bucket.
+  if (k === "photocopied-negative" && has(/(checklist|form\b)/)) {
+    return { kind: "table", reason: "form-or-checklist" };
+  }
+
+  // 4. Maps mislabeled as photograph because Gemini described them as
+  //    "Image: A map of …".
+  if (k === "photograph" && has(/(map of|weather map|map showing|geographic map)/)) {
+    return { kind: "map", reason: "map-misclassified-as-photo" };
+  }
+
+  // 5. Artistic illustrations mislabeled as photograph.
+  if (k === "photograph" && has(/(artistic illustration|illustration of|drawing of)/) &&
+      !has(/photograph/)) {
+    return { kind: "hand-drawing", reason: "illustration-misclassified-as-photo" };
+  }
+
+  // Default — accept the classifier's call.
+  return { kind: k, reason: null };
+}
 
 await mkdir(path.dirname(OUT), { recursive: true });
 
@@ -41,6 +112,7 @@ async function listDirs(p) {
 }
 
 const items = [];
+const curationStats = { excluded: {}, remapped: {} };
 for (const eid of await listDirs(VISUALS_DIR)) {
   const dir = path.join(VISUALS_DIR, eid);
   const event = eventsMap[eid] || null;
@@ -51,7 +123,19 @@ for (const eid of await listDirs(VISUALS_DIR)) {
     let sc;
     try { sc = JSON.parse(await readFile(path.join(dir, f), "utf8")); }
     catch { continue; }
-    if (!VISIBLE_KINDS.has(sc.kind)) continue;
+    // First pass: filter on the raw classifier kind (text-only stays out).
+    if (!["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"].includes(sc.kind)) continue;
+    // Second pass: presentation-layer curation. See curate() above.
+    const { kind: curatedKind, reason } = curate(sc);
+    if (curatedKind === null) {
+      curationStats.excluded[reason] = (curationStats.excluded[reason] || 0) + 1;
+      continue;
+    }
+    if (curatedKind !== sc.kind) {
+      const key = `${sc.kind}→${curatedKind}`;
+      curationStats.remapped[key] = (curationStats.remapped[key] || 0) + 1;
+    }
+    const effectiveKind = curatedKind;
     const pad4 = String(pageNum).padStart(4, "0");
     // Prefer PNG (lossless — what classify-visuals writes since 2.1).
     // Fall back to legacy JPEG from the early batch.
@@ -71,7 +155,11 @@ for (const eid of await listDirs(VISUALS_DIR)) {
       agency: event?.agency || null,
       era: event?.era || null,
       page: pageNum,
-      kind: sc.kind,
+      kind: effectiveKind,
+      // Preserve the raw classifier output for debugging — useful when
+      // a tile shows up under an unexpected kind and we want to know
+      // whether the model lied or the curator remapped it.
+      rawKind: sc.kind !== effectiveKind ? sc.kind : undefined,
       title: sc.title || "",
       description: sc.description || "",
       classifier: sc.classifier || null,
@@ -100,5 +188,14 @@ console.log(`[media-index] ${items.length} media items across ${Object.keys(byEv
 console.log(`[media-index] by kind:`);
 for (const [k, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {
   console.log(`               ${k.padEnd(22)} ${n}`);
+}
+if (Object.keys(curationStats.excluded).length || Object.keys(curationStats.remapped).length) {
+  console.log(`[media-index] curation:`);
+  for (const [reason, n] of Object.entries(curationStats.excluded)) {
+    console.log(`               excluded · ${reason.padEnd(28)} ${n}`);
+  }
+  for (const [pair, n] of Object.entries(curationStats.remapped)) {
+    console.log(`               remapped · ${pair.padEnd(28)} ${n}`);
+  }
 }
 console.log(`[media-index] wrote ${OUT}`);
