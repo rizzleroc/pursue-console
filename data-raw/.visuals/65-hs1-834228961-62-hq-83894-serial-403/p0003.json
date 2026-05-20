@@ -2,7 +2,12 @@
   "kind": "photograph",
   "title": "of Gray Barker",
   "description": "Image of Gray Barker",
-  "additional_markers": [],
+  "additional_markers": [
+    {
+      "kind": "hand-drawing",
+      "title": "Graphic: Silhouettes of men in hats and flying saucers"
+    }
+  ],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T06:34:20.152Z"
+  "classifiedAt": "2026-05-20T06:40:52.561Z"
 }

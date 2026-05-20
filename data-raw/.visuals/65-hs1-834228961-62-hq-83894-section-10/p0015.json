@@ -4,6 +4,10 @@
   "description": "Top Left Clipping",
   "additional_markers": [
     {
+      "kind": "hand-drawing",
+      "title": "Cartoon Caption"
+    },
+    {
       "kind": "photograph",
       "title": "Caption"
     },
@@ -29,5 +33,5 @@
     }
   ],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T06:34:19.840Z"
+  "classifiedAt": "2026-05-20T06:40:52.192Z"
 }

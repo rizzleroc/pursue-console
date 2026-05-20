@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
-  "title": "Aerial view of military airfield",
-  "description": "Black-and-white aerial photograph of a military airfield with runways, aircraft, buildings, handwritten annotations, and confidential stamps.",
-  "classifiedAt": "2026-05-19T07:25:46.511Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "title": "Aerial photograph of an airfield with two aircraft on the tarmac in the foregrou",
+  "description": "Aerial photograph of an airfield with two aircraft on the tarmac in the foreground. The image contains the following handwritten annotations:",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:40:52.170Z"
 }

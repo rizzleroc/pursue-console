@@ -1,0 +1,8 @@
+{
+  "kind": "hand-drawing",
+  "title": "Portrait of Thomas Jefferson",
+  "description": "Portrait of Thomas Jefferson",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:40:52.402Z"
+}

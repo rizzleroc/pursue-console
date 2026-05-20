@@ -39,11 +39,15 @@ const MEDIA = path.join(ROOT, "public", "media");
 const KIND_MAP = [
   // ordered: more specific patterns first
   [/^\s*(newspaper\s+clipping|press\s+clipping|news\s+clipping|clipping)/i, "newspaper-clipping"],
-  [/^\s*(photograph|photo)\b/i, "photograph"],
-  [/^\s*(sketch|drawing|hand-?drawn)/i, "hand-drawing"],
+  [/^\s*(aerial\s+photo(graph)?|photograph|photo)\b/i, "photograph"],
+  [/^\s*(sketch|drawing|hand-?drawn|cartoon)/i, "hand-drawing"],
   [/^\s*(diagram|schematic)/i, "diagram"],
   [/^\s*(map|floor\s*plan)/i, "map"],
   [/^\s*(negative|photocopy\s+of\s+negative|photocopied\s+negative)/i, "photocopied-negative"],
+  // Graphic = catch-all for non-photographic illustrations: saucer
+  // silhouettes, abstract symbols, official seals, war-bond posters.
+  // Treat as hand-drawing since they're closer to drawings than photos.
+  [/^\s*(graphic|seal\s+of|portrait\s+of)/i, "hand-drawing"],
   [/^\s*(image|figure|illustration)\b/i, "photograph"],
 ];
 

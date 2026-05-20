@@ -1,0 +1,13 @@
+{
+  "kind": "hand-drawing",
+  "title": "Graphic: Flying saucer",
+  "description": "Graphic: Flying saucer",
+  "additional_markers": [
+    {
+      "kind": "hand-drawing",
+      "title": "Graphic: Four small flying saucers"
+    }
+  ],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-20T06:40:52.446Z"
+}

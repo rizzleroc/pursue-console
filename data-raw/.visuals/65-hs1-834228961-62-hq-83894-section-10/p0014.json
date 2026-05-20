@@ -1,8 +1,12 @@
 {
-  "kind": "photograph",
-  "title": "U.F.O. (T) FLASH ACROSS PRE-DAWN SKY. TIME EXPOSURE TAKEN BY MICHIGAN DEPUTY SHE",
-  "description": "Image: U.F.O. (T) FLASH ACROSS PRE-DAWN SKY. TIME EXPOSURE TAKEN BY MICHIGAN DEPUTY SHERIFF",
+  "kind": "hand-drawing",
+  "title": "Cartoon image of a man looking at a flying saucer",
+  "description": "Cartoon image of a man looking at a flying saucer",
   "additional_markers": [
+    {
+      "kind": "photograph",
+      "title": "U.F.O. (T) FLASH ACROSS PRE-DAWN SKY. TIME EXPOSURE TAKEN BY MICHIGAN DEPUTY SHE"
+    },
     {
       "kind": "photograph",
       "title": "NEW PLYMOUTH, TUESDAY, MAY 10, 1966. Price Fourpence."
@@ -13,5 +17,5 @@
     }
   ],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T06:34:19.840Z"
+  "classifiedAt": "2026-05-20T06:40:52.191Z"
 }
