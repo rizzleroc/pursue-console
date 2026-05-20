@@ -9,14 +9,14 @@
     },
     "gemini": {
       "chars": 309,
-      "imported_at": "2026-05-20T02:57:25.283Z",
+      "imported_at": "2026-05-19T23:56:26.479Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:58:47.382256+00:00",
       "text_file": "p0088.gemini.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T02:57:31.170Z",
+    "computed_at": "2026-05-20T02:22:25.080Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -35,7 +35,7 @@
         "gpt-vision": {
           "text_file": "p0088.gpt-vision.v2.txt",
           "chars": 648,
-          "imported_at": "2026-05-20T02:57:30.972Z",
+          "imported_at": "2026-05-19T23:56:32.109Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +54,15 @@
         "score": 0.148
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "page-intrinsic",
+    "judge": {
+      "verdict": "corrected",
+      "best_source": null,
+      "confidence": 0.66,
+      "reasoning": "The page is a handwritten weather map; gpt-vision v1 is closest, but it contains uncertain placeholders and some OCR errors, while the other candidates describe unrelated stamps or omit most visible numerals.",
+      "judged_at": "2026-05-20T02:59:03.039Z",
+      "judge": "chatgpt",
+      "text_length": 561
+    }
   }
 }

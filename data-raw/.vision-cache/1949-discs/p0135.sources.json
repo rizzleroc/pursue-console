@@ -1,5 +1,5 @@
 {
-  "best": "gpt-vision",
+  "best": "judge",
   "sources": {
     "gpt-vision": {
       "chars": 37,
@@ -9,14 +9,20 @@
     },
     "gemini": {
       "chars": 111,
-      "imported_at": "2026-05-20T02:57:25.283Z",
+      "imported_at": "2026-05-19T23:56:26.479Z",
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:59:28.617175+00:00",
       "text_file": "p0135.gemini.txt"
+    },
+    "judge": {
+      "chars": 160,
+      "imported_at": "2026-05-20T02:59:27.788Z",
+      "text_file": "p0135.judge.txt",
+      "via": "chatgpt-judge"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T02:57:31.198Z",
+    "computed_at": "2026-05-20T02:22:25.117Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -29,13 +35,13 @@
       }
     ],
     "confidence": "low",
-    "needs_review": true,
+    "needs_review": false,
     "reevaluation": {
       "providers": {
         "gpt-vision": {
           "text_file": "p0135.gpt-vision.v2.txt",
           "chars": 40,
-          "imported_at": "2026-05-20T02:57:30.978Z",
+          "imported_at": "2026-05-19T23:56:32.112Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }
@@ -54,6 +60,15 @@
         "score": 0.304
       }
     ],
-    "dispute_kind": "page-intrinsic"
+    "dispute_kind": "judged",
+    "judge": {
+      "verdict": "blank",
+      "best_source": null,
+      "confidence": 0.93,
+      "reasoning": "The page has no readable body content, only punch holes, paper texture/bleed-through, a faint handwritten mark, and an upside-down transmitted stamp.",
+      "judged_at": "2026-05-20T02:59:27.787Z",
+      "judge": "chatgpt",
+      "text_length": 160
+    }
   }
 }
