@@ -36,6 +36,11 @@ export default function MediaView({ onSelect }) {
   const [filterEvent, setFilterEvent] = useState("all");
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(null);
+  // Default: only show tiles with a real rendered image. The
+  // text-only/placeholder tiles (extracted from Denis's Gemini
+  // bracket markers on pages we can't render) are useful metadata
+  // but look like noise when most of the grid is empty boxes.
+  const [includePlaceholders, setIncludePlaceholders] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}media.json?t=${Date.now()}`)
@@ -48,13 +53,24 @@ export default function MediaView({ onSelect }) {
     if (!data?.items) return [];
     const q = query.trim().toLowerCase();
     return data.items.filter(it => {
+      if (!includePlaceholders && !it.imagePath) return false;
       if (!filterKinds.has(it.kind)) return false;
       if (filterAgency !== "all" && (it.agency || "—") !== filterAgency) return false;
       if (filterEvent !== "all" && it.eventId !== filterEvent) return false;
       if (q && !`${it.title} ${it.description} ${it.eventTitle}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [data, filterKinds, filterAgency, filterEvent, query]);
+  }, [data, filterKinds, filterAgency, filterEvent, query, includePlaceholders]);
+
+  // Counts of with-image vs placeholder-only for the toggle label.
+  const counts = useMemo(() => {
+    if (!data?.items) return { withImage: 0, placeholder: 0 };
+    return data.items.reduce((acc, it) => {
+      if (it.imagePath) acc.withImage++;
+      else acc.placeholder++;
+      return acc;
+    }, { withImage: 0, placeholder: 0 });
+  }, [data]);
 
   const eventList = useMemo(() => {
     if (!data?.items) return [];
@@ -114,6 +130,27 @@ export default function MediaView({ onSelect }) {
         })}
       </div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
+        {/*
+          Placeholder toggle. Default OFF — most users want to see only
+          tiles backed by a rendered PNG. Placeholders are visuals we
+          know about (extracted from Denis's Gemini transcripts) for
+          pages where we don't have the source PDF locally; useful as
+          metadata but read as visual noise when grids are dominated by
+          empty boxes. Toggle ON to surface them anyway.
+        */}
+        <button onClick={() => setIncludePlaceholders(v => !v)}
+          title={includePlaceholders
+            ? `showing all ${counts.withImage + counts.placeholder} visuals (incl. ${counts.placeholder} metadata-only placeholders)`
+            : `showing only ${counts.withImage} pages with a rendered image · click to also show ${counts.placeholder} placeholder entries (no local PDF available)`}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
+            includePlaceholders
+              ? "text-cyan-300 border-cyan-500/50 bg-cyan-950/20"
+              : "text-emerald-300 border-emerald-700/50 hover:border-emerald-500/60"}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${includePlaceholders ? "bg-cyan-400" : "bg-emerald-400"}`} />
+          {includePlaceholders
+            ? <>ALL <span className="opacity-60 ml-0.5">{counts.withImage + counts.placeholder}</span></>
+            : <>WITH IMAGE <span className="opacity-60 ml-0.5">{counts.withImage}</span><span className="opacity-40 ml-1.5">+ {counts.placeholder} hidden</span></>}
+        </button>
         <input value={query} onChange={(e) => setQuery(e.target.value)}
           placeholder="search title / description"
           className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 placeholder-emerald-800 font-mono text-xs w-48 focus:outline-none focus:border-amber-400" />
