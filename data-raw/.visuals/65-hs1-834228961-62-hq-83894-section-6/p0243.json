@@ -4,5 +4,5 @@
   "description": "Diagram: A circle with lines pointing to it. Annotations include \"of\" written above \"plane\", \"not\" written above \"approach\", \"only\" written to the right of the circle, and \"not\" written below the circle.",
   "additional_markers": [],
   "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T11:25:55.392Z"
+  "classifiedAt": "2026-05-20T11:47:24.533Z"
 }
