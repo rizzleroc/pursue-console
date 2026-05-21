@@ -149,7 +149,8 @@ let runningProc = null;
 let runningMeta = null;  // { mode, eid, slice, loop, startedAt }
 
 function procRunning() {
-  return runningProc !== null && !runningProc.exitCode !== undefined;
+  // A live spawned child has exitCode === null until it exits, then a number.
+  return runningProc !== null && runningProc.exitCode === null;
 }
 
 function buildVolunteerArgs(opts) {
@@ -346,6 +347,15 @@ async function spawnVolunteer(opts) {
   runningMeta  = { mode: opts.mode, eid: opts.eid || null, slice: opts.slice, loop: !!opts.loop, startedAt: Date.now() };
   lastRun = null;
 
+  // Reflect "running" in /progress immediately. volunteer-media.mjs (visuals
+  // mode) never POSTs progress, so without this /progress keeps idle=true while
+  // /running says running=true — a contradiction that makes the dashboard look
+  // like it's flipping state. OCR/review overwrite this via POST /progress.
+  state.idle = false;
+  state.now = { phase: opts.mode === "visuals" ? "CLAIMING VISUAL CONTEXT" : String(opts.mode || "").toUpperCase(), eid: opts.eid || null };
+  state.updatedAt = Date.now();
+  persistState();
+
   const lines = [];
   const onLine = (chunk) => {
     for (const line of String(chunk).split(/\r?\n/).filter(Boolean)) {
@@ -375,7 +385,13 @@ async function spawnVolunteer(opts) {
     // Loop mode: requeue only if there was actually some work done OR pages failed.
     // If the run was a pure no-op (kind=="noop"), looping just spams empty runs at the queue —
     // stop and let the user pick a different queue or wait for fresh work.
-    if (loop && code !== null && code !== 1 && lastRun.kind !== "noop") {
+    //
+    // Visuals = the CLAIM phase: it only stages templates that then need a
+    // separate (manual) commit. Auto-relooping it re-claims the same "fresh"
+    // pages every few seconds (staged pages aren't marked submitted), causing
+    // unbounded staging growth and the constant running↔idle flipping in the
+    // UI. Only OCR/review/doc — which submit their own work — may loop.
+    if (loop && !String(startedMeta?.mode || "").startsWith("visuals") && code !== null && code !== 1 && lastRun.kind !== "noop") {
       await new Promise(r => setTimeout(r, 3000));
       try { await spawnVolunteer({ ...opts }); } catch {}
     }
