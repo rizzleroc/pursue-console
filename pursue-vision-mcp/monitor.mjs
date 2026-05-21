@@ -163,6 +163,7 @@ function buildVolunteerArgs(opts) {
     // volunteer-media.mjs has its own flow. --auto-context lets the daemon draft
     // the Context so the staged templates are commit-ready (dashboard default).
     const args = ["scripts/volunteer-media.mjs", `--my-handle=${handle}`, `--slice=${slice}`, `--daemon=${daemon}`];
+    if (existsSync(LOCAL_QUEUE_PATH)) args.push(`--queue-url=${LOCAL_QUEUE_PATH}`);
     if (opts.autoContext !== false) args.push("--auto-context");
     return { script: "volunteer-media.mjs", args };
   }
@@ -179,6 +180,7 @@ function buildVolunteerArgs(opts) {
     `--daemon=${daemon}`,
     "--no-pr",
   ];
+  if (existsSync(LOCAL_QUEUE_PATH)) args.push(`--queue-url=${LOCAL_QUEUE_PATH}`);
   if (opts.mode === "review") args.push("--review");
   if (opts.eid)              args.push(`--eid=${opts.eid}`);
   return { script: "volunteer.mjs", args };
@@ -456,9 +458,15 @@ async function daemonAlive() {
   } catch { return false; }
 }
 
-const QUEUE_URL = "https://rizzleroc.github.io/pursue-console/work-available.json";
+const REMOTE_QUEUE_URL = "https://rizzleroc.github.io/pursue-console/work-available.json";
+const LOCAL_QUEUE_PATH = path.resolve(SCRIPTS_ROOT, "public/work-available.json");
 async function fetchQueue() {
-  const r = await fetch(QUEUE_URL + "?t=" + Date.now());
+  // Prefer the local file (freshly built by build-work-available.mjs) over the
+  // remote GitHub Pages copy, which can lag behind by hours/days.
+  if (existsSync(LOCAL_QUEUE_PATH)) {
+    return JSON.parse(await readFile(LOCAL_QUEUE_PATH, "utf8"));
+  }
+  const r = await fetch(REMOTE_QUEUE_URL + "?t=" + Date.now());
   if (!r.ok) throw new Error("queue fetch failed: " + r.status);
   return await r.json();
 }
