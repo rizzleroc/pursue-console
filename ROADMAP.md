@@ -83,11 +83,50 @@ Ideas surfaced during 2.0 + 2.1 work that are worth pursuing if/when someone has
 
 - **Article-level segmentation for newspaper clippings.** When a page is `kind: newspaper-clipping`, currently the volunteer just transcribes the article body into `article_text`. A future pass could segment the page into per-article bounding boxes via vision and emit one media row per article, so a single newspaper page lights up SEARCH for multiple distinct stories.
 - **Per-source quality reports surfaced in REVIEW.** The `data-raw/.source-quality.json` log accumulates vs-human gold scores per source. Once human-typed pages exist, REVIEW could show "Gemini scored 0.91 mean vs human across N pages; GPT-vision scored 0.87 across M pages." Helps a volunteer decide which provider's transcript to trust on a given page.
-- **Auto-claim-then-warn for stale claims.** Right now the volunteer rotation is deterministic per handle (hash). If two volunteers run at the same time they might overlap. A claim file in `public/claims/<handle>.json` with a TTL would let the script skip pages another volunteer already claimed in the last hour.
+- **Auto-claim-then-warn for stale claims.** Right now the volunteer rotation is deterministic per handle (hash). If two volunteers run at the same time they might overlap. A claim file in `public/claims/<handle>.json` with a TTL would let the script skip pages another volunteer already claimed in the last hour. **Now scoped in full — see R7 and [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).**
 - **A "what changed" feed on the corpus-stats freshness strip.** Currently just "refreshed Nm ago"; could show "+3 vision pages from @volunteer, +2 disputes settled by reeval, +1 media context from @anotherperson."
 - **Per-event coverage page in the UI.** `npm run corpus:coverage` exists as a CLI report; could become a tab showing the matrix visually (this many events fully covered · this many have gaps · this many have mismatches).
 - **Make the FAISS rebuild incremental.** Right now it regenerates the entire 384-D index every time. With 3,300+ chunks and growing, an incremental "embed only new chunks, append to existing index" approach would scale better.
 
 ---
 
-_Updated 2026-05-19 alongside 2.1 release. To propose a new roadmap item, open an issue with the `roadmap` label._
+## R7 · Volunteer work leasing (claim tracking + stale reclaim)
+
+**Status:** DESIGNED, not built. Full design + brutal analysis in
+[design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).
+
+**Request:** a live-tracking server that records who's working on which page and
+auto-reassigns a page to the next volunteer after a configurable timeout
+(default 10 min, set in admin settings).
+
+**Verdict (see design doc for the full argument):** the *need* — don't let two
+volunteers duplicate a page; don't let a claim sit forever — is real and already
+flagged in R6. The *requested implementation* (an always-on, authenticated,
+admin-configurable tracking server) is the wrong order for a static-site /
+fork-and-PR project that deliberately has no backend, no auth, and promises *"no
+central server holds your work."* A lease here can only ever be advisory
+(submission is a GitHub PR, which knows nothing about leases), and an advisory
+lease needs a **file, not a server**. The 10-minute timeout is also
+mis-calibrated: real work units run 30 min (OCR slice) to days (visuals
+claim→fill→commit), so a 10-min reassign would *cause* duplicate PRs.
+
+**Phased plan:**
+1. **Phase 0 — local dedup (done).** Volunteer scripts skip pages that already
+   have a local contribution/staged template. Killed the "re-serves the same
+   lot" bug. Zero infra.
+2. **Phase 1 — static claims ledger (recommended next).** `public/claims/<eid>/p<NNN>.json`
+   with `{handle, claimed_at, lease_secs}`; default lease **24h** (matched to the
+   real work unit), configurable via committed `config/leasing.json`. Delivers
+   tracking + expiry + reassignment + configurable timeout with no server, no
+   auth, no privacy regression. Ship when a *second* real volunteer exists (i.e.
+   after R1).
+3. **Phase 2 — serverless claim function (deferred behind a trigger).** A single
+   stateless Worker/KV endpoint, *only* once there are ≥5 concurrent volunteers
+   AND duplicate PRs are a measured maintainer burden AND Phase 1's git-latency
+   is demonstrably too slow. Still advisory; still never holds the work.
+
+**Owner:** revisit when R1 lands a second contributor.
+
+---
+
+_Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._
