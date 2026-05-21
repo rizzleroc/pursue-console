@@ -91,8 +91,9 @@ function safetyCheck(text, mode = "transcription") {
 //   `human`     reserved for hand-typed transcriptions only
 //   `gpt-vision` what scripts/volunteer.mjs produces (ChatGPT vision)
 //   `gemini`    future Gemini-via-volunteer flow
+//   `claude`    Claude-via-volunteer flow (claude.ai vision)
 // Legacy <handle>/<eid>/ shape is accepted and labeled gpt-vision.
-const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
+const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "claude", "ocr"]);
 
 async function collectContributions() {
   if (!existsSync(CONTRIB)) return [];

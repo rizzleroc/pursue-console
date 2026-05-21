@@ -95,9 +95,10 @@ CREATE TABLE IF NOT EXISTS pages (
   -- have produced text for this page). best_source names which one is
   -- canonical in p<NNN>.txt.
   has_gemini      INTEGER NOT NULL DEFAULT 0,
+  has_claude      INTEGER NOT NULL DEFAULT 0,
   has_gpt_vision  INTEGER NOT NULL DEFAULT 0,
   has_human       INTEGER NOT NULL DEFAULT 0,
-  best_source     TEXT,        -- 'human' | 'gpt-vision' | 'gemini' | 'ocr' | 'pdfjs' | NULL
+  best_source     TEXT,        -- 'human' | 'gpt-vision' | 'gemini' | 'claude' | 'ocr' | 'pdfjs' | NULL
   chars           INTEGER NOT NULL DEFAULT 0,
   contributor     TEXT,        -- handle if a volunteer's page outranks/equals canonical
   -- Cross-source comparison (filled by scripts/compare-sources.mjs from
@@ -276,7 +277,8 @@ CREATE TABLE pages (
   event_id TEXT NOT NULL, page_num INTEGER NOT NULL,
   has_pdfjs INTEGER NOT NULL DEFAULT 0, has_ocr INTEGER NOT NULL DEFAULT 0,
   has_vision INTEGER NOT NULL DEFAULT 0, has_visuals INTEGER NOT NULL DEFAULT 0,
-  has_gemini INTEGER NOT NULL DEFAULT 0, has_gpt_vision INTEGER NOT NULL DEFAULT 0,
+  has_gemini INTEGER NOT NULL DEFAULT 0, has_claude INTEGER NOT NULL DEFAULT 0,
+  has_gpt_vision INTEGER NOT NULL DEFAULT 0,
   has_human INTEGER NOT NULL DEFAULT 0,
   agreement_score REAL, confidence TEXT, needs_review INTEGER NOT NULL DEFAULT 0,
   reeval_agreement REAL, dispute_kind TEXT,
@@ -289,13 +291,13 @@ CREATE INDEX IF NOT EXISTS idx_pages_source  ON pages(best_source);`);
 const insPage = db.prepare(`
   INSERT OR REPLACE INTO pages
     (event_id, page_num, has_pdfjs, has_ocr, has_vision, has_visuals,
-     has_gemini, has_gpt_vision, has_human,
+     has_gemini, has_claude, has_gpt_vision, has_human,
      agreement_score, confidence, needs_review,
      reeval_agreement, dispute_kind,
      best_source, chars, contributor, last_updated)
   VALUES
     (@event_id, @page_num, @has_pdfjs, @has_ocr, @has_vision, @has_visuals,
-     @has_gemini, @has_gpt_vision, @has_human,
+     @has_gemini, @has_claude, @has_gpt_vision, @has_human,
      @agreement_score, @confidence, @needs_review,
      @reeval_agreement, @dispute_kind,
      @best_source, @chars, @contributor, @last_updated)
@@ -397,6 +399,7 @@ for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : [
       const row = touch(eidDir, pn);
       row._sidecarBest = sc.best || null;
       row._hasGemini    = sc.sources?.gemini      ? 1 : 0;
+      row._hasClaude    = sc.sources?.claude      ? 1 : 0;
       row._hasGptVision = sc.sources?.["gpt-vision"] ? 1 : 0;
       row._hasHuman     = sc.sources?.human       ? 1 : 0;
       if (sc.comparison) {
@@ -421,7 +424,8 @@ for (const [eid, m] of pageMap) {
       has_pdfjs: 0,
       has_ocr: r.has_ocr, has_vision: r.has_vision, has_visuals: r.has_visuals,
       has_gemini: r._hasGemini || 0,
-      has_gpt_vision: r._hasGptVision || (r.has_vision && !r._hasGemini && !r._hasHuman ? 1 : 0),
+      has_claude: r._hasClaude || 0,
+      has_gpt_vision: r._hasGptVision || (r.has_vision && !r._hasGemini && !r._hasClaude && !r._hasHuman ? 1 : 0),
       has_human: r._hasHuman || 0,
       agreement_score: r._agreementScore ?? null,
       confidence: r._confidence ?? null,
@@ -498,18 +502,20 @@ const stats = {
   // transcribed it); has_X counts include overlap, best counts each page once.
   bySource: {
     gemini:    q("SELECT COUNT(*) AS n FROM pages WHERE has_gemini=1").n,
+    claude:    q("SELECT COUNT(*) AS n FROM pages WHERE has_claude=1").n,
     gptVision: q("SELECT COUNT(*) AS n FROM pages WHERE has_gpt_vision=1").n,
     human:     q("SELECT COUNT(*) AS n FROM pages WHERE has_human=1").n,
     ocr:       q("SELECT COUNT(*) AS n FROM pages WHERE has_ocr=1").n,
     pagesWithMultipleSources: q(`
       SELECT COUNT(*) AS n FROM pages
-      WHERE (has_gemini + has_gpt_vision + has_human) > 1
+      WHERE (has_gemini + has_claude + has_gpt_vision + has_human) > 1
     `).n,
   },
   bestSource: {
     human:     q("SELECT COUNT(*) AS n FROM pages WHERE best_source='human'").n,
     gptVision: q("SELECT COUNT(*) AS n FROM pages WHERE best_source='gpt-vision'").n,
     gemini:    q("SELECT COUNT(*) AS n FROM pages WHERE best_source='gemini'").n,
+    claude:    q("SELECT COUNT(*) AS n FROM pages WHERE best_source='claude'").n,
     ocr:       q("SELECT COUNT(*) AS n FROM pages WHERE best_source='ocr'").n,
   },
   contributions: {
@@ -568,6 +574,7 @@ const stats = {
       event_id,
       COUNT(*)              AS pages,
       SUM(has_gemini)       AS gemini,
+      SUM(has_claude)       AS claude,
       SUM(has_gpt_vision)   AS gptVision,
       SUM(has_human)        AS human,
       SUM(has_ocr)          AS ocr,
@@ -575,18 +582,19 @@ const stats = {
       SUM(CASE WHEN best_source='human'      THEN 1 ELSE 0 END) AS bestHuman,
       SUM(CASE WHEN best_source='gpt-vision' THEN 1 ELSE 0 END) AS bestGptVision,
       SUM(CASE WHEN best_source='gemini'     THEN 1 ELSE 0 END) AS bestGemini,
+      SUM(CASE WHEN best_source='claude'     THEN 1 ELSE 0 END) AS bestClaude,
       SUM(CASE WHEN best_source='ocr'        THEN 1 ELSE 0 END) AS bestOcr,
       SUM(chars)            AS chars
     FROM pages GROUP BY event_id
   `).map(r => {
     // Determine the dominant best_source for the whole event (used as
     // the event node's color in NETWORK).
-    const counts = { human: r.bestHuman, "gpt-vision": r.bestGptVision, gemini: r.bestGemini, ocr: r.bestOcr };
+    const counts = { human: r.bestHuman, "gpt-vision": r.bestGptVision, gemini: r.bestGemini, claude: r.bestClaude, ocr: r.bestOcr };
     let dominantBest = null, max = 0;
     for (const [k, v] of Object.entries(counts)) if (v > max) { dominantBest = k; max = v; }
     return [r.event_id, {
       pages: r.pages, chars: r.chars,
-      sources: Object.entries({ gemini: r.gemini, "gpt-vision": r.gptVision, human: r.human, ocr: r.ocr })
+      sources: Object.entries({ gemini: r.gemini, claude: r.claude, "gpt-vision": r.gptVision, human: r.human, ocr: r.ocr })
         .filter(([, n]) => n > 0).map(([k]) => k),
       dominantBest,
       needsReview: r.needsReview,
@@ -605,8 +613,8 @@ console.log(`[db] ${DB_PATH}`);
 console.log(`[db] inventory ${stats.inventory.total} (${stats.inventory.enumerated} enumerated · ${stats.inventory.placeholders} placeholder)`);
 console.log(`[db] events    ${stats.events.catalogued} catalogued · ${stats.events.withVisionPages} with vision pages`);
 console.log(`[db] pages     ${stats.pages.totalIndexed} indexed (${stats.pages.vision} vision · ${stats.pages.ocrOnly} ocr-only · ${stats.pages.visualsAnnotated} visuals)`);
-console.log(`[db] sources   gemini=${stats.bySource.gemini}  gpt-vision=${stats.bySource.gptVision}  human=${stats.bySource.human}  ocr=${stats.bySource.ocr}  multi=${stats.bySource.pagesWithMultipleSources}`);
-console.log(`[db] canonical human=${stats.bestSource.human}  gpt-vision=${stats.bestSource.gptVision}  gemini=${stats.bestSource.gemini}  ocr=${stats.bestSource.ocr}`);
+console.log(`[db] sources   gemini=${stats.bySource.gemini}  claude=${stats.bySource.claude}  gpt-vision=${stats.bySource.gptVision}  human=${stats.bySource.human}  ocr=${stats.bySource.ocr}  multi=${stats.bySource.pagesWithMultipleSources}`);
+console.log(`[db] canonical human=${stats.bestSource.human}  gpt-vision=${stats.bestSource.gptVision}  gemini=${stats.bestSource.gemini}  claude=${stats.bestSource.claude}  ocr=${stats.bestSource.ocr}`);
 console.log(`[db] chars     ${stats.pages.totalChars.toLocaleString()}`);
 console.log(`[db] contribs  ${stats.contributions.total} pages from ${stats.contributions.contributors.length} volunteer(s):`);
 for (const c of stats.contributions.contributors) {
