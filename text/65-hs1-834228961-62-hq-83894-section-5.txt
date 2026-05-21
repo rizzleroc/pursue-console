@@ -1,0 +1,40 @@
+65 HS1 834228961 62 HQ 83894 Section 5
+======================================
+
+Agency: FBI
+Date: null
+Location: Washington, DC
+Type: Document
+Source extraction: VISION · 1 pages
+
+---
+
+=== Page 71 (vision) ===
+
+CLASSIFIED
+INCOMING
+MESSAGE
+
+(?) CONFIDENTIAL (?)
+DEPARTMENT OF THE ARMY
+STAFF COMMUNICATIONS OFFICE
+
+NR: AJACT 1-2 Page 2
+
+            3.  Third Army has no radar operators.
+
+            4.  Inquiry of Lt Col Nunamaker revealed that
+
+Chief Security Div Oak Ridge is anxious to get qualified
+personnel check on the performance of the radar.
+
+ACTION: G-2
+
+CM IN 12036 (3 Mar 50) DTG: 022030Z m1f/c
+
+(?) FORM
+AN 1949 22-3
+
+CONFIDENTIAL COPY NO.
+
+U. S. GOVERNMENT PRINTING OFFICE : 1949--O-830430

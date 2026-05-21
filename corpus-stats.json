@@ -1,0 +1,217 @@
+{
+  "generatedAt": "2026-05-21T16:02:49.558Z",
+  "pressReleaseClaim": 162,
+  "inventory": {
+    "total": 173,
+    "enumerated": 169,
+    "placeholders": 0,
+    "pdfs": 169,
+    "videos": 0,
+    "images": 0,
+    "bytesKnown": 0
+  },
+  "events": {
+    "catalogued": 121,
+    "withPdfDownloaded": 0,
+    "withAnyPages": 15,
+    "withVisionPages": 12,
+    "fullyVision": 11
+  },
+  "pages": {
+    "totalKnown": 38,
+    "totalIndexed": 56,
+    "vision": 38,
+    "ocrOnly": 0,
+    "visualsAnnotated": 0,
+    "totalChars": 55198
+  },
+  "bySource": {
+    "gemini": 0,
+    "gptVision": 38,
+    "human": 0,
+    "ocr": 0,
+    "pagesWithMultipleSources": 0
+  },
+  "bestSource": {
+    "human": 0,
+    "gptVision": 38,
+    "gemini": 0,
+    "ocr": 0
+  },
+  "contributions": {
+    "total": 56,
+    "contributors": [
+      {
+        "handle": "Rizzleroc",
+        "pages": 56,
+        "chars": 57917
+      }
+    ]
+  },
+  "runs": {
+    "last": {
+      "ts": "2026-05-21T16:02:49.558Z",
+      "kind": "db-rebuild",
+      "outcome": "ok",
+      "duration_ms": 56,
+      "note": "events=121 inventory=173 contributions=56"
+    },
+    "recent": [
+      {
+        "ts": "2026-05-21T16:02:49.558Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 56,
+        "note": "events=121 inventory=173 contributions=56"
+      }
+    ]
+  },
+  "gap": {
+    "uncataloguedRecords": 52,
+    "cataloguedButNoPages": 106,
+    "partialOcrNeedsVision": 0
+  },
+  "review": {
+    "pagesNeedingReview": 0,
+    "pagesHighConfidence": 0,
+    "pagesMediumConfidence": 0,
+    "pagesLowConfidence": 0,
+    "topEventsByReviewQueue": [],
+    "reevaluated": 0,
+    "resolvedByPromptStandard": 0,
+    "pageIntrinsicDisputes": 0,
+    "partialImprovementByReeval": 0
+  },
+  "sourceQuality": {},
+  "byEvent": {
+    "1949-discs": {
+      "pages": 13,
+      "chars": 0,
+      "sources": [],
+      "dominantBest": null,
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-10": {
+      "pages": 4,
+      "chars": 11990,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-2": {
+      "pages": 1,
+      "chars": 533,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-3": {
+      "pages": 3,
+      "chars": 1573,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-5": {
+      "pages": 1,
+      "chars": 519,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-6": {
+      "pages": 4,
+      "chars": 2794,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-7": {
+      "pages": 4,
+      "chars": 10569,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-164": {
+      "pages": 1,
+      "chars": 1249,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-sub-a": {
+      "pages": 1,
+      "chars": 1359,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "amc-1947": {
+      "pages": 10,
+      "chars": 13383,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "fbi-62hq83894": {
+      "pages": 1,
+      "chars": 366,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "general-1948": {
+      "pages": 1,
+      "chars": 0,
+      "sources": [],
+      "dominantBest": null,
+      "needsReview": 0
+    },
+    "incident-summaries": {
+      "pages": 2,
+      "chars": 0,
+      "sources": [],
+      "dominantBest": null,
+      "needsReview": 0
+    },
+    "krasuski-1944": {
+      "pages": 4,
+      "chars": 2635,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "shaef-1945": {
+      "pages": 6,
+      "chars": 8228,
+      "sources": [
+        "gpt-vision"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    }
+  }
+}
