@@ -10,9 +10,9 @@
 //
 // Options:
 //     --my-handle=<handle>         GitHub handle (no @, used for path + PR author)
-//     --provider=chatgpt|gemini    Vision model (default chatgpt). Writes to
-//                                  contributions/<handle>/gpt-vision/  or
-//                                  contributions/<handle>/gemini/        accordingly.
+//     --provider=chatgpt|gemini|claude  Vision model (default chatgpt). Writes to
+//                                  contributions/<handle>/gpt-vision/ , .../gemini/ ,
+//                                  or .../claude/        accordingly.
 //                                  Requires the matching tab logged-in in your Chrome.
 //     --slice=20                   Max pages to claim this run (default 20)
 //     --eid=<event-id>             Restrict to a single event (else picks deterministically)
@@ -72,16 +72,17 @@ const NO_PR = !!args["no-pr"];
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volunteer"));
-// Provider (--provider=chatgpt|gemini, default chatgpt). The MCP daemon
-// routes the request to the matching driver. The `<source>` segment of
-// the contribution path is the same string the corpus uses (gpt-vision
-// for chatgpt, gemini for gemini), so a re-run on the other provider
-// adds a second source to the same page rather than overwriting it.
+// Provider (--provider=chatgpt|gemini|claude, default chatgpt). The MCP
+// daemon routes the request to the matching driver. The `<source>` segment
+// of the contribution path is the same string the corpus uses (gpt-vision
+// for chatgpt, gemini for gemini, claude for claude), so a re-run on a
+// different provider adds another source to the same page rather than
+// overwriting it.
 const PROVIDER = (args.provider || "chatgpt").toLowerCase();
-const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini" };
+const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini", claude: "claude" };
 const CONTRIB_SOURCE = PROVIDER_TO_SOURCE[PROVIDER];
 if (!CONTRIB_SOURCE) {
-  console.error(`error: --provider must be 'chatgpt' or 'gemini' (got '${PROVIDER}')`);
+  console.error(`error: --provider must be 'chatgpt', 'gemini', or 'claude' (got '${PROVIDER}')`);
   process.exit(1);
 }
 const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);
@@ -390,7 +391,7 @@ for (const c of live) {
         eid: c.eid,
         page: firstP,
         docMeta: c.doc.title + (c.doc.agency ? "  ·  " + c.doc.agency : ""),
-        phase: batch.length > 1 ? `batched ${batch.length} pages · awaiting ChatGPT` : "single page · awaiting ChatGPT",
+        phase: batch.length > 1 ? `batched ${batch.length} pages · awaiting ${PROVIDER}` : `single page · awaiting ${PROVIDER}`,
         metaLine: `BATCH ${Math.floor(i / BATCH_PAGES) + 1} / ${Math.ceil(ready.length / BATCH_PAGES)}     ·     PAGES ${pages}     ·     SLICE ${pagesOK}/${total}`,
         previewUrl: `/preview/${previewB64}`,
       },

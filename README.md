@@ -138,9 +138,10 @@ iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex         
 
 # Then:
 cd pursue-helper
-npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini tabs
+npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini + claude tabs
 npm run volunteer -- --my-handle=YOU --slice=20                   # ChatGPT
 npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini # Gemini
+npm run volunteer -- --my-handle=YOU --slice=20 --provider=claude # Claude
 ```
 
 ### 3. Image + context capture

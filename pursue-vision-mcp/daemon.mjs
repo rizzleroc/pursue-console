@@ -29,6 +29,7 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { ChatGPTDriver } from "./chatgpt-driver.mjs";
 import { GeminiDriver }  from "./gemini-driver.mjs";
+import { ClaudeDriver }  from "./claude-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -58,14 +59,15 @@ async function loadToken() {
 }
 const TOKEN = await loadToken();
 
-// Two driver instances, two single-slot queues — one per provider. That
-// way a /fanout-style "send to both at the same time" call can really
-// run in parallel (different browser tabs, different network paths).
+// One driver instance + one single-slot queue per provider. That way a
+// /fanout-style "send to all at the same time" call can really run in
+// parallel (different browser tabs, different network paths).
 const drivers = {
   chatgpt: new ChatGPTDriver({ cdpPort: CDP_PORT }),
   gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
+  claude:  new ClaudeDriver({  cdpPort: CDP_PORT }),
 };
-const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve() };
+const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve(), claude: Promise.resolve() };
 function enqueue(provider, fn) {
   const cur = queues[provider] ?? Promise.resolve();
   const next = cur.then(fn, fn);
@@ -76,6 +78,7 @@ function normalizeProvider(p) {
   const v = (p || "chatgpt").toLowerCase();
   if (v === "openai" || v === "gpt" || v === "chatgpt") return "chatgpt";
   if (v === "gemini" || v === "google" || v === "bard") return "gemini";
+  if (v === "claude" || v === "anthropic" || v === "claude.ai") return "claude";
   throw new Error(`unknown provider: ${p}`);
 }
 
@@ -119,6 +122,7 @@ const server = http.createServer(async (req, res) => {
         providers: {
           chatgpt: { connected: drivers.chatgpt.isConnected(), history: drivers.chatgpt.callCount },
           gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
+          claude:  { connected: drivers.claude.isConnected(),  history: drivers.claude.callCount },
         },
       });
     }
@@ -187,11 +191,11 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`[daemon] listening on http://127.0.0.1:${PORT}`);
   console.log(`[daemon] token  →  ${TOKEN_PATH}  (Authorization: Bearer ...)`);
-  console.log(`[daemon] CDP    →  http://127.0.0.1:${CDP_PORT}  (must have an authenticated ChatGPT tab)`);
+  console.log(`[daemon] CDP    →  http://127.0.0.1:${CDP_PORT}  (must have an authenticated ChatGPT, Gemini, or Claude tab)`);
 });
 
 process.on("SIGINT", async () => {
   console.log("[daemon] shutting down");
-  try { await driver.disconnect(); } catch {}
+  for (const d of Object.values(drivers)) { try { await d.disconnect?.(); } catch {} }
   server.close(() => process.exit(0));
 });

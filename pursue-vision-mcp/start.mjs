@@ -96,10 +96,11 @@ async function ensureChrome() {
   spawn(chrome, [
     `--remote-debugging-port=${CDP_PORT}`,
     `--user-data-dir=${userDataDir}`,
-    // Open both provider tabs up front — the daemon picks whichever
+    // Open all provider tabs up front — the daemon picks whichever
     // matches at request time. Sign in once in each.
     "https://chatgpt.com",
     "https://gemini.google.com/app",
+    "https://claude.ai/new",
   ], { detached: true, stdio: "ignore" }).unref();
   // Give Chrome a moment to bind the port
   for (let i = 0; i < 20; i++) {

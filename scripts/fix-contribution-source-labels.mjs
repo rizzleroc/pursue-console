@@ -36,7 +36,7 @@ const QUALITY = path.join(ROOT, "data-raw", ".source-quality.json");
 
 // Known source folders that should NOT be migrated (they're already in
 // the new <handle>/<source>/<eid>/ shape, or are tooling dirs).
-const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr", "pdfjs"]);
+const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "claude", "ocr", "pdfjs"]);
 
 async function listDirs(p) {
   try { return (await readdir(p, { withFileTypes: true })).filter(d => d.isDirectory()); }

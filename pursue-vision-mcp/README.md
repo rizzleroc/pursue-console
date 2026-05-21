@@ -1,13 +1,13 @@
 # pursue-vision-mcp
 
-**Minimal open-source daemon that drives your already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents.** Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
+**Minimal open-source daemon that drives your already-logged-in ChatGPT, Gemini, and Claude browser tabs to OCR pages of documents.** Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
 
 Two routes:
 
-- **`POST /chat-with-files`** — send N image paths + a prompt to one provider (`chatgpt` or `gemini`), get the model's reply back as text.
-- **`POST /fanout`** — send the SAME prompt + files to BOTH providers in parallel; returns both responses. Used by the corpus's cross-source re-evaluation pipeline (`scripts/reevaluate-disputed.mjs`).
+- **`POST /chat-with-files`** — send N image paths + a prompt to one provider (`chatgpt`, `gemini`, or `claude`), get the model's reply back as text.
+- **`POST /fanout`** — send the SAME prompt + files to multiple providers in parallel; returns all responses. Used by the corpus's cross-source re-evaluation pipeline (`scripts/reevaluate-disputed.mjs`).
 
-No image generation, no API keys, no chat memory, no fancy queue, no telemetry. If you have ChatGPT Plus and/or a Gemini account, this is enough to contribute transcriptions to the corpus (see [HOW-CAN-I-HELP.md](../HOW-CAN-I-HELP.md) in the parent project).
+No image generation, no API keys, no chat memory, no fancy queue, no telemetry. If you have a ChatGPT Plus, Gemini, and/or Claude account, this is enough to contribute transcriptions to the corpus (see [HOW-CAN-I-HELP.md](../HOW-CAN-I-HELP.md) in the parent project).
 
 ## What it does
 
@@ -41,7 +41,7 @@ npm start
 
 `npm start` will:
 1. Launch Chrome with `--remote-debugging-port=9222` (using a dedicated profile so you stay signed in).
-2. Open BOTH `chatgpt.com` and `gemini.google.com/app` — sign in once in each (or skip the one you don't have).
+2. Open `chatgpt.com`, `gemini.google.com/app`, and `claude.ai/new` — sign in once in each (or skip any you don't have).
 3. Start the daemon on `http://127.0.0.1:9223`.
 4. Generate a bearer token at `~/.pursue-vision-token`.
 
@@ -92,7 +92,7 @@ That's it. The pipeline handles rendering, pacing, batching, retries, and cachin
 }
 ```
 
-Headers: `Authorization: Bearer <your token>`. `provider` defaults to `chatgpt`; the other accepted value is `gemini`.
+Headers: `Authorization: Bearer <your token>`. `provider` defaults to `chatgpt`; the other accepted values are `gemini` and `claude`.
 
 Returns:
 ```json
@@ -103,19 +103,20 @@ Returns:
 
 ```json
 {
-  "providers": ["chatgpt", "gemini"],
+  "providers": ["chatgpt", "gemini", "claude"],
   "filePaths": ["/abs/path/to/page.png"],
   "prompt": "Transcribe every word visible on this page verbatim.",
   "timeoutMs": 300000
 }
 ```
 
-Both providers run in parallel (separate queues, separate tabs). Returns:
+`providers` defaults to `["chatgpt", "gemini"]` when omitted. All listed providers run in parallel (separate queues, separate tabs). Returns:
 ```json
 {
   "results": [
     { "provider": "chatgpt", "ok": true,  "text": "...", "durationMs": 24310 },
-    { "provider": "gemini",  "ok": true,  "text": "...", "durationMs": 42180 }
+    { "provider": "gemini",  "ok": true,  "text": "...", "durationMs": 42180 },
+    { "provider": "claude",  "ok": true,  "text": "...", "durationMs": 38120 }
   ],
   "totalDurationMs": 42180
 }
@@ -136,7 +137,8 @@ Errors:
   "cdpPort": 9222,
   "providers": {
     "chatgpt": { "connected": true,  "history": 47 },
-    "gemini":  { "connected": true,  "history":  3 }
+    "gemini":  { "connected": true,  "history":  3 },
+    "claude":  { "connected": true,  "history":  5 }
   }
 }
 ```
@@ -147,7 +149,7 @@ Unauthenticated. Returns `{ "ok": true }`.
 
 ## Concurrency
 
-**One request per provider at a time, both providers in parallel.** Each provider has its own single-slot queue; `/chat-with-files` against `chatgpt` and `/chat-with-files` against `gemini` can be in flight simultaneously (different browser tabs, different network paths). Within one provider, requests serialize because parallel uploads in the same tab race on UI state. If you want throughput per provider, batch more files per request (`filePaths.length`), not more requests.
+**One request per provider at a time, all providers in parallel.** Each provider has its own single-slot queue; `/chat-with-files` against `chatgpt`, `gemini`, and `claude` can all be in flight simultaneously (different browser tabs, different network paths). Within one provider, requests serialize because parallel uploads in the same tab race on UI state. If you want throughput per provider, batch more files per request (`filePaths.length`), not more requests.
 
 ## Security model
 
@@ -164,7 +166,7 @@ See [SECURITY.md](./SECURITY.md) for the full posture.
 This is a focused release. It does NOT include:
 
 - Image / video generation
-- Multi-LLM fan-out (Claude / Gemini / Kimi / local)
+- Additional providers beyond chatgpt / gemini / claude (e.g. Kimi / local)
 - Browser automation for other sites
 - Persistent chat threads or context
 - A dashboard / UI
