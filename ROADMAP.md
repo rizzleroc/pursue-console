@@ -135,5 +135,40 @@ claim→fill→commit), so a 10-min reassign would *cause* duplicate PRs.
 
 ---
 
+## R8 · `volunteer.mjs --review` producer (consumer wired, producer absent)
+
+**Status:** DESIGNED by its consumers, **not built**. Surfaced in the 2.2 sweep.
+
+`import-contributions.mjs` handles `<handle>/gpt-vision-review/` and
+`<handle>/gemini-review/` source folders (lands them as `p<NNN>.<base>.v2.txt` so
+`compare-sources.mjs` re-scores the dispute), and `judge-disputed.mjs` references
+output from "volunteer.mjs `--review`". But `volunteer.mjs` has **no `--review`
+mode** — nothing produces those folders. The consumer contract is precise (path
+shape + the standardized prompt), so this is buildable; it's just unbuilt.
+
+**Why deferred (not built in 2.2):** the REVIEW queue is currently **empty** (0
+disputed pages), and maintainer-side `reevaluate-disputed.mjs` already does
+standardized re-eval through both providers via `/fanout`. A volunteer `--review`
+mode would be a *volunteer-driven* version of that same job. Building ~150 lines
+of new render+prompt+write path for an empty queue, duplicating a working
+maintainer pipeline, is speculative — exactly the kind of half-feature this sweep
+exists to prevent. Note the *human* "settle the REVIEW queue" path (HOW-CAN-I-HELP
+priority 1) is unrelated: that produces a hand-typed `human` source, not a
+`-review` re-OCR.
+
+**Definition of done (when built):** `volunteer.mjs --review [--provider=…]` pulls
+disputed pages from `review-queue.json`, renders + re-transcribes each through
+`scripts/prompts/standard-transcription.txt`, and writes
+`contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt`. **Trigger to
+build:** the REVIEW queue has real disputes AND a volunteer wants to contribute
+re-OCR compute rather than hand-typing.
+
+**Alternative:** if volunteer-driven reeval is never wanted, delete the
+`gpt-vision-review`/`gemini-review` branches from `import-contributions.mjs` +
+`judge-disputed.mjs` to retire the dangling contract.
+
+---
+
+_Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._
 _Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._
