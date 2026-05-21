@@ -78,6 +78,54 @@ PURSUE_VISION_TOKEN=$(cat ~/.pursue-vision-token) \
 
 That's it. The pipeline handles rendering, pacing, batching, retries, and caching. The daemon's only job is being the ChatGPT messenger.
 
+## Volunteer cockpit (`monitor.mjs`)
+
+A **separate, optional process** from the OCR daemon. It owns the volunteer-facing
+progress UI — the "PURSUE · Volunteer Instrument" dashboard — so the daemon (9223)
+stays single-responsibility (its only job is OCR).
+
+```bash
+node pursue-vision-mcp/monitor.mjs            # HTTP on :9224 + auto-open browser
+node pursue-vision-mcp/monitor.mjs --no-open  # HTTP only, don't open a browser
+node pursue-vision-mcp/monitor.mjs --tui      # terminal dashboard instead of HTTP
+```
+
+Then open <http://localhost:9224/dashboard>.
+
+What it does:
+
+- **Serves the cockpit** (`dashboard.html`) at `/` and `/dashboard`, re-read fresh on
+  every request, plus local PNG page previews on `/preview/<base64-path>` (path-jailed
+  to home + cwd).
+- **Persists state** to `~/.pursue-helper/progress.json` so it can show last-known
+  progress even when nothing is running. `volunteer.mjs` pushes live updates via
+  `POST /progress` (bearer-authed when `PURSUE_MONITOR_TOKEN` is set).
+- **Launches work runs** from the dashboard via `POST /run` / `POST /run-any`. Modes:
+  `ocr` and `review` (→ `scripts/volunteer.mjs`), `visuals` (claim) and
+  `visuals-commit` (→ `scripts/volunteer-media.mjs`), and `doc` (a single document).
+- **Loop mode** keeps `ocr`/`review`/`doc` runs going until the queue is empty.
+  The `visuals` *claim* phase is intentionally **one-shot, never looped** — it only
+  stages templates that still need a separate commit step, so auto-relooping it would
+  just re-claim the same pages forever.
+- **Prefers the local work queue.** If `public/work-available.json` exists (freshly
+  built by `scripts/build-work-available.mjs`) the cockpit and the workers it spawns
+  use it instead of the GitHub Pages copy, which can lag hours behind.
+
+### Monitor endpoints (port 9224)
+
+| Method · path        | Purpose                                                        |
+|----------------------|----------------------------------------------------------------|
+| `GET /progress`      | Current `progress.json` state (idle / now / slice / corpus).   |
+| `POST /progress`     | Live update from a running worker (bearer-authed if token set).|
+| `GET /running`       | `{ running, meta, log, lastRun }` for the active/last run.     |
+| `POST /run`          | Start a run: `{ mode, eid?, slice?, loop?, handle }`.          |
+| `POST /run-any`      | Auto-pick the first queue with fresh work and run it.          |
+| `POST /stop`         | Stop the current run (also clears loop so it won't restart).   |
+| `GET /daemon-health` | Whether the OCR daemon on `:9223` is reachable.                |
+
+Env: `PURSUE_MONITOR_PORT` (default `9224`), `PURSUE_HELPER_DIR` (default
+`~/.pursue-helper`), `PURSUE_MONITOR_TOKEN` (if set, required on `POST /progress`).
+
 ## API
 
 ### `POST /chat-with-files`
@@ -167,8 +215,10 @@ This is a focused release. It does NOT include:
 - Multi-LLM fan-out (Claude / Gemini / Kimi / local)
 - Browser automation for other sites
 - Persistent chat threads or context
-- A dashboard / UI
 - An MCP-protocol stdio interface (despite the name — this is HTTP-only here)
+
+(The optional volunteer cockpit — `monitor.mjs` on :9224, documented above — does add
+a progress UI, but the OCR daemon itself stays headless.)
 
 If you want a fuller toolkit, the parent project's maintainer uses a more extensive private MCP. This release is the OCR-only slice anyone can run.
 
