@@ -30,6 +30,13 @@ const RESPONSE_SEL = 'model-response, message-content[data-test-id="model-respon
 const STOP_BTN_SEL = 'button[aria-label*="stop" i], button[data-test-id*="stop" i]';
 const SEND_BTN_SEL = '[data-test-id="bard-send-button"], button[aria-label*="Send" i][data-mat-icon-name="send"], button[aria-label*="Submit" i]';
 
+const UPLOAD_FAILURE_PATTERNS = [
+  /no\s+(page|image|file|attachment|document)s?\s+(was\s+)?(provided|attached|shared|uploaded)/i,
+  /i\s+(don'?t|do not|cannot|can'?t)\s+see\s+(any|an?)\s+(image|file|attachment|page|document)/i,
+  /please\s+(share|upload|attach|provide)\s+(the|an?)\s+(image|file|page|document)/i,
+  /no\s+(image|page|file|attachment)[^.]{0,40}(yet|here|shared|been provided)/i,
+];
+
 export class GeminiDriver {
   constructor({ cdpPort = 9222 } = {}) {
     this.cdpPort = cdpPort;
@@ -38,6 +45,11 @@ export class GeminiDriver {
     this.callCount = 0;
   }
   isConnected() { return !!this.page && !this.page.isClosed?.(); }
+
+  async disconnect() {
+    try { if (this.browser) await this.browser.close(); } catch {}
+    this.browser = null; this.page = null;
+  }
 
   async connect() {
     if (this.isConnected()) return;
@@ -79,6 +91,11 @@ export class GeminiDriver {
     await this._uploadFiles(filePaths);
     await this._submitPrompt(prompt);
     const text = await this._waitForReply(priorTurns, timeoutMs);
+    // Sanity: if the reply looks like an upload-failure complaint, throw —
+    // caller can retry. Better to fail loud than poison the cache.
+    for (const re of UPLOAD_FAILURE_PATTERNS) {
+      if (re.test(text)) throw new Error(`Gemini did not receive the attachments: ${text.slice(0, 160)}`);
+    }
     this.callCount++;
     return { text, durationMs: Date.now() - t0 };
   }
