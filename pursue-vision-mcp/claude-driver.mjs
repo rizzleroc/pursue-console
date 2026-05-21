@@ -16,6 +16,7 @@
 // mirror the ChatGPT driver closely.
 
 import { chromium } from "playwright";
+import path from "node:path";
 
 const COMPOSER_TIMEOUT = 30_000;
 const REPLY_TIMEOUT_DEFAULT = 300_000;       // 5 min — multi-page replies are long
@@ -24,8 +25,15 @@ const POLL_INTERVAL = 600;
 
 const COMPOSER_SEL = 'div[contenteditable="true"].ProseMirror, div.ProseMirror[contenteditable="true"], div[contenteditable="true"][role="textbox"], div[contenteditable="true"]';
 const SEND_BTN_SEL = 'button[aria-label="Send message"], button[aria-label="Send Message"], button[aria-label*="Send" i]';
-const STOP_BTN_SEL = 'button[aria-label="Stop response"], button[aria-label*="Stop" i]';
-const ASSISTANT_SEL = 'div.font-claude-message, [data-testid="assistant-message"], div[data-is-streaming]';
+// One node per assistant turn — keep this 1:1 with replies so turn-counting
+// stays honest. font-claude-message is the per-message content node; the
+// data-testid is a more durable fallback if the class churns. They are NOT
+// unioned (that would double-count a single reply, since the streaming
+// wrapper and the content node are different elements).
+const TURN_SEL_PRIMARY  = 'div.font-claude-message';
+const TURN_SEL_FALLBACK = '[data-testid="assistant-message"]';
+// Streaming indicator: the streaming-wrapper attribute, or the stop button.
+const STREAMING_SEL = '[data-is-streaming="true"], button[aria-label="Stop response"], button[aria-label*="Stop" i]';
 
 const UPLOAD_FAILURE_PATTERNS = [
   /no\s+(page|image|file|attachment|document)s?\s+(was\s+)?(provided|attached|shared|uploaded)/i,
@@ -121,21 +129,20 @@ export class ClaudeDriver {
   }
 
   async _countAssistantMessages() {
-    return this.page.evaluate((sel) => {
-      const sels = sel.split(", ");
-      const set = new Set();
-      for (const s of sels) for (const el of document.querySelectorAll(s)) set.add(el);
-      return set.size;
-    }, ASSISTANT_SEL);
+    return this.page.evaluate(({ primary, fallback }) => {
+      const n = document.querySelectorAll(primary).length;
+      return n > 0 ? n : document.querySelectorAll(fallback).length;
+    }, { primary: TURN_SEL_PRIMARY, fallback: TURN_SEL_FALLBACK });
   }
 
   async _uploadFiles(filePaths) {
+    const resolved = filePaths.map(p => path.resolve(p));
     // claude.ai's composer has a hidden <input type="file"> — set the files
     // directly rather than driving the "+" attach menu.
     const fileChooserPromise = this.page.waitForEvent("filechooser", { timeout: 3000 }).catch(() => null);
     const input = await this.page.$('input[type="file"]');
     if (input) {
-      await input.setInputFiles(filePaths);
+      await input.setInputFiles(resolved);
     } else {
       // Fall back to the attach button → native file chooser.
       const attachBtn = await this.page.$('button[aria-label*="attach" i], button[aria-label*="Upload" i], button[aria-label*="Add" i]');
@@ -143,24 +150,27 @@ export class ClaudeDriver {
       await attachBtn.click();
       const chooser = await fileChooserPromise;
       if (!chooser) throw new Error("Claude attach: filechooser did not fire and no <input type=file> appeared");
-      await chooser.setFiles(filePaths);
+      await chooser.setFiles(resolved);
     }
-    // Wait for at least N attachment chips to appear.
+    // Wait for the attachment chips. Prefer dedicated chip/remove selectors
+    // and require one per file; only fall back to a blob-image *presence*
+    // check (>=1, not >=N) when no chip selector is recognized — a single
+    // image can render several blob <img>, so blob count is an unreliable
+    // per-file tally.
     const N = filePaths.length;
     const deadline = Date.now() + UPLOAD_INDICATOR_TIMEOUT;
     while (Date.now() < deadline) {
       const ok = await this.page.evaluate((n) => {
-        const sels = [
+        const chipSels = [
           '[data-testid="file-thumbnail"]',
           '[data-testid*="attachment"]',
-          '[data-testid*="file"]',
           'button[aria-label*="Remove" i]',
           'div[aria-label*="attachment" i]',
-          'img[src^="blob:"]',
         ];
-        for (const s of sels) {
+        for (const s of chipSels) {
           if (document.querySelectorAll(s).length >= n) return true;
         }
+        if (document.querySelectorAll('img[src^="blob:"]').length >= 1) return true;
         return false;
       }, N);
       if (ok) { await this.page.waitForTimeout(1000); return; }
@@ -173,39 +183,50 @@ export class ClaudeDriver {
     const composer = await this.page.$(COMPOSER_SEL);
     if (!composer) throw new Error("Claude composer not found");
     await composer.click();
+    // Clear any retained draft before typing so we never append to stale text.
+    // ControlOrMeta resolves to Cmd on macOS, Ctrl elsewhere.
+    await this.page.keyboard.press("ControlOrMeta+a").catch(() => {});
+    await this.page.keyboard.press("Delete").catch(() => {});
     await this.page.keyboard.type(text, { delay: 0 });
     await this.page.waitForTimeout(300);
   }
 
   async _submit(priorCount) {
-    // Prefer the send button; fall back to Enter.
-    let posted = false;
-    for (let attempt = 0; attempt < 4 && !posted; attempt++) {
+    const trySend = async () => {
       const btn = await this.page.$(SEND_BTN_SEL);
       if (btn) {
         const enabled = await btn.evaluate(b => !b.disabled).catch(() => true);
-        if (enabled) { await btn.click().catch(() => {}); }
-        else { await this.page.keyboard.press("Enter"); }
-      } else {
-        await this.page.keyboard.press("Enter");
+        if (enabled) { await btn.click().catch(() => {}); return; }
       }
-      // Verify: composer cleared OR streaming started OR a new turn appeared.
-      const deadline = Date.now() + 5000;
+      await this.page.keyboard.press("Enter");
+    };
+    // Send once. Re-issue ONLY if we can prove nothing was sent (the prompt
+    // text is still sitting in the composer). Blind retries double-send —
+    // either an empty Enter or a duplicate message — so we never do that.
+    await trySend();
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const deadline = Date.now() + 6000;
       while (Date.now() < deadline) {
-        const state = await this.page.evaluate((composerSel, assistantSel, stopSel, prior) => {
-          const c = document.querySelector(composerSel);
-          const len = c?.innerText?.trim?.()?.length ?? 0;
-          const streaming = !!document.querySelector(stopSel);
-          const sels = assistantSel.split(", ");
-          const set = new Set();
-          for (const s of sels) for (const el of document.querySelectorAll(s)) set.add(el);
-          return { len, streaming, turns: set.size };
-        }, COMPOSER_SEL, ASSISTANT_SEL, STOP_BTN_SEL, priorCount);
-        if (state.len <= 1 && (state.streaming || state.turns > priorCount)) { posted = true; break; }
+        const state = await this.page.evaluate((composerSel, primary, fallback, streamingSel) => {
+          const turnsPrimary = document.querySelectorAll(primary).length;
+          return {
+            streaming: !!document.querySelector(streamingSel),
+            turns: turnsPrimary > 0 ? turnsPrimary : document.querySelectorAll(fallback).length,
+          };
+        }, COMPOSER_SEL, TURN_SEL_PRIMARY, TURN_SEL_FALLBACK, STREAMING_SEL);
+        // Definitely sent: a reply is streaming or a new turn appeared.
+        if (state.streaming || state.turns > priorCount) return;
         await this.page.waitForTimeout(200);
       }
+      // Window elapsed with no visible reply. Re-send only if the prompt text
+      // is still in the composer; otherwise assume it posted and let
+      // _waitForReply adjudicate (it has its own timeout).
+      const len = await this.page.evaluate(
+        (sel) => (document.querySelector(sel)?.innerText?.trim?.()?.length ?? 0), COMPOSER_SEL);
+      if (len <= 1) return;
+      await trySend();
     }
-    if (!posted) throw new Error("Claude submit failed (composer not cleared after retries)");
+    throw new Error("Claude submit failed (prompt never left the composer)");
   }
 
   async _waitForReply(priorCount, timeoutMs) {
@@ -213,17 +234,15 @@ export class ClaudeDriver {
     let lastText = ""; let stableTicks = 0;
     while (Date.now() < deadline) {
       await new Promise(r => setTimeout(r, POLL_INTERVAL));
-      const snap = await this.page.evaluate((assistantSel, stopSel, prior) => {
-        const sels = assistantSel.split(", ");
-        const set = new Set();
-        for (const s of sels) for (const el of document.querySelectorAll(s)) set.add(el);
-        const nodes = Array.from(set);
+      const snap = await this.page.evaluate((primary, fallback, streamingSel, prior) => {
+        const useFallback = document.querySelectorAll(primary).length === 0;
+        const nodes = Array.from(document.querySelectorAll(useFallback ? fallback : primary));
         if (nodes.length <= prior) return { ready: false, count: nodes.length };
         const newest = nodes[nodes.length - 1];
-        const streaming = !!document.querySelector(stopSel);
+        const streaming = !!document.querySelector(streamingSel);
         const text = newest.innerText?.trim?.() ?? newest.textContent?.trim() ?? "";
         return { ready: !streaming && text.length > 0, text, count: nodes.length };
-      }, ASSISTANT_SEL, STOP_BTN_SEL, priorCount);
+      }, TURN_SEL_PRIMARY, TURN_SEL_FALLBACK, STREAMING_SEL, priorCount);
       if (!snap.ready) { stableTicks = 0; continue; }
       if (snap.text === lastText) {
         stableTicks++;
