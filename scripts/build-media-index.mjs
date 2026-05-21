@@ -73,10 +73,23 @@ function curate(sc) {
     return { kind: null, reason: "typed-memo-only" };
   }
 
-  // 3. Checklists / forms — typewritten structured pages with fields,
-  //    rows, columns. The user explicitly asked for "tables" in MEDIA;
-  //    this captures the FBI/AAF incident checklists that dominate the
-  //    photocopied-negative bucket.
+  // 3a. Project Blue Book / AAF UFO incident checklists. These are a
+  //     recurring form template (~11 instances of the same page layout
+  //     in incident-summaries, with different sighting details typed
+  //     into the same blank). Interesting as text — they're findable
+  //     in SEARCH — but useless as MEDIA: 11 nearly-identical tiles is
+  //     clutter, not browsable visual content.
+  if (has(/\b(ufo|unidentified flying objects?|incident)[\s-]*(incident\s+)?checklist/) ||
+      has(/restricted (?:ufo|incident) checklist/)) {
+    return { kind: null, reason: "blue-book-checklist-template" };
+  }
+
+  // 3b. Other typewritten checklist/form pages — kept as the "table"
+  //     kind. Currently empty in this corpus once the Blue Book
+  //     template is excluded, but the kind stays defined for future
+  //     unique tabular content (sightings statistics, comparison
+  //     tables, structured reference data — the things the user
+  //     actually means by "table").
   if (k === "photocopied-negative" && has(/(checklist|form\b)/)) {
     return { kind: "table", reason: "form-or-checklist" };
   }

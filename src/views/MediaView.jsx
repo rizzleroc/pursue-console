@@ -93,6 +93,18 @@ export default function MediaView({ onSelect }) {
     return out;
   }, [data, includePlaceholders]);
 
+  // Kinds that have any items at all (image OR placeholder) across the
+  // full dataset. Used to suppress filter pills for kinds that aren't
+  // represented in the current corpus — e.g. `table` stays defined for
+  // future tabular content but won't render a "0" pill until something
+  // actually populates the bucket.
+  const kindsWithAnyItem = useMemo(() => {
+    if (!data?.items) return new Set();
+    const out = new Set();
+    for (const it of data.items) out.add(it.kind);
+    return out;
+  }, [data]);
+
   const eventList = useMemo(() => {
     if (!data?.items) return [];
     const map = new Map();
@@ -143,7 +155,7 @@ export default function MediaView({ onSelect }) {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
-        {ALL_KINDS.map(k => {
+        {ALL_KINDS.filter(k => kindsWithAnyItem.has(k)).map(k => {
           const active = filterKinds.has(k);
           const c = KIND_COLORS[k];
           // kindCounts respects the placeholder toggle so the number on
