@@ -41,3 +41,6 @@ eng.traineddata
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code subagent isolated worktrees (ephemeral, never committed)
+.claude/worktrees/
