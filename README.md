@@ -2,8 +2,13 @@
 
 ![PURSUE Console](./public/og-card.png)
 
-> **An open, community-built investigation desk for the [war.gov/UFO Release 01](https://www.war.gov/UFO) disclosure.**
-> *Department of War, May 8 2026 — 173 records. All cases UNRESOLVED.*
+> **An open, community-built investigation desk for the [war.gov/UFO](https://www.war.gov/UFO) disclosure.**
+> *Department of War — Release 01: May 8 2026 (173 records) · Release 02: May 22 2026 (second tranche). All cases UNRESOLVED.*
+
+> [!NOTE]
+> **Two different things are called "Release 2" — they are unrelated.**
+> - **war.gov's releases** are the government's UAP document tranches, published on [war.gov/UFO](https://www.war.gov/UFO) under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters) on a rolling basis: **Release 01** dropped **May 8 2026** (173 records); the **Second Release (Release 02)** dropped **May 22 2026** — 40+ videos, NASA mission audio, and D-series military encounter reports.
+> - **This project's "Release 2.0"** is just the console's own **software version**. It does not track, mirror, or correspond to war.gov's release numbering. The app version and the government document tranches are wholly separate.
 
 [![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
 [![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml)
