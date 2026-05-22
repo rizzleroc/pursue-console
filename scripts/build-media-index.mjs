@@ -209,6 +209,35 @@ for (const it of items) {
 items.length = 0;
 items.push(...deduped);
 
+// Release videos — DVIDS sensor footage. These have no local image (the
+// clips live on dvidshub.net and can't be reliably iframe-embedded on a
+// keyless static site behind their WAF), so each is a "video" tile that
+// links out to DVIDS. Sourced from every EVENT carrying a videoId. Added
+// after image dedup since they have no bytes to hash.
+let videoCount = 0;
+for (const ev of Object.values(eventsMap)) {
+  if (!ev.videoId) continue;
+  items.push({
+    id: `${ev.id}-video`,
+    eventId: ev.id,
+    eventTitle: ev.title,
+    agency: ev.agency || null,
+    era: ev.era || null,
+    page: null,
+    kind: "video",
+    title: ev.title,
+    description: ev.summary || "",
+    videoId: ev.videoId,
+    dvidsUrl: `https://www.dvidshub.net/video/${ev.videoId}`,
+    classifier: "release-video",
+    classifiedAt: "2026-05-08",
+    imagePath: null,
+    thumbnailPath: null,
+  });
+  videoCount++;
+}
+console.log(`[media-index] + ${videoCount} release videos (DVIDS sensor footage)`);
+
 // Default sort: most recent classification first
 items.sort((a, b) => (b.classifiedAt || "").localeCompare(a.classifiedAt || ""));
 
