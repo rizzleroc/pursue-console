@@ -357,9 +357,10 @@ export default function MediaView({ onSelect }) {
                     className="w-full h-full"
                     src={`https://www.dvidshub.net/video/embed/${focused.videoId}`}
                     title={focused.title || "DVIDS video"}
-                    allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                    allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
                     loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
               ) : focused.imagePath ? (
