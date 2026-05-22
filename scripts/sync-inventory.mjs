@@ -53,17 +53,23 @@ for (const line of tsv.split(/\r?\n/)) {
   });
 }
 
-// Reconcile against our EVENTS table by URL (case-insensitive — war.gov
-// URLs are sometimes upper, sometimes lower).
+// Reconcile against our EVENTS table by URL. Normalize both sides:
+// events.js stores raw war.gov URLs with literal spaces and underscores
+// (e.g. "dow-uap-d12_ mission report_ iraq_ may 2022.pdf") while Denis's
+// manifest stores the canonical hyphenated form ("dow-uap-d12-mission-
+// report-iraq-may-2022.pdf"). Normalizing collapses both to the same key.
+function normalizeUrl(url) {
+  return url.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-");
+}
 const { EVENTS } = await import(`../src/data/events.js?cb=${Date.now()}`);
 const eventByUrl = new Map();
 for (const ev of EVENTS) {
   if (!ev.url) continue;
-  eventByUrl.set(ev.url.toLowerCase(), ev);
+  eventByUrl.set(normalizeUrl(ev.url), ev);
 }
 let matched = 0, unmatched = 0;
 for (const r of rows) {
-  const ev = eventByUrl.get(r.url.toLowerCase());
+  const ev = eventByUrl.get(normalizeUrl(r.url));
   if (ev) { r.event_id = ev.id; matched++; }
   else { r.event_id = null; unmatched++; }
 }

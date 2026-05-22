@@ -53,18 +53,15 @@
   }
   .pulse-dot {
     position: relative; display: inline-block; width: 10px; height: 10px;
-    --dot: var(--green);   /* recolored by setStatus to track daemon state */
   }
   .pulse-dot::before {
     content: ''; position: absolute; inset: 0; border-radius: 50%;
-    background: var(--dot); animation: ping 1.4s ease-out infinite;
+    background: var(--green); animation: ping 1.4s ease-out infinite;
   }
   .pulse-dot::after {
     content: ''; position: absolute; inset: 1px; border-radius: 50%;
-    background: var(--dot); box-shadow: 0 0 8px var(--dot);
+    background: var(--green); box-shadow: 0 0 8px var(--green);
   }
-  /* OFFLINE/IDLE: stop the ping so a dead daemon doesn't look alive */
-  .pulse-dot.still::before { animation: none; opacity: 0; }
 
   /* TOP RAIL */
   .top-rail { display: grid; grid-template-columns: 1fr auto; gap: 24px; margin-bottom: 12px; }
@@ -516,9 +513,9 @@
       <span class="qb-sub qb-count">render + auto-draft context · one slice</span>
       <span class="qb-cmd">volunteer-media.mjs --auto-context</span>
     </button>
-    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Validate filled templates and stage the media contribution">
+    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Commit filled templates as a media contribution PR">
       <span class="qb-title">✓ COMMIT VISUALS</span>
-      <span class="qb-sub">stage reviewed templates → contribution</span>
+      <span class="qb-sub" id="qb-commit-sub">stage reviewed templates → contribution</span>
       <span class="qb-cmd">volunteer-media.mjs --commit</span>
     </button>
     <button id="qb-ocr-loop" class="quick-btn ocr loop" data-needs="ocr" onclick="quickRun('ocr', true)" title="Loop OCR until queue empty">
@@ -639,12 +636,7 @@
   let lastSeen = 0;
   function setStatus(text, color = "var(--green)") {
     const el = $("status-text"); el.textContent = text; el.style.color = color;
-    // Recolor the pulse dot to match (rank-one "is it running?" signal) and
-    // freeze its ping when we're not actively processing.
-    const dot = $("status-dot");
-    dot.style.setProperty("--dot", color);
-    const alive = text === "ACTIVE" || text.startsWith("BREAK");
-    dot.classList.toggle("still", !alive);
+    const dot = $("status-dot").firstChild?.nextSibling; // ::after
     document.body.classList.toggle("idle", text === "IDLE");
   }
 
@@ -1251,6 +1243,28 @@
   }
   pollDaemonHealth();
   setInterval(pollDaemonHealth, 15_000);
+
+  // ---- COMMIT VISUALS readiness ----
+  // Make the commit button reflect actual staging state instead of always
+  // looking ready: enabled + "N ready to commit" only when there are filled
+  // templates, disabled otherwise (so it stops inviting a pointless resubmit).
+  async function pollStaging() {
+    const btn = $("qb-visuals-commit"), sub = $("qb-commit-sub");
+    if (!btn) return;
+    if (btn.dataset.runDisabled === "1") return; // a run is active — pollRunner owns the lock
+    try {
+      const s = await fetch("/staging", { cache: "no-store" }).then(r => r.json());
+      if (s.committable > 0) {
+        btn.disabled = false;
+        if (sub) sub.textContent = `${s.committable} ready to commit` + (s.incomplete ? ` · ${s.incomplete} still need drafting` : "");
+      } else {
+        btn.disabled = true;
+        if (sub) sub.textContent = s.total ? `nothing ready — ${s.total} staged still need drafting` : "no staged visuals to commit";
+      }
+    } catch {}
+  }
+  setInterval(pollStaging, 3000);
+  pollStaging();
 
   // ---- clean stubs button (manual trigger; auto-clean also runs before each spawn) ----
   window.cleanStubs = async function() {
