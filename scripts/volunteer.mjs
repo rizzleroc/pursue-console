@@ -340,6 +340,27 @@ async function callDaemon(filePaths) {
 const PNG_STAGE = path.join(os.homedir(), ".pursue-vision-staging", HANDLE);
 await mkdir(PNG_STAGE, { recursive: true });
 
+// Pages already MERGED to origin/main by ANY handle — so we never re-OCR work
+// that's already done (by us or another volunteer). Graceful: empty set on
+// offline/no-git falls back to the local existsSync(txt) check below.
+async function publishedOcrSet() {
+  const cap = (argv) => new Promise((res) => {
+    const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000, shell: process.platform === "win32" });
+    let out = ""; p.stdout.on("data", c => out += c);
+    p.on("exit", code => res(code === 0 ? out : "")); p.on("error", () => res(""));
+  });
+  const set = new Set();
+  try {
+    await cap(["fetch", "origin", "main", "--quiet"]);
+    const out = await cap(["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"]);
+    const re = new RegExp(`^contributions/[^/]+/${CONTRIB_SOURCE}/(.+)/p0*(\\d+)\\.txt$`, "i");
+    for (const line of out.split(/\r?\n/)) { const m = line.match(re); if (m) set.add(`${m[1]}|${Number(m[2])}`); }
+  } catch {}
+  return set;
+}
+const publishedDone = await publishedOcrSet();
+if (publishedDone.size) console.log(`[volunteer] ${publishedDone.size} ${CONTRIB_SOURCE} page(s) already on main — won't re-OCR those`);
+
 let pagesOK = 0, pagesErr = 0;
 const tAll = Date.now();
 for (const c of live) {
@@ -360,7 +381,7 @@ for (const c of live) {
   for (const p of c.pages) {
     const txt = path.join(docDir, `p${String(p).padStart(4,"0")}.txt`);
     const jsn = path.join(docDir, `p${String(p).padStart(4,"0")}.json`);
-    if (existsSync(txt)) { console.log(`  ⊖ ${c.eid} p${p} already submitted`); continue; }
+    if (existsSync(txt) || publishedDone.has(`${c.eid}|${Number(p)}`)) { console.log(`  ⊖ ${c.eid} p${p} already done (local or merged to main)`); continue; }
     const png = path.join(docPngDir, `p${String(p).padStart(4,"0")}.png`);
     try {
       if (!existsSync(png)) await writeFile(png, await renderPng(doc, p, 2.0));

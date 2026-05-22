@@ -129,6 +129,25 @@ async function capture(cmd, argv, opts = {}) {
   });
 }
 
+// Media pages already MERGED to origin/main, by ANY handle. The queue keeps
+// listing a page until it regenerates, and the local dedup below only sees our
+// own handle's files — so without this we'd re-run the (expensive) vision draft
+// on pages someone already finished. Returns a Set of "<eid>|<page>". Graceful:
+// if git/network is unavailable the set is empty and we fall back to local-only.
+async function fetchPublishedMediaSet() {
+  const set = new Set();
+  try {
+    await run("git", ["fetch", "origin", "main", "--quiet"], { stdio: "ignore", timeout: 8000 });
+    const out = await capture("git", ["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"], { timeout: 8000 });
+    for (const line of out.split(/\r?\n/)) {
+      // contributions/<handle>/media/<eid>/p<NNNN>.json
+      const m = line.match(/^contributions\/[^/]+\/media\/(.+)\/p0*(\d+)\.json$/i);
+      if (m) set.add(`${m[1]}|${Number(m[2])}`);
+    }
+  } catch { /* offline / no git — fall back to local-only dedup */ }
+  return set;
+}
+
 // Ask the vision daemon to draft documentary context for a rendered page.
 // imagePaths is [prevPagePng?, thisPagePng, nextPagePng?] — surrounding pages
 // carry the captions/explanations that make the context meaningful, which is
@@ -240,10 +259,15 @@ async function claimPhase() {
   // queue keeps listing a page until our contribution is merged AND the queue
   // regenerates, so without this check the deterministic rotation re-serves the
   // same first N pages every run instead of advancing through the backlog.
-  // A page counts as done if it has a contribution JSON OR a staged template.
+  // A page counts as done if it's already MERGED to origin/main by ANYONE, OR we
+  // have a local contribution JSON, OR a staged template — so we never re-run
+  // vision on work that's already been done (by us or another volunteer).
+  const published = await fetchPublishedMediaSet();
+  if (published.size) console.log(`[claim] ${published.size} media page(s) already published to main — won't re-vision those`);
   const alreadyDone = (eid, page) => {
     const pad = String(page).padStart(4, "0");
-    return existsSync(path.join(CONTRIB_DIR, eid, `p${pad}.json`))
+    return published.has(`${eid}|${Number(page)}`)
+        || existsSync(path.join(CONTRIB_DIR, eid, `p${pad}.json`))
         || existsSync(path.join(STAGING, eid, `p${pad}.md`));
   };
 
