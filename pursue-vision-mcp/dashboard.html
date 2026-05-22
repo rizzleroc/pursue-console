@@ -533,9 +533,9 @@
       <span class="qb-sub">halt the running job</span>
       <span class="qb-cmd">SIGTERM</span>
     </button>
-    <button class="quick-btn" onclick="cleanStubs()" title="Delete <50-byte stub files from failed runs (also auto-runs before each spawn)" style="color:var(--amber);border-color:rgba(255,217,61,0.35);grid-column: span 3">
+    <button class="quick-btn" onclick="cleanStubs()" title="Delete empty (0-byte / whitespace-only) stub files from failed runs. Real short OCR is kept. Also auto-runs before each spawn." style="color:var(--amber);border-color:rgba(255,217,61,0.35);grid-column: span 3">
       <span class="qb-title">⌧ CLEAN STUB FILES</span>
-      <span class="qb-sub">deletes 0-byte placeholders left by failed runs so retries can actually happen · auto-runs before each spawn too</span>
+      <span class="qb-sub">deletes empty placeholders left by failed runs so retries can happen (real short OCR is kept) · auto-runs before each spawn too</span>
     </button>
   </div>
 
@@ -688,6 +688,7 @@
 
       // Identity
       if (p.handle) $("handle").textContent = p.handle;
+      syncHandleField(p);  // auto-fill the run-control handle input so quick-run never has to prompt()
 
       // Shift
       shiftStart = p.shiftStart || null;

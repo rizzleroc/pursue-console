@@ -671,9 +671,10 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { alive, port: state.daemonPort });
     }
 
-    // Delete stub contributions (txt < 50 bytes) so retries can happen.
-    // Failed runs leave behind tiny placeholder files that fool the
-    // "already submitted" check.
+    // Delete TRULY-empty stub contributions (0-byte / whitespace-only) so
+    // retries can happen. Failed runs leave behind empty placeholder files that
+    // fool the "already submitted" check. Short-but-real OCR (e.g. "BOTTOM
+    // VIEW", 11 bytes) is legitimate output and is KEPT — matches isStub().
     if (req.method === "POST" && req.url === "/clean-stubs") {
       const body = await readBody(req).catch(() => ({}));
       const handle = body.handle || state.handle || "Rizzleroc";
@@ -693,7 +694,10 @@ const server = http.createServer(async (req, res) => {
             const fp = path.join(docDir, f);
             try {
               const s = statSync(fp);
-              if (s.size < 50) {
+              // Only TRULY-empty (0-byte or whitespace-only). Keep short-but-real
+              // OCR so we don't re-claim a page that's actually done.
+              const empty = s.size === 0 || !(await readFile(fp, "utf8")).trim();
+              if (empty) {
                 await rm(fp);
                 const jp = fp.replace(/\.txt$/, ".json");
                 if (existsSync(jp)) { try { await rm(jp); } catch {} }
