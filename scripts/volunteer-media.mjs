@@ -37,20 +37,44 @@
 //   --pdf-root=…           Where to download PDFs (default data-raw/volunteer)
 //   --staging=…            Override staging dir (default ~/.pursue-helper/media-staging)
 
-import { readFile, writeFile, mkdir, readdir, stat, copyFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, stat, copyFile, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
-// pdfjs's nested canvas (0.1.x), not the top-level 1.0.x. The 1.0
-// API drifts on Path handling and breaks pdfjs renders for pages
-// with complex vector content. See backfill-media-renders.mjs.
-import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
+import { createCanvas, Path2D, DOMMatrix, ImageData } from "@napi-rs/canvas";
 import path from "node:path";
 import os from "node:os";
-import { fileURLToPath } from "node:url";
-import { getPdfjsAssetUrls } from "./lib/pdfjs-assets.mjs";
+
+// pdfjs builds Path2D objects for clipping and hands them to ctx.clip(). In
+// Node there's no global Path2D, so pdfjs falls back to an internal one that
+// @napi-rs/canvas's clip() rejects with "Value is none of these types String,
+// Path" — which is what made every page render fail. Exposing napi-canvas's
+// own Path2D/DOMMatrix/ImageData as globals makes pdfjs use the compatible one.
+globalThis.Path2D ??= Path2D;
+globalThis.DOMMatrix ??= DOMMatrix;
+globalThis.ImageData ??= ImageData;
+
+// Belt-and-suspenders: pdfjs can still leak async rejections from font/cmap
+// loads that complete after a per-page try/catch moved on. Swallow the known
+// pdfjs ones so a single bad page can't crash a multi-page batch with [exit 1].
+process.on("unhandledRejection", (reason) => {
+  const msg = reason instanceof Error ? reason.message : String(reason);
+  if (/Value is none of these types|AbortException|standardFontDataUrl/.test(msg)) {
+    return;  // expected pdfjs aborts — already logged per-page above
+  }
+  console.error(`[volunteer-media] unhandled rejection: ${msg.slice(0, 200)}`);
+});
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
+
+// Resolve the on-disk path of the pdfjs entry module so we can locate its
+// sibling standard_fonts/ directory regardless of where node_modules lives.
+const _require = createRequire(import.meta.url);
+function pdfjsEntryPath() {
+  return _require.resolve("pdfjs-dist/legacy/build/pdf.mjs");
+}
 
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const m = a.match(/^--([^=]+)(?:=(.*))?$/);
@@ -73,6 +97,20 @@ const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volu
 const STAGING = path.resolve(args.staging || path.join(os.homedir(), ".pursue-helper", "media-staging", HANDLE));
 const CONTRIB_DIR = path.join(ROOT, "contributions", HANDLE, "media");
 
+// --auto-context: after rendering each page, ask the vision daemon to draft the
+// documentary Context from the rendered image so the staged template is
+// commit-ready instead of requiring a human to type it. The volunteer can still
+// open the template and edit before committing. Off by default to preserve the
+// hand-written flow; the dashboard turns it on.
+const AUTO_CONTEXT = !!args["auto-context"];
+const DAEMON = args.daemon || "http://127.0.0.1:9223";
+let DAEMON_TOKEN = process.env.WHIPGEN_TOKEN || process.env.PURSUE_VISION_TOKEN || "";
+if (!DAEMON_TOKEN) {
+  for (const tf of [".whipgen-token", ".pursue-vision-token"]) {
+    try { DAEMON_TOKEN = (await readFile(path.join(os.homedir(), tf), "utf8")).trim(); if (DAEMON_TOKEN) break; } catch {}
+  }
+}
+
 function hash(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return Math.abs(h); }
 async function run(cmd, argv, opts = {}) {
   return new Promise((resolve, reject) => {
@@ -80,6 +118,64 @@ async function run(cmd, argv, opts = {}) {
     p.on("exit", code => code === 0 ? resolve() : reject(new Error(`${cmd} exit ${code}`)));
     p.on("error", reject);
   });
+}
+// Like run() but captures stdout (used for `git rev-parse` etc.).
+async function capture(cmd, argv, opts = {}) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(cmd, argv, { stdio: ["ignore", "pipe", "pipe"], ...opts });
+    let out = ""; p.stdout.on("data", c => out += c);
+    p.on("exit", code => code === 0 ? resolve(out) : reject(new Error(`${cmd} exit ${code}`)));
+    p.on("error", reject);
+  });
+}
+
+// Ask the vision daemon to draft documentary context for a rendered page.
+// imagePaths is [prevPagePng?, thisPagePng, nextPagePng?] — surrounding pages
+// carry the captions/explanations that make the context meaningful, which is
+// why the template asks "what does the page BEFORE/AFTER say?".
+// Uses http.request (not fetch) for the same reason volunteer.mjs does — no
+// hard headers timeout, so ChatGPT can take as long as it needs.
+async function draftContext(imagePaths, claim, hasPrev, hasNext) {
+  const http = await import("node:http");
+  const order = [];
+  if (hasPrev) order.push(`Image 1 = the page BEFORE (page ${claim.page - 1})`);
+  order.push(`Image ${hasPrev ? 2 : 1} = the target page (page ${claim.page}, the one with the ${claim.kind})`);
+  if (hasNext) order.push(`Image ${imagePaths.length} = the page AFTER (page ${claim.page + 1})`);
+  const prompt = [
+    `These are consecutive pages from a declassified government UFO document (event "${claim.eid}").`,
+    order.join("; ") + ".",
+    `The target page contains a ${claim.kind}${claim.suggestedTitle ? ` — "${claim.suggestedTitle}"` : ""}.`,
+    ``,
+    `Write the DOCUMENTARY CONTEXT for the ${claim.kind} on the target page, using VERBATIM quotes only — no summary, no interpretation:`,
+    `- Any caption or label on or beside the image itself.`,
+    `- What the page BEFORE says that introduces or explains this image.`,
+    `- What the page AFTER says that refers back to it.`,
+    `- Stamps, classification markings, dates, reference numbers near the image.`,
+    `Quote exactly. Mark unreadable text [illegible]. Output plain text only — no preamble, no markdown headers.`,
+  ].join("\n");
+  const payload = JSON.stringify({ filePaths: imagePaths, prompt, freshChat: true, timeoutMs: 1_800_000 });
+  const u = new URL(`${DAEMON}/chat-with-files`);
+  const j = await new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: u.hostname, port: u.port || 80, path: u.pathname, method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload),
+        Authorization: `Bearer ${DAEMON_TOKEN}`,
+      },
+    }, res => {
+      let data = "";
+      res.on("data", c => { data += c; });
+      res.on("end", () => {
+        if (res.statusCode >= 400) return reject(new Error(`daemon HTTP ${res.statusCode}: ${data.slice(0, 160)}`));
+        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(`daemon JSON parse: ${data.slice(0, 100)}`)); }
+      });
+    });
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
+  return (j.text ?? j.result?.text ?? j.output ?? "").trim();
 }
 
 // =====================================================================
@@ -90,12 +186,12 @@ async function claimPhase() {
   await mkdir(PDF_ROOT, { recursive: true });
 
   console.log(`[claim] fetching ${QUEUE_URL}`);
-  let queue;
-  if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
-    queue = await (await fetch(QUEUE_URL)).json();
-  } else {
-    queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
-  }
+  // QUEUE_URL may be a local filesystem path (the monitor passes the freshly
+  // built public/work-available.json, which is fresher than GitHub Pages) or a
+  // remote http(s) URL. fetch() only handles http(s) — read local paths from disk.
+  const queue = /^https?:\/\//i.test(QUEUE_URL)
+    ? await (await fetch(QUEUE_URL)).json()
+    : JSON.parse(await readFile(QUEUE_URL, "utf8"));
   if (!queue.byEvent) { console.error("error: queue missing byEvent"); process.exit(1); }
   console.log(`[claim] queue gen ${queue.generatedAt} · ${queue.totalPagesNeedingVisualContext || 0} pages need visual context`);
 
@@ -106,21 +202,49 @@ async function claimPhase() {
   const start = hash(HANDLE) % candidates.length;
   const rotated = candidates.slice(start).concat(candidates.slice(0, start));
 
+  // Skip pages we've already contributed. The server's visualsNeedingContext
+  // queue keeps listing a page until our contribution is merged AND the queue
+  // regenerates, so without this check the deterministic rotation re-serves the
+  // same first N pages every run instead of advancing through the backlog.
+  // A page counts as done if it has a contribution JSON OR a staged template.
+  const alreadyDone = (eid, page) => {
+    const pad = String(page).padStart(4, "0");
+    return existsSync(path.join(CONTRIB_DIR, eid, `p${pad}.json`))
+        || existsSync(path.join(STAGING, eid, `p${pad}.md`));
+  };
+
   const claims = [];
+  let skippedDone = 0;
   let remaining = SLICE;
   for (const [eid, d] of rotated) {
     if (remaining <= 0) break;
     for (const v of d.visualsNeedingContext) {
       if (remaining <= 0) break;
+      const page = (v && typeof v === "object") ? v.page : v;
+      if (alreadyDone(eid, page)) { skippedDone++; continue; }
       claims.push({ eid, doc: d, ...v });
       remaining--;
     }
   }
+  if (skippedDone) console.log(`[claim] skipped ${skippedDone} page(s) already contributed or staged`);
+  if (!claims.length) {
+    console.log("[claim] nothing fresh to claim — every queued page already has a contribution or staged template. Push/merge your open PR or wait for the queue to regenerate.");
+    process.exit(0);
+  }
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
 
+  // pdfjs render. The "Value is none of these types String, Path" failures
+  // were NOT a font problem — they came from ctx.clip(path) rejecting pdfjs's
+  // Path2D because Node had no global Path2D (now polyfilled at the top of this
+  // file from @napi-rs/canvas). With that fixed, the war.gov PDFs render fine,
+  // so the canonical-copy fallback below is a nicety, not a requirement.
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = await getPdfjsAssetUrls();
+  // standard_fonts dir as an absolute path (forward slashes + trailing slash):
+  // pdfjs's NodeBinaryDataFactory reads it via fs.readFile(url+filename), which
+  // breaks for file:// URL strings on Windows but works for absolute paths.
+  const fontUrl = path.join(path.dirname(pdfjsEntryPath()), "..", "..", "standard_fonts")
+    .split(path.sep).join("/") + "/";
   class NodeCanvasFactory {
     create(w, h) { const cv = createCanvas(w, h); return { canvas: cv, context: cv.getContext("2d") }; }
     reset(c, w, h) { c.canvas.width = w; c.canvas.height = h; }
@@ -166,31 +290,64 @@ async function claimPhase() {
     // so size doesn't matter.
     const pngPath = path.join(outDir, `p${pad4}.png`);
     const tmplPath = path.join(outDir, `p${pad4}.md`);
+    // Adjacent-page temp renders (only used for auto-context drafting).
+    const adjPaths = [];
+    let hasPrev = false, hasNext = false;
     try {
       const pdfPath = await getPdfPath(c.eid, c.doc.pdfUrl);
       const buf = await readFile(pdfPath);
       const doc = await pdfjs.getDocument({
         data: new Uint8Array(buf),
+        standardFontDataUrl: fontUrl,
         useSystemFonts: false,
         disableFontFace: true,
         isEvalSupported: false,
         useWorkerFetch: false,
-        wasmUrl: PDFJS_WASM_URL,
-        standardFontDataUrl: PDFJS_FONTS_URL,
       }).promise;
-      const page = await doc.getPage(c.page);
-      const baseViewport = page.getViewport({ scale: 1 });
-      const scale = 1200 / Math.max(baseViewport.width, baseViewport.height);
-      const viewport = page.getViewport({ scale });
-      const factory = new NodeCanvasFactory();
-      const cv = factory.create(Math.floor(viewport.width), Math.floor(viewport.height));
-      await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
-      const png = cv.canvas.toBuffer("image/png");
-      factory.destroy(cv);
-      await writeFile(pngPath, png);
+      // Render one page number to a PNG buffer.
+      const renderPageToPng = async (pageNum) => {
+        const page = await doc.getPage(pageNum);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = 1200 / Math.max(baseViewport.width, baseViewport.height);
+        const viewport = page.getViewport({ scale });
+        const factory = new NodeCanvasFactory();
+        const cv = factory.create(Math.floor(viewport.width), Math.floor(viewport.height));
+        await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
+        const out = cv.canvas.toBuffer("image/png");
+        factory.destroy(cv);
+        return out;
+      };
+      await writeFile(pngPath, await renderPageToPng(c.page));
+      // Render prev/next into the staging dir as hidden temps for the daemon.
+      if (AUTO_CONTEXT) {
+        if (c.page > 1) {
+          try { const p = path.join(outDir, `.ctx-prev-${pad4}.png`); await writeFile(p, await renderPageToPng(c.page - 1)); adjPaths.unshift(p); hasPrev = true; } catch {}
+        }
+        if (c.page < doc.numPages) {
+          try { const p = path.join(outDir, `.ctx-next-${pad4}.png`); await writeFile(p, await renderPageToPng(c.page + 1)); adjPaths.push(p); hasNext = true; } catch {}
+        }
+      }
     } catch (e) {
       console.log(`    ! ${c.eid} p${pad4}: render failed (${e.message})`);
       continue;
+    }
+    // Optionally let the vision daemon draft the Context (target page + the
+    // pages before/after) so the template is commit-ready. Falls back to an
+    // empty Context (manual fill) on any error.
+    let draftedContext = "";
+    if (AUTO_CONTEXT) {
+      try {
+        const imagePaths = hasPrev ? [adjPaths[0], pngPath, ...(hasNext ? [adjPaths[adjPaths.length - 1]] : [])]
+                                   : [pngPath, ...(hasNext ? [adjPaths[adjPaths.length - 1]] : [])];
+        process.stdout.write(`    ◐ ${c.eid} p${pad4}: drafting context (${imagePaths.length} pages) via daemon… `);
+        draftedContext = await draftContext(imagePaths, c, hasPrev, hasNext);
+        console.log(draftedContext ? `✓ ${draftedContext.length} chars` : "∅ empty");
+      } catch (e) {
+        console.log(`✗ ${e.message.slice(0, 80)} (leaving Context blank for manual fill)`);
+      } finally {
+        // Clean up the adjacent-page temps — they're not part of the contribution.
+        for (const p of adjPaths) { try { await rm(p); } catch {} }
+      }
     }
     // Markdown template alongside the rendered page
     await writeFile(tmplPath, `<!--
@@ -219,8 +376,9 @@ ${c.suggestedTitle || ""}
 Quote verbatim from the document. What does the page BEFORE this say about the image?
 What's the caption on this page? What does the page AFTER say? Why is this image in the file?
 Don't summarize. Don't interpret. Quotes only. Mark unreadable text [illegible].
+${AUTO_CONTEXT ? "NOTE: draft below was auto-generated by the vision daemon — review & edit before committing." : ""}
 -->
-
+${draftedContext}
 
 # Article text (newspaper-clipping ONLY)
 <!--
@@ -361,8 +519,8 @@ async function commitPhase() {
 
   // Stage on the CURRENT branch first so we can tell whether anything actually
   // changed. If every reviewed page is already committed/merged, the staged
-  // content is byte-identical → there is nothing to commit. Report that cleanly
-  // instead of erroring with "finish by hand" and leaving an orphan branch.
+  // content is byte-identical → nothing to commit. Report that cleanly instead
+  // of erroring with "finish by hand" and leaving an orphan branch.
   await run("git", ["add", `contributions/${HANDLE}/media`]);
   let hasChanges = false;
   try { await run("git", ["diff", "--cached", "--quiet", "--", `contributions/${HANDLE}/media`]); }
@@ -374,6 +532,13 @@ async function commitPhase() {
   }
 
   // There IS genuinely new work — branch, commit, push, open the PR.
+  // Capture the branch we're on first so we can ALWAYS return to it. The monitor
+  // and other tooling share this working tree, so we must never strand it on a
+  // throwaway contrib branch (which is what left the tree on contrib-… and piled
+  // up orphan branches when the PR step failed).
+  let originalBranch = "main";
+  try { originalBranch = (await capture("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim() || "main"; } catch {}
+
   const branch = `contrib-${HANDLE}-media-${Date.now().toString(36)}`;
   try {
     await run("git", ["checkout", "-b", branch]); // carries the already-staged changes
@@ -386,7 +551,10 @@ async function commitPhase() {
     console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s)`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
-    console.error(`[commit] your changes are committed locally on ${branch} — finish with: git push -u origin ${branch} && gh pr create --head ${branch}`);
+    console.error(`[commit] your changes are committed on ${branch}; reopen the PR with: gh pr create --head ${branch}`);
+  } finally {
+    // Always return the shared working tree to where it started.
+    try { await run("git", ["checkout", originalBranch]); } catch {}
   }
 }
 

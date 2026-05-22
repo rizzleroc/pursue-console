@@ -946,6 +946,11 @@
 
   // Poll runner status every 2 s
   let logScrollBottom = true;
+  // Set the instant a run is launched; keeps buttons locked through the gap
+  // before the server reports running=true (so pollRunner's idle branch can't
+  // re-enable them). Cleared once the run is really running, or by a safety
+  // timeout in lockRunControls if the run never starts.
+  let runPending = false;
   async function pollRunner() {
     try {
       const r = await fetch("/running", { cache: "no-store" });
@@ -959,18 +964,21 @@
       // Toggle quick-launch buttons too (everything except STOP)
       const quickStartBtns = document.querySelectorAll(".quick-btn:not(.stop)");
       const quickStop = $("quick-stop");
-      if (data.running) {
+      if (data.running || runPending) {
+        if (data.running) runPending = false;  // real run started — pollRunner now owns the lock
         if (startBtn) startBtn.disabled = true;
         if (stopBtn)  stopBtn.disabled  = false;
         if (quickStop) quickStop.style.display = "";
         quickStartBtns.forEach(b => { b.dataset.runDisabled = "1"; b.disabled = true; });
-        const m = data.meta;
-        const loopTag = m?.loop ? " · LOOP" : "";
-        const docTag  = m?.eid  ? " · " + m.eid.replace(/^65-hs1-834228961-62-hq-83894-/, "§") : "";
-        if (statusEl) {
-          statusEl.className = "ctrl-status running";
-          statusEl.textContent = "RUNNING · " + (m?.mode || "").toUpperCase() + docTag + loopTag
-            + " · " + Math.round((Date.now() - (m?.startedAt || Date.now())) / 1000) + "s";
+        if (data.running) {
+          const m = data.meta;
+          const loopTag = m?.loop ? " · LOOP" : "";
+          const docTag  = m?.eid  ? " · " + m.eid.replace(/^65-hs1-834228961-62-hq-83894-/, "§") : "";
+          if (statusEl) {
+            statusEl.className = "ctrl-status running";
+            statusEl.textContent = "RUNNING · " + (m?.mode || "").toUpperCase() + docTag + loopTag
+              + " · " + Math.round((Date.now() - (m?.startedAt || Date.now())) / 1000) + "s";
+          }
         }
       } else {
         if (startBtn) startBtn.disabled = false;
@@ -1076,6 +1084,20 @@
   // Override the old fetchQueue calls (the panel is now updated by fetchQueueAndSync)
   // Keep original interval inert
   // ---- action handlers ----
+  // Instantly lock every run-trigger button the moment a job is launched, so a
+  // second job can't be claimed before the 2s pollRunner tick catches up (the
+  // server also rejects overlap with 409, but this gives immediate UX feedback).
+  // pollRunner re-applies this while running and clears it when the run ends.
+  function lockRunControls() {
+    runPending = true;
+    document.querySelectorAll(".quick-btn:not(.stop)").forEach(b => { b.dataset.runDisabled = "1"; b.disabled = true; });
+    const sb = $("btn-start"); if (sb) sb.disabled = true;
+    const qs = $("quick-stop"); if (qs) qs.style.display = "";
+    // Safety net: if the run never actually starts (POST errored / server busy),
+    // release the lock so the buttons don't stay disabled forever.
+    setTimeout(() => { runPending = false; }, 8000);
+  }
+
   window.ctrlStart = async function() {
     const handle = ($("ctrl-handle")?.value || "").trim();
     if (!handle) { alert("Enter your GitHub handle first"); return; }
@@ -1086,6 +1108,7 @@
 
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "STARTING…"; }
+    lockRunControls();
 
     try {
       const r = await fetch("/run", {
@@ -1250,6 +1273,7 @@
     const loop  = !!$("ctrl-loop")?.checked;
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "PICKING QUEUE…"; }
+    lockRunControls();
     try {
       const r = await fetch("/run-any", {
         method: "POST",
@@ -1318,6 +1342,7 @@
     const slice = Number($("ctrl-slice")?.value || (mode === "visuals" ? 5 : 20));
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = `STARTING ${mode.toUpperCase()}${loop ? " (LOOP)" : ""}…`; }
+    lockRunControls();
     try {
       const r = await fetch("/run", {
         method: "POST",
