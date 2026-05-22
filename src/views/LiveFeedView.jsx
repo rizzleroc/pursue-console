@@ -729,14 +729,22 @@ function HelpWantedPanel() {
   const top = queue ? Object.entries(queue.byEvent)
     .sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded)
     .slice(0, 5) : [];
+  const notPulled = queue?.notYetPulled?.slice(0, 6) || [];
   return (
     <div className="border-2 border-dashed border-amber-700/50 bg-amber-950/20 rounded-sm p-3">
       <div className="flex items-baseline justify-between mb-2">
         <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300">▌ H O W &nbsp; C A N &nbsp; I &nbsp; H E L P ?</div>
         {queue && (
-          <div className="font-mono text-[9px] text-amber-700">
+          <div className="font-mono text-[9px] text-amber-700 text-right">
             <span className="text-amber-300 tabular-nums text-base mr-1">{queue.totalPagesNeeded}</span>
             pages need volunteers
+            {queue.totalDocsNotPulled > 0 && (
+              <div className="text-emerald-700 mt-0.5">
+                + <span className="text-emerald-400 tabular-nums">{queue.totalDocsNotPulled}</span> docs
+                {" · "}
+                <span className="text-emerald-400 tabular-nums">{queue.totalPagesNotPulled}</span> pages awaiting first pull
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -751,6 +759,19 @@ function HelpWantedPanel() {
               <div key={eid} className="font-mono text-[10px] text-emerald-300 flex justify-between gap-2">
                 <span className="truncate">{eid}</span>
                 <span className="text-amber-300 tabular-nums shrink-0">{d.pagesNeeded}p</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {notPulled.length > 0 && (
+        <div className="mb-3">
+          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">▌ AWAITING FIRST PULL · RELEASE BACKLOG</div>
+          <div className="space-y-1">
+            {notPulled.map(d => (
+              <div key={d.eid} className="font-mono text-[10px] text-emerald-400/80 flex justify-between gap-2">
+                <span className="truncate">{d.title}</span>
+                <span className="text-emerald-500 tabular-nums shrink-0">{d.pages}p</span>
               </div>
             ))}
           </div>
