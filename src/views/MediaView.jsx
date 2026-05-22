@@ -236,7 +236,7 @@ export default function MediaView({ onSelect }) {
                   // transcript marker for an event we don't have the PDF
                   // for). Show a placeholder + the description so the
                   // metadata is still useful.
-                  <div className={`w-full h-full flex flex-col items-center justify-center p-3 ${c.bg || "bg-emerald-950/30"}`}>
+                  <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-emerald-950/30">
                     <span className={`w-2 h-2 rounded-full ${c.dot} mb-2`} />
                     <span className={`font-mono text-[9px] tracking-widest ${c.text} opacity-70 mb-1`}>NO LOCAL IMAGE</span>
                     <span className={`font-mono text-[10px] ${c.text} opacity-90 text-center line-clamp-4`}>

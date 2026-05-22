@@ -14,7 +14,7 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { randomBytes } from "node:crypto";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 // pdfjs's nested canvas (0.1.x); see backfill-media-renders.mjs.
 import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import { createWorker } from "tesseract.js";
@@ -41,8 +41,10 @@ const tokenize = (text) => text
   .filter(w => w.length >= 3 && w.length <= 30 && !/^\d+$/.test(w) && !STOP.has(w));
 
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\","/");
-const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\","/");
+// pathToFileURL produces 'file:///C:/...' on Windows; raw 'file://' concat
+// lacks the third slash and pdfjs's font/wasm loaders fail silently. See vision-ocr.mjs.
+const PDFJS_WASM_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/wasm")).href + "/";
+const PDFJS_FONTS_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts")).href + "/";
 
 class NodeCanvasFactory {
   create(width, height) {

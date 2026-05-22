@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // Two-row nav: primary actions in the top row, analysis views below.
 // REVIEW gets a live count badge — it's the loudest tab on the site
@@ -19,18 +20,8 @@ const ANALYSIS = [
   { id: "network",  label: "NETWORK",  glyph: "✦" },
 ];
 
-let _statsP = null;
-function loadStats() {
-  if (!_statsP) {
-    _statsP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
-      .then(r => r.ok ? r.json() : null).catch(() => null);
-  }
-  return _statsP;
-}
-
 export default function Header({ view, onViewChange, onVolunteer, query, onSearch }) {
-  const [stats, setStats] = useState(null);
-  useEffect(() => { loadStats().then(setStats); }, []);
+  const { stats } = useCorpusStats();
 
   const catalogued = stats?.events?.catalogued ?? null;
   const totalInv   = stats?.inventory?.total ?? null;

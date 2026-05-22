@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AGENCY_COLORS, FLAG_LABEL } from "../data/events.js";
 import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
-import { THREADS } from "../data/threads.js";
 import { GlitchText, MiniChip, DocTypeBadge, DOC_TYPE_BADGE } from "../components/Primitives.jsx";
 import ReadingMode from "../components/ReadingMode.jsx";
 import { highlightQuery } from "../lib/highlightQuery.jsx";
@@ -51,7 +50,7 @@ const FLAG_COLOR = {
 };
 const FLAG_LABELS = { date: "DATE", clock: "TIME", entity: "ENTITY", shape: "SHAPE", behavior: "BEHAVIOR", sensor: "SENSOR", number: "NUMBER" };
 
-export default function DossierView({ event, onClose, onSelect, onJumpThread, allEvents, selectionPage, selectionMatch }) {
+export default function DossierView({ event, onClose, onSelect, allEvents, selectionPage, selectionMatch }) {
   const [reading, setReading] = useState(false);
   const [expandedPages, setExpandedPages] = useState(new Set());
   const { data: extracts, loading: extractsLoading } = useExtracts(event?.id || "");
@@ -72,7 +71,7 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
     return (
       <div className="px-3 sm:px-8 py-12 text-center">
         <div className="font-mono text-emerald-700 text-sm tracking-widest">▽ NO RECORD SELECTED</div>
-        <div className="font-mono text-emerald-800 text-xs mt-2">Tap any event in TIMELINE, GLOBE, ATLAS, NETWORK, PATTERNS, THREADS, or CONSTELLATION</div>
+        <div className="font-mono text-emerald-800 text-xs mt-2">Tap any event in TIMELINE, GLOBE, ATLAS, or NETWORK</div>
       </div>
     );
   }
@@ -95,9 +94,6 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
     .filter(x => x.score > 0)
     .sort((a,b) => b.score - a.score)
     .slice(0, 4);
-
-  // Threads that contain this event
-  const threadsHere = THREADS.filter(t => t.events.includes(event.id));
 
   const color = AGENCY_COLORS[event.agency] || "#7CFFB2";
 
@@ -401,21 +397,6 @@ export default function DossierView({ event, onClose, onSelect, onJumpThread, al
                 title={ENTITY_KIND[en.kind].label}>
                 {ENTITY_KIND[en.kind].glyph} {en.name}
               </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* THREADS containing this event */}
-      {threadsHere.length > 0 && (
-        <div className="mb-5 border border-amber-400/30 bg-amber-400/5 rounded-sm p-4">
-          <div className="font-mono text-[9px] text-amber-400 tracking-widest mb-3">▌ APPEARS IN THREAD{threadsHere.length > 1 ? "S" : ""}</div>
-          <div className="space-y-2">
-            {threadsHere.map(t => (
-              <button key={t.id} onClick={() => onJumpThread?.(t.id)} className="block w-full text-left p-2 rounded-sm hover:bg-amber-400/10 transition-colors">
-                <div className="font-mono text-[11px] text-amber-200">→ {t.title}</div>
-                <div className="font-mono text-[10px] text-emerald-600 mt-0.5 line-clamp-2">{t.thesis.slice(0, 160)}…</div>
-              </button>
             ))}
           </div>
         </div>

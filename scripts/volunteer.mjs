@@ -213,7 +213,10 @@ function recordCompletion(page, state, note) {
 await reportProgress({
   now: { phase: "rendering pending pages…", eid: claims[0]?.eid, page: claims[0]?.pages[0] },
   slice: { done: 0, total },
-  corpus: { done: queue.totalDocsRemaining ? (queue.inventoryTotal || 162) - queue.totalPagesNeeded : 0, target: queue.inventoryTotal || 162 },
+  // Whole-corpus page progress from work-available.json. Older builds mashed
+  // records (inventoryTotal) against pages (totalPagesNeeded) with a stale 162
+  // fallback; the CORPUS gauge is pages-search-ready / total-corpus-pages.
+  corpus: { done: queue.corpusPagesCompleted ?? 0, target: queue.corpusPagesTotal ?? 0 },
   recent: [],
   session: { pagesOk: 0, pagesErr: 0 },
 });

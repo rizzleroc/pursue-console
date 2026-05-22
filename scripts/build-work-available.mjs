@@ -113,6 +113,11 @@ let totalPagesNeeded = 0;
 let totalDocsRemaining = 0;
 let totalPagesNeedingReview = 0;
 let totalPagesNeedingVisualContext = 0;
+// Whole-corpus page totals (across every catalogued scanned doc, not just
+// docs with remaining work) so the volunteer cockpit's CORPUS gauge can show
+// an honest "pages search-ready / total" instead of a records-vs-pages mashup.
+let corpusPagesTotal = 0;
+let corpusPagesCompleted = 0;
 
 for (const ev of EVENTS) {
   // Only care about events whose source is OCR/mixed (i.e., scanned PDFs needing
@@ -134,6 +139,12 @@ for (const ev of EVENTS) {
   // forever, vs adding one more sometimes-wrong machine pass.
   const reviewQueue = await reviewPagesForEvent(ev.id);
   const visualsQueue = await visualsNeedingContextForEvent(ev.id);
+
+  // Accumulate whole-corpus totals for every scanned doc, regardless of
+  // whether it still has remaining work (so the gauge denominator is the
+  // full corpus, not just the backlog).
+  corpusPagesTotal += totalPages;
+  corpusPagesCompleted += visionPages.size;
 
   // If a doc has no work AND no review queue AND no visuals queue, skip.
   if (queue.length === 0 && reviewQueue.length === 0 && visualsQueue.length === 0) continue;
@@ -168,6 +179,9 @@ const out = {
   // nothing consumed. The live count comes from corpus-stats.json's
   // inventory.total (synced from Denis's manifest).
   cataloguedTotal: EVENTS.length,
+  // Whole-corpus page progress for the volunteer cockpit CORPUS gauge.
+  corpusPagesTotal,
+  corpusPagesCompleted,
   byEvent,
 };
 
