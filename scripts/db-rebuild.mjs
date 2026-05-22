@@ -229,13 +229,17 @@ try {
 // real filenames, real upstream bytes). Each becomes an inventory row
 // with is_curated=0 — when someone writes an events.js entry pointing
 // at the same URL, the next rebuild flips is_curated=1.
-const inventoryByUrl = new Map(inventoryRows.filter(r => r.url).map(r => [r.url.toLowerCase(), r]));
 let syncedUncatalogued = 0;
 try {
   const sync = JSON.parse(await readFile(path.join(RAW_DIR, "inventory-sync.json"), "utf8"));
   for (const r of sync.rows || []) {
-    const u = r.url.toLowerCase();
-    if (inventoryByUrl.has(u)) continue;  // already catalogued; nothing to add
+    // sync-inventory.mjs already reconciled every manifest row against
+    // events.js with normalized-URL matching and recorded the result in
+    // r.event_id. Trust it: a row that matched a catalogued event must NOT
+    // also be added as an "uncatalogued upstream" row, or the same physical
+    // PDF gets counted twice (once curated, once not). Only genuinely
+    // unmatched rows (event_id === null) become upstream inventory rows.
+    if (r.event_id) continue;
     inventoryRows.push({
       id: `upstream-${r.filename.replace(/\.pdf$/i, "").toLowerCase()}`,
       url: r.url,

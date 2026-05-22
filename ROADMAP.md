@@ -40,6 +40,8 @@ Each verification removes the corresponding `@unverified` annotation.
 
 **Status:** classifier batches have run since 2.1 — **187 visual tiles** now published to MEDIA (up from ~119 classified / 16 tiles), across 3,394 transcribed pages. Source mix is `gemini` 3,370 · `gpt-vision` 445 · `ocr` 693 (425 pages have ≥2 sources). The OCR backlog that this item was originally scoped against is effectively cleared by the Denis Gemini sync.
 
+**OCR tail (2026-05-22 audit):** 12 pages across 7 events still need vision OCR — this is nearly done. The dominant open work has shifted to **205 visual context pages needing human annotation** (R4 territory).
+
 **Plan (remaining):**
 1. Continue the visual classifier across the not-yet-classified tail in batches; each batch ships new tiles to MEDIA on the next deploy
 2. Parallelize across Gemini once `gemini-driver.mjs` is verified end-to-end (R2)
@@ -72,6 +74,7 @@ Things called out in the brutal analysis that we didn't close this round, with t
 | Tests | Real unit/integration/E2E test infrastructure | Adopted ad-hoc `scripts/test-*.mjs` pattern for now. Bigger commitment when the project has more contributors. |
 | CI smoke | End-to-end smoke test in CI (render one page, OCR via mock, import, validate, db-rebuild) | Mocking the MCP daemon is real work. Defer until a regression actually slips through. |
 | `install-helper.sh` audit | Re-walk the sparse-checkout config against 2.0 paths | Will be exercised + fixed as part of R1. |
+| Denis URL mismatches (8) | 8 Denis PDFs whose filenames differ from the corresponding `events.js` URLs even after normalization: `38_143685_box7_*`, `DOW-UAP-D44`/`D48`/`D49` (Denis uses simplified names), and 3 FBI serial-redacted files. Needs manual URL reconciliation in `events.js` to unlock those PDFs for import. | Not a script bug — genuine filename discrepancies between Denis's TSV and war.gov URLs. Low-volume; fix per-file when doing the next Denis import pass. |
 
 ---
 
@@ -211,6 +214,7 @@ rather than do the scrape ourselves.
 ---
 
 _Updated 2026-05-22: added R9 (Release 02 published on war.gov; scaffolded as "incoming", ingest blocked on the DenisSergeevitch/UFO-USA mirror — watch loop polls the upstream manifest)._
+_Updated 2026-05-22: URL normalization bug fixed in `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` — Denis manifest uses hyphenated filenames, `events.js` uses raw war.gov URLs with literal spaces; case-insensitive comparison never matched. Fix: normalize both sides with `.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-")`. Result: Denis manifest matching improved from **68/120 → 112/120 PDFs matched**; 44 previously unlinked events are now matched, unlocking ~800 Denis pages for those events on the next import run. 8 PDFs remain genuinely mismatched due to filename discrepancies (tracked in R5 Denis URL mismatches). Corpus status at audit: 121 events catalogued (65 have pages, 56 do not); 3,394 pages transcribed; 12 pages need vision OCR (7 events, nearly done); 205 visual context pages need human annotation; 4 catalogue placeholders have no URL (japan-2023, indopacom-2024, army-2026, pursue-release-01); 0 review-queue disputes._
 _Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._
 _Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-20T14:25:28.144Z",
+  "generatedAt": "2026-05-22T22:52:24.540Z",
   "pressReleaseClaim": 162,
   "inventory": {
-    "total": 173,
-    "enumerated": 169,
-    "placeholders": 0,
-    "pdfs": 169,
+    "total": 162,
+    "enumerated": 117,
+    "placeholders": 41,
+    "pdfs": 117,
     "videos": 0,
     "images": 0,
     "bytesKnown": 0
@@ -23,7 +23,7 @@
     "vision": 3390,
     "ocrOnly": 4,
     "visualsAnnotated": 0,
-    "totalChars": 7030091
+    "totalChars": 7028839
   },
   "bySource": {
     "gemini": 3370,
@@ -50,13 +50,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-20T14:25:28.144Z",
+      "ts": "2026-05-22T22:52:24.540Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 947,
-      "note": "events=121 inventory=173 contributions=54"
+      "duration_ms": 6519,
+      "note": "events=121 inventory=162 contributions=54"
     },
     "recent": [
+      {
+        "ts": "2026-05-22T22:52:24.540Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 6519,
+        "note": "events=121 inventory=162 contributions=54"
+      },
       {
         "ts": "2026-05-20T14:25:28.144Z",
         "kind": "db-rebuild",
@@ -119,18 +126,11 @@
         "outcome": "ok",
         "duration_ms": 2281,
         "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T10:25:54.321Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1075,
-        "note": "events=121 inventory=173 contributions=54"
       }
     ]
   },
   "gap": {
-    "uncataloguedRecords": 52,
+    "uncataloguedRecords": 41,
     "cataloguedButNoPages": 56,
     "partialOcrNeedsVision": 2
   },
@@ -160,7 +160,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-10": {
       "pages": 182,
-      "chars": 704695,
+      "chars": 704374,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -170,7 +170,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-2": {
       "pages": 194,
-      "chars": 229769,
+      "chars": 229753,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -180,7 +180,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-3": {
       "pages": 189,
-      "chars": 310731,
+      "chars": 310687,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -199,7 +199,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-5": {
       "pages": 209,
-      "chars": 258202,
+      "chars": 258176,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -209,7 +209,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-6": {
       "pages": 270,
-      "chars": 405584,
+      "chars": 405501,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -219,7 +219,7 @@
     },
     "65-hs1-834228961-62-hq-83894-section-7": {
       "pages": 205,
-      "chars": 404233,
+      "chars": 403984,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -265,7 +265,7 @@
     },
     "65-hs1-834228961-62-hq-83894-serial-164": {
       "pages": 137,
-      "chars": 138309,
+      "chars": 138248,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -311,7 +311,7 @@
     },
     "65-hs1-834228961-62-hq-83894-sub-a": {
       "pages": 124,
-      "chars": 277440,
+      "chars": 277385,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -331,7 +331,7 @@
     },
     "amc-1947": {
       "pages": 28,
-      "chars": 37894,
+      "chars": 37648,
       "sources": [
         "gemini",
         "gpt-vision",
@@ -516,7 +516,7 @@
     },
     "incident-summaries": {
       "pages": 209,
-      "chars": 228852,
+      "chars": 228780,
       "sources": [
         "gemini",
         "gpt-vision",
@@ -620,7 +620,7 @@
     },
     "netherlands-1948": {
       "pages": 7,
-      "chars": 9154,
+      "chars": 9141,
       "sources": [
         "gemini",
         "gpt-vision",
@@ -651,7 +651,7 @@
     },
     "shaef-1945": {
       "pages": 17,
-      "chars": 23765,
+      "chars": 23699,
       "sources": [
         "gemini",
         "gpt-vision",
