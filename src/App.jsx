@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS } from "./data/events.js";
+import { parseHash, buildHash } from "./lib/route.js";
 
 // Global handle for cross-view event lookups (MediaView, ReviewView use
 // this when their deep-link buttons only have eid + title, but the
@@ -27,18 +28,35 @@ import MediaView from "./views/MediaView.jsx";
 const SemanticSearchView = lazy(() => import("./views/SemanticSearchView.jsx"));
 
 export default function App() {
-  // LIVE is home — it's where the freshly-arrived data shows up, and it's
-  // the view that carries the hero band. Every other view is "instrument."
-  const [view, setView] = useState("live");
+  // The URL hash is the source of truth for navigation — LIVE is home and
+  // maps to #/live, every other view to its own route, and a drilled-down
+  // record to #/dossier/<id>. State is derived from the hash so back/forward
+  // and shared links work; nav actions just push a new hash.
+  const [route, setRoute] = useState(() => parseHash(window.location.hash));
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(null);
-  const [selectionPage, setSelectionPage] = useState(null);
-  // When a deep-link arrives from Semantic Search, carry the matched chunk
-  // text + the active query terms so DossierView can show "this is what
-  // your search hit" inline on the deep-linked page. Cleared on close /
-  // view change so subsequent dossier visits don't show a stale banner.
-  const [selectionMatch, setSelectionMatch] = useState(null);
   const [volunteerOpen, setVolunteerOpen] = useState(false);
+
+  // The match banner from a Semantic Search deep-link (matched chunk text +
+  // query terms) can't be encoded in the URL, so we keep it in state across
+  // the hash-change round-trip, tagged with the dossier id it belongs to so
+  // it never bleeds onto a different record reached via back/forward.
+  const [selectionMatch, setSelectionMatch] = useState(null);
+
+  useEffect(() => {
+    const onHash = () => setRoute(parseHash(window.location.hash));
+    if (!window.location.hash) window.history.replaceState(null, "", buildHash({ view: "live" }));
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const navigate = (target) => { window.location.hash = buildHash(target); };
+
+  const view = route.view;
+  const selected = route.eventId ? (window.__EVENTS_BY_ID?.[route.eventId] || null) : null;
+  const selectionPage = route.page;
+  const activeMatch = selectionMatch && selectionMatch.eventId === route.eventId
+    ? { text: selectionMatch.text, terms: selectionMatch.terms }
+    : null;
 
   const filtered = useMemo(() => {
     if (!query.trim()) return EVENTS;
@@ -53,16 +71,14 @@ export default function App() {
   }, [query]);
 
   const handleSelect = (event, opts) => {
-    setSelected(event);
-    setSelectionPage(opts?.page ?? null);
     setSelectionMatch(opts?.matchText
-      ? { text: opts.matchText, terms: opts.matchTerms || [] }
+      ? { eventId: event.id, text: opts.matchText, terms: opts.matchTerms || [] }
       : null);
-    setView("dossier");
+    navigate({ view: "dossier", eventId: event.id, page: opts?.page ?? null });
   };
   const handleViewChange = (v) => {
-    setView(v);
-    if (v !== "dossier") { setSelected(null); setSelectionPage(null); setSelectionMatch(null); }
+    if (v !== "dossier") setSelectionMatch(null);
+    navigate({ view: v });
   };
 
   // Help link survives as a tab even after we cleaned up the nav — it's
@@ -127,8 +143,8 @@ export default function App() {
           {view === "dossier" && (
             <DossierView event={selected}
               selectionPage={selectionPage}
-              selectionMatch={selectionMatch}
-              onClose={() => { setSelected(null); setSelectionPage(null); setSelectionMatch(null); setView("live"); }}
+              selectionMatch={activeMatch}
+              onClose={() => { setSelectionMatch(null); navigate({ view: "live" }); }}
               onSelect={handleSelect}
               allEvents={EVENTS} />
           )}
