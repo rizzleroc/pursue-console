@@ -523,6 +523,7 @@ async function commitPhase() {
   let committed = 0, skipped = 0, badTemplate = 0;
   const touchedEids = new Set();
   const committedStaging = []; // { dir, pad } of templates committed this run, cleared on success
+  const committedFiles = [];   // repo-relative paths of contribution files written this run (git add only these)
 
   for (const eid of eids) {
     const dir = path.join(STAGING, eid);
@@ -578,6 +579,8 @@ async function commitPhase() {
       committed++;
       touchedEids.add(eid);
       committedStaging.push({ dir, pad });
+      committedFiles.push(`contributions/${HANDLE}/media/${eid}/p${pad}.json`,
+                          `contributions/${HANDLE}/media/${eid}/p${pad}${path.extname(imgSrc)}`);
       console.log(`✓ ${eid} p${pad}  ${sec.kind.padEnd(20)}  "${sec.title.slice(0, 40)}"`);
     }
   }
@@ -589,58 +592,48 @@ async function commitPhase() {
     process.exit(0);
   }
 
-  // Stage on the CURRENT branch first so we can tell whether anything actually
-  // changed. If every reviewed page is already committed/merged, the staged
-  // content is byte-identical → nothing to commit. Report that cleanly instead
-  // of erroring with "finish by hand" and leaving an orphan branch.
-  await run("git", ["add", `contributions/${HANDLE}/media`]);
-  let hasChanges = false;
-  try { await run("git", ["diff", "--cached", "--quiet", "--", `contributions/${HANDLE}/media`]); }
-  catch { hasChanges = true; } // non-zero exit from --quiet = staged differences exist
-  if (!hasChanges) {
-    console.log(`[commit] nothing new to publish — all ${committed} reviewed page(s) are already committed or merged. ✓`);
-    console.log(`[commit] you're up to date; the staging templates can be cleared.`);
-    process.exit(0);
-  }
-
-  // There IS genuinely new work — branch, commit, push, open the PR.
-  // Capture the branch we're on first so we can ALWAYS return to it. The monitor
-  // and other tooling share this working tree, so we must never strand it on a
-  // throwaway contrib branch (which is what left the tree on contrib-… and piled
-  // up orphan branches when the PR step failed).
-  let originalBranch = "main";
-  try { originalBranch = (await capture("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim() || "main"; } catch {}
-
+  // Build a media-ONLY commit on top of origin/main, WITHOUT touching the working
+  // tree. The shared tree may sit on an unrelated branch full of its own history;
+  // branching from it made the PR contain "the whole package" instead of just the
+  // media. Here we stage only the media files into a throwaway git index seeded
+  // from origin/main, write a commit whose parent IS origin/main, and push that —
+  // so the PR diff is exactly the media changes. No checkout, no stranding.
+  await run("git", ["fetch", "origin", "main", "--quiet"], { stdio: "ignore" });
   const branch = `contrib-${HANDLE}-media-${Date.now().toString(36)}`;
+  const tmpIndex = path.join(os.tmpdir(), `pursue-idx-${Date.now().toString(36)}`);
+  const idxEnv = { env: { ...process.env, GIT_INDEX_FILE: tmpIndex } };
   try {
-    // Keep git output OFF the runner log. With 200+ unrelated modified files in
-    // this shared tree (build artifacts) + sparse-checkout, `git checkout` prints
-    // a huge "M …" list and `git commit` lists every created file — that flood
-    // buried the actual commit result and broke the dashboard's outcome banner.
-    await run("git", ["checkout", "-q", "-b", branch], { stdio: "ignore" }); // carries the already-staged changes
-    await run("git", ["commit", "-q", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
-    await run("git", ["push", "-q", "-u", "origin", branch]);
-    const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
-    // --head=<branch> so gh opens the PR for the branch we just pushed even when
-    // the working tree has unrelated uncommitted changes (build artifacts/caches).
-    await run("gh", ["pr", "create", "--head", branch, "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
-    console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s)`);
-    // These templates are now submitted — remove them from staging so a second
-    // commit doesn't re-stage the same files and open a DUPLICATE PR. (Only on
-    // success; a failed PR keeps them so the user can retry.)
-    for (const { dir, pad } of committedStaging) {
-      for (const f of [`p${pad}.md`, `p${pad}.png`, `p${pad}.jpg`, `.ctx-prev-${pad}.png`, `.ctx-next-${pad}.png`]) {
-        try { await rm(path.join(dir, f)); } catch {}
+    await run("git", ["read-tree", "origin/main"], { stdio: "ignore", ...idxEnv });   // throwaway index = origin/main tree
+    // Stage ONLY the files written this run (not the whole media dir, which would
+    // re-stage pages already in other open PRs and spawn duplicates).
+    await run("git", ["add", "--", ...committedFiles], { stdio: "ignore", ...idxEnv });
+    let hasChanges = false;
+    try { await run("git", ["diff-index", "--quiet", "--cached", "origin/main"], { stdio: "ignore", ...idxEnv }); }
+    catch { hasChanges = true; } // non-zero = the media differs from main
+    if (!hasChanges) {
+      console.log(`[commit] nothing new to publish — all ${committed} reviewed page(s) are already merged to main. ✓`);
+    } else {
+      const tree   = (await capture("git", ["write-tree"], idxEnv)).trim();
+      const parent = (await capture("git", ["rev-parse", "origin/main"])).trim();
+      const msg = `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`;
+      const commit = (await capture("git", ["commit-tree", tree, "-p", parent, "-m", msg], idxEnv)).trim();
+      await run("git", ["push", "-q", "origin", `${commit}:refs/heads/${branch}`]);
+      const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
+      await run("gh", ["pr", "create", "--head", branch, "--base", "main", "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
+      console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s) · media-only diff vs main`);
+      // Submitted now → clear from staging so a re-run won't open a duplicate PR.
+      for (const { dir, pad } of committedStaging) {
+        for (const f of [`p${pad}.md`, `p${pad}.png`, `p${pad}.jpg`, `.ctx-prev-${pad}.png`, `.ctx-next-${pad}.png`]) {
+          try { await rm(path.join(dir, f)); } catch {}
+        }
       }
+      console.log(`[commit] cleared ${committedStaging.length} submitted template(s) from staging`);
     }
-    console.log(`[commit] cleared ${committedStaging.length} submitted template(s) from staging`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
-    console.error(`[commit] your changes are committed on ${branch}; reopen the PR with: gh pr create --head ${branch}`);
+    console.error(`[commit] media files are saved at contributions/${HANDLE}/media — commit them by hand against origin/main if needed.`);
   } finally {
-    // Always return the shared working tree to where it started (quiet + output
-    // discarded so the sparse-checkout "M …" list doesn't flood the runner log).
-    try { await run("git", ["checkout", "-q", originalBranch], { stdio: "ignore" }); } catch {}
+    try { await rm(tmpIndex); } catch {}
   }
 }
 

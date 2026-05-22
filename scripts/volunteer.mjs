@@ -218,10 +218,7 @@ function recordCompletion(page, state, note) {
 await reportProgress({
   now: { phase: "rendering pending pages…", eid: claims[0]?.eid, page: claims[0]?.pages[0] },
   slice: { done: 0, total },
-  // Whole-corpus page progress from work-available.json. Older builds mashed
-  // records (inventoryTotal) against pages (totalPagesNeeded) with a stale 162
-  // fallback; the CORPUS gauge is pages-search-ready / total-corpus-pages.
-  corpus: { done: queue.corpusPagesCompleted ?? 0, target: queue.corpusPagesTotal ?? 0 },
+  corpus: { done: queue.totalDocsRemaining ? (queue.inventoryTotal || 162) - queue.totalPagesNeeded : 0, target: queue.inventoryTotal || 162 },
   recent: [],
   session: { pagesOk: 0, pagesErr: 0 },
 });
@@ -488,39 +485,42 @@ const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);
 console.log(`[volunteer] files at: ${CONTRIB_ROOT}`);
 
-if (pagesOK === 0) { console.log("[volunteer] nothing to commit, exiting."); process.exit(2); }
-
-if (NO_PR) {
+// NOTE: use process.exitCode (not process.exit) so the event loop drains and
+// libuv closes spawned-child / socket handles cleanly. Calling process.exit()
+// here force-closed handles that were still closing — when every page was
+// skipped this raced the just-spawned git handles and crashed Node on Windows
+// with "Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)" (exit 0xC0000409).
+if (pagesOK === 0) {
+  console.log("[volunteer] nothing to commit, exiting.");
+  process.exitCode = 2;
+} else if (NO_PR) {
   console.log("[volunteer] --no-pr set, leaving the rest to you (git add + commit + gh pr create)");
-  process.exit(0);
-}
-
-// ----- step 5: open PR -----
-console.log("[volunteer] preparing PR via gh CLI…");
-const branch = `contrib-${HANDLE}-${Date.now().toString(36)}`;
-function run(cmd, args, opts = {}) {
-  return new Promise((resolve, reject) => {
+} else {
+  // ----- step 5: open PR -----
+  console.log("[volunteer] preparing PR via gh CLI…");
+  const branch = `contrib-${HANDLE}-${Date.now().toString(36)}`;
+  const run = (cmd, args, opts = {}) => new Promise((resolve, reject) => {
     const c = spawn(cmd, args, { cwd: ROOT, stdio: "inherit", ...opts });
     c.on("error", reject);
     c.on("exit", code => code === 0 ? resolve() : reject(new Error(`${cmd} exited ${code}`)));
   });
-}
-try {
-  await run("git", ["checkout", "-b", branch]);
-  await run("git", ["add", `contributions/${HANDLE}`]);
-  const docsTouched = [...new Set(claims.map(c => c.eid))].join(", ");
-  await run("git", ["commit", "-m", `corpus: volunteer transcriptions for ${docsTouched}\n\nSubmitted by @${HANDLE} via scripts/volunteer.mjs (${pagesOK} pages).`]);
-  await run("git", ["push", "-u", "origin", branch]);
-  const body = `## Volunteer contribution\n\n` +
-    `Submitted ${pagesOK} vision-OCR'd pages across ${claims.length} document(s):\n\n` +
-    claims.map(c => `- \`${c.eid}\` pages ${c.pages.join(", ")}`).join("\n") +
-    `\n\nGenerated via [pursue-vision-mcp](../tree/main/pursue-vision-mcp) by @${HANDLE}.\n\n` +
-    `CI will validate against [JUDGE-STANDARD.md](../blob/main/JUDGE-STANDARD.md). ` +
-    `Pages in the \`?-review\` quality band will be checked manually.`;
-  await run("gh", ["pr", "create", "--title", `Volunteer corpus contribution from @${HANDLE}`, "--body", body]);
-  console.log("[volunteer] PR opened. Thank you!");
-} catch (e) {
-  console.error("[volunteer] PR step failed:", e.message);
-  console.error("[volunteer] your files are still on disk — finish by hand: git add contributions/" + HANDLE + " && gh pr create");
-  process.exit(2);
+  try {
+    await run("git", ["checkout", "-b", branch]);
+    await run("git", ["add", `contributions/${HANDLE}`]);
+    const docsTouched = [...new Set(claims.map(c => c.eid))].join(", ");
+    await run("git", ["commit", "-m", `corpus: volunteer transcriptions for ${docsTouched}\n\nSubmitted by @${HANDLE} via scripts/volunteer.mjs (${pagesOK} pages).`]);
+    await run("git", ["push", "-u", "origin", branch]);
+    const body = `## Volunteer contribution\n\n` +
+      `Submitted ${pagesOK} vision-OCR'd pages across ${claims.length} document(s):\n\n` +
+      claims.map(c => `- \`${c.eid}\` pages ${c.pages.join(", ")}`).join("\n") +
+      `\n\nGenerated via [pursue-vision-mcp](../tree/main/pursue-vision-mcp) by @${HANDLE}.\n\n` +
+      `CI will validate against [JUDGE-STANDARD.md](../blob/main/JUDGE-STANDARD.md). ` +
+      `Pages in the \`?-review\` quality band will be checked manually.`;
+    await run("gh", ["pr", "create", "--title", `Volunteer corpus contribution from @${HANDLE}`, "--body", body]);
+    console.log("[volunteer] PR opened. Thank you!");
+  } catch (e) {
+    console.error("[volunteer] PR step failed:", e.message);
+    console.error("[volunteer] your files are still on disk — finish by hand: git add contributions/" + HANDLE + " && gh pr create");
+    process.exitCode = 2;
+  }
 }
