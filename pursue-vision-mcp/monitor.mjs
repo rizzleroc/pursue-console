@@ -215,15 +215,28 @@ function summarizeLog(allLines, exitCode) {
   const draftedCount = (text.match(/drafting context via daemon… ✓/g) || []).length;
   // Visuals commit phase: "[commit] N ready · M incomplete · K empty".
   const commitMatch = text.match(/\[commit\] (\d+) ready · (\d+) incomplete · (\d+) empty/);
+  // Final outcome of the commit phase (volunteer-media.mjs prints exactly one).
+  const prOpened   = /\[commit\] ✓ PR opened for/.test(text);
+  const nothingNew = /\[commit\] nothing new to publish/.test(text);
+  const prFailed   = /\[commit\] PR step failed/.test(text);
 
   let kind, headline, detail;
   if (exitCode === null) {
     kind = "stopped"; headline = "STOPPED"; detail = "Killed by user.";
   } else if (commitMatch) {
     const ready = Number(commitMatch[1]), incomplete = Number(commitMatch[2]), empty = Number(commitMatch[3]);
-    if (ready > 0) {
+    if (prOpened) {
+      kind = "success"; headline = `✓ PR OPENED · ${ready} page(s)`;
+      detail = `Opened a pull request with ${ready} media contribution(s)${incomplete ? `; ${incomplete} incomplete template(s) skipped` : ""}. Merge it to publish.`;
+    } else if (nothingNew) {
+      kind = "noop"; headline = `✓ UP TO DATE · ${ready} already published`;
+      detail = `All ${ready} reviewed page(s) are already committed or merged — nothing new to publish.${incomplete ? ` ${incomplete} template(s) still incomplete.` : ""} The staging folder can be cleared.`;
+    } else if (prFailed) {
+      kind = "error"; headline = `PR STEP FAILED · ${ready} committed locally`;
+      detail = `${ready} contribution(s) were committed on a local branch but the PR couldn't be opened (auth/network?). Finish with: gh pr create --head <branch>. See log.`;
+    } else if (ready > 0) {
       kind = "success"; headline = `COMMITTED · ${ready} page(s)`;
-      detail = `${ready} media contribution(s) staged into contributions/.${incomplete ? ` ${incomplete} template(s) incomplete (skipped).` : ""}${empty ? ` ${empty} empty (skipped).` : ""} Run git add + commit + gh pr create to push.`;
+      detail = `${ready} media contribution(s) committed.${incomplete ? ` ${incomplete} template(s) incomplete (skipped).` : ""}${empty ? ` ${empty} empty (skipped).` : ""}`;
     } else {
       kind = "noop"; headline = `NOTHING TO COMMIT · ${incomplete} incomplete, ${empty} empty`;
       detail = "No templates passed validation. Each needs Kind + Title (≥4 chars) + Context (≥20 chars) + a rendered PNG. Fill the Context fields and retry.";

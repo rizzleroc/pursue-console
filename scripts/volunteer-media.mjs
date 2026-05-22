@@ -359,23 +359,34 @@ async function commitPhase() {
     process.exit(0);
   }
 
-  // git + gh
+  // Stage on the CURRENT branch first so we can tell whether anything actually
+  // changed. If every reviewed page is already committed/merged, the staged
+  // content is byte-identical → there is nothing to commit. Report that cleanly
+  // instead of erroring with "finish by hand" and leaving an orphan branch.
+  await run("git", ["add", `contributions/${HANDLE}/media`]);
+  let hasChanges = false;
+  try { await run("git", ["diff", "--cached", "--quiet", "--", `contributions/${HANDLE}/media`]); }
+  catch { hasChanges = true; } // non-zero exit from --quiet = staged differences exist
+  if (!hasChanges) {
+    console.log(`[commit] nothing new to publish — all ${committed} reviewed page(s) are already committed or merged. ✓`);
+    console.log(`[commit] you're up to date; the staging templates can be cleared.`);
+    process.exit(0);
+  }
+
+  // There IS genuinely new work — branch, commit, push, open the PR.
   const branch = `contrib-${HANDLE}-media-${Date.now().toString(36)}`;
   try {
-    await run("git", ["checkout", "-b", branch]);
-    await run("git", ["add", `contributions/${HANDLE}/media`]);
+    await run("git", ["checkout", "-b", branch]); // carries the already-staged changes
     await run("git", ["commit", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
     await run("git", ["push", "-u", "origin", branch]);
     const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
-    // Use --head=<branch> so gh creates the PR for the branch we just pushed
-    // even when the working tree has unrelated uncommitted changes (build
-    // artifacts, caches). Without it, gh aborts with "you must first push the
-    // current branch to a remote, or use the --head flag".
+    // --head=<branch> so gh opens the PR for the branch we just pushed even when
+    // the working tree has unrelated uncommitted changes (build artifacts/caches).
     await run("gh", ["pr", "create", "--head", branch, "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
-    console.log(`[commit] PR opened for ${branch}`);
+    console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s)`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
-    console.error(`[commit] your files are staged at contributions/${HANDLE}/media — finish by hand.`);
+    console.error(`[commit] your changes are committed locally on ${branch} — finish with: git push -u origin ${branch} && gh pr create --head ${branch}`);
   }
 }
 

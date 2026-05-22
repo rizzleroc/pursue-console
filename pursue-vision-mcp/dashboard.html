@@ -752,7 +752,7 @@
 
   function pageListStr(pages, max = 10) {
     if (!pages?.length) return "";
-    const shown = pages.slice(0, max).map(p => "p" + pad4(p)).join("  ");
+    const shown = pages.slice(0, max).map(p => "p" + pad4(typeof p === "object" ? p.page : p)).join("  ");
     return pages.length > max ? shown + "  +" + (pages.length - max) + " more" : shown;
   }
 
