@@ -4,6 +4,7 @@ import { mkdir, writeFile, access } from "node:fs/promises";
 import { constants } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { safeFetch } from "./safe-fetch.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -25,7 +26,7 @@ for (const ev of EVENTS) {
   if (await exists(outPath)) { skipped++; continue; }
   process.stdout.write(`↓ ${ev.id.padEnd(28)} `);
   try {
-    const res = await fetch(ev.url, { redirect: "follow" });
+    const res = await safeFetch(ev.url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
     await writeFile(outPath, buf);

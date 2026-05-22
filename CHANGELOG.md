@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.2 — Security review sweep
+
+Comprehensive security review (token-exposure audit + tooling/dependency risk assessment) run across the full working tree and all 91 commits of history. Headline: **no secrets are or ever were committed**, and `npm audit` is clean (0 vulns) in both `package.json` trees. The fixes below close the actionable hardening items the review surfaced; the residual/accepted items are tracked in [ROADMAP.md](./ROADMAP.md) §R8.
+
+### Token / secret exposure — clean
+- Full-tree + git-history (`-S` pickaxe) sweep for OpenAI/Anthropic/Google/AWS keys, GitHub PATs, private keys, JWTs, and connection strings: **zero real matches.** The `sk-`/`AKIA` history hits were substrings inside OCR'd corpus text ("task", "disks"), not keys.
+- All auth material is read at runtime from outside the repo: the daemon mints a 192-bit bearer token to `~/.pursue-vision-token` (mode 0600); drivers attach to an already-authenticated Chrome over CDP — no cookie jars or storage-state files are committed. No `.env`/`.pem`/`.key`/service-account files are tracked or were ever added.
+- Workflows use only the standard `${{ secrets.GITHUB_TOKEN }}`; no hardcoded secrets and no secret values echoed to logs.
+
+### Hardening fixes (resolved)
+- **CI install no longer runs dependency lifecycle scripts** — `.github/workflows/validate-contribution.yml` now installs with `--ignore-scripts`. A fork PR can edit `package.json`/`package-lock.json`, so an `install`/`postinstall` hook would otherwise have run attacker-controlled code on the runner (bounded by the read-only `GITHUB_TOKEN`, but still arbitrary execution).
+- **Path-traversal in the PDF fetcher closed** — `scripts/fetch-missing-pdfs.mjs` derives the download filename from the upstream-synced inventory; it now `path.basename()`s that value so a crafted row can't write outside `data-raw/`.
+- **SSRF guard on all corpus downloads** — new `scripts/safe-fetch.mjs` enforces https-only and blocks loopback/link-local/private-range hosts, re-validating every redirect hop. Wired into `fetch-pdfs.mjs` and `fetch-missing-pdfs.mjs`, which previously did `fetch(url, { redirect: "follow" })` against URLs from data files with no scheme/host checks. (All current event URLs are `https://www.war.gov` — no legitimate download is affected.)
+- **Dashboard XSS surface tightened** — `pursue-vision-mcp/dashboard.html` now `escapeHTML()`s the live `previewUrl` (into `<img src>`) and recent-item `note` fields that arrive via `POST /progress`, matching the escaping already applied to log lines and PR titles.
+
 ## 2.1 — Punchlist sweep
 
 Phase-2 brutal analysis identified ~30 partial features and stale code paths. This release closes the closable items, surfaces the not-yet-verifiable items via the new `@unverified` annotation system, and ships a new [ROADMAP.md](./ROADMAP.md) for the items that need a real third party (outside volunteer walking the contribution flow, etc.).

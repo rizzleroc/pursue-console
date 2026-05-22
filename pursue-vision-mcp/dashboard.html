@@ -653,7 +653,7 @@
         cell.innerHTML = `
           <div class="page" style="color: ${c};">p ${item.page}</div>
           <div class="stat" style="color: ${c};">${lbl}</div>
-          <div class="sub">${(item.note || "")}</div>
+          <div class="sub">${escapeHTML(item.note || "")}</div>
         `;
       }
       el.appendChild(cell);
@@ -689,7 +689,7 @@
       // Preview thumbnail
       const thumb = $("thumb");
       if (p.now?.previewUrl) {
-        thumb.innerHTML = `<img src="${p.now.previewUrl}?t=${Date.now()}" alt="page preview" />`;
+        thumb.innerHTML = `<img src="${escapeHTML(p.now.previewUrl)}?t=${Date.now()}" alt="page preview" />`;
       } else if (!thumb.querySelector("img") && !thumb.querySelector(".placeholder")) {
         thumb.innerHTML = '<div class="placeholder"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>';
       }
