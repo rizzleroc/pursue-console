@@ -21,7 +21,7 @@
 //     under the directory you started the daemon from. No reading /etc.
 
 import http from "node:http";
-import { readFile, writeFile, mkdir, stat } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -156,10 +156,11 @@ const server = http.createServer(async (req, res) => {
     // uses this for re-evaluating disputed pages with a standardized prompt.
     if (req.method === "POST" && req.url === "/fanout") {
       const body = await readBody(req);
-      const { filePaths, prompt, timeoutMs, freshChat = true } = body;
+      const { filePaths, prompt, timeoutMs, perProviderTimeoutMs, freshChat = true } = body;
       if (!Array.isArray(filePaths) || !filePaths.length || !prompt) {
         return sendJson(res, 400, { error: "filePaths[] (non-empty) + prompt required" });
       }
+      const fanoutTimeoutMs = perProviderTimeoutMs ?? timeoutMs;
       const requested = Array.isArray(body.providers) && body.providers.length
         ? body.providers.map(normalizeProvider)
         : ["chatgpt", "gemini", "claude"];
@@ -171,7 +172,7 @@ const server = http.createServer(async (req, res) => {
         const pt0 = Date.now();
         enqueue(provider, async () => {
           try {
-            const { text } = await drivers[provider].chatWithFiles({ filePaths: validated, prompt, timeoutMs, freshChat });
+            const { text } = await drivers[provider].chatWithFiles({ filePaths: validated, prompt, timeoutMs: fanoutTimeoutMs, freshChat });
             resolve({ provider, ok: true, text, durationMs: Date.now() - pt0 });
           } catch (e) {
             console.error(`[/fanout ${provider}] ${e.message}`);
@@ -196,6 +197,8 @@ server.listen(PORT, "127.0.0.1", () => {
 
 process.on("SIGINT", async () => {
   console.log("[daemon] shutting down");
-  try { await driver.disconnect(); } catch {}
+  for (const d of Object.values(drivers)) {
+    try { if (typeof d?.disconnect === "function") await d.disconnect(); } catch {}
+  }
   server.close(() => process.exit(0));
 });

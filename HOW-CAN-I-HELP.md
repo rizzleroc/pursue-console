@@ -6,9 +6,9 @@ A SETI@home-style distributed contribution model for the PURSUE corpus.
 
 | Priority | Open | Concentrated in |
 |---|---:|---|
-| **P1** Settle disputed pages | **19** | `1949-discs` (13) · `incident-summaries` (2) · `krasuski-1944` (2) |
-| **P2** Transcribe new pages | **28** | scattered across 12 events |
-| **P3** Image + context capture | **16** | `1949-discs` (16 — witness sketches, maps, photographs from Project SIGN) |
+| **P1** Settle disputed pages | **0** | queue is clear — 22 reevaluated, 3 settled by standardized prompt |
+| **P2** Catalogue inventoried records | **52** | records inventoried but not yet curated into `src/data/events.js` |
+| **P3** Image + context capture | live | pages classified as visuals — see the HELP tab for current counts |
 
 Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (with a badge in the nav) and the [HELP tab](https://rizzleroc.github.io/pursue-console/) (with per-event breakdown).
 
@@ -130,7 +130,7 @@ CI auto-validates against `JUDGE-STANDARD.md`. A maintainer reviews and merges. 
 
 OCR is non-deterministic and lossy. The same page run twice gives slightly different output; the same page through different OCR engines (tesseract, GPT-4o vision, Claude vision, Gemini) gives substantially different output. **Multiple independent transcriptions of the same page are higher-confidence than one.**
 
-Also: the maintainer has one ChatGPT Plus account. Release 01 alone has 597+ pages of tesseract-noise replacement work, plus 110 records still to catalogue. At ~20 pages per hour through one account, it's a ~50-hour bottleneck. A dozen volunteers turning their own otherwise-idle compute on it for an evening clears the backlog in a week.
+The original bottleneck — a single ChatGPT Plus account grinding through a raw-OCR backlog — is gone. The 2.0 Gemini sync brought the whole corpus to vision-quality coverage, so there's no longer a wall of tesseract-noise pages to replace. The open work now is narrower and more human: settling the REVIEW queue when machine sources genuinely disagree, cataloguing the records that are inventoried but not yet curated into `src/data/events.js`, and adding human context to pages classified as visuals. Live counts for each live on the REVIEW and HELP tabs.
 
 The deliberate design goals:
 - **No central server.** Everything coordinates through GitHub. The work queue is a static JSON file on GH Pages; submissions are pull requests; review is the existing PR comment thread; the corpus is the merged main branch.
@@ -147,7 +147,7 @@ The deliberate design goals:
 │                    THE WORK QUEUE (static, public)                   │
 │         public/work-available.json   ← generated each rebuild         │
 │   {                                                                  │
-│     "totalPagesNeeded": 597,                                         │
+│     "totalPagesNeeded": 0,   // raw-OCR backlog cleared in 2.0       │
 │     "byEvent": {                                                     │
 │       "incident-summaries": { pdfUrl, totalPages: 202,               │
 │                                pagesCompleted: 41,                   │
@@ -172,8 +172,8 @@ The deliberate design goals:
                  ▼                 ▼                 ▼
         ┌──────────────────────────────────────────────────┐
         │  GITHUB PULL REQUESTS                            │
-        │  contributions/<handle>/<eid>/p<NNNN>.txt        │
-        │  + contributions/<handle>/<eid>/p<NNNN>.json     │
+        │  contributions/<handle>/<source>/<eid>/p<NNNN>.txt │
+        │  + contributions/<handle>/media/<eid>/p<NNNN>.json │
         │    (visual descriptions)                         │
         └────────────────────┬─────────────────────────────┘
                              │
@@ -217,21 +217,21 @@ After the latest rebuild, `public/work-available.json` lists what pages still ne
 | `cometa` | ~36 | Easy — clean French scans |
 | `1949-discs` | ~90 | Mid — early FBI files |
 | **partial-vision docs** (apollo-17, shaef, azerbaijan, ...) | ~30 | Mid — page-by-page mop-up |
-| **uncatalogued** | ~110 records | Requires curation, not just OCR — see "Cataloguing" below |
+| **uncatalogued** | ~52 records | Requires curation, not just OCR — see "Cataloguing" below |
 
-Total: **~520 pages of OCR work + 110 records to catalogue.** A volunteer doing 30 pages an evening clears their slice in an hour.
+Total: **~52 records to catalogue.** The raw-OCR backlog is essentially cleared after the 2.0 vision sync; the remaining curation work needs human judgment, not a transcription pass. See the live HELP tab for current counts.
 
 ---
 
 ## How the volunteer mode works
 
-The `pursue-vision-mcp/volunteer.mjs` command does this loop:
+The `scripts/volunteer.mjs` command does this loop:
 
 1. **Fetch work** — `GET https://rizzleroc.github.io/pursue-console/work-available.json`
 2. **Pick a slice** — first N pages whose event id you haven't already contributed to (deterministic by your handle so two volunteers don't pick the same pages by accident)
 3. **Download PDFs** — directly from `war.gov/UFO`. We never proxy your traffic; you talk to war.gov yourself.
 4. **Render + batch + OCR** — same pipeline as the maintainer's. Pacing + breaks behave naturally so you don't hit ChatGPT rate limits.
-5. **Write contributions** — `contributions/<your-handle>/<event-id>/p<NNNN>.txt` + `.json` for visuals
+5. **Write contributions** — `contributions/<your-handle>/<source>/<event-id>/p<NNNN>.txt` + media `.json` for visuals
 6. **Open PR** — via `gh pr create`. You'll be prompted once to authenticate the GitHub CLI.
 
 Stop the script any time. Re-run later to pick up where you left off. Your contributions are credited to your GitHub handle in commit history and `CONTRIBUTORS.md`.
@@ -243,7 +243,7 @@ Stop the script any time. Re-run later to pick up where you left off. Your contr
 ### Per-page text (the standard contribution)
 
 ```
-contributions/<handle>/<event-id>/p<NNNN>.txt
+contributions/<handle>/<source>/<event-id>/p<NNNN>.txt
 ```
 
 Verbatim transcription of the page, identical format to the maintainer's `data-raw/.vision-cache/` cache. Validated against [JUDGE-STANDARD.md](./JUDGE-STANDARD.md) — schema, safety, lexical quality, FAISS semantic authenticity.
@@ -251,7 +251,7 @@ Verbatim transcription of the page, identical format to the maintainer's `data-r
 ### Per-page visual content (optional but encouraged)
 
 ```
-contributions/<handle>/<event-id>/p<NNNN>.json
+contributions/<handle>/media/<event-id>/p<NNNN>.json
 ```
 
 Structured list of photographs, diagrams, sketches, maps, charts, annotations on each page:
@@ -272,13 +272,13 @@ These flow into the DOSSIER view's **VISUAL CONTENT** panel.
 The architecture supports these naturally but they need more code:
 
 ### Image extraction with coordinates
-For pages flagged as `kind: photo` or `kind: sketch`, extract the image region (bounding box) from the PDF and save it as `contributions/<handle>/<eid>/p<NNNN>-<kind>-<idx>.png`. The DOSSIER VISUAL CONTENT panel renders these inline. Lets the corpus become **visually inspectable**, not just text-searchable.
+For pages flagged as `kind: photo` or `kind: sketch`, extract the image region (bounding box) from the PDF and save it as `contributions/<handle>/media/<eid>/p<NNNN>-<kind>-<idx>.png`. The DOSSIER VISUAL CONTENT panel renders these inline. Lets the corpus become **visually inspectable**, not just text-searchable.
 
 ### Sketch enrichment (manual / AI-rendered)
 For low-quality sketches and faded composite drawings, contributors can submit a "cleaned up" version:
 
 ```
-contributions/<handle>/<eid>/p<NNNN>-sketch-<idx>-rendered.png
+contributions/<handle>/media/<eid>/p<NNNN>-sketch-<idx>-rendered.png
 ```
 
 with a metadata sidecar describing the provenance:
@@ -312,7 +312,7 @@ PR comments are already the discussion thread. Phase 2 adds a tiny UI overlay so
 
 ## Cataloguing (different from OCR)
 
-110 of the 162 records in Release 01 are **not yet in `src/data/events.js`** at all. Adding a record needs human judgment — the title, the date, the location, the agency, what kind of record it is, a 1-3 sentence summary. This is harder than transcription and can't be automated.
+52 of the 173 records in Release 01 are **not yet in `src/data/events.js`** at all. Adding a record needs human judgment — the title, the date, the location, the agency, what kind of record it is, a 1-3 sentence summary. This is harder than transcription and can't be automated.
 
 If you want to catalogue rather than OCR:
 
@@ -332,7 +332,7 @@ Every contributor is credited in:
 - **`CONTRIBUTORS.md`** — auto-generated by maintainer after each merge wave
 - **The dossier** itself — for AI-rendered contributions, the metadata shows your name + method + tools used
 
-High-volume contributors who consistently pass on the first try get added to `TRUSTED-TRANSCRIBERS.md` and gain expedited review (their `?-review`-band files get less scrutiny).
+High-volume contributors who consistently pass on the first try are recognized in `CONTRIBUTORS.md` and may get expedited review — an informal, planned mechanism where their `?-review`-band files get less scrutiny.
 
 ---
 

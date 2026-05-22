@@ -333,7 +333,6 @@ for (const c of contribs) {
 console.log(`\n[validate] ${pass} pass · ${review} review · ${reject} reject`);
 if (reject > 0) {
   console.log(`\n[validate] FAILED — ${reject} file(s) below quality floor or violate safety/schema.`);
-  console.log(`[validate] Re-run with VERBOSE=1 npm run contrib:validate for full text dumps.`);
   process.exit(1);
 }
 if (review > 0) {

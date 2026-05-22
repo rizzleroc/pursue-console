@@ -82,11 +82,15 @@ function pickBest(sources) {
   return best;
 }
 
-// Load events.js to build url → eventId map.
+// Load events.js to build url → eventId map. Normalize both sides so that
+// events.js raw URLs (literal spaces/"_") match Denis's hyphenated manifest URLs.
+function normalizeUrl(url) {
+  return url.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-");
+}
 const { EVENTS } = await import(`../src/data/events.js?cb=${Date.now()}`);
 const urlToEid = new Map();
 for (const e of EVENTS) {
-  if (e.url) urlToEid.set(e.url.toLowerCase(), e.id);
+  if (e.url) urlToEid.set(normalizeUrl(e.url), e.id);
 }
 
 if (!existsSync(UPSTREAM)) {
@@ -129,7 +133,7 @@ for (const folder of folders) {
   // Read the first page to discover source_url, then map to event id.
   const firstMd = await readFile(path.join(folderPath, pages[0]), "utf8");
   const { meta: firstMeta } = parseFrontmatter(firstMd);
-  const sourceUrl = (firstMeta.source_url || "").toLowerCase();
+  const sourceUrl = normalizeUrl(firstMeta.source_url || "");
   const eid = urlToEid.get(sourceUrl);
 
   if (!eid) {

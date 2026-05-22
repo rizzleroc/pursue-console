@@ -309,6 +309,14 @@
   .log-box .l-err  { color: var(--rose); }
   .log-box .l-warn { color: var(--amber); }
   .log-box .l-info { color: var(--cyan); }
+  .log-actions { display: flex; gap: 6px; }
+  .log-btn {
+    font: inherit; font-size: 9px; letter-spacing: 0.15em; cursor: pointer;
+    background: transparent; color: var(--green-dim);
+    border: 1px solid var(--hair); border-radius: 3px; padding: 2px 7px;
+  }
+  .log-btn:hover { color: var(--green); border-color: var(--green-dim); }
+  .log-btn.ok { color: var(--green); border-color: var(--green); }
 
   /* FOOTER */
   .footer { margin-top: 48px; }
@@ -505,9 +513,9 @@
       <span class="qb-sub qb-count">render + auto-draft context · one slice</span>
       <span class="qb-cmd">volunteer-media.mjs --auto-context</span>
     </button>
-    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Validate filled templates and stage the media contribution">
+    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Commit filled templates as a media contribution PR">
       <span class="qb-title">✓ COMMIT VISUALS</span>
-      <span class="qb-sub">stage reviewed templates → contribution</span>
+      <span class="qb-sub" id="qb-commit-sub">stage reviewed templates → contribution</span>
       <span class="qb-cmd">volunteer-media.mjs --commit</span>
     </button>
     <button id="qb-ocr-loop" class="quick-btn ocr loop" data-needs="ocr" onclick="quickRun('ocr', true)" title="Loop OCR until queue empty">
@@ -525,9 +533,9 @@
       <span class="qb-sub">halt the running job</span>
       <span class="qb-cmd">SIGTERM</span>
     </button>
-    <button class="quick-btn" onclick="cleanStubs()" title="Delete <50-byte stub files from failed runs (also auto-runs before each spawn)" style="color:var(--amber);border-color:rgba(255,217,61,0.35);grid-column: span 3">
+    <button class="quick-btn" onclick="cleanStubs()" title="Delete empty (0-byte / whitespace-only) stub files from failed runs. Real short OCR is kept. Also auto-runs before each spawn." style="color:var(--amber);border-color:rgba(255,217,61,0.35);grid-column: span 3">
       <span class="qb-title">⌧ CLEAN STUB FILES</span>
-      <span class="qb-sub">deletes 0-byte placeholders left by failed runs so retries can actually happen · auto-runs before each spawn too</span>
+      <span class="qb-sub">deletes empty placeholders left by failed runs so retries can happen (real short OCR is kept) · auto-runs before each spawn too</span>
     </button>
   </div>
 
@@ -560,6 +568,7 @@
         </select>
       </div>
 
+
       <div class="ctrl-row" id="eid-row" style="display:none">
         <span class="ctrl-label">DOC ID</span>
         <select id="ctrl-eid" style="width:220px"></select>
@@ -587,7 +596,13 @@
 
     <!-- Log panel -->
     <div class="log-panel">
-      <div class="log-cap">R U N N E R &nbsp; L O G</div>
+      <div class="log-cap" style="display:flex;align-items:center;justify-content:space-between">
+        <span>R U N N E R &nbsp; L O G</span>
+        <span class="log-actions">
+          <button id="log-copy" class="log-btn" title="Copy the full runner log to the clipboard">⧉ COPY</button>
+          <button id="log-csv" class="log-btn" title="Download the runner log as a CSV (seq, time, level, text)">⤓ CSV</button>
+        </span>
+      </div>
       <div class="log-box" id="log-box"><span style="opacity:0.3">awaiting run…</span></div>
     </div>
   </div>
@@ -683,6 +698,7 @@
 
       // Identity
       if (p.handle) $("handle").textContent = p.handle;
+      syncHandleField(p);  // auto-fill the run-control handle input so quick-run never has to prompt()
 
       // Shift
       shiftStart = p.shiftStart || null;
@@ -747,7 +763,7 @@
 
   function pageListStr(pages, max = 10) {
     if (!pages?.length) return "";
-    const shown = pages.slice(0, max).map(p => "p" + pad4(p)).join("  ");
+    const shown = pages.slice(0, max).map(p => "p" + pad4(typeof p === "object" ? p.page : p)).join("  ");
     return pages.length > max ? shown + "  +" + (pages.length - max) + " more" : shown;
   }
 
@@ -940,6 +956,11 @@
 
   // Poll runner status every 2 s
   let logScrollBottom = true;
+  // Set the instant a run is launched; keeps buttons locked through the gap
+  // before the server reports running=true (so pollRunner's idle branch can't
+  // re-enable them). Cleared once the run is really running, or by a safety
+  // timeout in lockRunControls if the run never starts.
+  let runPending = false;
   async function pollRunner() {
     try {
       const r = await fetch("/running", { cache: "no-store" });
@@ -953,18 +974,21 @@
       // Toggle quick-launch buttons too (everything except STOP)
       const quickStartBtns = document.querySelectorAll(".quick-btn:not(.stop)");
       const quickStop = $("quick-stop");
-      if (data.running) {
+      if (data.running || runPending) {
+        if (data.running) runPending = false;  // real run started — pollRunner now owns the lock
         if (startBtn) startBtn.disabled = true;
         if (stopBtn)  stopBtn.disabled  = false;
         if (quickStop) quickStop.style.display = "";
         quickStartBtns.forEach(b => { b.dataset.runDisabled = "1"; b.disabled = true; });
-        const m = data.meta;
-        const loopTag = m?.loop ? " · LOOP" : "";
-        const docTag  = m?.eid  ? " · " + m.eid.replace(/^65-hs1-834228961-62-hq-83894-/, "§") : "";
-        if (statusEl) {
-          statusEl.className = "ctrl-status running";
-          statusEl.textContent = "RUNNING · " + (m?.mode || "").toUpperCase() + docTag + loopTag
-            + " · " + Math.round((Date.now() - (m?.startedAt || Date.now())) / 1000) + "s";
+        if (data.running) {
+          const m = data.meta;
+          const loopTag = m?.loop ? " · LOOP" : "";
+          const docTag  = m?.eid  ? " · " + m.eid.replace(/^65-hs1-834228961-62-hq-83894-/, "§") : "";
+          if (statusEl) {
+            statusEl.className = "ctrl-status running";
+            statusEl.textContent = "RUNNING · " + (m?.mode || "").toUpperCase() + docTag + loopTag
+              + " · " + Math.round((Date.now() - (m?.startedAt || Date.now())) / 1000) + "s";
+          }
         }
       } else {
         if (startBtn) startBtn.disabled = false;
@@ -994,6 +1018,8 @@
 
       // Update log
       const logEl = $("log-box");
+      if (data.log?.length) mergeLog(data.log);
+      latestLastRun = data.lastRun || latestLastRun;
       if (logEl && data.log?.length) {
         const atBottom = logEl.scrollHeight - logEl.scrollTop <= logEl.clientHeight + 20;
         logEl.innerHTML = data.log.map(line => {
@@ -1011,6 +1037,55 @@
       }
     } catch {}
   }
+  // ---- runner-log capture + export (COPY / CSV) ----
+  // The monitor only keeps a rolling 40-line window in /running.log, so we
+  // accumulate the full session here by tail-merging each poll's window.
+  let logHistory = [];
+  let prevLog = [];
+  let latestLastRun = null;
+  function mergeLog(cur) {
+    if (!cur || !cur.length) return;
+    if (!prevLog.length) { logHistory.push(...cur); prevLog = cur.slice(); return; }
+    let overlap = 0;
+    const maxK = Math.min(prevLog.length, cur.length);
+    for (let k = maxK; k > 0; k--) {
+      if (prevLog.slice(-k).join("") === cur.slice(0, k).join("")) { overlap = k; break; }
+    }
+    logHistory.push(...cur.slice(overlap));
+    prevLog = cur.slice();
+    if (logHistory.length > 5000) logHistory = logHistory.slice(-5000);
+  }
+  function logLevel(line) {
+    if (/✗|err=[1-9]|\bError\b|\bFAIL\b|\[exit [^02]/.test(line)) return "error";
+    if (/Warning|⚠|skipping/i.test(line)) return "warn";
+    if (/✓|done\. ok=|\[exit (0|2)\]/.test(line)) return "ok";
+    return "info";
+  }
+  function flashBtn(btn, label) {
+    if (!btn) return;
+    const orig = btn.textContent; btn.textContent = label; btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove("ok"); }, 1400);
+  }
+  $("log-copy")?.addEventListener("click", async () => {
+    const text = (logHistory.length ? logHistory.join("\n") : ($("log-box")?.innerText || "")).trim();
+    try { await navigator.clipboard.writeText(text); flashBtn($("log-copy"), "✓ COPIED"); }
+    catch { flashBtn($("log-copy"), "✗ FAILED"); }
+  });
+  $("log-csv")?.addEventListener("click", () => {
+    const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const now = new Date().toISOString();
+    const rows = [["seq", "exported_at", "level", "text"].join(",")];
+    logHistory.forEach((line, i) => rows.push([i + 1, esc(now), logLevel(line), esc(line)].join(",")));
+    if (latestLastRun) rows.push(["", esc(now), "lastRun", esc((latestLastRun.headline || "") + " — " + (latestLastRun.detail || ""))].join(","));
+    const blob = new Blob([rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `pursue-runner-log-${now.replace(/[:.]/g, "-")}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(a.href);
+    flashBtn($("log-csv"), "✓ SAVED");
+  });
+
   setInterval(pollRunner, 2000);
   pollRunner();
   fetchQueueAndSync();
@@ -1019,6 +1094,21 @@
   // Override the old fetchQueue calls (the panel is now updated by fetchQueueAndSync)
   // Keep original interval inert
   // ---- action handlers ----
+  // Instantly lock every run-trigger button the moment a job is launched, so a
+  // second job can't be claimed before the 2s pollRunner tick catches up (the
+  // server also rejects overlap with 409, but this gives immediate UX feedback).
+  // pollRunner re-applies this while running and clears it when the run ends.
+  function lockRunControls() {
+    runPending = true;
+    document.querySelectorAll(".quick-btn:not(.stop)").forEach(b => { b.dataset.runDisabled = "1"; b.disabled = true; });
+    const sb = $("btn-start"); if (sb) sb.disabled = true;
+    const qs = $("quick-stop"); if (qs) qs.style.display = "";
+    // Safety net: if the run never actually starts (POST errored / server busy),
+    // release the lock so the buttons don't stay disabled forever.
+    setTimeout(() => { runPending = false; }, 8000);
+  }
+
+
   window.ctrlStart = async function() {
     const handle = ($("ctrl-handle")?.value || "").trim();
     if (!handle) { alert("Enter your GitHub handle first"); return; }
@@ -1030,6 +1120,7 @@
 
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "STARTING…"; }
+    lockRunControls();
 
     try {
       const r = await fetch("/run", {
@@ -1165,6 +1256,29 @@
   pollDaemonHealth();
   setInterval(pollDaemonHealth, 15_000);
 
+  // ---- COMMIT VISUALS readiness ----
+  // Make the commit button reflect actual staging state instead of always
+  // looking ready: enabled + "N ready to commit" only when there are filled
+  // templates, disabled otherwise (so it stops inviting a pointless resubmit).
+  async function pollStaging() {
+    const btn = $("qb-visuals-commit"), sub = $("qb-commit-sub");
+    if (!btn) return;
+    if (btn.dataset.runDisabled === "1") return; // a run is active — pollRunner owns the lock
+    try {
+      const s = await fetch("/staging", { cache: "no-store" }).then(r => r.json());
+      if (s.committable > 0) {
+        btn.disabled = false;
+        if (sub) sub.textContent = `${s.committable} ready to commit` + (s.incomplete ? ` · ${s.incomplete} still need drafting` : "");
+      } else {
+        btn.disabled = true;
+        if (sub) sub.textContent = s.total ? `nothing ready — ${s.total} staged still need drafting` : "no staged visuals to commit";
+      }
+    } catch {}
+  }
+  setInterval(pollStaging, 3000);
+  pollStaging();
+
+
   // ---- clean stubs button (manual trigger; auto-clean also runs before each spawn) ----
   window.cleanStubs = async function() {
     const handle = ($("ctrl-handle")?.value || "").trim() || "Rizzleroc";
@@ -1195,6 +1309,7 @@
     const provider = $("ctrl-provider")?.value || "chatgpt";
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "PICKING QUEUE…"; }
+    lockRunControls();
     try {
       const r = await fetch("/run-any", {
         method: "POST",
@@ -1264,6 +1379,7 @@
     const provider = $("ctrl-provider")?.value || "chatgpt";
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = `STARTING ${mode.toUpperCase()}${loop ? " (LOOP)" : ""}…`; }
+    lockRunControls();
     try {
       const r = await fetch("/run", {
         method: "POST",

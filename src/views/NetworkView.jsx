@@ -3,6 +3,7 @@ import { AGENCY_COLORS } from "../data/events.js";
 import { ENTITIES, ENTITY_KIND, EVENT_ENTITIES } from "../data/entities.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
 import { sourceStyle, SourceLegend } from "../components/SourceMix.jsx";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // FAISS-derived event-event similarity, loaded once and cached.
 let _simP = null;
@@ -22,17 +23,14 @@ function useSimilarity() {
 // Patterns (shapes / behaviors / sensors) + per-event source mix.
 // Loaded once. Patterns gives us a separate spine of nodes from the
 // hand-curated entities — the corpus's own text-mined vocabulary.
-let _patP = null, _statsP = null;
-function useCorpusData() {
-  const [data, setData] = useState({ patterns: null, byEvent: null });
+let _patP = null;
+function usePatterns() {
+  const [patterns, setPatterns] = useState(null);
   useEffect(() => {
     if (!_patP) _patP = fetch(`${import.meta.env.BASE_URL}patterns.json`).then(r => r.ok ? r.json() : null).catch(() => null);
-    if (!_statsP) _statsP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json`).then(r => r.ok ? r.json() : null).catch(() => null);
-    Promise.all([_patP, _statsP]).then(([patterns, stats]) => {
-      setData({ patterns, byEvent: stats?.byEvent || {} });
-    });
+    _patP.then(setPatterns);
   }, []);
-  return data;
+  return patterns;
 }
 
 // How many pattern terms per kind to put on the canvas. Higher = richer
@@ -122,7 +120,9 @@ export default function NetworkView({ events, onSelect }) {
   // Minimum cosine for a semantic edge to appear (tunable)
   const [minCos, setMinCos] = useState(0.55);
   const sim = useSimilarity();
-  const { patterns, byEvent } = useCorpusData();
+  const patterns = usePatterns();
+  const { stats } = useCorpusStats();
+  const byEvent = stats?.byEvent || {};
   const svgRef = useRef(null);
   const [size, setSize] = useState({ w: 900, h: 620 });
 

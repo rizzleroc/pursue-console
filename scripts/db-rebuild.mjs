@@ -230,13 +230,17 @@ try {
 // real filenames, real upstream bytes). Each becomes an inventory row
 // with is_curated=0 — when someone writes an events.js entry pointing
 // at the same URL, the next rebuild flips is_curated=1.
-const inventoryByUrl = new Map(inventoryRows.filter(r => r.url).map(r => [r.url.toLowerCase(), r]));
 let syncedUncatalogued = 0;
 try {
   const sync = JSON.parse(await readFile(path.join(RAW_DIR, "inventory-sync.json"), "utf8"));
   for (const r of sync.rows || []) {
-    const u = r.url.toLowerCase();
-    if (inventoryByUrl.has(u)) continue;  // already catalogued; nothing to add
+    // sync-inventory.mjs already reconciled every manifest row against
+    // events.js with normalized-URL matching and recorded the result in
+    // r.event_id. Trust it: a row that matched a catalogued event must NOT
+    // also be added as an "uncatalogued upstream" row, or the same physical
+    // PDF gets counted twice (once curated, once not). Only genuinely
+    // unmatched rows (event_id === null) become upstream inventory rows.
+    if (r.event_id) continue;
     inventoryRows.push({
       id: `upstream-${r.filename.replace(/\.pdf$/i, "").toLowerCase()}`,
       url: r.url,
@@ -413,6 +417,18 @@ for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : [
   }
 }
 
+// Mark pdfjs pages: any event whose text/manifest.json source is "pdfjs"
+// (or "mixed") counts each of its pages as has_pdfjs=1. We can't know which
+// page-numbers without re-opening the PDF, so this is a per-event flag we
+// project across that event's rows rather than enumerate per page.
+const pdfjsEvents = new Set();
+try {
+  const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
+  for (const [eid, info] of Object.entries(manifest)) {
+    if (info.source === "pdfjs" || info.source === "mixed") pdfjsEvents.add(eid);
+  }
+} catch {}
+
 // Flush pageMap → pages table
 const pageRows = [];
 for (const [eid, m] of pageMap) {
@@ -421,7 +437,7 @@ for (const [eid, m] of pageMap) {
     const best = r._sidecarBest || (r.has_vision ? "gpt-vision" : r.has_ocr ? "ocr" : null);
     pageRows.push({
       event_id: eid, page_num: pn,
-      has_pdfjs: 0,
+      has_pdfjs: pdfjsEvents.has(eid) ? 1 : 0,
       has_ocr: r.has_ocr, has_vision: r.has_vision, has_visuals: r.has_visuals,
       has_gemini: r._hasGemini || 0,
       has_claude: r._hasClaude || 0,
@@ -439,18 +455,6 @@ for (const [eid, m] of pageMap) {
   }
 }
 db.transaction((rs) => { for (const r of rs) insPage.run(r); })(pageRows);
-
-// Mark pdfjs pages: any event whose text/manifest.json source is "pdfjs"
-// counts each of its pages as has_pdfjs=1. We can't know which page-numbers
-// without re-opening the PDF, so this is a per-event flag we project across
-// rows in dashboards rather than enumerate.
-const pdfjsEvents = new Set();
-try {
-  const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
-  for (const [eid, info] of Object.entries(manifest)) {
-    if (info.source === "pdfjs" || info.source === "mixed") pdfjsEvents.add(eid);
-  }
-} catch {}
 
 // ---- runs: append a row for this rebuild ----
 db.prepare(`
