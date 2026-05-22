@@ -1,0 +1,19 @@
+[Image: Graph titled "Figure 17. Atlas IIAS All-Mode Ship-Hit Contours with A = 3.00"]
+
+**Atlas IIAS** | **All Mode P_i**
+
+**Legend:**
+- Solid line: 10^-4
+- Dashed line: 10^-5
+- Dotted line: 10^-6
+
+**Y-axis:** Crossrange Distance (nm)
+**X-axis:** Downrange Distance (nm)
+
+**Internal Text:**
+B = 1,000
+A = 3.00
+
+Figure 17. Atlas IIAS All-Mode Ship-Hit Contours with A = 3.00
+
+9/10/96                                     54                                     RTI

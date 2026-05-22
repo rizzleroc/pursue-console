@@ -1,0 +1,16 @@
+Figure 19. Atlas IIAS All-Mode Ship-Hit Contours with A = 3.45
+
+[This page consists of a technical graph plotting Crossrange Distance (nm) against Downrange Distance (nm). The text within the graph is as follows:]
+
+Atlas IIAS
+All Mode P_I
+
+Legend:
+- 10^-4 (Solid line)
+- 10^-5 (Dashed line)
+- 10^-6 (Dotted line)
+
+B = 1,000
+A = 3.45
+
+9/10/96 56 RTI

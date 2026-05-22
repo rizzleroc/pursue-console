@@ -1,0 +1,3 @@
+Incident: 192
+
+While motoring on U. S. Highway #52 in a northwestern direction on the outskirts of Moorhead, Minnesota, Mr. L. G. Sanders & wife observed a light traveling in an east to west direction. Mr. Sanders first observed the light which was to his right and pointed it out to his wife who also clearly saw it. Visibility at the time was good. Observer estimated that he could have seen a plane at the distance he estimated the object to have been. The speed was two or three times faster than a plane. Both agreed that it could not have been a meteor because of the length of time it was visible and because the direction of flight was a slight rise rather than down.

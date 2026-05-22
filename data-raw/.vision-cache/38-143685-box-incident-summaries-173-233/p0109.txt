@@ -1,0 +1,3 @@
+Incident: 219
+
+Doris Croke, age 14, a ninth grade student at North Junior High, Newburgh, N. Y., reported that on the night of 29 November 1948 at precisely 8:00 while standing with two young friends on the corner of Concord St & 1st Street, that she observed a ball of fire with a long tail in the north of the sky. Course of the object was from east to west. It was visible for two seconds and then went below the horizon. She stated that while she had seen many shooting stars that she had never seen anything like this. She also described the astral phenomenon as being a "large red ball speeding thru the heavens." She was convinced that she had seen a blue-tailed comet.

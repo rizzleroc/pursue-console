@@ -1,0 +1,12 @@
+**Atlas IIAS Failures through 280 sec**
+**Breakup q-alpha = 20,000 deg-lb/ft^2**
+
+*   o Random-attitude turns
+*   [square] Slow turns
+*   [triangle] Combined turns (0.75 random + 0.25 slow)
+
+[Graph: Y-axis labeled "Percent in 5-deg sector (%)" (log scale 0.1 to 100); X-axis labeled "Angle From Flight Path (deg)" (0 to 180)]
+
+**Figure 5. Combined Random-Attitude and Slow-Turn Results**
+
+9/10/96 36 RTI

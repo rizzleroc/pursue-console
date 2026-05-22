@@ -1,0 +1,125 @@
+# Polls Denis's UFO-USA manifest every 6h. If new PDFs are detected,
+# triggers the deploy pipeline. Akamai blocks direct PDF download
+# (HTTP 403 confirmed); Denis's Gemini transcripts are the source.
+
+name: Sync upstream UFO-USA manifest
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full depth for commit)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Read prior PDF count from sentinel
+        id: prior
+        run: |
+          SENTINEL="data-raw/.upstream-pdf-count"
+          if [ -f "$SENTINEL" ]; then
+            PRIOR=$(cat "$SENTINEL" | tr -d '[:space:]')
+          else
+            PRIOR=0
+          fi
+          echo "count=$PRIOR" >> "$GITHUB_OUTPUT"
+          echo "Prior PDF count: $PRIOR"
+
+      - name: Run corpus:sync (fetch Denis's manifest)
+        run: npm run corpus:sync
+
+      - name: Read fresh PDF count from inventory-sync.json
+        id: fresh
+        run: |
+          TOTAL=$(node --input-type=module <<'JS'
+            import { readFileSync } from 'fs';
+            const d = JSON.parse(readFileSync('data-raw/inventory-sync.json', 'utf8'));
+            process.stdout.write(String(d.totalPdfs));
+          JS
+          )
+          MATCHED=$(node --input-type=module <<'JS'
+            import { readFileSync } from 'fs';
+            const d = JSON.parse(readFileSync('data-raw/inventory-sync.json', 'utf8'));
+            process.stdout.write(String(d.matched));
+          JS
+          )
+          echo "total=$TOTAL"     >> "$GITHUB_OUTPUT"
+          echo "matched=$MATCHED" >> "$GITHUB_OUTPUT"
+          echo "Fresh PDF count: $TOTAL (matched to events: $MATCHED)"
+
+      - name: Decide — new PDFs?
+        id: decide
+        run: |
+          PRIOR=${{ steps.prior.outputs.count }}
+          FRESH=${{ steps.fresh.outputs.total }}
+          if [ "$FRESH" -gt "$PRIOR" ]; then
+            DELTA=$(( FRESH - PRIOR ))
+            echo "changed=true"  >> "$GITHUB_OUTPUT"
+            echo "delta=$DELTA"  >> "$GITHUB_OUTPUT"
+            echo "::notice::New tranche detected: $DELTA new PDF(s) ($PRIOR to $FRESH total)"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "delta=0"       >> "$GITHUB_OUTPUT"
+            echo "Manifest unchanged ($FRESH PDFs). Nothing to do."
+          fi
+
+      - name: Update sentinel and commit
+        if: steps.decide.outputs.changed == 'true'
+        env:
+          FRESH: ${{ steps.fresh.outputs.total }}
+          PRIOR: ${{ steps.prior.outputs.count }}
+          DELTA: ${{ steps.decide.outputs.delta }}
+        run: |
+          echo "$FRESH" > data-raw/.upstream-pdf-count
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data-raw/.upstream-pdf-count
+          git commit -m "chore(sync): upstream PDF count ${PRIOR} to ${FRESH} (+${DELTA})"
+          git push origin main
+
+      - name: Open issue for new tranche
+        if: steps.decide.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FRESH: ${{ steps.fresh.outputs.total }}
+          PRIOR: ${{ steps.prior.outputs.count }}
+          DELTA: ${{ steps.decide.outputs.delta }}
+          MATCHED: ${{ steps.fresh.outputs.matched }}
+        run: |
+          NEW=$(( FRESH - MATCHED ))
+          printf '## Upstream manifest updated\n\nDenis'"'"'s [UFO-USA](https://github.com/DenisSergeevitch/UFO-USA) manifest grew from **%s** to **%s** PDFs (+**%s** new).\n\n| Metric | Value |\n|---|---|\n| Total PDFs in manifest | %s |\n| Matched to existing events | %s |\n| New (need cataloguing) | %s |\n\nThe deploy pipeline has been dispatched automatically to ingest the new Gemini transcripts.\n\n> Note: Akamai blocks direct PDF download (HTTP 403); Denis'"'"'s Gemini transcripts are the canonical source.\n\n_Opened by `.github/workflows/sync-upstream.yml`_\n' \
+            "$PRIOR" "$FRESH" "$DELTA" "$FRESH" "$MATCHED" "$NEW" > /tmp/issue-body.md
+          gh issue create \
+            --title "New upstream tranche: +${DELTA} PDF(s) (${PRIOR} to ${FRESH} total)" \
+            --body-file /tmp/issue-body.md
+
+      - name: Dispatch deploy pipeline
+        if: steps.decide.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run deploy.yml --ref main
+          echo "::notice::deploy.yml dispatched — new transcripts will be ingested on next build."

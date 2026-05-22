@@ -1,0 +1,41 @@
+| Acronym | Definition |
+| :--- | :--- |
+| OT PHASE I | (See OT) |
+| OT PHASE II | (See FOT) |
+| | |
+| PALC | Point Arguello Launch Complex |
+| PAS | Penetration Aids Study |
+| PLC | Probe Launch Complex |
+| PRP | Propulsion Replacement System |
+| PVM | Production Verification Missile |
+| | |
+| QuickScat | Quick Scatterometer |
+| | |
+| RADARSAT | Radar Satellite |
+| RADCAL | Radar Calibration |
+| RAF | Royal Air Force |
+| R&D | Research and Development (Category I & II before 1 July 1963) |
+| REX | Radiation Experiment |
+| RSLP | Reentry Systems Launch Program |
+| | |
+| SAC | Strategic Air Command |
+| SAFEGUARD | An Antiballistic Missile (ABM) test program |
+| SALVO | Simultaneous launching of two or more missiles |
+| SAMAST | Sandia ABRES Material Systems Test |
+| SAMPEX | Solar, Anomalous and Magnetospheric Particle Explorer |
+| SEASAT | Sea [Observation] Satellite |
+| SENT | Severe nose-tip Environment Test |
+| SET | Single Engine Test |
+| SFT | Supplemental Flight Test |
+| SLC | Space Launch Complex |
+| SLF | Space Launch Facility |
+| SLTF | Silo Launch Test Facility |
+| SLV | Space Launch Vehicle |
+| SM | Solar Mesosphere |
+| SMLV | Single Module Launch Vehicle |
+| SNOE | Student Nitric Oxide Explorer |
+| SOOS | Stacked Oscar On Scout |
+| SOT | Special Operational Test |
+| SPACE | Orbital space Operations |
+
+vi

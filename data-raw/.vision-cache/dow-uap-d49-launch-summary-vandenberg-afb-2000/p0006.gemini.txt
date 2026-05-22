@@ -1,0 +1,42 @@
+| Acronym | Definition |
+| :--- | :--- |
+| KOMPSAT | Korea Multi-Purpose Satellite |
+| | |
+| LAGEOS | Laser Geodynamic Satellite |
+| LANDSAT | Earth Resources Satellite |
+| LBRV | Large Ballistic Reentry Vehicle (See ABRV) |
+| LE | Launch Emplacement |
+| LF | Launch Facility |
+| LLL | Lawrence Livermore Laboratory |
+| LLV-1 | Lockheed Launch Vehicle 1. (Became Lockheed Martin Launch Vehicle, and in Sept 97 was renamed Athena.) |
+| LM | Lockheed Martin (Corporation) |
+| | |
+| MACSAT | Multiple Access Communications Satellite |
+| MAGSAT | Magnetic Field Measurement Satellite |
+| MaST | Maneuvering Systems Technology |
+| MDA | McDonnell Douglas Aerospace |
+| MINT | Miniaturized Instrumented Nose Tip |
+| MOD | Modernized Minuteman (R&D, DASO) Operational tests are identified by the suffix "M" in the nickname |
+| MS | Motorola Satcom |
+| MSLS | Multi-Service Launch System |
+| MSTI | Miniature Seeker Technology Integration |
+| MSX | Midcourse Space Experiment |
+| MUBLCOM | Multiple Path Beyond Line of Sight Communications |
+| | |
+| N/A | Not Applicable |
+| NASA | National Aeronautics and Space Administration |
+| NAVSTAR | Navigation Satellite (Formerly NDS) |
+| NDS | Navigation Development Satellite |
+| NOAA | National Oceanic and Atmospheric Administration |
+| NTS | Navigation Technology Satellite |
+| NTV | Nosetip Vehicle |
+| | |
+| OBLSS | Operational Base Launch Safety System |
+| ORBCOMM (FM) | Orbital Communications (Flight Module) |
+| ORT | Operational Readiness Test |
+| OSC | Orbital Sciences Corporation |
+| OSL | Ogden Special Launch |
+| OSTF | Operational System Test Facility |
+| OT | Operational Test (Now OT PHASE I) (Category III before 1 July 1963) |
+
+v

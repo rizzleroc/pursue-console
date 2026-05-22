@@ -1,0 +1,18 @@
+The best-fit values of B and A shown in Figure 27 and Figure 28 are tabulated for convenient reference in Table 24. For breakup qa's of 10,000 and 5,000 deg-lb/ft², the currently-used value of B = 1,000 provided a better data fit than other values of B that were investigated.
+
+Table 24. Shaping Constants for Titan IV
+
+| $T_B$ (sec) | Breakup $q\alpha$ (deg-lb/ft²) | B | A |
+| :--- | :--- | :--- | :--- |
+| 300 | none | 1,000 | 2.00 |
+| | 20,000 | | 2.95 |
+| | 10,000 | | 3.25 |
+| | 5,000 | | 3.50 |
+| 300 | none | 10,000 | 2.70 |
+| | 20,000 | 2,000 | 3.15 |
+| | 10,000 | 1,000 | 3.25 |
+| | 5,000 | 1,000 | 3.50 |
+
+Risk calculations in the launch area were not made for Titan IV.
+
+9/10/96 68 RTI

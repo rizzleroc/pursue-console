@@ -1,0 +1,13 @@
+Atlas IIAS
+Mode 5 P_l
+--- 10^-5
+... 10^-6
+
+[Graph: Crossrange Distance (nm) vs Downrange Distance (nm)]
+
+B = 5,000,000
+A = 6.30
+
+Figure 20. Atlas IIAS Mode-5 Ship-Hit Contours with A = 6.30
+
+9/10/96                                     57                                     RTI

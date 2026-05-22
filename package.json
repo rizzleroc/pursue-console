@@ -21,6 +21,7 @@
     "corpus:alignment": "node scripts/diagnose-page-alignment.mjs",
     "corpus:sync-check": "node scripts/diagnose-deploy-sync.mjs",
     "corpus:contributors": "node scripts/build-contributors.mjs",
+    "corpus:transcribe": "node scripts/transcribe-gemini-api.mjs",
     "corpus:fetch-missing": "node scripts/fetch-missing-pdfs.mjs",
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",

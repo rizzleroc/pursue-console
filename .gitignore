@@ -21,6 +21,7 @@ data-raw/*
 !data-raw/.ocr-cache/
 !data-raw/.visuals/
 !data-raw/.contributions-manifest.json
+!data-raw/.upstream-pdf-count
 !data-raw/corpus.sqlite
 # upstream-gemini is a clone of DenisSergeevitch/UFO-USA — the imported
 # transcripts live in .vision-cache/, so the upstream clone itself only

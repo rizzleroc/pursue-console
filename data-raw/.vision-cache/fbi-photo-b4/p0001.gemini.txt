@@ -1,0 +1,16 @@
+**Document title:** FBI Photo B4
+**Source file:** FBI Photo B4.pdf
+**Page:** 1 of 1
+**Agency:** FBI
+**Release date:** 5/8/26
+**Incident date:** Late 2025
+**Incident location:** Western United States
+
+---
+
+This page consists of a single sensor/camera feed image containing the following elements:
+
+* **Top:** [redacted]
+* **Center:** A crosshair overlay with a horizontal scale marked 15, 10, 5, 0, 5, 10, 15.
+* **Left/Right:** Multiple [redacted] bars.
+* **Bottom Left:** 12/31/99 18:12:16

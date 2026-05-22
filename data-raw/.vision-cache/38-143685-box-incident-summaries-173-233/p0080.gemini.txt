@@ -1,0 +1,3 @@
+Incident: 205
+
+Observer reported seeing an aluminum colored object sail northeast across the sky while lying on his back in his yard. Object seemed about 30 to 40 feet in diameter. Could not ascertain height but thought object was moving very fast - estimated speed to be around 1500 MPH. Object seemed to be slowly rotating while remaining upright - like a flat top. Noticed no smoke or noise.

@@ -1,0 +1,9 @@
+Black-and-white sighting photograph frame.
+
+Visible page content:
+
+- A central crosshair or reticle overlay with horizontal and vertical scales marked roughly from -15 to 15.
+- A small dark object or mark appears slightly above and to the right of the reticle center.
+- Several black redaction bars cover labels or other identifying text around the image.
+- The lower-left timestamp reads: `12/31/99 18:11:27`.
+- Faint terrain or mountains are visible near the lower edge of the frame.

@@ -1,0 +1,9 @@
+Atlas IIAS
+Inner Ear Injury
+Mode-5 A = 3.5
+
+[Diagram: A technical map showing risk contours for inner-ear injury with lines labeled 10^-6, 10^-5, and 10^-4]
+
+Figure 3. Atlas IIAS Risk Contours for Inner-Ear Injury with A = 3.5
+
+9/10/96 12 RTI

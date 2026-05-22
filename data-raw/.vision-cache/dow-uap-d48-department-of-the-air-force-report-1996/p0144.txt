@@ -1,0 +1,5 @@
+The entire Delta history through 1995 is depicted rather compactly in bar-graph form in Figure 38. The solid-block portion of each bar indicates the number of launches during the calendar year for which vehicle performance was entirely normal, in so far as could be determined. The clear white parts forming the tops of most bars show the number of launches that were either failures or flights where the launch vehicle experienced some sort of anomalous behavior. Every launch with an entry in the response-mode column in Table 43 falls in this category. Such behavior did not necessarily prevent the attainment of some, or even all, mission objectives.
+
+![Figure 38. Delta Launch Summary](Figure_38_Delta_Launch_Summary.png)
+
+9/10/96  &nbsp

@@ -1,0 +1,6 @@
+It is obvious from the response-mode definitions in Appendix A that none of the described vehicle failures can be considered as a Mode 1, 2, or 3 response, or a Mode-4 on-trajectory failure.* Except possibly for (2), it also seems apparent that none can be modeled as either a rapid tumble or a slow turn.
+
+
+* Although prompt destruct action during any of the described flights might have resulted in a Mode-4 classification, the safety officer typically needs several seconds to evaluate data after a malfunction. Quick action is contrary to safety philosophy if impact limit lines are not threatened and the destruct system is not at risk, since additional flight time enhances the user's opportunity to pinpoint the nature of the problem.
+
+9/10/96  &

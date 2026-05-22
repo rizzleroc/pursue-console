@@ -1,0 +1,5 @@
+Inc. ent: 177
+
+at a terrific rate of speed. Witness states she has heard many planes but could not describe the sound.
+
+Subsequent investigation of this incident reveals that according to neighbors Mrs McDaniel possesses a vivid imagination and that the daughter was inclined to take after the mother. Neither of the neighbors heard any unusual noises in the vicinity.

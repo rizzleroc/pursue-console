@@ -1,0 +1,28 @@
+| Acronym | Definition |
+| :--- | :--- |
+| SPACEPROBE | Non-orbital space operations |
+| ST | Special Test |
+| STEX | Space Technology Experiment |
+| STM | Special Test Missile |
+| STP | Special Test Program |
+| STREP | System Technology Reentry Experiments Program |
+| SWAS | Submillimeter Wave Astronomy Satellite |
+| | |
+| TAC | Tactical Air Command |
+| TARGET | Missile target for surface-to-air/air-to-air missile firing practice |
+| TAT | Thrust Augmented Thor |
+| TD | Technology Demonstration |
+| TDT | Target Development Test |
+| TDV | Technology Development Vehicle |
+| TERRIERS | Tomographic Experiment using Radioactive Recombinative Ionospheric EUV and Radio Sources |
+| TIP | Transition Improvement Program |
+| TOMS-EP | Total Ozone Mapping Spectrometer-Earth Probe |
+| TREP | Thrusted Replica |
+| TP | Test Pad |
+| TRACE | Transition Region and Coronal Explorer |
+| | |
+| UTE | Unified Test Equipment |
+| | |
+| WIRE | Wide Field Infrared Explorer |
+
+vii

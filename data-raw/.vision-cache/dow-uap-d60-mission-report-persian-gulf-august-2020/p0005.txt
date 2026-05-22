@@ -1,0 +1,53 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 20 March 2026
+
+[redacted]
+
+*   **Observed Activity Description:** TRANSITTING
+*   **Method of Observation:** FMV
+
+### GENTEXT/OBSERVATION
+
+*   **Gentext:** [redacted] AT 0726Z, [1.4a] OBSERVED 1X UAP IVO 39RWL08[1.4a]5[1.4a] NO IMPACT TO MISSION.
+
+### WEATHER
+
+*   **Weather:** WEATHER WAS NOT A FACTOR
+
+### Takeoff
+
+*   **Callsign:** [1.4a]
+*   **Number of Aircraft:** 1
+*   **Asset Type (Aircraft):** [1.4a, 1.4g]
+*   **Aircraft Tail Number(s):** [1.4a, 1.4g]
+*   **Takeoff Location (ICAO Code):** OKAS
+*   **Takeoff Time DTG:** 080337:00ZAUG20
+*   **Mode 3 (IFF Codes):** -
+*   **Gentext/Additional Details:** -
+*   **Mission Canceled:**
+
+### On Station
+
+*   **Time On Station DTG:** 080359:00ZAUG20
+*   **Callsign:** [1.4a]
+*   **JTAR Number:** -
+*   **Killbox (Location):** -
+*   **Mission Type:** AREC
+*   **JTAC Callsign:** -
+*   **Gentext/Additional Details:** -
+*   **Did not Arrive On Station:**
+
+### ISR
+
+*   **Time-on Station DTG:** 080513:00ZAUG20
+*   **Time-off Station DTG:** 082256:00ZAUG20
+*   **Aircraft Callsign:** [1.4a]
+*   **Msn Type:** AREC
+*   **Primary Sensor:** ANDAS4
+*   **Sensors Available:** AH\GMESH
+
+[redacted] (b)(6)
+[redacted]
+
+USCENTCOM MDR 26-0038 to MDR 26-0046 Approved for Release to AARO 03/27/26 000005

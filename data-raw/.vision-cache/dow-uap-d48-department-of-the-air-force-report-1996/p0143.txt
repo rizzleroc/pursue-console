@@ -1,0 +1,13 @@
+| Configuration | Description |
+| :--- | :--- |
+| 1910, 1913, 1914 | Stg. 0: Nine Castor IIs employed<br>Stg. 3: Varied: none (1910), TE-364-3 (1913), TE-364-4 (1914)<br>PLF: 96-inch diameter replaced 65-inch |
+| 2310, 2313, 2314 | Stg. 0: Three Castor IIs employed<br>Stg. 1: RS-27 replaced MB-3<br>Stg. 2: TR-201 engine replaced AJ10-118F<br>Stg. 3: Varied: none (2310), TE-364-3 (2313), TE-364-4 (2314) |
+| 2910, 2913, 2914 | Stg. 0: Nine Castor IIs employed<br>Stg. 3: Varied: none (2910), TE-364-3 (2913), TE-364-4 (2914) |
+| 3910, 3913, 3914 | Stg. 0: Nine Castor IVs replaced Castor IIs<br>Stg. 3: Varied:none or PAM (3910),TE-364-3 (3913),TE-364-4 (3914) |
+| 3920, 3924 | Stg. 2: AJ10-118K engine replaced TR-201<br>Stg. 3: Varied: none or PAM (3920), TE-364-4 (3924) |
+| 4920 | Stg. 0: Castor IVA replaced Castor IV<br>Stg. 1: MB-3 replaced RS-27 |
+| 5920 | Stg. 1: RS-27 replaced MB-3 |
+| 6925 | Stg. 1: Tanks lengthened 12 feet<br>Stg. 3: STAR 48B motor used<br>PLF: Bulbous 114-inch diameter used |
+| 7925 | Stg. 0: GEM replaced Castor IVA<br>Stg. 1: RS-27A replaced RS-27 |
+
+9/10/96  &nbsp

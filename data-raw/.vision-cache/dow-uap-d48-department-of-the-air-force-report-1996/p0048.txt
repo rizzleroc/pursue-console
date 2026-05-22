@@ -1,0 +1,10 @@
+[Image: A map showing a scatter plot of impact points over a geographic region.]
+
+Atlas IIAS Impacts
+Random-Attitude Failures at 130 sec.
+Thrust to 280 sec.
+No Breakup
+
+Figure 7. Atlas IIAS Impacts with No Breakup
+
+9/10/96                                     39                                     RTI

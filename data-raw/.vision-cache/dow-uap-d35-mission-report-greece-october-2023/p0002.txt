@@ -1,0 +1,49 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 22 January 2026
+
+[redacted]
+
+### MSGID
+* **Report Type:** MISREP
+* **Originator (Unit or Squadron):** 33 SOS
+* **Submit Date:**
+
+### MSNID
+* **Tasking Order (ATO):** [1.4a]
+* **Mission Type:** ISR
+* **ATO Mission Number:** [1.4a]
+* **Country Tasked:** US - UNITED STATES
+* **Service Tasked:** A - AIR FORCE
+
+### Poc
+
+### POC
+* **Rank:** A1C
+* **Full Name:** [3.5c, (b)(3), 130b, (b)(6)]
+* **Unit:** 56 SOIS
+* **Wing:** 27 SOW
+* **Phone Number:** [3.5c, (b)(6)]
+* **Email:** [3.5c, (b)(6)]
+* **Service:** Air Force
+* **Operations Center:** 609 AOC Det 1
+
+### QC
+* **Rank:** SrA
+* **Full Name:** [3.5c, (b)(3), 130b, (b)(6)]
+* **Unit:** Unavailable
+* **Wing:** 27 SOW
+* **Phone Number:** [3.5c, (b)(6)]
+* **Email:** [3.5c, (b)(6)]
+* **Service:** Air Force
+* **Operations Center:** 609 CAOC
+
+### APPROVER
+* **Rank:** A1C
+* **Full Name:** [3.5c, (b)(3), 130b, (b)(6)]
+* **Unit:** Unavailable
+
+[3.5c, (b)(6)]
+[redacted]
+
+USCENTCOM MDR 26-0019  &nbsp

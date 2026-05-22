@@ -1,0 +1,3 @@
+Incident: 201
+
+Staff Sgt Joseph J. Barnett, AF 13127245, AATS APO 406, N. Y. reported the following: On 31 Oct 48 at approximately 0230Z he noticed a flat round object weaving overhead but maintaining a northerly course at an approximate speed of 160 MPH. Object was pale yellow or light orange color and not bluewhite. Seemed to maintain the same altitude and disappeared behind clouds. The object was viewed from 3 to 5 minutes. No vapor trails were seen nor was any sound heard.

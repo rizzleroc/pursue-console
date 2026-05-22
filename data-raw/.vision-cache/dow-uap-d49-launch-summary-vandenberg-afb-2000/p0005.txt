@@ -1,0 +1,40 @@
+| Acronym | Definition |
+| :--- | :--- |
+| DT&E | Development Test & Evaluation |
+| DT&E PHASE I | Development Test & Evaluation (Missile Functional Performance [Peacekeeper]) |
+| DT&E PHASE II | Development Test & Evaluation (Missile Reentry Vehicle Capabilities and Silo Intergradation [Peacekeeper]) |
+| DUAL LAUNCH | The launch of two missiles one after another |
+| | |
+| EOS | Earth Observation System |
+| ERCS | Emergency Rocket Communications System (494L) |
+| EXOSAT | X-Ray Observatory Satellite |
+| FAST | Fast Auroral Snapshot Explorer |
+| FDE | Force Development Evaluation (Replace the term OT PHASE II testing) |
+| FOT | Follow-on Operational Test (Replaced by OT PHASE II) (Category IV before 1 July 1963) |
+| FTM | Flight Test Missile |
+| | |
+| GBI | Ground Based Interceptor |
+| GEOS | Geodetic Earth Orbiting Satellite |
+| GEOSAT | Geodetic Satellite (Navy) |
+| GFO | Geosat Follow-on |
+| GLCM | Ground Launch Cruise Missile |
+| GRP | Guidance Replacement Program |
+| | |
+| HCMM | Heat Capacity Mapping Mission |
+| HP | Helicopter Pad |
+| | |
+| ICBM | Intercontinental Ballistic Missile |
+| IDF | Integrated Demonstration Flight |
+| IFT | Integrated Flight Test |
+| IPA | ICBM Penetration Aids |
+| IPMS | Inertial navigation system Performance Measurement System |
+| IRAS | Infrared Astronomical Satellite |
+| IRBM | Intermediate Range Ballistic Missile |
+| IRR | Industrial Research Rocket |
+| IRS | Interim Recovery System |
+| ITOS | Improved Tiros Operational Satellite |
+| IWST | Integrated Weapons System Training (RAF/SAC) |
+| | |
+| JAWSAT | Joint Air Force Academy Weber State |
+
+iv

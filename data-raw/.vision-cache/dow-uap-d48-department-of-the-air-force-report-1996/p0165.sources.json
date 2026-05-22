@@ -1,0 +1,12 @@
+{
+  "best": "gemini",
+  "sources": {
+    "gemini": {
+      "chars": 1368,
+      "imported_at": "2026-05-22T21:47:43.661Z",
+      "model": "manual-local-transcription",
+      "generated_at": "2026-05-08T18:33:51.650551+00:00",
+      "text_file": "p0165.gemini.txt"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+# Atlas IIAS Random-Attitude Failures through 280 sec
+## Breakup q-alpha in deg-lb/ft²
+
+[Graph showing "Percent in 5-deg sector (%)" on the Y-axis (logarithmic scale) vs "Angle From Flight Path (deg)" on the X-axis. Multiple lines represent different simulation parameters.]
+
+**Legend:**
+* ▼ no breakup
+* ● 20,000
+* ○ 10,000
+* □ 5,000
+* B = 5,000,000
+* A = 4.75
+* A = 5.65
+* A = 6.10
+* A = 6.30
+
+Figure 13. Atlas IIAS Simulation Results with B = 5,000,000
+
+9/10/96  &

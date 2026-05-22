@@ -1,0 +1,81 @@
+# Auto-merges PRs that contain ONLY claim files (contributions/*/claims/**).
+# Full contribution PRs (with OCR text or media) are not auto-merged.
+
+name: Auto-merge volunteer claim PRs
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  auto-merge-claims:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Get changed files
+        id: changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          FILES=$(gh pr view ${{ github.event.pull_request.number }} \
+            --json files \
+            --jq '.files[].path')
+          echo "Changed files:"
+          echo "$FILES"
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check if PR is claims-only
+        id: check
+        run: |
+          set -euo pipefail
+          ALL_CLAIMS=true
+          while IFS= read -r file; do
+            if [[ -z "$file" ]]; then
+              continue
+            fi
+            if [[ ! "$file" =~ ^contributions/.+/claims/.+\.json$ ]]; then
+              echo "Non-claim file detected: $file"
+              ALL_CLAIMS=false
+              break
+            fi
+          done <<< "${{ steps.changed.outputs.files }}"
+          echo "all_claims=$ALL_CLAIMS" >> $GITHUB_OUTPUT
+
+      - name: Add label needs-review and skip
+        if: steps.check.outputs.all_claims == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-label "needs-review" || true
+          echo "PR touches non-claim files — skipping auto-merge."
+
+      - name: Add label auto-claim, approve, and merge
+        if: steps.check.outputs.all_claims == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR="${{ github.event.pull_request.number }}"
+
+          gh pr edit "$PR" --add-label "auto-claim" || true
+
+          gh pr review "$PR" --approve \
+            --body "All changed files are claim files under \`contributions/*/claims/\`. Auto-approving."
+
+          gh pr merge "$PR" \
+            --squash \
+            --subject "claims: merge volunteer claim files from @${AUTHOR}" \
+            --delete-branch

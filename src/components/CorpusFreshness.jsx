@@ -17,6 +17,17 @@ function loadVersion(bust = false) {
   return _versionP;
 }
 
+let _workP = null;
+function loadWorkAvailable(bust = false) {
+  if (bust || !_workP) {
+    const t = bust ? `?t=${Date.now()}` : "";
+    _workP = fetch(`${import.meta.env.BASE_URL}work-available.json${t}`, { cache: bust ? "reload" : "default" })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .catch(() => null);
+  }
+  return _workP;
+}
+
 function fmtAgo(iso) {
   if (!iso) return "—";
   const ms = Date.now() - new Date(iso).getTime();
@@ -31,13 +42,15 @@ export default function CorpusFreshness({ compact = false }) {
   const [v, setV] = useState(null);
   const { stats: s, reload: reloadStats } = useCorpusStats();
   const [refreshing, setRefreshing] = useState(false);
+  const [workAvailable, setWorkAvailable] = useState(null);
 
   async function refresh(bust = false) {
     setRefreshing(true);
-    if (bust) { _versionP = null; }
+    if (bust) { _versionP = null; _workP = null; }
     try {
-      const [ver] = await Promise.all([loadVersion(bust), reloadStats(bust)]);
+      const [ver, work] = await Promise.all([loadVersion(bust), loadWorkAvailable(bust), reloadStats(bust)]);
       setV(ver);
+      setWorkAvailable(work);
     } finally { setRefreshing(false); }
   }
   useEffect(() => {
@@ -60,12 +73,19 @@ export default function CorpusFreshness({ compact = false }) {
   const contribCount   = s?.contributions?.contributors?.length ?? 0;
   const uncatalogued   = s?.gap?.uncataloguedRecords ?? null;
 
+  const inFlight = workAvailable?.totalPagesFullyClaimed ?? 0;
+
   if (compact) {
     return (
       <div className="px-3 sm:px-6 py-1.5 border-b border-emerald-900/40 bg-black/30 flex items-center justify-between gap-3 flex-wrap">
         <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
           {catalogued}/{inventoryTotal} records · {pagesIndexed?.toLocaleString()} pages · refreshed {ago}
+          {inFlight > 0 && (
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm border border-amber-700/60 bg-amber-950/40 text-amber-300 tracking-widest" title="Pages currently claimed by an active worker">
+              {inFlight} in-flight
+            </span>
+          )}
         </span>
         <button onClick={() => refresh(true)} disabled={refreshing}
           className="text-emerald-600 hover:text-amber-300 px-1.5 py-0.5 font-mono text-[10px] tracking-widest disabled:opacity-40">
@@ -104,6 +124,12 @@ export default function CorpusFreshness({ compact = false }) {
         {contribPages > 0 && (
           <span className="text-emerald-600" title="Pages contributed by outside volunteers via PRs">
             ·  <span className="text-amber-300">{contribPages}</span> from <span className="text-amber-300">{contribCount}</span> volunteer{contribCount === 1 ? "" : "s"}
+          </span>
+        )}
+        {inFlight > 0 && (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm border border-amber-700/60 bg-amber-950/40 text-amber-300 tracking-widest" title="Pages currently claimed by an active worker">
+            <span className="w-1 h-1 rounded-full bg-amber-400" />
+            {inFlight} in-flight
           </span>
         )}
         {uncatalogued > 0 && (

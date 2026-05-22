@@ -1,0 +1,34 @@
+Declassified by MG Richard A. Harrison
+USCENTCOM Chief of Staff
+Declassified on: 16 March 2026
+FOUO / Privacy Act applies
+
+[redacted]
+
+* Observation DTG: 022148:00ZNOV20
+* Aircraft Callsign: [redacted] 1.4a
+* Aircraft Location: 39RWK[redacted] 1.4a
+* Aircraft Heading: 110 T
+* Aircraft Altitude: FL220
+* Aircraft Airspeed: 107 KIAS
+* Relative Bearing or Clock Position: -
+* Range: -
+* Killbox & Keypad: -
+* Observed Activity Location: 39RWK[redacted] 1.4a
+* Observed Activity Description: UAP
+* Method of Observation: FMV
+
+GENTEXT/OBSERVATION
+
+* Gentext: [redacted] AT 2148Z, 1.4a OBSERVED AN ADDITIONAL UAP TRAVELING NW IVO 39RWK[redacted] 1.4a
+
+WEATHER
+
+* Weather:
+
+| 3.5c (b)(6) |
+| :--- |
+
+[redacted]
+
+USCENTCOM MDR 26-0028 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Approved for Release to AARO - FOUO / PA applies &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 03/16/26 000007

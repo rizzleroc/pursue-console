@@ -1,0 +1,3 @@
+Incident: 200a
+
+At about 1610, 17 Oct 1948 Mr Andrew N. Siler, a fisherman, heard the sound of a plane. Looking up he saw a silver-colored egg-shaped object that had the appearance of a small blimp traveling south at about 300 mph. No wings or tail structure was visible nor was there any smoke visible. No noise was heard from the object. The sound which attracted observer's attention came from a small piper cub type plane. Mr Siler did not watch to observe where the object went.

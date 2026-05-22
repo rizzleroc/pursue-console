@@ -1,0 +1,10 @@
+[Image: A map of the North Atlantic region showing a dense scatter plot of points representing "Atlas IIAS Impacts".]
+
+Atlas IIAS Impacts
+Random-Attitude Failures at 130 sec.
+Thrust to 280 sec.
+Breakup q-alpha = 5,000 deg-lb/ft²
+
+Figure 8. Atlas IIAS Impacts with Breakup
+
+9/10/96                                     40                                     RTI

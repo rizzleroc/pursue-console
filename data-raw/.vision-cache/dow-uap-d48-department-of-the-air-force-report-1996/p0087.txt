@@ -1,0 +1,7 @@
+important in the launch-area risk calculations provided an appropriate value of A is selected.
+
+Since a good data match within ±40° of the flight line was not found, the effect of this on ship-hit calculations was investigated. It was discovered that the values chosen for A and B made no significant difference, since the risks to shipping near the flight line are totally dominated by the Mode-4 failure response (see Section 6.2.3).
+
+Mode-5 baseline risks for Atlas and Delta were recomputed using newly derived values for (1) shaping constants A and B, (2) the overall vehicle failure probability, and (3) the relative probabilities of occurrence of the individual failure-response modes. Results were then compared with baseline risks computed in prior RTI studies. For Atlas, Mode-5 launch-area risks were reduced by a factor between 3 to 11, the exact value depending on the assumed breakup qα for the vehicle. For Delta, the reduction factor was between 4 and 75, with the exact value again depending on assumed breakup conditions.
+
+9/10/96  &

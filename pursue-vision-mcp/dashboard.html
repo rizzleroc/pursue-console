@@ -462,6 +462,9 @@
     </div>
   </div>
 
+  <div id="q-claimed-line" style="display:none;font-size:10px;letter-spacing:0.18em;color:var(--amber);margin-top:14px">
+    <span id="q-claimed-count">0</span> pages fully claimed (consensus in progress)
+  </div>
   <div class="queue-ts" id="q-ts"></div>
 </div>
 
@@ -803,6 +806,13 @@
       renderQueueDocs("q-rev-docs",  events, "reviewQueue",           "var(--amber)");
       renderQueueDocs("q-vis-docs",  events, "visualsNeedingContext", "var(--cyan)");
 
+      const totalClaimed = data.totalPagesFullyClaimed ?? 0;
+      const claimedLine = $("q-claimed-line");
+      if (claimedLine) {
+        $("q-claimed-count").textContent = totalClaimed;
+        claimedLine.style.display = totalClaimed > 0 ? "" : "none";
+      }
+
       const gen = data.generatedAt ? new Date(data.generatedAt).toISOString().replace("T"," ").slice(0,19) + " UTC" : "";
       $("q-ts").textContent = "queue generated " + gen + " · refreshes every 5 min";
     } catch {}
@@ -867,6 +877,14 @@
     renderQueueDocs("q-ocr-docs",  events, "queue",                 "var(--green)");
     renderQueueDocs("q-rev-docs",  events, "reviewQueue",           "var(--amber)");
     renderQueueDocs("q-vis-docs",  events, "visualsNeedingContext", "var(--cyan)");
+
+    // Claimed pages
+    const totalClaimed = data.totalPagesFullyClaimed ?? 0;
+    const claimedLine = $("q-claimed-line");
+    if (claimedLine) {
+      $("q-claimed-count").textContent = totalClaimed;
+      claimedLine.style.display = totalClaimed > 0 ? "" : "none";
+    }
 
     // Disable quick-launch buttons whose queue has nothing to do — saves
     // the user from clicking a button that just no-ops with "0 pages claimed".

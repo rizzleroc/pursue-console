@@ -1,0 +1,16 @@
+6.3.1 Optimum Mode-5 Shaping Constants
+
+The percentage of Delta vehicles that break up during simulated random-attitude turns are plotted against failure time in Figure 23. The same breakup q$\alpha$'s used in the Atlas IIAS calculations were used here. It can be seen from the figure that over 50% of the vehicles break up, either immediately or eventually, if a turn begins between about 10 and 115 seconds.
+
+**Figure 23. Delta-GEM Breakup Percentages**
+
+*   **Legend:**
+    *   Delta-GEM
+    *   q-alpha in deg-lb/ft$^2$
+    *   — q-alpha = 5,000
+    *   - - q-alpha = 10,000
+    *   - - - q-alpha = 20,000
+
+*(The chart plots Breakup Percent (%) on the Y-axis from 0 to 100, and Failure Time (sec) on the X-axis from 0 to 280.)*
+
+9/10/96 61 RTI

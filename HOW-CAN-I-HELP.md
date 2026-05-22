@@ -28,9 +28,13 @@ To submit a settlement: drop the corrected `.txt` into `contributions/<your-hand
 
 Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini, opens a PR with the transcripts. The setup is below.
 
+> The script automatically writes a claim file so other volunteers skip these pages. Claims last 2 hours for OCR. No manual action needed.
+
 ### 3. Screenshot the visuals + context *(open now · ~1 hour per slice)*
 
 Pages classified as containing visuals — photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, or diagrams — need page screenshots **plus the verbatim documentary context from the surrounding pages**. What introduces this image? What's the caption? What does the page after say about it?
+
+> The script automatically writes a claim file so other volunteers skip these pages. Claims last 24 hours for media capture. No manual action needed.
 
 For newspaper clippings, also transcribe the article body so it becomes its own searchable doc in the corpus.
 
@@ -136,6 +140,22 @@ The deliberate design goals:
 - **No API keys needed.** The bundled [`pursue-vision-mcp`](./pursue-vision-mcp/) daemon drives the volunteer's already-logged-in ChatGPT browser. The volunteer never gives us their credentials.
 - **Convergent transcription.** Multiple submissions for the same page are valuable signal, not duplicates. The grading pipeline scores agreement and prefers the most-corroborated text.
 - **All contributions visible.** Submitted, in-review, accepted, rejected — every interpretation is part of the public record. Rejected ones can be resubmitted; the validator gives concrete reasons.
+
+---
+
+## How claim tracking works
+
+When you run a volunteer script, it writes a claim file to `contributions/<handle>/claims/<eid>/p<NNNN>.json` and includes it in your PR. After merge, other volunteers' scripts see the claim and skip those pages automatically.
+
+Key rules:
+
+- **Claims are advisory.** The merged PR is the final arbiter of what's in the corpus — claims just reduce redundant effort.
+- **First 3 passes on any page are allowed** (consensus building — more independent transcriptions improve confidence).
+- **After 3 same-type passes, that slot is considered full.** New volunteers are routed to other pages.
+- **Different task types always coexist.** A vision OCR claim and a visual media claim on the same page don't block each other.
+- **Propagation latency is minutes**, not instant — claims become visible to others only after your PR is merged and the next deploy runs.
+
+Claim lifetimes: OCR/vision claims expire after **2 hours**; media/visual claims expire after **24 hours**. Expired claims are ignored.
 
 ---
 

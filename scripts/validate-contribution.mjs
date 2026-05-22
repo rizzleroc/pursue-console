@@ -105,6 +105,22 @@ async function collectContributions() {
       const childPath = path.join(hdir, child);
       if (!(await stat(childPath)).isDirectory()) continue;
 
+      // <handle>/claims/<eid>/p<NNNN>.json — volunteer claim files
+      if (child === "claims") {
+        for (const eid of await readdir(childPath)) {
+          const edir = path.join(childPath, eid);
+          if (!(await stat(edir)).isDirectory()) continue;
+          for (const f of await readdir(edir)) {
+            out.push({
+              handle, source: "claims", eid, file: f, fullPath: path.join(edir, f),
+              relPath: `contributions/${handle}/claims/${eid}/${f}`,
+              isClaim: true,
+            });
+          }
+        }
+        continue;
+      }
+
       // <handle>/media/<eid>/p<NNN>.{jpg,json} — image-extraction submissions
       if (child === "media") {
         for (const eid of await readdir(childPath)) {
@@ -205,6 +221,91 @@ async function validateMediaItem(file) {
   return issues;
 }
 
+// ---- Claim file validation ----
+// Path: contributions/<handle>/claims/<eid>/p<NNNN>.json
+// Schema: { <role>: [{ handle, claimed_at, lease_secs }] }
+const CLAIM_ROLES = new Set(["vision", "visual", "review", "revalidation"]);
+const VALID_LEASE_SECS = new Set([3600, 7200, 86400]);
+const GITHUB_HANDLE_RE = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+const VALID_EID_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
+const CLAIM_PAGE_RE = /^p\d{4}\.json$/;
+const MIN_CLAIMED_AT = 1_700_000_000;
+
+async function validateClaimFile(file) {
+  const issues = [];
+
+  // Rule 4: eid directory name must be valid
+  if (!VALID_EID_RE.test(file.eid)) {
+    issues.push(`invalid event id directory name "${file.eid}" (must be lowercase alphanumeric + hyphens)`);
+  }
+
+  // Rule 5: filename must match p\d{4}.json
+  if (!CLAIM_PAGE_RE.test(file.file)) {
+    issues.push(`invalid claim filename "${file.file}" (must match p\\d{4}.json)`);
+  }
+
+  // Rule 1: must be valid JSON
+  let data;
+  try {
+    data = JSON.parse(await readFile(file.fullPath, "utf8"));
+  } catch (e) {
+    return [`${file.relPath}: invalid JSON — ${e.message}`];
+  }
+
+  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+    return [`${file.relPath}: top-level value must be a JSON object`];
+  }
+
+  // Rule 2: must have at least one recognised role key
+  const presentRoles = Object.keys(data).filter(k => CLAIM_ROLES.has(k));
+  if (presentRoles.length === 0) {
+    issues.push(`${file.relPath}: must contain at least one of: ${[...CLAIM_ROLES].join(", ")}`);
+  }
+
+  const nowSecs = Math.floor(Date.now() / 1000);
+
+  // Rule 3: validate each entry in every role array
+  for (const role of presentRoles) {
+    const entries = data[role];
+    if (!Array.isArray(entries)) {
+      issues.push(`${file.relPath}: "${role}" must be an array`);
+      continue;
+    }
+    entries.forEach((entry, i) => {
+      const prefix = `${file.relPath}: ${role}[${i}]`;
+      if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
+        issues.push(`${prefix}: each entry must be an object`);
+        return;
+      }
+      // handle
+      if (typeof entry.handle !== "string" || !GITHUB_HANDLE_RE.test(entry.handle)) {
+        issues.push(`${prefix}: handle must be a valid GitHub handle (got ${JSON.stringify(entry.handle)})`);
+      }
+      // claimed_at
+      if (!Number.isInteger(entry.claimed_at)) {
+        issues.push(`${prefix}: claimed_at must be an integer unix timestamp`);
+      } else {
+        // Rule 6: reasonable unix timestamp
+        if (entry.claimed_at <= MIN_CLAIMED_AT) {
+          issues.push(`${prefix}: claimed_at ${entry.claimed_at} is too old (must be > ${MIN_CLAIMED_AT})`);
+        }
+        if (entry.claimed_at > nowSecs + 3600) {
+          issues.push(`${prefix}: claimed_at ${entry.claimed_at} is in the future (now=${nowSecs})`);
+        }
+      }
+      // lease_secs
+      if (!Number.isInteger(entry.lease_secs) || entry.lease_secs <= 0) {
+        issues.push(`${prefix}: lease_secs must be a positive integer`);
+      } else if (!VALID_LEASE_SECS.has(entry.lease_secs)) {
+        // Rule 7
+        issues.push(`${prefix}: lease_secs must be one of ${[...VALID_LEASE_SECS].join(", ")} (got ${entry.lease_secs})`);
+      }
+    });
+  }
+
+  return issues;
+}
+
 // ---- 3. Lightweight cosine on token-set overlap (proxy for embedding sim) ----
 // Used when comparing against the canonical .vision-cache page if it exists.
 function tokenSet(text) {
@@ -233,6 +334,21 @@ const out = { pass: [], review: [], reject: [] };
 
 for (const c of contribs) {
   const issues = [];
+
+  // Claim file — dedicated validator; failures are always errors
+  if (c.isClaim) {
+    const claimIssues = await validateClaimFile(c);
+    if (claimIssues.length) {
+      reject++;
+      out.reject.push({ ...c, quality: 0, vsCanonical: null, issues: claimIssues });
+      for (const issue of claimIssues) console.log(`  ✗ ${issue}`);
+    } else {
+      pass++;
+      out.pass.push({ ...c, quality: 1, vsCanonical: null, issues: [], note: "claim:ok" });
+      console.log(`  [ok] claim: ${c.eid}/${c.file}`);
+    }
+    continue;
+  }
 
   // Media submission — separate validator (schema + image presence + safety)
   if (c.isMedia) {
