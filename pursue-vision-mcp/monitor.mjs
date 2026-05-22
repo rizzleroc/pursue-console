@@ -671,6 +671,40 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { alive, port: state.daemonPort });
     }
 
+    // Visuals staging state — so the COMMIT VISUALS button reflects reality
+    // instead of always looking "ready". `committable` = filled templates that
+    // would actually produce a contribution (Title ≥4, Context ≥20, image
+    // present); `incomplete` = staged but not yet drafted/filled. When
+    // committable is 0 the dashboard disables the commit button.
+    if (req.method === "GET" && req.url === "/staging") {
+      const handle = state.handle || "Rizzleroc";
+      const base = path.join(HELPER_DIR, "media-staging", handle);
+      const sectionText = (t, name) => {
+        const m = t.match(new RegExp(`^#\\s+${name}\\s*$`, "m"));
+        if (!m) return "";
+        const rest = t.slice(m.index + m[0].length);
+        const nx = rest.search(/^#\s+/m);
+        return (nx >= 0 ? rest.slice(0, nx) : rest).replace(/<!--[\s\S]*?-->/g, "").trim();
+      };
+      let total = 0, committable = 0;
+      try {
+        for (const eid of await readdir(base)) {
+          let files; try { files = await readdir(path.join(base, eid)); } catch { continue; }
+          for (const f of files) {
+            if (!/^p\d+\.md$/i.test(f)) continue;
+            total++;
+            try {
+              const t = await readFile(path.join(base, eid, f), "utf8");
+              const img = existsSync(path.join(base, eid, f.replace(/\.md$/i, ".png")))
+                       || existsSync(path.join(base, eid, f.replace(/\.md$/i, ".jpg")));
+              if (img && sectionText(t, "Title").length >= 4 && sectionText(t, "Context").length >= 20) committable++;
+            } catch {}
+          }
+        }
+      } catch { /* no staging dir yet */ }
+      return sendJson(res, 200, { total, committable, incomplete: total - committable });
+    }
+
     // Delete TRULY-empty stub contributions (0-byte / whitespace-only) so
     // retries can happen. Failed runs leave behind empty placeholder files that
     // fool the "already submitted" check. Short-but-real OCR (e.g. "BOTTOM
