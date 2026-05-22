@@ -14,6 +14,7 @@
 
 import { readFile, readdir, writeFile, stat, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -183,6 +184,31 @@ for (const eid of await listDirs(VISUALS_DIR)) {
   }
 }
 
+// De-duplicate by IMAGE CONTENT. The same scan/photo is sometimes reproduced
+// across documents (e.g. a memo's photo appears in section-3 and section-7), so
+// two different (eid,page) tiles can be the exact same image. The library must
+// show each distinct image only once. We hash the actual image bytes and keep
+// the first occurrence; later byte-identical tiles are dropped. Items without an
+// image (metadata-only) are always kept (their id is already unique per page).
+const seenImageHash = new Map(); // md5 -> kept item id
+let droppedDuplicates = 0;
+const deduped = [];
+for (const it of items) {
+  if (it.imagePath) {
+    let h = null;
+    try { h = createHash("md5").update(await readFile(path.join(ROOT, "public", it.imagePath))).digest("hex"); }
+    catch { /* unreadable image — keep the item, can't dedup it */ }
+    if (h) {
+      const keptId = seenImageHash.get(h);
+      if (keptId) { droppedDuplicates++; continue; }   // identical image already in the library
+      seenImageHash.set(h, it.id);
+    }
+  }
+  deduped.push(it);
+}
+items.length = 0;
+items.push(...deduped);
+
 // Default sort: most recent classification first
 items.sort((a, b) => (b.classifiedAt || "").localeCompare(a.classifiedAt || ""));
 
@@ -198,6 +224,7 @@ await writeFile(OUT, JSON.stringify({
 }, null, 2) + "\n", "utf8");
 
 console.log(`[media-index] ${items.length} media items across ${Object.keys(byEvent).length} events`);
+if (droppedDuplicates) console.log(`[media-index] dropped ${droppedDuplicates} duplicate image(s) (same content under a different page)`);
 console.log(`[media-index] by kind:`);
 for (const [k, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {
   console.log(`               ${k.padEnd(22)} ${n}`);
