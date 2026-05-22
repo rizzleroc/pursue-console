@@ -28,6 +28,11 @@ queue 0**.
 - **Stale fallbacks:** the `162` inventory fallback (SemanticSearchView, LiveFeedView) → `173`.
 - **HelpView** no longer swallows a failed `corpus-stats.json` fetch entirely silently (warns; counts keep their placeholder).
 
+### Volunteer cockpit (Helmsman instrument)
+The live `pursue-vision-mcp/dashboard.html` panel a volunteer watches while their machine OCRs (served by `monitor.mjs` on :9224, styled per `design/HELMSMAN-PHOSPHOR.md`).
+- **CORPUS (GLOBAL) gauge was showing nonsense.** `volunteer.mjs` fed it `(queue.inventoryTotal || 162) - totalPagesNeeded` — but `work-available.json` has no `inventoryTotal` field, so it always used the stale `162` and then subtracted *pages* from *records*. `build-work-available.mjs` now emits whole-corpus `corpusPagesTotal` / `corpusPagesCompleted`, and the gauge reads pages-search-ready / total-corpus-pages (currently 3,390 / 3,394 ≈ 100%).
+- **Status dot now tracks daemon state.** `setStatus` computed a `dot` variable it never used (and couldn't — it tried to grab a `::after` pseudo-element via `firstChild`), so the pulsing dot stayed green even when the panel said OFFLINE/IDLE. The dot now recolors to match (green active · dim idle · rose offline) and freezes its ping when not processing — restoring the philosophy's rank-one "is it running?" signal.
+
 ### Docs reconciled to live counts
 - **README, HOW-CAN-I-HELP, JUDGE-STANDARD, PLAN-VISION-COMPLETION, SQL-MIGRATION-ROADMAP** all refreshed off the pre-2.0 framing (162 records / 597 tesseract pages / ~110 uncatalogued / ~900 chunks / 3,376 pages) to the live numbers.
 - **Broken `TRUSTED-TRANSCRIBERS.md` link removed (×2)** — HOW-CAN-I-HELP and JUDGE-STANDARD pointed at a file that doesn't exist (same class of bug 2.1 fixed for CONTRIBUTORS.md). Reworded to CONTRIBUTORS.md + informal/planned expedited review.
@@ -42,6 +47,7 @@ queue 0**.
 - **Fixed stale `index.html` social meta** — the `description`/`og`/`twitter` tags advertised the deleted "patterns, threads" views and "47 declassified records"; updated to current views + 121 catalogued records (3,394 pages).
 - **`volunteer.mjs --review` producer** documented as new ROADMAP **R8** (consumer wired in `import-contributions.mjs` + `judge-disputed.mjs`, producer absent) rather than built speculatively against an empty REVIEW queue.
 - `@unverified` end-to-end paths unchanged: `gemini-driver.mjs` round-trip, `volunteer-media.mjs` claim/commit, `import-contributions.mjs` media branch (R2).
+- **Cockpit `BREAK` status is consumer-wired, producer-absent** — `monitor.mjs` models `onBreak` (state + TUI) and `dashboard.html` renders a BREAK state, but `volunteer.mjs` never reports a break (it has no pacing-break logic). Left in place as a harmless forward hook; either wire volunteer pacing breaks to POST `onBreak`, or drop the branch. (Also: the cockpit pulls Geist/IBM Plex Mono from Google Fonts CDN — a local instrument that degrades to system monospace offline.)
 
 ## 2.1 — Punchlist sweep
 

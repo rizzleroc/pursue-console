@@ -53,15 +53,18 @@
   }
   .pulse-dot {
     position: relative; display: inline-block; width: 10px; height: 10px;
+    --dot: var(--green);   /* recolored by setStatus to track daemon state */
   }
   .pulse-dot::before {
     content: ''; position: absolute; inset: 0; border-radius: 50%;
-    background: var(--green); animation: ping 1.4s ease-out infinite;
+    background: var(--dot); animation: ping 1.4s ease-out infinite;
   }
   .pulse-dot::after {
     content: ''; position: absolute; inset: 1px; border-radius: 50%;
-    background: var(--green); box-shadow: 0 0 8px var(--green);
+    background: var(--dot); box-shadow: 0 0 8px var(--dot);
   }
+  /* OFFLINE/IDLE: stop the ping so a dead daemon doesn't look alive */
+  .pulse-dot.still::before { animation: none; opacity: 0; }
 
   /* TOP RAIL */
   .top-rail { display: grid; grid-template-columns: 1fr auto; gap: 24px; margin-bottom: 12px; }
@@ -287,7 +290,12 @@
   let lastSeen = 0;
   function setStatus(text, color = "var(--green)") {
     const el = $("status-text"); el.textContent = text; el.style.color = color;
-    const dot = $("status-dot").firstChild?.nextSibling; // ::after
+    // Recolor the pulse dot to match (rank-one "is it running?" signal) and
+    // freeze its ping when we're not actively processing.
+    const dot = $("status-dot");
+    dot.style.setProperty("--dot", color);
+    const alive = text === "ACTIVE" || text.startsWith("BREAK");
+    dot.classList.toggle("still", !alive);
     document.body.classList.toggle("idle", text === "IDLE");
   }
 
