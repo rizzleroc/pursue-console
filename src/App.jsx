@@ -11,6 +11,7 @@ import { ScanlineOverlay } from "./components/Primitives.jsx";
 import CorpusFreshness from "./components/CorpusFreshness.jsx";
 import Header from "./components/Header.jsx";
 import VolunteerModal from "./components/VolunteerModal.jsx";
+import LaunchOverlay from "./components/LaunchOverlay.jsx";
 import TimelineView from "./views/TimelineView.jsx";
 import AtlasView from "./views/AtlasView.jsx";
 import GlobeView from "./views/GlobeView.jsx";
@@ -39,6 +40,12 @@ export default function App() {
   // view change so subsequent dossier visits don't show a stale banner.
   const [selectionMatch, setSelectionMatch] = useState(null);
   const [volunteerOpen, setVolunteerOpen] = useState(false);
+  // One-time 2.0 launch overlay. Gate is read once on mount; closing the
+  // overlay writes the localStorage flag so it never returns on reload.
+  const [showLaunch, setShowLaunch] = useState(() => {
+    try { return localStorage.getItem("pursue:launch-2.0-seen") !== "1"; }
+    catch { return true; }
+  });
 
   const filtered = useMemo(() => {
     if (!query.trim()) return EVENTS;
@@ -152,6 +159,8 @@ export default function App() {
       </div>
 
       <VolunteerModal open={volunteerOpen} onClose={() => setVolunteerOpen(false)} onViewChange={handleViewChange} />
+
+      {showLaunch && <LaunchOverlay onClose={() => setShowLaunch(false)} />}
     </div>
   );
 }
