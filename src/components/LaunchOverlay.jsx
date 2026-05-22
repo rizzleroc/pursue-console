@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 
-// One-time launch overlay for the 2.0 drop. Shows the declassified DVIDS
-// sensor footage inline and hypes the release. Once dismissed it never
-// shows again (localStorage gate lives in App — this component just calls
-// onClose). Motion follows Emil Kowalski's playbook: ease-out entrances,
-// blur+scale reveals, staggered children, transform/opacity/filter only.
+// One-time launch overlay for the 2.0 drop. Hypes the release and links
+// out to the declassified DVIDS sensor footage. DVIDS can't be reliably
+// iframe-embedded on a keyless static site (WAF/whitelist), so each clip
+// is an IR-scope poster that opens the real video on dvidshub.net. Once
+// dismissed it never shows again (localStorage gate lives in App — this
+// component just calls onClose). Motion follows Emil Kowalski's playbook:
+// ease-out entrances, blur+scale reveals, staggered transform/opacity.
 
 const SEEN_KEY = "pursue:launch-2.0-seen";
 
@@ -216,18 +218,46 @@ export default function LaunchOverlay({ onClose }) {
           {/* Featured player */}
           <div className="lo-rise mt-6 grid lg:grid-cols-[1.6fr_1fr] gap-5" style={{ animationDelay: "200ms" }}>
             <div>
-              <div className="relative aspect-video w-full overflow-hidden rounded-sm border border-emerald-700/40 bg-black">
-                <iframe
-                  key={swapKey}
-                  className="lo-swap absolute inset-0 w-full h-full"
-                  src={`https://www.dvidshub.net/video/embed/${clip.videoId}`}
-                  title={`${clip.code} — ${clip.tag}`}
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
+              <a
+                key={swapKey}
+                href={`https://www.dvidshub.net/video/${clip.videoId}`}
+                target="_blank" rel="noopener noreferrer"
+                aria-label={`Play ${clip.code} — ${clip.tag} on DVIDS`}
+                className="lo-swap group relative block aspect-video w-full overflow-hidden rounded-sm border border-emerald-700/40 bg-[#020806]"
+              >
+                {/* IR-scope poster: scanlines + reticle glow */}
+                <div className="absolute inset-0" style={{
+                  backgroundImage:
+                    "radial-gradient(circle at 50% 46%, rgba(16,185,129,0.14), rgba(2,8,6,0) 62%)," +
+                    "repeating-linear-gradient(0deg, rgba(16,185,129,0.05) 0px, rgba(16,185,129,0.05) 1px, transparent 1px, transparent 3px)",
+                }} />
+                {/* corner brackets */}
+                <span className="absolute top-2 left-2 w-4 h-4 border-t border-l border-emerald-500/50" />
+                <span className="absolute top-2 right-2 w-4 h-4 border-t border-r border-emerald-500/50" />
+                <span className="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-emerald-500/50" />
+                <span className="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-emerald-500/50" />
+                {/* reticle crosshair */}
+                <svg className="absolute inset-0 w-full h-full text-emerald-500/25" viewBox="0 0 100 56" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <line x1="50" y1="0" x2="50" y2="56" stroke="currentColor" strokeWidth="0.3" />
+                  <line x1="0" y1="28" x2="100" y2="28" stroke="currentColor" strokeWidth="0.3" />
+                  <circle cx="50" cy="28" r="13" fill="none" stroke="currentColor" strokeWidth="0.4" />
+                  <circle cx="50" cy="28" r="22" fill="none" stroke="currentColor" strokeWidth="0.25" />
+                </svg>
+                {/* header chips */}
+                <div className="absolute top-2.5 left-3 text-[9px] tracking-[0.25em] text-emerald-500">▌ TRACK · {clip.code}</div>
+                <div className="absolute top-2.5 right-3 text-[9px] tracking-[0.25em] text-emerald-700">IR SENSOR FEED</div>
+                {/* play affordance */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5">
+                  <span className="flex items-center justify-center w-16 h-16 rounded-full border border-emerald-400/60 bg-emerald-950/40 backdrop-blur-sm transition-all duration-200 group-hover:scale-110 group-hover:border-emerald-300 group-hover:shadow-[0_0_28px_rgba(52,211,153,0.45)]">
+                    <svg width="22" height="24" viewBox="0 0 22 24" aria-hidden="true">
+                      <path d="M2 2 L20 12 L2 22 Z" fill="#6ee7b7" className="group-hover:fill-emerald-200" />
+                    </svg>
+                  </span>
+                  <span className="text-[10px] tracking-[0.3em] text-emerald-400 group-hover:text-emerald-100 transition-colors">PLAY ON DVIDS ↗</span>
+                </div>
+                {/* designation */}
+                <div className="absolute bottom-2.5 left-3 right-3 text-[11px] tracking-[0.16em] text-emerald-200 truncate">{clip.tag}</div>
+              </a>
               <div key={`meta-${swapKey}`} className="lo-swap mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className={`text-[9px] tracking-[0.25em] px-1.5 py-0.5 border rounded-sm ${FLAG_COLOR[clip.flag]}`}>{clip.flag.toUpperCase()}</span>
                 <span className="text-[12px] tracking-[0.18em] text-emerald-200">{clip.code} · {clip.tag}</span>
