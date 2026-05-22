@@ -185,13 +185,27 @@ async function claimPhase() {
   await mkdir(STAGING, { recursive: true });
   await mkdir(PDF_ROOT, { recursive: true });
 
-  console.log(`[claim] fetching ${QUEUE_URL}`);
-  // QUEUE_URL may be a local filesystem path (the monitor passes the freshly
-  // built public/work-available.json, which is fresher than GitHub Pages) or a
-  // remote http(s) URL. fetch() only handles http(s) — read local paths from disk.
-  const queue = /^https?:\/\//i.test(QUEUE_URL)
-    ? await (await fetch(QUEUE_URL)).json()
-    : JSON.parse(await readFile(QUEUE_URL, "utf8"));
+  // Load the work queue, preferring whichever of {the passed queue, the deployed
+  // remote} has the NEWER generatedAt. The monitor passes the local
+  // public/work-available.json, but that can be STALER than the deployed GitHub
+  // Pages copy (or fresher) — so trust the timestamp instead of assuming local
+  // always wins, otherwise a stale local file makes the job find "nothing fresh"
+  // even when real work exists. (fetch() only handles http(s); local = readFile.)
+  const REMOTE_QUEUE = "https://rizzleroc.github.io/pursue-console/work-available.json";
+  async function readQueue(src) {
+    try {
+      const q = /^https?:\/\//i.test(src)
+        ? await (await fetch(src + (src.includes("?") ? "" : "?t=" + Date.now()))).json()
+        : JSON.parse(await readFile(src, "utf8"));
+      return { q, ts: Date.parse(q.generatedAt) || 0, kind: /^https?:\/\//i.test(src) ? "remote" : "local" };
+    } catch { return null; }
+  }
+  const sources = [await readQueue(QUEUE_URL)];
+  if (QUEUE_URL !== REMOTE_QUEUE) sources.push(await readQueue(REMOTE_QUEUE));
+  const loaded = sources.filter(Boolean).sort((a, b) => b.ts - a.ts);
+  if (!loaded.length) { console.error("error: could not load any work queue"); process.exit(1); }
+  const queue = loaded[0].q;
+  console.log(`[claim] using ${loaded[0].kind} queue (newer of ${loaded.length})`);
   if (!queue.byEvent) { console.error("error: queue missing byEvent"); process.exit(1); }
   console.log(`[claim] queue gen ${queue.generatedAt} · ${queue.totalPagesNeedingVisualContext || 0} pages need visual context`);
 
