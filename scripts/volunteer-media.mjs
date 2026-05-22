@@ -217,55 +217,6 @@ async function draftContext(imagePaths, claim, hasPrev, hasNext) {
   throw lastErr;
 }
 
-// Ask the vision daemon to draft documentary context for a rendered page.
-// imagePaths is [prevPagePng?, thisPagePng, nextPagePng?] — surrounding pages
-// carry the captions/explanations that make the context meaningful, which is
-// why the template asks "what does the page BEFORE/AFTER say?".
-// Uses http.request (not fetch) for the same reason volunteer.mjs does — no
-// hard headers timeout, so ChatGPT can take as long as it needs.
-async function draftContext(imagePaths, claim, hasPrev, hasNext) {
-  const http = await import("node:http");
-  const order = [];
-  if (hasPrev) order.push(`Image 1 = the page BEFORE (page ${claim.page - 1})`);
-  order.push(`Image ${hasPrev ? 2 : 1} = the target page (page ${claim.page}, the one with the ${claim.kind})`);
-  if (hasNext) order.push(`Image ${imagePaths.length} = the page AFTER (page ${claim.page + 1})`);
-  const prompt = [
-    `These are consecutive pages from a declassified government UFO document (event "${claim.eid}").`,
-    order.join("; ") + ".",
-    `The target page contains a ${claim.kind}${claim.suggestedTitle ? ` — "${claim.suggestedTitle}"` : ""}.`,
-    ``,
-    `Write the DOCUMENTARY CONTEXT for the ${claim.kind} on the target page, using VERBATIM quotes only — no summary, no interpretation:`,
-    `- Any caption or label on or beside the image itself.`,
-    `- What the page BEFORE says that introduces or explains this image.`,
-    `- What the page AFTER says that refers back to it.`,
-    `- Stamps, classification markings, dates, reference numbers near the image.`,
-    `Quote exactly. Mark unreadable text [illegible]. Output plain text only — no preamble, no markdown headers.`,
-  ].join("\n");
-  const payload = JSON.stringify({ filePaths: imagePaths, prompt, freshChat: true, timeoutMs: 1_800_000 });
-  const u = new URL(`${DAEMON}/chat-with-files`);
-  const j = await new Promise((resolve, reject) => {
-    const req = http.request({
-      hostname: u.hostname, port: u.port || 80, path: u.pathname, method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(payload),
-        Authorization: `Bearer ${DAEMON_TOKEN}`,
-      },
-    }, res => {
-      let data = "";
-      res.on("data", c => { data += c; });
-      res.on("end", () => {
-        if (res.statusCode >= 400) return reject(new Error(`daemon HTTP ${res.statusCode}: ${data.slice(0, 160)}`));
-        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(`daemon JSON parse: ${data.slice(0, 100)}`)); }
-      });
-    });
-    req.on("error", reject);
-    req.write(payload);
-    req.end();
-  });
-  return (j.text ?? j.result?.text ?? j.output ?? "").trim();
-}
-
 // =====================================================================
 // CLAIM PHASE
 // =====================================================================
