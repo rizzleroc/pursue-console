@@ -155,7 +155,7 @@ async function draftContext(imagePaths, claim, hasPrev, hasNext) {
   ].join("\n");
   const payload = JSON.stringify({ filePaths: imagePaths, prompt, freshChat: true, timeoutMs: 1_800_000 });
   const u = new URL(`${DAEMON}/chat-with-files`);
-  const j = await new Promise((resolve, reject) => {
+  const attempt = () => new Promise((resolve, reject) => {
     const req = http.request({
       hostname: u.hostname, port: u.port || 80, path: u.pathname, method: "POST",
       headers: {
@@ -175,7 +175,27 @@ async function draftContext(imagePaths, claim, hasPrev, hasNext) {
     req.write(payload);
     req.end();
   });
-  return (j.text ?? j.result?.text ?? j.output ?? "").trim();
+  // Image upload to the browser LLM is occasionally flaky — the model doesn't
+  // acknowledge the attachment, the reply times out, or it comes back empty.
+  // Retry a few times with backoff; freshChat:true means each attempt re-uploads
+  // into a clean chat, so a stuck upload doesn't poison the retry.
+  const MAX_ATTEMPTS = 3;
+  let lastErr;
+  for (let n = 1; n <= MAX_ATTEMPTS; n++) {
+    try {
+      const j = await attempt();
+      const text = (j.text ?? j.result?.text ?? j.output ?? "").trim();
+      if (text) return text;
+      lastErr = new Error("daemon returned empty text (upload may not have attached)");
+    } catch (e) {
+      lastErr = e;
+    }
+    if (n < MAX_ATTEMPTS) {
+      process.stdout.write(`(upload retry ${n}/${MAX_ATTEMPTS - 1}) `);
+      await new Promise(r => setTimeout(r, 2000 * n));
+    }
+  }
+  throw lastErr;
 }
 
 // =====================================================================

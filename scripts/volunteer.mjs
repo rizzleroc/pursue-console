@@ -30,12 +30,12 @@
 //     2  partial completion (some pages succeeded, some failed)
 
 import { readFile, writeFile, mkdir, readdir, rename } from "node:fs/promises";
-import { existsSync, createReadStream } from "node:fs";
-import http from "node:http";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { spawn } from "node:child_process";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+import { getPdfjsAssetUrls } from "./lib/pdfjs-assets.mjs";
 // pdfjs's nested canvas (0.1.x), not the top-level 1.0.x — keeps the
 // renderer compatible with pages that have complex vector content.
 // See backfill-media-renders.mjs for the failure mode.
@@ -125,9 +125,14 @@ await checkGhAuth();
 
 // ----- step 1: fetch the work queue -----
 console.log(`[volunteer] fetching ${QUEUE_URL}`);
-const queueRes = await fetch(QUEUE_URL);
-if (!queueRes.ok) { console.error(`error: queue fetch HTTP ${queueRes.status}`); process.exit(1); }
-const queue = await queueRes.json();
+let queue;
+if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
+  const queueRes = await fetch(QUEUE_URL);
+  if (!queueRes.ok) { console.error(`error: queue fetch HTTP ${queueRes.status}`); process.exit(1); }
+  queue = await queueRes.json();
+} else {
+  queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
+}
 console.log(`[volunteer] queue gen ${queue.generatedAt} · ${queue.totalDocsRemaining} docs · ${queue.totalPagesNeeded} pages need vision OCR`);
 
 // ----- step 2: pick a slice -----
@@ -233,31 +238,12 @@ for (const c of claims) {
 const live = claims.filter(c => !c.skip);
 
 // ----- step 4: render + OCR via daemon -----
-// pdfjs's isValidFetchUrl() rejects file:// URLs (only accepts http/https), so
-// useWorkerFetch is never enabled and wasm/font loading silently fails. Serve
-// the pdfjs-dist assets over a local HTTP server so the URLs pass validation.
-const PDFJS_DIST_DIR = path.join(ROOT, "node_modules/pdfjs-dist");
-const assetServer = http.createServer((req, res) => {
-  const safePath = path.normalize(decodeURIComponent(req.url)).replace(/^[/\\]+/, "");
-  const filePath = path.join(PDFJS_DIST_DIR, safePath);
-  if (!filePath.startsWith(PDFJS_DIST_DIR + path.sep) && filePath !== PDFJS_DIST_DIR) {
-    res.writeHead(403); return res.end();
-  }
-  const ct = filePath.endsWith(".wasm") ? "application/wasm" : "application/octet-stream";
-  res.writeHead(200, { "Content-Type": ct });
-  createReadStream(filePath).on("error", () => res.end()).pipe(res);
-});
-await new Promise(resolve => assetServer.listen(0, "127.0.0.1", resolve));
-const { port: assetPort } = assetServer.address();
-console.log(`[volunteer] pdfjs asset server → http://127.0.0.1:${assetPort}/`);
-
 // pdfjs creates `new Path2D()` from whatever is in scope; @napi-rs/canvas's
 // clip/fill only accept their own Path2D class. Wire it up before import.
 globalThis.Path2D = Path2D;
 globalThis.DOMMatrix = DOMMatrix;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL  = `http://127.0.0.1:${assetPort}/wasm/`;
-const PDFJS_FONTS_URL = `http://127.0.0.1:${assetPort}/standard_fonts/`;
+const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = getPdfjsAssetUrls();
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }
@@ -317,14 +303,30 @@ function splitVisuals(raw) {
 async function callDaemon(filePaths) {
   const isBatch = filePaths.length > 1;
   const prompt = isBatch ? batchPrompt(filePaths.length) : PROMPT_SINGLE;
-  const r = await fetch(`${DAEMON}/chat-with-files`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
-    body: JSON.stringify({ provider: PROVIDER, filePaths, prompt, freshChat: true, timeoutMs: 600_000 }),
-  });
-  if (!r.ok) throw new Error(`daemon HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
-  const j = await r.json();
-  const raw = j.text ?? j.result?.text ?? j.output ?? "";
+  const body = JSON.stringify({ provider: PROVIDER, filePaths, prompt, freshChat: true, timeoutMs: 600_000 });
+  // Image upload to the browser LLM is occasionally flaky (HTTP 500 "upload
+  // didn't acknowledge", reply timeout, transient network drop). Retry transient
+  // failures with backoff; freshChat:true re-uploads into a clean chat each time.
+  // A batch section-count mismatch is NOT transient — it's thrown below and
+  // propagates so the caller falls back to single-page calls.
+  let raw;
+  for (let n = 1; ; n++) {
+    try {
+      const r = await fetch(`${DAEMON}/chat-with-files`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${TOKEN}` },
+        body,
+      });
+      if (!r.ok) throw new Error(`daemon HTTP ${r.status}: ${(await r.text()).slice(0,200)}`);
+      const j = await r.json();
+      raw = j.text ?? j.result?.text ?? j.output ?? "";
+      break;
+    } catch (e) {
+      if (n >= 3) throw e;
+      console.log(`    ↻ upload retry ${n}/2 — ${e.message.slice(0, 70)}`);
+      await new Promise(res => setTimeout(res, 2000 * n));
+    }
+  }
   if (!isBatch) return [splitVisuals(raw)];
   const sepRe = new RegExp(`\\n?\\s*${BATCH_SEP.replace(/[<>]/g, c => "\\" + c)}\\s*\\n?`, "i");
   const sections = raw.split(sepRe);
@@ -345,7 +347,7 @@ for (const c of live) {
   const doc = await pdfjs.getDocument({
     data: new Uint8Array(pdfBuf),
     useSystemFonts: false, disableFontFace: true,
-    useWorkerFetch: true,
+    useWorkerFetch: false,
     wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL,
   }).promise;
   const docDir = path.join(CONTRIB_ROOT, c.eid);
@@ -458,7 +460,6 @@ await reportProgress({
   recent: sessionRecent.slice(),
 });
 
-assetServer.close();
 const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);
 console.log(`[volunteer] files at: ${CONTRIB_ROOT}`);
