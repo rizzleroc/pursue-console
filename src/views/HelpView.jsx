@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText } from "../components/Primitives.jsx";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // HELP view — the "How can I help?" tab.
 //
@@ -19,7 +20,7 @@ const C = {
 
 export default function HelpView({ onViewChange }) {
   const [queue, setQueue] = useState(null);
-  const [stats, setStats] = useState(null);
+  const { stats, error: statsError } = useCorpusStats();
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");  // "all" | "small" | "big"
   const [copied, setCopied] = useState("");
@@ -29,9 +30,14 @@ export default function HelpView({ onViewChange }) {
       .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(setQueue)
       .catch(e => setError(e.message));
-    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
-      .then(r => r.ok ? r.json() : null).then(setStats).catch(() => {});
   }, []);
+
+  // Non-fatal: the Priority-card counts fall back to their "—" placeholder
+  // when stats is null. Warn so the failure isn't silent (the hook leaves
+  // stats null on failure and surfaces the reason via `error`).
+  useEffect(() => {
+    if (statsError) console.warn("[help] corpus-stats.json fetch failed:", statsError);
+  }, [statsError]);
 
   const docs = useMemo(() => {
     if (!queue) return [];

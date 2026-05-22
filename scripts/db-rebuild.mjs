@@ -410,6 +410,18 @@ for (const eidDir of (await existsDir(VIS_CACHE)) ? await readdir(VIS_CACHE) : [
   }
 }
 
+// Mark pdfjs pages: any event whose text/manifest.json source is "pdfjs"
+// (or "mixed") counts each of its pages as has_pdfjs=1. We can't know which
+// page-numbers without re-opening the PDF, so this is a per-event flag we
+// project across that event's rows rather than enumerate per page.
+const pdfjsEvents = new Set();
+try {
+  const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
+  for (const [eid, info] of Object.entries(manifest)) {
+    if (info.source === "pdfjs" || info.source === "mixed") pdfjsEvents.add(eid);
+  }
+} catch {}
+
 // Flush pageMap → pages table
 const pageRows = [];
 for (const [eid, m] of pageMap) {
@@ -418,7 +430,7 @@ for (const [eid, m] of pageMap) {
     const best = r._sidecarBest || (r.has_vision ? "gpt-vision" : r.has_ocr ? "ocr" : null);
     pageRows.push({
       event_id: eid, page_num: pn,
-      has_pdfjs: 0,
+      has_pdfjs: pdfjsEvents.has(eid) ? 1 : 0,
       has_ocr: r.has_ocr, has_vision: r.has_vision, has_visuals: r.has_visuals,
       has_gemini: r._hasGemini || 0,
       has_gpt_vision: r._hasGptVision || (r.has_vision && !r._hasGemini && !r._hasHuman ? 1 : 0),
@@ -435,18 +447,6 @@ for (const [eid, m] of pageMap) {
   }
 }
 db.transaction((rs) => { for (const r of rs) insPage.run(r); })(pageRows);
-
-// Mark pdfjs pages: any event whose text/manifest.json source is "pdfjs"
-// counts each of its pages as has_pdfjs=1. We can't know which page-numbers
-// without re-opening the PDF, so this is a per-event flag we project across
-// rows in dashboards rather than enumerate.
-const pdfjsEvents = new Set();
-try {
-  const manifest = JSON.parse(await readFile(path.join(ROOT, "public/text/manifest.json"), "utf8"));
-  for (const [eid, info] of Object.entries(manifest)) {
-    if (info.source === "pdfjs" || info.source === "mixed") pdfjsEvents.add(eid);
-  }
-} catch {}
 
 // ---- runs: append a row for this rebuild ----
 db.prepare(`

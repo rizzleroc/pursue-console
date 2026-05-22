@@ -14,7 +14,7 @@ If the validators say "pass," your work goes in. If they say "review," a maintai
 
 > "To make it searchable you need to index this using FAISS. Yes there are many deep patterns, here data is complex, hence insight will not be linear after all." — *feedback that triggered this document*
 
-The corpus is small (~900 vector chunks today) but each chunk participates in semantic search across the whole record set. A single bad submission — hallucinated text, wrong-page paste, OCR mojibake re-uploaded — polluted at the chunk level surfaces in unrelated queries. Better to gate at intake than apologize forever.
+The corpus is still modest (~5,584 vector chunks today) but each chunk participates in semantic search across the whole record set. A single bad submission — hallucinated text, wrong-page paste, OCR mojibake re-uploaded — polluted at the chunk level surfaces in unrelated queries. Better to gate at intake than apologize forever.
 
 The data is also genuinely non-linear: the same UAP event is described differently by FBI, NASA, and CENTCOM. We don't enforce a single "correct" transcription. Multiple corroborating transcriptions of the same page are *additional signal*, not duplicates — the system can average them. What we DO enforce is that each individual submission is itself trustworthy.
 
@@ -156,6 +156,6 @@ The standard is itself versioned in this file. Substantive changes (thresholds, 
 
 ## Credit
 
-Contributors whose submissions pass are credited in the commit history and `CONTRIBUTORS.md`. High-volume contributors who consistently pass on the first try are added to a `TRUSTED-TRANSCRIBERS.md` and gain expedited review for `? review`-band files.
+Contributors whose submissions pass are credited in the commit history and `CONTRIBUTORS.md`. High-volume contributors who consistently pass on the first try are recognized in `CONTRIBUTORS.md` and may gain expedited review for `? review`-band files — an informal, planned mechanism rather than a separate roster.
 
 Reviewers are credited similarly. The goal is for the standard to be transparent enough that any reasonable reviewer reaches the same verdict as any other.

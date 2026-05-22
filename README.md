@@ -3,7 +3,7 @@
 ![PURSUE Console](./public/og-card.png)
 
 > **An open, community-built investigation desk for the [war.gov/UFO Release 01](https://www.war.gov/UFO) disclosure.**
-> *Department of War, May 8 2026 — 162 records. All cases UNRESOLVED.*
+> *Department of War, May 8 2026 — 173 records. All cases UNRESOLVED.*
 
 [![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
 [![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml)
@@ -27,10 +27,10 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 | | |
 |---|---|
 | **Records inventoried** | 173 (121 catalogued · 52 awaiting metadata) |
-| **Pages transcribed** | 3,376 across 65 events |
+| **Pages transcribed** | 3,394 across 65 events |
 | **Per source** | 3,370 Gemini · 427 GPT-vision · 4 OCR · 18 contributor-submitted |
 | **Multi-source pages** | 425 (cross-checked for agreement) |
-| **Review queue** | 19 pages flagged for human eyes (low cross-source agreement) |
+| **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
 ---
 
