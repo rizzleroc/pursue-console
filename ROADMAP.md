@@ -169,6 +169,24 @@ re-OCR compute rather than hand-typing.
 
 ---
 
+---
+
+## R9 · Security review residuals (from the 2.2 sweep)
+
+The [2.2 security review](./CHANGELOG.md) closed every actionable hardening item. These are the residual / accepted-risk items it surfaced — none is currently exploitable in this app's threat model (static-site, fork-and-PR, localhost-only daemon), but each is worth revisiting if the architecture changes.
+
+| | What | Why deferred / accepted |
+|---|---|---|
+| S1 | **Monitor `POST /progress` auth is optional** (`pursue-vision-mcp/monitor.mjs:566`). `PURSUE_MONITOR_TOKEN` is enforced when set but defaults to no auth. | Bound to `127.0.0.1` only; worst case is a local process injecting cosmetic dashboard state. Making the token mandatory is a behavior change for existing local setups — do it (or default-generate a token like the daemon does) when the monitor is ever exposed beyond localhost. |
+| S2 | **SSRF guard doesn't resolve bare hostnames** (`scripts/safe-fetch.mjs`). Scheme + literal-IP + per-redirect checks are enforced, but a hostname whose DNS points at a private IP (rebinding) would pass. | Download URLs are maintainer-curated (all `https://www.war.gov` today). Add DNS resolution + post-resolve IP checks only if downloads ever accept untrusted/user-supplied URLs. |
+| S3 | **CI installs the fork's lockfile** (`validate-contribution.yml`). Now runs with `--ignore-scripts`, but still resolves the PR's `package*.json`. | Token is read-only and scripts are disabled, so blast radius is small. Consider `npm ci` against the base lockfile + flagging PRs that touch `package*.json` for manual review if dependency-confusion ever becomes a concern. |
+| S4 | **No automated secret-scanning / dependency-audit gate in CI.** The 2.2 review was manual. | Low churn today. When contributor volume grows, add a `gitleaks` (or GitHub secret-scanning) + `npm audit --audit-level=high` gate so regressions are caught without a manual sweep. |
+
+**Owner:** revisit S1/S2 if the daemon or fetchers ever take untrusted input; S3/S4 when contributor volume justifies the CI cost.
+
+---
+
+_Updated 2026-05-22: added R9 (security review residuals) after the 2.2 sweep._
 _Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._
 _Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._

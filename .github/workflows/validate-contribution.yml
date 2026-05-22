@@ -25,7 +25,9 @@ jobs:
           # (requirements.txt / pyproject.toml) at repo root. Without one
           # the action fails the whole job before any validator runs, which
           # is what burned PR #3 (both gates reported "(no output)").
-      - run: npm install --no-audit --no-fund
+      # --ignore-scripts: a fork PR can edit package.json/package-lock.json,
+      # so never run dependency lifecycle scripts during the validation install.
+      - run: npm install --no-audit --no-fund --ignore-scripts
 
       - name: Ensure wordlist (Gate 3)
         run: |

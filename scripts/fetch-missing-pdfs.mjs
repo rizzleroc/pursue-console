@@ -14,6 +14,7 @@ import { readFile, mkdir, writeFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { safeFetch } from "./safe-fetch.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -68,11 +69,13 @@ for (let i = 0; i < missing.length; i++) {
   // Save under <eid>.pdf when we have a catalogued event id (so the
   // classifier's filename heuristic finds it). Fall back to the
   // upstream filename.
-  const dstName = r.event_id ? `${r.event_id}.pdf` : r.filename;
+  // basename() strips any directory components from the upstream-supplied
+  // filename so a crafted inventory row can't write outside data-raw/.
+  const dstName = path.basename(r.event_id ? `${r.event_id}.pdf` : r.filename);
   const dst = path.join(RAW, dstName);
   process.stdout.write(`[${i+1}/${missing.length}] ${dstName.padEnd(50)} `);
   try {
-    const res = await fetch(r.url, { redirect: "follow", signal: AbortSignal.timeout(120_000) });
+    const res = await safeFetch(r.url, { signal: AbortSignal.timeout(120_000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = Buffer.from(await res.arrayBuffer());
     await writeFile(dst, buf);
