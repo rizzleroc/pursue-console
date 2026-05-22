@@ -7,6 +7,9 @@ import { GlitchText } from "../components/Primitives.jsx";
 // to that page in DOSSIER (no scrolling required).
 
 const KIND_LABELS = {
+  // Release videos (DVIDS sensor footage). Listed first so the footage is
+  // the first thing the library surfaces. These tiles link out to DVIDS.
+  "video":                 "VIDEO / FOOTAGE",
   "photograph":            "PHOTOGRAPH",
   "hand-drawing":          "HAND DRAWING",
   "photocopied-negative":  "PHOTOCOPIED NEGATIVE",
@@ -23,6 +26,7 @@ const KIND_LABELS = {
 const KIND_COLORS = {
   // Distinct hues per kind so the grid reads as a color taxonomy.
   // All within the project palette (no new colors introduced).
+  "video":                 { dot: "bg-blue-400",    text: "text-blue-300",    ring: "ring-blue-500/40" },
   "photograph":            { dot: "bg-cyan-400",    text: "text-cyan-300",    ring: "ring-cyan-500/40" },
   "hand-drawing":          { dot: "bg-amber-400",   text: "text-amber-300",   ring: "ring-amber-500/40" },
   "photocopied-negative":  { dot: "bg-zinc-400",    text: "text-zinc-300",    ring: "ring-zinc-500/40" },
@@ -33,6 +37,38 @@ const KIND_COLORS = {
 };
 
 const ALL_KINDS = Object.keys(KIND_LABELS);
+
+// IR-scope poster for video tiles — reticle + scanlines + play affordance.
+// DVIDS clips can't be embedded, so this stands in for a thumbnail and the
+// whole tile/modal links out to dvidshub.net.
+function VideoPoster({ label, big }) {
+  return (
+    <div className="relative w-full h-full bg-[#020806] overflow-hidden">
+      <div className="absolute inset-0" style={{
+        backgroundImage:
+          "radial-gradient(circle at 50% 46%, rgba(59,130,246,0.16), rgba(2,8,6,0) 62%)," +
+          "repeating-linear-gradient(0deg, rgba(59,130,246,0.05) 0px, rgba(59,130,246,0.05) 1px, transparent 1px, transparent 3px)",
+      }} />
+      <svg className="absolute inset-0 w-full h-full text-blue-400/25" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="0" x2="50" y2="100" stroke="currentColor" strokeWidth="0.4" />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.4" />
+        <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" strokeWidth="0.5" />
+      </svg>
+      <span className="absolute top-1.5 left-1.5 w-3 h-3 border-t border-l border-blue-400/50" />
+      <span className="absolute top-1.5 right-1.5 w-3 h-3 border-t border-r border-blue-400/50" />
+      <span className="absolute bottom-1.5 left-1.5 w-3 h-3 border-b border-l border-blue-400/50" />
+      <span className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b border-r border-blue-400/50" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <span className={`flex items-center justify-center rounded-full border border-blue-400/60 bg-blue-950/40 transition-all group-hover:scale-110 group-hover:border-blue-300 ${big ? "w-16 h-16" : "w-10 h-10"}`}>
+          <svg width={big ? 20 : 13} height={big ? 22 : 15} viewBox="0 0 22 24" aria-hidden="true">
+            <path d="M2 2 L20 12 L2 22 Z" fill="#93c5fd" />
+          </svg>
+        </span>
+        <span className={`tracking-[0.25em] text-blue-300 group-hover:text-blue-100 transition-colors ${big ? "text-[10px]" : "text-[8px]"}`}>{label || "PLAY ON DVIDS ↗"}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function MediaView({ onSelect }) {
   const [data, setData] = useState(null);
@@ -59,7 +95,9 @@ export default function MediaView({ onSelect }) {
     if (!data?.items) return [];
     const q = query.trim().toLowerCase();
     return data.items.filter(it => {
-      if (!includePlaceholders && !it.imagePath) return false;
+      // Videos have no local image but must always be visible — they're
+      // the release footage, not a metadata-only placeholder.
+      if (!includePlaceholders && !it.imagePath && it.kind !== "video") return false;
       if (!filterKinds.has(it.kind)) return false;
       if (filterAgency !== "all" && (it.agency || "—") !== filterAgency) return false;
       if (filterEvent !== "all" && it.eventId !== filterEvent) return false;
@@ -73,7 +111,7 @@ export default function MediaView({ onSelect }) {
     if (!data?.items) return { withImage: 0, placeholder: 0 };
     return data.items.reduce((acc, it) => {
       if (it.imagePath) acc.withImage++;
-      else acc.placeholder++;
+      else if (it.kind !== "video") acc.placeholder++;   // videos aren't placeholders
       return acc;
     }, { withImage: 0, placeholder: 0 });
   }, [data]);
@@ -87,7 +125,7 @@ export default function MediaView({ onSelect }) {
     if (!data?.items) return {};
     const out = {};
     for (const it of data.items) {
-      if (!includePlaceholders && !it.imagePath) continue;
+      if (!includePlaceholders && !it.imagePath && it.kind !== "video") continue;
       out[it.kind] = (out[it.kind] || 0) + 1;
     }
     return out;
@@ -228,7 +266,9 @@ export default function MediaView({ onSelect }) {
             <button key={it.id} onClick={() => setFocused(it)}
               className={`group block text-left bg-black/40 border border-emerald-900/40 hover:${c.ring} hover:ring-2 hover:border-transparent rounded-sm overflow-hidden transition-all`}>
               <div className="aspect-[3/4] bg-black overflow-hidden">
-                {it.thumbnailPath ? (
+                {it.kind === "video" ? (
+                  <VideoPoster />
+                ) : it.thumbnailPath ? (
                   <img src={`${import.meta.env.BASE_URL}${it.thumbnailPath}`} alt={it.title || it.kind}
                     className="w-full h-full object-cover opacity-90 group-hover:opacity-100" loading="lazy" />
                 ) : (
@@ -236,7 +276,7 @@ export default function MediaView({ onSelect }) {
                   // transcript marker for an event we don't have the PDF
                   // for). Show a placeholder + the description so the
                   // metadata is still useful.
-                  <div className={`w-full h-full flex flex-col items-center justify-center p-3 ${c.bg || "bg-emerald-950/30"}`}>
+                  <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-emerald-950/30">
                     <span className={`w-2 h-2 rounded-full ${c.dot} mb-2`} />
                     <span className={`font-mono text-[9px] tracking-widest ${c.text} opacity-70 mb-1`}>NO LOCAL IMAGE</span>
                     <span className={`font-mono text-[10px] ${c.text} opacity-90 text-center line-clamp-4`}>
@@ -254,7 +294,7 @@ export default function MediaView({ onSelect }) {
                   {it.title || it.description || `page ${it.page}`}
                 </div>
                 <div className="font-mono text-[9px] text-emerald-700 mt-0.5 truncate">
-                  {it.eventTitle} · p{it.page}
+                  {it.kind === "video" ? `${it.eventTitle} · DVIDS` : `${it.eventTitle} · p${it.page}`}
                 </div>
               </div>
             </button>
@@ -279,9 +319,16 @@ export default function MediaView({ onSelect }) {
                 <span className="font-mono text-[10px] text-emerald-700">·</span>
                 <span className="font-mono text-[11px] text-emerald-200 truncate">{focused.eventTitle}</span>
                 <span className="font-mono text-[10px] text-emerald-700">·</span>
-                <span className="font-mono text-[10px] text-emerald-500">p{focused.page}</span>
+                <span className="font-mono text-[10px] text-emerald-500">{focused.kind === "video" ? "DVIDS" : `p${focused.page}`}</span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {focused.kind === "video" && (
+                  <a href={focused.dvidsUrl || `https://www.dvidshub.net/video/${focused.videoId}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="font-mono text-[10px] tracking-widest border border-blue-600/60 text-blue-300 hover:bg-blue-900/30 px-2 py-1 rounded-sm">
+                    PLAY ON DVIDS ↗
+                  </a>
+                )}
                 {onSelect && (
                   <button
                     onClick={() => onSelect(
@@ -304,7 +351,19 @@ export default function MediaView({ onSelect }) {
               </div>
             </div>
             <div className="flex-1 overflow-auto bg-black flex items-center justify-center p-6 min-h-[40vh]">
-              {focused.imagePath ? (
+              {focused.kind === "video" ? (
+                <div className="w-full max-w-3xl aspect-video rounded-sm border border-blue-700/40 overflow-hidden bg-black">
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.dvidshub.net/video/embed/${focused.videoId}`}
+                    title={focused.title || "DVIDS video"}
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              ) : focused.imagePath ? (
                 <img src={`${import.meta.env.BASE_URL}${focused.imagePath}`} alt={focused.title || focused.kind}
                   className="max-w-full max-h-[70vh] object-contain" />
               ) : (

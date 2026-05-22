@@ -1,7 +1,8 @@
 // Extract text from each PDF in data-raw/. Writes src/data/corpus.json.
-// Strategy: pdfjs-dist first (fast, works on text-layer PDFs).
-// If a page yields little/no text AND --ocr is passed, fall back to
-// rendering + tesseract.js (slow). Default skips OCR — set OCR=1 to enable.
+// Strategy: pdfjs-dist only (fast, works on text-layer PDFs). Scanned
+// PDFs that yield little/no text are left for the dedicated OCR scripts —
+// run scripts/ocr-scanned.mjs (tesseract) or scripts/vision-ocr.mjs
+// (ChatGPT vision) on those, then re-aggregate.
 import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

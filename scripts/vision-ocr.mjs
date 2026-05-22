@@ -511,4 +511,4 @@ for (const id of targets) {
 const allMin = ((Date.now() - tAll) / 60000).toFixed(1);
 console.log(`\n[vision] done. pages ${totalPages} · ocr ${totalOcrd} · cached ${totalCached} · err ${totalErr}  [${allMin} min total]`);
 console.log(`[vision] cache → ${CACHE_DIR}`);
-console.log(`[vision] next: update scripts/build-text-files.mjs to prefer .vision-cache over .ocr-cache, then rebuild embeddings`);
+console.log(`[vision] next: run scripts/build-text-files.mjs (it already prefers .vision-cache over .ocr-cache), then rebuild embeddings`);

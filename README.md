@@ -2,14 +2,19 @@
 
 ![PURSUE Console](./public/og-card.png)
 
-> **An open, community-built investigation desk for the [war.gov/UFO Release 01](https://www.war.gov/UFO) disclosure.**
-> *Department of War, May 8 2026 — 162 records. All cases UNRESOLVED.*
+> **An open, community-built investigation desk for the [war.gov/UFO](https://www.war.gov/UFO) disclosure.**
+> *Department of War — Release 01: May 8 2026 (173 records) · Release 02: May 22 2026 (second tranche). All cases UNRESOLVED.*
+
+> [!NOTE]
+> **Two different things are called "Release 2" — they are unrelated.**
+> - **war.gov's releases** are the government's UAP document tranches, published on [war.gov/UFO](https://www.war.gov/UFO) under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters) on a rolling basis: **Release 01** dropped **May 8 2026** (173 records); the **Second Release (Release 02)** dropped **May 22 2026** — 40+ videos, NASA mission audio, and D-series military encounter reports.
+> - **This project's "Release 2.0"** is just the console's own **software version**. It does not track, mirror, or correspond to war.gov's release numbering. The app version and the government document tranches are wholly separate.
 
 [![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
 [![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Live site](https://img.shields.io/badge/live-rizzleroc.github.io%2Fpursue--console-FFD93D)](https://rizzleroc.github.io/pursue-console/)
-[![Changelog](https://img.shields.io/badge/changelog-2.1-7CFFB2)](./CHANGELOG.md)
+[![Changelog](https://img.shields.io/badge/changelog-2.2-7CFFB2)](./CHANGELOG.md)
 [![Roadmap](https://img.shields.io/badge/roadmap-open-82B6FF)](./ROADMAP.md)
 
 **Live:** https://rizzleroc.github.io/pursue-console/
@@ -26,11 +31,12 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 
 | | |
 |---|---|
-| **Records inventoried** | 173 (121 catalogued · 52 awaiting metadata) |
-| **Pages transcribed** | 3,376 across 65 events |
+| **Records inventoried** | 162 (121 catalogued · 41 awaiting enumeration) |
+| **Pages transcribed** | 3,394 across 65 events |
+| **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
 | **Per source** | 3,370 Gemini · 427 GPT-vision · 4 OCR · 18 contributor-submitted |
 | **Multi-source pages** | 425 (cross-checked for agreement) |
-| **Review queue** | 19 pages flagged for human eyes (low cross-source agreement) |
+| **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
 ---
 
@@ -283,7 +289,7 @@ Stack: Vite + React 19 + Tailwind v3 + better-sqlite3. No chart libraries; the n
 
 ## Source posture
 
-Every catalogued record cites back to `https://www.war.gov/medialink/ufo/release_1/...`. PDF inventory reconciles against [DenisSergeevitch/UFO-USA](https://github.com/DenisSergeevitch/UFO-USA) (the upstream maintainer scraped war.gov directly via Gemini; war.gov blocks our IPs via Akamai). **All cases marked UNRESOLVED by the originating agencies.** This console is an unofficial mirror with hand-curated structure on top; nothing here adds claims beyond the primary documents.
+Every catalogued record cites back to `https://www.war.gov/medialink/ufo/release_1/...`. PDF inventory reconciles against [DenisSergeevitch/UFO-USA](https://github.com/DenisSergeevitch/UFO-USA) (the upstream maintainer scraped war.gov directly via Gemini; war.gov blocks our IPs via Akamai). As of 2.2, `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` apply URL normalization so that Denis's hyphenated manifest URLs are matched correctly against the raw-space war.gov URLs stored in `events.js`; this improved Denis manifest-to-event matching from 68/120 → 112/120 PDFs. The remaining 8 PDFs have genuine filename discrepancies that require manual reconciliation. **All cases marked UNRESOLVED by the originating agencies.** This console is an unofficial mirror with hand-curated structure on top; nothing here adds claims beyond the primary documents.
 
 When new Release tranches drop, that's where new event records come from.
 
