@@ -169,6 +169,48 @@ re-OCR compute rather than hand-typing.
 
 ---
 
+## R9 · Release 02 ingestion (blocked on upstream mirror)
+
+**Status:** SCAFFOLDED + watching, **payload not yet available**.
+
+war.gov/UFO published its **Second Release (Release 02) on 2026-05-22** — 64 files:
+**6 PDFs, 7 audio, 51 videos** ([DoW press release](https://www.war.gov/News/Releases/Release/Article/4499305/department-of-war-publishes-second-release-of-unidentified-anomalous-phenomena/)).
+It's the next drop in the rolling PURSUE program.
+
+**The blocker is the same one the whole pipeline is built around:** war.gov blocks
+our IPs via Akamai, so we don't scrape it — we ride the community mirror
+[`DenisSergeevitch/UFO-USA`](https://github.com/DenisSergeevitch/UFO-USA) for the
+PDF manifest + transcriptions. As of now Denis's mirror is **unchanged at 120 PDFs
+/ 2.3 GiB (last commit 2026-05-08)** — Release 02 is **not mirrored yet**. So there
+is nothing to ingest: no manifest rows, no PDFs, no transcripts. We wait for Denis
+rather than do the scrape ourselves.
+
+**What's scaffolded now (this round):**
+- `config/releases.json` — single source of truth for war.gov releases + mirror
+  status (`release-01: mirrored`, `release-02: pending-mirror`).
+- `build-work-available.mjs` emits `releases` + `incomingReleases` into
+  `work-available.json`; HelpView renders a "HEADS UP — INCOMING RELEASE" card and
+  the LIVE hero reads "release 02 incoming". Honest framing: *nothing for a
+  volunteer to do yet.*
+
+**Plan when Denis mirrors it:**
+1. The watch loop polls `DenisSergeevitch/UFO-USA/metadata/download_summary.json`;
+   when `manifest_pdf_rows > 120`, `npm run corpus:sync` (sync-inventory →
+   db-rebuild → build-work-available) ingests the **6 new PDFs** automatically — no
+   pipeline change needed; they surface as "uncatalogued" records and as volunteer
+   OCR/catalogue work.
+2. Flip `release-02` to `status: "mirrored"` in `config/releases.json` once ingested.
+3. **Video/audio caveat:** the bulk of Release 02 (7 audio + 51 videos) likely
+   *won't* appear in Denis's PDF manifest. A separate path (`scripts/transcribe-videos.mjs`
+   already exists for release-01 DVIDS clips via Whisper) would be needed to bring
+   audio/video transcripts in. That's a bigger lift — deferred until the PDFs land
+   and we see what Denis's mirror actually captures for non-PDF assets.
+
+**Owner:** the watch loop (auto), then a maintainer pass to catalogue the new records.
+
+---
+
+_Updated 2026-05-22: added R9 (Release 02 published on war.gov; scaffolded as "incoming", ingest blocked on the DenisSergeevitch/UFO-USA mirror — watch loop polls the upstream manifest)._
 _Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._
 _Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._

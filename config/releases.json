@@ -1,0 +1,23 @@
+{
+  "_comment": "Known war.gov/UFO (PURSUE program) data releases and mirror status. The site ingests a release once DenisSergeevitch/UFO-USA mirrors its PDFs (war.gov blocks our IPs). 'mirrored' releases are live in the corpus; 'pending-mirror' releases are surfaced as 'incoming' on the site and picked up automatically when corpus:sync sees the upstream manifest grow. Edit here; the next build of public/work-available.json reflects changes.",
+  "releases": [
+    {
+      "id": "release-01",
+      "label": "Release 01",
+      "published": "2026-05-08",
+      "status": "mirrored",
+      "files": { "total": 162, "pdf": 120, "video": 28, "image": 14 },
+      "source": "https://www.war.gov/ufo",
+      "note": "First PURSUE release. Mirrored and transcribed — this is the live corpus."
+    },
+    {
+      "id": "release-02",
+      "label": "Release 02",
+      "published": "2026-05-22",
+      "status": "pending-mirror",
+      "files": { "total": 64, "pdf": 6, "audio": 7, "video": 51 },
+      "source": "https://www.war.gov/News/Releases/Release/Article/4499305/department-of-war-publishes-second-release-of-unidentified-anomalous-phenomena/",
+      "note": "Second PURSUE release. Video/audio-heavy (only 6 PDFs). Awaiting DenisSergeevitch/UFO-USA mirror before ingest."
+    }
+  ]
+}

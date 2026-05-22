@@ -42,6 +42,17 @@ if (!existsSync(VIS)) {
 let manifest = {};
 try { manifest = JSON.parse(await readFile(MANIFEST, "utf8")); } catch {}
 
+// Known war.gov releases + mirror status (config/releases.json). Tolerate the
+// file being absent — default to [] so nothing breaks if it's missing.
+let releases = [];
+try {
+  const cfg = JSON.parse(await readFile(path.join(ROOT, "config/releases.json"), "utf8"));
+  releases = Array.isArray(cfg.releases) ? cfg.releases : [];
+} catch {}
+// Releases not yet in the live corpus (awaiting upstream mirror) — surfaced
+// as "incoming" on the site.
+const incomingReleases = releases.filter(r => r.status !== "mirrored");
+
 async function visionPageCount(eid) {
   const dir = path.join(VIS, eid);
   if (!existsSync(dir)) return new Set();
@@ -182,6 +193,10 @@ const out = {
   // Whole-corpus page progress for the volunteer cockpit CORPUS gauge.
   corpusPagesTotal,
   corpusPagesCompleted,
+  // Known war.gov releases (pass-through from config/releases.json) and the
+  // subset still awaiting an upstream mirror (surfaced as "incoming").
+  releases,
+  incomingReleases,
   byEvent,
 };
 

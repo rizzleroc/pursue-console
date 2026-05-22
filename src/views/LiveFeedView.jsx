@@ -302,7 +302,7 @@ export default function LiveFeedView({ onSelect }) {
   //   improving — has some vision pages AND some tesseract/missing pages (partial coverage)
   //   queued    — has only tesseract pages indexed (or just curated meta, no body text)
   //   missing   — no body chunks at all (not yet OCR'd / not yet downloaded)
-  //   uncatalogued — beyond our 52 (the 110 records still on war.gov we haven't catalogued)
+  //   uncatalogued — beyond our 52 (records inventoried but not yet catalogued)
   const docProgress = useMemo(() => {
     if (!feed) return null;
     // Classify from stats.byEvent (full per-event totals across the whole
