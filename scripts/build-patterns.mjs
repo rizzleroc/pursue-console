@@ -5,7 +5,7 @@
 //
 // Output: public/patterns.json
 //   {
-//     generatedAt, sourceDocs, totalEvents,
+//     generatedAt, sourceDocs,
 //     byKind: {
 //       shape:    [{ term, total, docCount, events: [{eid, count}] }, ...],
 //       behavior: [...],

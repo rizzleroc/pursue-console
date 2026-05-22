@@ -7,40 +7,10 @@ export function ScanlineOverlay() {
     mixBlendMode: "multiply",
   }} />;
 }
-export function GrainOverlay() {
-  return <div className="pointer-events-none fixed inset-0 z-40 opacity-[0.06]" style={{
-    backgroundImage: 'url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="200" height="200" filter="url(%23n)" opacity="0.5"/></svg>\')',
-  }} />;
-}
-export function VignetteOverlay() {
-  return <div className="pointer-events-none fixed inset-0 z-30" style={{
-    background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%)",
-  }} />;
-}
-
 export function GlitchText({ children, className = "" }) {
   return <span className={`relative inline-block ${className}`} style={{
     textShadow: "0 0 1px #7CFFB2, 0.5px 0 0 rgba(255,140,66,0.5), -0.5px 0 0 rgba(130,182,255,0.5)",
   }}>{children}</span>;
-}
-
-export function RadarSweep({ size = 220 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" className="opacity-50">
-      <defs>
-        <radialGradient id="sweepGrad">
-          <stop offset="0%" stopColor="#7CFFB2" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#7CFFB2" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      {[48,36,24,12].map(r => <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="#7CFFB2" strokeWidth="0.3" opacity="0.35" />)}
-      <line x1="50" y1="50" x2="50" y2="2" stroke="#7CFFB2" strokeWidth="0.3" opacity="0.4" />
-      <line x1="50" y1="50" x2="98" y2="50" stroke="#7CFFB2" strokeWidth="0.3" opacity="0.4" />
-      <g style={{ transformOrigin: "50px 50px", animation: "radarSpin 6s linear infinite" }}>
-        <path d="M 50 50 L 50 2 A 48 48 0 0 1 89.4 23 Z" fill="url(#sweepGrad)" />
-      </g>
-    </svg>
-  );
 }
 
 // Doc-type badge — for records that are primarily visual (photos, sketches,

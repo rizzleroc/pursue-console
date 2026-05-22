@@ -279,6 +279,28 @@ for (const handleEnt of await listDirs(CONTRIB)) {
       }
       await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
 
+      // Clobber guard for the *canonical* p<NNN>.txt: human always wins, but
+      // a non-human contribution must be meaningfully better than the existing
+      // canonical (longer than non-empty existing text) before we overwrite.
+      // The sidecar + per-source files are always written above; only the
+      // canonical sync is gated here.
+      const isMeaningfullyBetter =
+        contribSource === "human" ||
+        !existingText ||
+        srcText.length > existingText.length;
+
+      if (!isMeaningfullyBetter) {
+        // Existing canonical is non-empty and at least as long — keep it.
+        stats.skipped_existing_better++;
+        manifest[`${eid}/p${pad4Page}.txt`] = {
+          handle,
+          importedAt,
+          chars: srcText.length,
+          source: contribSource,
+        };
+        continue;
+      }
+
       // Sync canonical p<NNN>.txt to the winning source's text
       const winnerInfo = sidecar.sources[sidecar.best];
       if (winnerInfo?.text_file) {

@@ -15,6 +15,55 @@ Comprehensive security review (token-exposure audit + tooling/dependency risk as
 - **SSRF guard on all corpus downloads** — new `scripts/safe-fetch.mjs` enforces https-only and blocks loopback/link-local/private-range hosts, re-validating every redirect hop. Wired into `fetch-pdfs.mjs` and `fetch-missing-pdfs.mjs`, which previously did `fetch(url, { redirect: "follow" })` against URLs from data files with no scheme/host checks. (All current event URLs are `https://www.war.gov` — no legitimate download is affected.)
 - **Dashboard XSS surface tightened** — `pursue-vision-mcp/dashboard.html` now `escapeHTML()`s the live `previewUrl` (into `<img src>`) and recent-item `note` fields that arrive via `POST /progress`, matching the escaping already applied to log lines and PR titles.
 
+## 2.2 — Punchlist sweep 2 (2026-05-21)
+
+A second brutal-analysis pass over the daemon, the scripts, the React app, and the
+docs. Three audit agents found ~40 incomplete/half-built/stale items; this release
+closes every one that's closable without a third party and re-files the rest on the
+[ROADMAP](./ROADMAP.md). Numbers throughout the docs were refreshed to the live
+corpus: **173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review
+queue 0**.
+
+### MCP daemon (pursue-vision-mcp)
+- **SIGINT handler no longer crashes.** The Ctrl-C handler called `await driver.disconnect()` on a variable that never existed; the `ReferenceError` was swallowed by an empty `catch {}`, so browser drivers were **never disconnected** on shutdown and CDP connections leaked. Now iterates the `drivers` map and disconnects each.
+- **`/fanout` honors `perProviderTimeoutMs`.** `reevaluate-disputed.mjs` posts a 180s per-provider timeout, but the daemon destructured only `timeoutMs` and silently fell back to the 300s driver default — so the reeval retry logic (built around a 180s timeout) could never fire. The handler now accepts and applies it.
+- **`gemini-driver.mjs` parity fixes.** Added the `disconnect()` method it was missing (ChatGPT's driver had one) and ported the `UPLOAD_FAILURE_PATTERNS` guard, so a Gemini reply where the model never saw the attachment now throws instead of being cached as a real transcript. Driver is still `@unverified` end-to-end (R2).
+- Dead `mkdir`/`stat` imports removed from `daemon.mjs`.
+
+### Scripts
+- **`import-contributions.mjs` clobber guard now exists.** The header promised "won't clobber existing pages unless meaningfully better" and a `skipped_existing_better` stat — but the guard was never implemented and the stat never incremented; non-`human` sources always overwrote canonical. Now a non-`human` contribution must be longer than the existing non-empty canonical before it overwrites `p<NNN>.txt`; otherwise it's recorded and skipped. Sidecar + per-source writes are unchanged.
+- **Windows `file://` bug fixed in three scripts.** `vision-visuals-augment.mjs`, `build-text-files.mjs`, and `ocr-scanned.mjs` built pdfjs asset URLs via `"file://" + path` (missing the third slash → fonts/wasm load silently fail on Windows). All three now use `pathToFileURL(...).href`, matching `vision-ocr.mjs`.
+- **`db-rebuild.mjs` `has_pdfjs` now reflects reality.** The `pdfjsEvents` set was computed *after* the rows were already written, so the column was hardcoded `0` for every page. The computation moved ahead of the insert and now drives the column.
+- **Stale operator guidance removed:** `vision-ocr.mjs` no longer prints a "next: update build-text-files.mjs" instruction for a migration that's already done; `validate-contribution.mjs` dropped the `VERBOSE=1` hint for a flag it never read; `build-patterns.mjs` docstring no longer lists a `totalEvents` field it doesn't emit; `extract-text.mjs` header no longer claims an `--ocr` tesseract fallback that was never built (now points at the real OCR scripts).
+
+### UI
+- **SemanticSearchView chunk-count lie fixed.** The live search status read "ranking 1,057 chunks" — the index is **5,584**. Now reads the live count from index state; stale header comment de-hardcoded.
+- **`useCorpusStats` migration finished.** 2.1 shipped the shared hook but only migrated TimelineView + AtlasView. Header, CorpusFreshness, VolunteerModal, HelpView, LiveFeedView, SemanticSearchView, and NetworkView still rolled their own `let _statsP = null` corpus-stats caches — all seven are now on the hook (10 components total). Other-endpoint caches (version, similarity, patterns, extracts) intentionally left as-is. `vite build` clean.
+- **Dead code removed:** DossierView's "APPEARS IN THREAD(S)" block (its `onJumpThread` prop was never passed after THREADS was deleted) + the now-orphaned `threads.js` import; DossierView empty-state copy that still named the deleted PATTERNS/THREADS/CONSTELLATION views; unused `GrainOverlay`/`VignetteOverlay`/`RadarSweep` exports in Primitives; MediaView's dead `c.bg ||` branch; LiveFeedView's permanently-zero "USER DROP" gauge; CorpusFreshness's unreachable `if (false)` block.
+- **Stale fallbacks:** the `162` inventory fallback (SemanticSearchView, LiveFeedView) → `173`.
+- **HelpView** no longer swallows a failed `corpus-stats.json` fetch entirely silently (warns; counts keep their placeholder).
+
+### Volunteer cockpit (Helmsman instrument)
+The live `pursue-vision-mcp/dashboard.html` panel a volunteer watches while their machine OCRs (served by `monitor.mjs` on :9224, styled per `design/HELMSMAN-PHOSPHOR.md`).
+- **CORPUS (GLOBAL) gauge was showing nonsense.** `volunteer.mjs` fed it `(queue.inventoryTotal || 162) - totalPagesNeeded` — but `work-available.json` has no `inventoryTotal` field, so it always used the stale `162` and then subtracted *pages* from *records*. `build-work-available.mjs` now emits whole-corpus `corpusPagesTotal` / `corpusPagesCompleted`, and the gauge reads pages-search-ready / total-corpus-pages (currently 3,390 / 3,394 ≈ 100%).
+- **Status dot now tracks daemon state.** `setStatus` computed a `dot` variable it never used (and couldn't — it tried to grab a `::after` pseudo-element via `firstChild`), so the pulsing dot stayed green even when the panel said OFFLINE/IDLE. The dot now recolors to match (green active · dim idle · rose offline) and freezes its ping when not processing — restoring the philosophy's rank-one "is it running?" signal.
+
+### Docs reconciled to live counts
+- **README, HOW-CAN-I-HELP, JUDGE-STANDARD, PLAN-VISION-COMPLETION, SQL-MIGRATION-ROADMAP** all refreshed off the pre-2.0 framing (162 records / 597 tesseract pages / ~110 uncatalogued / ~900 chunks / 3,376 pages) to the live numbers.
+- **Broken `TRUSTED-TRANSCRIBERS.md` link removed (×2)** — HOW-CAN-I-HELP and JUDGE-STANDARD pointed at a file that doesn't exist (same class of bug 2.1 fixed for CONTRIBUTORS.md). Reworded to CONTRIBUTORS.md + informal/planned expedited review.
+- **Wrong script path fixed:** HOW-CAN-I-HELP said `pursue-vision-mcp/volunteer.mjs`; it's `scripts/volunteer.mjs`.
+- **Path-shape contradiction fixed:** HOW-CAN-I-HELP's ASCII map + example blocks used the legacy `contributions/<handle>/<eid>/...` shape; updated to the 2.0 `contributions/<handle>/<source>/<eid>/...` shape that the prose and the validator already use.
+- **SQL-MIGRATION-ROADMAP** body now carries a "not the shipped design" note: the build-time consolidation shipped (`data-raw/corpus.sqlite`, 5 tables, projected to per-view JSON), but the runtime sql.js / `corpusDb.js` / browser-served `public/corpus.sqlite` / `build-corpus-db.mjs` / FTS5 sketch was never adopted.
+- **ROADMAP** R2/R3/R4/R7 refreshed (live counts; R7 flagged as config-scaffolded-but-unwired).
+
+### Still open (re-filed, not closed this round)
+- `volunteer.mjs --review` **producer is missing.** `import-contributions.mjs` (`gpt-vision-review`/`gemini-review` sources) and `judge-disputed.mjs` both consume output from a documented `volunteer.mjs --review` mode that doesn't exist. The consumer side is wired; the flag was left unbuilt rather than guessed at. Needs a real review-flow design.
+- **Deleted dead `src/data/threads.js`** — nothing imported it after the DossierView THREADS block was removed (THREADS view was deleted in 2.0); recoverable from git history if THREADS ever returns. (Note: `public/visuals.json` and `public/coverage.json` are **not** orphans — `visuals.json` is a build intermediate written by `build-text-files.mjs` and read by `build-dossier-extracts.mjs`; `coverage.json` is generated by `corpus:coverage` for the planned R6 per-event coverage UI. Both are regenerated by the pipeline and were left in place.)
+- **Fixed stale `index.html` social meta** — the `description`/`og`/`twitter` tags advertised the deleted "patterns, threads" views and "47 declassified records"; updated to current views + 121 catalogued records (3,394 pages).
+- **`volunteer.mjs --review` producer** documented as new ROADMAP **R8** (consumer wired in `import-contributions.mjs` + `judge-disputed.mjs`, producer absent) rather than built speculatively against an empty REVIEW queue.
+- `@unverified` end-to-end paths unchanged: `gemini-driver.mjs` round-trip, `volunteer-media.mjs` claim/commit, `import-contributions.mjs` media branch (R2).
+- **Cockpit `BREAK` status is consumer-wired, producer-absent** — `monitor.mjs` models `onBreak` (state + TUI) and `dashboard.html` renders a BREAK state, but `volunteer.mjs` never reports a break (it has no pacing-break logic). Left in place as a harmless forward hook; either wire volunteer pacing breaks to POST `onBreak`, or drop the branch. (Also: the cockpit pulls Geist/IBM Plex Mono from Google Fonts CDN — a local instrument that degrades to system monospace offline.)
+
 ## 2.1 — Punchlist sweep
 
 Phase-2 brutal analysis identified ~30 partial features and stale code paths. This release closes the closable items, surfaces the not-yet-verifiable items via the new `@unverified` annotation system, and ships a new [ROADMAP.md](./ROADMAP.md) for the items that need a real third party (outside volunteer walking the contribution flow, etc.).
