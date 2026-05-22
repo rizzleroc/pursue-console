@@ -31,8 +31,9 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 
 | | |
 |---|---|
-| **Records inventoried** | 173 (121 catalogued · 52 awaiting metadata) |
+| **Records inventoried** | 162 (121 catalogued · 41 awaiting enumeration) |
 | **Pages transcribed** | 3,394 across 65 events |
+| **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
 | **Per source** | 3,370 Gemini · 427 GPT-vision · 4 OCR · 18 contributor-submitted |
 | **Multi-source pages** | 425 (cross-checked for agreement) |
 | **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |

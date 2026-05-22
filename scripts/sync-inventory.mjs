@@ -61,15 +61,33 @@ for (const line of tsv.split(/\r?\n/)) {
 function normalizeUrl(url) {
   return url.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-");
 }
+// Also match on the bare filename. Auto-catalogued events (events-auto.js)
+// derive their url from the manifest's FILENAME column, which can differ
+// from the manifest's URL column — the upstream URL is sometimes re-slugged
+// (e.g. "...d44-range-fouler-arabian-sea...") or even scrambled (the FBI
+// serial PDFs). The filename is the reliable join key, so fall back to it.
+function normalizeName(s) {
+  return (s.split("/").pop() || "")
+    .toLowerCase()
+    .replace(/\.pdf$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-|-$/g, "");
+}
 const { EVENTS } = await import(`../src/data/events.js?cb=${Date.now()}`);
 const eventByUrl = new Map();
+const eventByName = new Map();
 for (const ev of EVENTS) {
   if (!ev.url) continue;
   eventByUrl.set(normalizeUrl(ev.url), ev);
+  const nm = normalizeName(ev.url);
+  if (nm && !eventByName.has(nm)) eventByName.set(nm, ev);
 }
 let matched = 0, unmatched = 0;
 for (const r of rows) {
-  const ev = eventByUrl.get(normalizeUrl(r.url));
+  const ev = eventByUrl.get(normalizeUrl(r.url))
+    || eventByName.get(normalizeName(r.url))
+    || eventByName.get(normalizeName(r.filename));
   if (ev) { r.event_id = ev.id; matched++; }
   else { r.event_id = null; unmatched++; }
 }

@@ -169,12 +169,39 @@ for (const ev of EVENTS) {
   if (queue.length > 0) totalDocsRemaining++;
 }
 
+// Docs not yet pulled at ALL: catalogued (usually auto-stubs) with a known
+// page_count and a download URL but no manifest entry and zero transcribed
+// pages — the PDF was never downloaded/extracted. These are the bulk of the
+// remaining Release backlog. They are kept in a SEPARATE bucket (not the
+// actionable OCR queue) because a volunteer can't OCR pages until the PDF is
+// fetched first; surfacing them lets the dashboards show the true "what's
+// left" instead of only the trickle inside already-downloaded PDFs.
+const notYetPulled = [];
+let totalPagesNotPulled = 0;
+for (const ev of EVENTS) {
+  if (byEvent[ev.id]) continue;                       // already has actionable work
+  const m = manifest[ev.id];
+  if (m && (m.pages || 0) > 0) continue;              // already downloaded/extracted
+  const pages = ev.page_count || 0;
+  if (!ev.url || pages <= 0) continue;                // need a real doc with known size
+  if ((await visionPageCount(ev.id)).size > 0) continue;  // already has some pages
+  notYetPulled.push({
+    eid: ev.id, title: ev.title, agency: ev.agency, date: ev.date,
+    pdfUrl: ev.url, pages, auto: !!ev.auto,
+  });
+  totalPagesNotPulled += pages;
+}
+notYetPulled.sort((a, b) => b.pages - a.pages);
+
 const out = {
   generatedAt: new Date().toISOString(),
   totalPagesNeeded,
   totalDocsRemaining,
   totalPagesNeedingReview,
   totalPagesNeedingVisualContext,
+  // Docs whose PDFs haven't been pulled/transcribed at all (first-pull backlog).
+  totalDocsNotPulled: notYetPulled.length,
+  totalPagesNotPulled,
   // inventoryTotal removed in 2.1 — used to ship a hardcoded 162 that
   // nothing consumed. The live count comes from corpus-stats.json's
   // inventory.total (synced from Denis's manifest).
@@ -183,12 +210,14 @@ const out = {
   corpusPagesTotal,
   corpusPagesCompleted,
   byEvent,
+  notYetPulled,
 };
 
 await writeFile(OUT, JSON.stringify(out));
 const { stat } = await import("node:fs/promises");
 const sz = (await stat(OUT)).size;
 console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR · ${totalPagesNeedingReview} pages need human review · ${totalPagesNeedingVisualContext} pages need visual context`);
+console.log(`[work-available] first-pull backlog: ${notYetPulled.length} docs · ${totalPagesNotPulled} pages not yet pulled`);
 // Top 5 biggest remaining
 const top = Object.entries(byEvent).sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded).slice(0,5);
 for (const [eid, w] of top) {
