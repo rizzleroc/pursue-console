@@ -78,10 +78,10 @@ const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volu
 // for chatgpt, gemini for gemini), so a re-run on the other provider
 // adds a second source to the same page rather than overwriting it.
 const PROVIDER = (args.provider || "chatgpt").toLowerCase();
-const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini" };
+const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini", claude: "claude" };
 const CONTRIB_SOURCE = PROVIDER_TO_SOURCE[PROVIDER];
 if (!CONTRIB_SOURCE) {
-  console.error(`error: --provider must be 'chatgpt' or 'gemini' (got '${PROVIDER}')`);
+  console.error(`error: --provider must be 'chatgpt', 'gemini', or 'claude' (got '${PROVIDER}')`);
   process.exit(1);
 }
 const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);

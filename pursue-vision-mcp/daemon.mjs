@@ -29,6 +29,7 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { ChatGPTDriver } from "./chatgpt-driver.mjs";
 import { GeminiDriver }  from "./gemini-driver.mjs";
+import { ClaudeDriver } from "./claude-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -64,8 +65,9 @@ const TOKEN = await loadToken();
 const drivers = {
   chatgpt: new ChatGPTDriver({ cdpPort: CDP_PORT }),
   gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
+  claude: new ClaudeDriver({ cdpPort: CDP_PORT }),
 };
-const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve() };
+const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve(), claude: Promise.resolve() };
 function enqueue(provider, fn) {
   const cur = queues[provider] ?? Promise.resolve();
   const next = cur.then(fn, fn);
@@ -76,6 +78,7 @@ function normalizeProvider(p) {
   const v = (p || "chatgpt").toLowerCase();
   if (v === "openai" || v === "gpt" || v === "chatgpt") return "chatgpt";
   if (v === "gemini" || v === "google" || v === "bard") return "gemini";
+  if (v === "claude" || v === "anthropic" || v === "claude.ai") return "claude";
   throw new Error(`unknown provider: ${p}`);
 }
 
@@ -119,6 +122,7 @@ const server = http.createServer(async (req, res) => {
         providers: {
           chatgpt: { connected: drivers.chatgpt.isConnected(), history: drivers.chatgpt.callCount },
           gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
+          claude:  { connected: drivers.claude.isConnected(), history: drivers.claude.callCount },
         },
       });
     }
@@ -159,7 +163,7 @@ const server = http.createServer(async (req, res) => {
       const fanoutTimeoutMs = perProviderTimeoutMs ?? timeoutMs;
       const requested = Array.isArray(body.providers) && body.providers.length
         ? body.providers.map(normalizeProvider)
-        : ["chatgpt", "gemini"];
+        : ["chatgpt", "gemini", "claude"];
       let validated;
       try { validated = filePaths.map(jailPath); }
       catch (e) { return sendJson(res, 403, { error: e.message }); }

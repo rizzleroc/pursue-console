@@ -100,6 +100,7 @@ async function ensureChrome() {
     // matches at request time. Sign in once in each.
     "https://chatgpt.com",
     "https://gemini.google.com/app",
+    "https://claude.ai/new",
   ], { detached: true, stdio: "ignore" }).unref();
   // Give Chrome a moment to bind the port
   for (let i = 0; i < 20; i++) {

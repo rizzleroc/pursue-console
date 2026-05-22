@@ -53,7 +53,7 @@ const MAX_LONG_SIDE = 3000;
 const args = Object.fromEntries(process.argv.slice(2).map(a => a.replace(/^--/, "").split("=")).map(([k, v]) => [k, v ?? true]));
 const ONLY = args.only || null;
 const SLICE = args.slice ? Number(args.slice) : null;
-const PROVIDERS = ["chatgpt", "gemini"];
+const PROVIDERS = ["chatgpt", "gemini", "claude"];
 
 async function loadToken() {
   for (const p of [path.join(os.homedir(), ".pursue-vision-token"), path.join(os.homedir(), ".whipgen-token")]) {
