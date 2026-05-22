@@ -11,6 +11,7 @@ const SEEN_KEY = "pursue:launch-2.0-seen";
 
 // Curated, ranked. Each clip is real DVIDS sensor footage from Release 01.
 const CLIPS = [
+  { videoId: "DOD_111719732", code: "PR-54", tag: "SPHERICAL UAP · ERRATIC", loc: "Middle East · 2022", flag: "anchor", line: 'Metallic spherical orb over the Middle East exhibiting erratic movement — the headline clip of the release. (DOW-UAP-PR-54, 2022.)' },
   { videoId: "1006073", code: "PR-28", tag: "SWIR-ONLY DIAMOND",   loc: "Mediterranean Sea", flag: "anchor", line: 'Diamond with a probe at ~434 kts — visible ONLY on short-wave IR. Invisible to the naked eye.' },
   { videoId: "1006106", code: "PR-46", tag: "FOOTBALL-SHAPED BODY", loc: "East China Sea",     flag: "anchor", line: "Football body with three radial projections. The most distinctive morphology in the tranche." },
   { videoId: "1006080", code: "PR-34", tag: 'SEA-SKIM "90° TURNS"', loc: "Aegean Sea",         flag: "anchor", line: 'Multiple 90-degree turns at ~80 mph, just above the ocean surface.' },
