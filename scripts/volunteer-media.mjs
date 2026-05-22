@@ -510,6 +510,7 @@ async function commitPhase() {
   const ALLOWED_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
   let committed = 0, skipped = 0, badTemplate = 0;
   const touchedEids = new Set();
+  const committedStaging = []; // { dir, pad } of templates committed this run, cleared on success
 
   for (const eid of eids) {
     const dir = path.join(STAGING, eid);
@@ -564,6 +565,7 @@ async function commitPhase() {
       await copyFile(imgSrc, dstImg);
       committed++;
       touchedEids.add(eid);
+      committedStaging.push({ dir, pad });
       console.log(`✓ ${eid} p${pad}  ${sec.kind.padEnd(20)}  "${sec.title.slice(0, 40)}"`);
     }
   }
@@ -599,20 +601,34 @@ async function commitPhase() {
 
   const branch = `contrib-${HANDLE}-media-${Date.now().toString(36)}`;
   try {
-    await run("git", ["checkout", "-b", branch]); // carries the already-staged changes
-    await run("git", ["commit", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
-    await run("git", ["push", "-u", "origin", branch]);
+    // Keep git output OFF the runner log. With 200+ unrelated modified files in
+    // this shared tree (build artifacts) + sparse-checkout, `git checkout` prints
+    // a huge "M …" list and `git commit` lists every created file — that flood
+    // buried the actual commit result and broke the dashboard's outcome banner.
+    await run("git", ["checkout", "-q", "-b", branch], { stdio: "ignore" }); // carries the already-staged changes
+    await run("git", ["commit", "-q", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
+    await run("git", ["push", "-q", "-u", "origin", branch]);
     const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
     // --head=<branch> so gh opens the PR for the branch we just pushed even when
     // the working tree has unrelated uncommitted changes (build artifacts/caches).
     await run("gh", ["pr", "create", "--head", branch, "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
     console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s)`);
+    // These templates are now submitted — remove them from staging so a second
+    // commit doesn't re-stage the same files and open a DUPLICATE PR. (Only on
+    // success; a failed PR keeps them so the user can retry.)
+    for (const { dir, pad } of committedStaging) {
+      for (const f of [`p${pad}.md`, `p${pad}.png`, `p${pad}.jpg`, `.ctx-prev-${pad}.png`, `.ctx-next-${pad}.png`]) {
+        try { await rm(path.join(dir, f)); } catch {}
+      }
+    }
+    console.log(`[commit] cleared ${committedStaging.length} submitted template(s) from staging`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
     console.error(`[commit] your changes are committed on ${branch}; reopen the PR with: gh pr create --head ${branch}`);
   } finally {
-    // Always return the shared working tree to where it started.
-    try { await run("git", ["checkout", originalBranch]); } catch {}
+    // Always return the shared working tree to where it started (quiet + output
+    // discarded so the sparse-checkout "M …" list doesn't flood the runner log).
+    try { await run("git", ["checkout", "-q", originalBranch], { stdio: "ignore" }); } catch {}
   }
 }
 
