@@ -8,7 +8,7 @@
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -24,8 +24,10 @@ const VISUALS_OUT = path.join(ROOT, "public/visuals.json");
 
 const { EVENTS } = await import("../src/data/events.js");
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const PDFJS_WASM_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/wasm/").replaceAll("\\","/");
-const PDFJS_FONTS_URL = "file://" + path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts/").replaceAll("\\","/");
+// pathToFileURL produces 'file:///C:/...' on Windows; raw 'file://' concat
+// lacks the third slash and pdfjs's font/wasm loaders fail silently. See vision-ocr.mjs.
+const PDFJS_WASM_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/wasm")).href + "/";
+const PDFJS_FONTS_URL = pathToFileURL(path.join(ROOT, "node_modules/pdfjs-dist/standard_fonts")).href + "/";
 
 await mkdir(OUT_DIR, { recursive: true });
 

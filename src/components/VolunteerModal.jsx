@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // The primary CTA of the entire site. The priority ladder up top mirrors
 // the HELP view: settle disputes first, then transcribe new pages, then
@@ -6,14 +7,8 @@ import React, { useEffect, useState } from "react";
 // machine-OCR vs hand-typed setup paths.
 
 export default function VolunteerModal({ open, onClose, onViewChange }) {
-  const [reviewCount, setReviewCount] = useState(null);
-  useEffect(() => {
-    if (!open) return;
-    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(j => setReviewCount(j?.review?.pagesNeedingReview ?? null))
-      .catch(() => {});
-  }, [open]);
+  const { stats } = useCorpusStats();
+  const reviewCount = stats?.review?.pagesNeedingReview ?? null;
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"

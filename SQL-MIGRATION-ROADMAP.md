@@ -135,6 +135,8 @@ CREATE TABLE activity (
 CREATE INDEX idx_activity_ts ON activity(ts);
 ```
 
+> **⚠️ Not the shipped design.** What actually shipped in 2.0 is the *build-time consolidation* described in the header: `scripts/db-rebuild.mjs` builds `data-raw/corpus.sqlite` (5 tables — `inventory`, `events`, `pages`, `contributions`, `runs`) at build time, and the existing per-view builder scripts project that DB into the per-view JSON files in `public/`. The *runtime* design sketched in this and the following sections — a `scripts/build-corpus-db.mjs`, a browser-served `public/corpus.sqlite`, `src/lib/corpusDb.js` loading it via sql.js WASM at runtime, and the FTS5 / `chunk_vectors` / 8-table schema above — was **not adopted**. There is no sql.js in the bundle and no `public/corpus.sqlite`; the views still fetch the per-view JSON projections. The sketch below is preserved as historical context only — don't go looking for files it names.
+
 ### Build pipeline
 
 Add `scripts/build-corpus-db.mjs` that runs after all the per-artifact builders. It:
