@@ -309,6 +309,14 @@
   .log-box .l-err  { color: var(--rose); }
   .log-box .l-warn { color: var(--amber); }
   .log-box .l-info { color: var(--cyan); }
+  .log-actions { display: flex; gap: 6px; }
+  .log-btn {
+    font: inherit; font-size: 9px; letter-spacing: 0.15em; cursor: pointer;
+    background: transparent; color: var(--green-dim);
+    border: 1px solid var(--hair); border-radius: 3px; padding: 2px 7px;
+  }
+  .log-btn:hover { color: var(--green); border-color: var(--green-dim); }
+  .log-btn.ok { color: var(--green); border-color: var(--green); }
 
   /* FOOTER */
   .footer { margin-top: 48px; }
@@ -578,7 +586,13 @@
 
     <!-- Log panel -->
     <div class="log-panel">
-      <div class="log-cap">R U N N E R &nbsp; L O G</div>
+      <div class="log-cap" style="display:flex;align-items:center;justify-content:space-between">
+        <span>R U N N E R &nbsp; L O G</span>
+        <span class="log-actions">
+          <button id="log-copy" class="log-btn" title="Copy the full runner log to the clipboard">⧉ COPY</button>
+          <button id="log-csv" class="log-btn" title="Download the runner log as a CSV (seq, time, level, text)">⤓ CSV</button>
+        </span>
+      </div>
       <div class="log-box" id="log-box"><span style="opacity:0.3">awaiting run…</span></div>
     </div>
   </div>
@@ -985,6 +999,8 @@
 
       // Update log
       const logEl = $("log-box");
+      if (data.log?.length) mergeLog(data.log);
+      latestLastRun = data.lastRun || latestLastRun;
       if (logEl && data.log?.length) {
         const atBottom = logEl.scrollHeight - logEl.scrollTop <= logEl.clientHeight + 20;
         logEl.innerHTML = data.log.map(line => {
@@ -1002,6 +1018,55 @@
       }
     } catch {}
   }
+  // ---- runner-log capture + export (COPY / CSV) ----
+  // The monitor only keeps a rolling 40-line window in /running.log, so we
+  // accumulate the full session here by tail-merging each poll's window.
+  let logHistory = [];
+  let prevLog = [];
+  let latestLastRun = null;
+  function mergeLog(cur) {
+    if (!cur || !cur.length) return;
+    if (!prevLog.length) { logHistory.push(...cur); prevLog = cur.slice(); return; }
+    let overlap = 0;
+    const maxK = Math.min(prevLog.length, cur.length);
+    for (let k = maxK; k > 0; k--) {
+      if (prevLog.slice(-k).join("") === cur.slice(0, k).join("")) { overlap = k; break; }
+    }
+    logHistory.push(...cur.slice(overlap));
+    prevLog = cur.slice();
+    if (logHistory.length > 5000) logHistory = logHistory.slice(-5000);
+  }
+  function logLevel(line) {
+    if (/✗|err=[1-9]|\bError\b|\bFAIL\b|\[exit [^02]/.test(line)) return "error";
+    if (/Warning|⚠|skipping/i.test(line)) return "warn";
+    if (/✓|done\. ok=|\[exit (0|2)\]/.test(line)) return "ok";
+    return "info";
+  }
+  function flashBtn(btn, label) {
+    if (!btn) return;
+    const orig = btn.textContent; btn.textContent = label; btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove("ok"); }, 1400);
+  }
+  $("log-copy")?.addEventListener("click", async () => {
+    const text = (logHistory.length ? logHistory.join("\n") : ($("log-box")?.innerText || "")).trim();
+    try { await navigator.clipboard.writeText(text); flashBtn($("log-copy"), "✓ COPIED"); }
+    catch { flashBtn($("log-copy"), "✗ FAILED"); }
+  });
+  $("log-csv")?.addEventListener("click", () => {
+    const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const now = new Date().toISOString();
+    const rows = [["seq", "exported_at", "level", "text"].join(",")];
+    logHistory.forEach((line, i) => rows.push([i + 1, esc(now), logLevel(line), esc(line)].join(",")));
+    if (latestLastRun) rows.push(["", esc(now), "lastRun", esc((latestLastRun.headline || "") + " — " + (latestLastRun.detail || ""))].join(","));
+    const blob = new Blob([rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `pursue-runner-log-${now.replace(/[:.]/g, "-")}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(a.href);
+    flashBtn($("log-csv"), "✓ SAVED");
+  });
+
   setInterval(pollRunner, 2000);
   pollRunner();
   fetchQueueAndSync();

@@ -168,8 +168,11 @@ function buildVolunteerArgs(opts) {
     return { script: "volunteer-media.mjs", args };
   }
   if (opts.mode === "visuals-commit") {
-    // Second phase: validate filled templates and stage the contribution.
-    const args = ["scripts/volunteer-media.mjs", `--my-handle=${handle}`, "--commit", "--no-pr"];
+    // Second phase: validate filled templates, commit them, and open the PR.
+    // (Previously passed --no-pr, which stopped at "finish by hand" — the
+    // commit button is supposed to actually publish, so let it run the full
+    // git commit + push + gh pr create flow.)
+    const args = ["scripts/volunteer-media.mjs", `--my-handle=${handle}`, "--commit"];
     return { script: "volunteer-media.mjs", args };
   }
 
@@ -481,10 +484,41 @@ function isStub(p) {
   } catch { return true; } // missing → needs work
 }
 
+// ----- published-state probe (the "real backend" check) -----
+// With many concurrent volunteers, local files alone can't tell whether a page
+// is actually DONE — someone else may have already published it. There's no
+// coordination server by design (this is a fork + PR project), so origin/main
+// IS the backend: any contribution file merged there means that (queue, eid,
+// page) is done, no matter which handle did it. We refresh origin/main and
+// cache the result ~60s. Fully graceful: if git/network is unavailable the set
+// is empty and we fall back to the old local-only dedup.
+let _publishedCache = null;
+// Map a queue's local working dir to the published contributions dir on main.
+const PUBLISHED_DIR = { "gpt-vision": "gpt-vision", "gpt-vision-review": "gpt-vision-review", "media-staging": "media", "media": "media" };
+async function fetchPublishedSet() {
+  if (_publishedCache && Date.now() - _publishedCache.ts < 60_000) return _publishedCache.set;
+  const set = new Set(); // keys: "<dir>|<eid>|<pageNum>"
+  try {
+    await runCmd("git", ["fetch", "origin", "main", "--quiet"], { cwd: SCRIPTS_ROOT, timeout: 8000 });
+    const out = await runCmd("git", ["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"], { cwd: SCRIPTS_ROOT, timeout: 8000 });
+    for (const line of out.split(/\r?\n/)) {
+      // contributions/<handle>/<dir>/<eid>/p<NNN>.<ext>
+      const m = line.match(/^contributions\/[^/]+\/([^/]+)\/(.+)\/p0*(\d+)\.[a-z0-9]+$/i);
+      if (m) set.add(`${m[1]}|${m[2]}|${Number(m[3])}`);
+    }
+  } catch { /* offline / no git — fall back to local-only dedup */ }
+  _publishedCache = { ts: Date.now(), set };
+  return set;
+}
+
 // Walk `contributions/<handle>/<dir>/<eid>/p####.txt` and find docs that
 // still have at least one un-submitted page. Returns { totalFresh, freshDocs }.
+// A page is "fresh" only if it is BOTH a local stub AND not already published
+// to origin/main by anyone — so concurrent volunteers don't redo merged work.
 async function findFreshWork(handle, dir, byEvent, field) {
   const base = path.resolve(SCRIPTS_ROOT, "contributions", handle, dir);
+  const published = await fetchPublishedSet();
+  const pubDir = PUBLISHED_DIR[dir] || dir;
   let totalFresh = 0;
   const freshDocs = [];
   for (const [eid, doc] of Object.entries(byEvent)) {
@@ -493,6 +527,8 @@ async function findFreshWork(handle, dir, byEvent, field) {
     // For visuals the queue items are objects {page,kind,...}; OCR/review are bare numbers.
     const missing = pages.filter(p => {
       const num = typeof p === "object" ? p.page : p;
+      // Already merged to main (by any volunteer) → done, skip.
+      if (published.has(`${pubDir}|${eid}|${Number(num)}`)) return false;
       return isStub(path.join(base, eid, `p${String(num).padStart(4,"0")}.txt`));
     });
     if (missing.length) {
@@ -733,6 +769,28 @@ const server = http.createServer(async (req, res) => {
         });
       } catch (e) {
         return sendJson(res, 500, { error: e.message });
+      }
+    }
+
+    // Published-state check — the "real backend". Reports what's actually
+    // merged to origin/main (by whom, by kind), so the dashboard reflects
+    // published truth instead of local guesses. Read-only.
+    if (req.method === "GET" && req.url === "/published") {
+      try {
+        await fetchPublishedSet(); // refresh + cache origin/main (graceful if offline)
+        const out = await runCmd("git", ["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"], { cwd: SCRIPTS_ROOT, timeout: 8000 });
+        const byHandle = {}, byKind = {}; let total = 0;
+        for (const line of out.split(/\r?\n/)) {
+          // count one per page via the canonical .json sidecar
+          const m = line.match(/^contributions\/([^/]+)\/([^/]+)\/.+\/p0*\d+\.json$/i);
+          if (!m) continue;
+          total++;
+          byHandle[m[1]] = (byHandle[m[1]] || 0) + 1;
+          byKind[m[2]] = (byKind[m[2]] || 0) + 1;
+        }
+        return sendJson(res, 200, { total, byHandle, byKind, ref: "origin/main", checkedAt: Date.now() });
+      } catch (e) {
+        return sendJson(res, 503, { error: "published probe failed: " + e.message });
       }
     }
 

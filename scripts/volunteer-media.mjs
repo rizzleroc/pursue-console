@@ -46,7 +46,8 @@ import { spawn } from "node:child_process";
 import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import os from "node:os";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+import { getPdfjsAssetUrls } from "./lib/pdfjs-assets.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -89,7 +90,12 @@ async function claimPhase() {
   await mkdir(PDF_ROOT, { recursive: true });
 
   console.log(`[claim] fetching ${QUEUE_URL}`);
-  const queue = await (await fetch(QUEUE_URL)).json();
+  let queue;
+  if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
+    queue = await (await fetch(QUEUE_URL)).json();
+  } else {
+    queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
+  }
   if (!queue.byEvent) { console.error("error: queue missing byEvent"); process.exit(1); }
   console.log(`[claim] queue gen ${queue.generatedAt} · ${queue.totalPagesNeedingVisualContext || 0} pages need visual context`);
 
@@ -113,13 +119,8 @@ async function claimPhase() {
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
 
-  // pdfjs render — matches the WORKING classify-visuals config. We
-  // pointedly do NOT pass wasmUrl or standardFontDataUrl: when those
-  // are set, napi-canvas's font loader throws "Value is none of
-  // these types String, Path" on pages with embedded font references
-  // (sketch labels, map city names, weather table annotations) —
-  // testing showed pages that worked WITHOUT the URLs fail WITH them.
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = await getPdfjsAssetUrls();
   class NodeCanvasFactory {
     create(w, h) { const cv = createCanvas(w, h); return { canvas: cv, context: cv.getContext("2d") }; }
     reset(c, w, h) { c.canvas.width = w; c.canvas.height = h; }
@@ -174,6 +175,8 @@ async function claimPhase() {
         disableFontFace: true,
         isEvalSupported: false,
         useWorkerFetch: false,
+        wasmUrl: PDFJS_WASM_URL,
+        standardFontDataUrl: PDFJS_FONTS_URL,
       }).promise;
       const page = await doc.getPage(c.page);
       const baseViewport = page.getViewport({ scale: 1 });
@@ -323,11 +326,21 @@ async function commitPhase() {
       const dstJson = path.join(dstDir, `p${pad}.json`);
       // Preserve the source extension (png if available, jpg fallback)
       const dstImg = path.join(dstDir, `p${pad}${path.extname(imgSrc)}`);
+      // Preserve an existing captured_at so re-committing an already-contributed
+      // page produces NO diff (instead of timestamp-only churn that made the
+      // dashboard show phantom "N to commit" work and wasted volunteer effort).
+      let capturedAt = new Date().toISOString();
+      if (existsSync(dstJson)) {
+        try {
+          const prev = JSON.parse(await readFile(dstJson, "utf8"));
+          if (prev.captured_at) capturedAt = prev.captured_at;
+        } catch {}
+      }
       const out = {
         kind: sec.kind,
         title: sec.title,
         context: sec.context,
-        captured_at: new Date().toISOString(),
+        captured_at: capturedAt,
       };
       const article = sec["article text (newspaper-clipping only)"];
       if (out.kind === "newspaper-clipping" && article) out.article_text = article;
@@ -354,7 +367,12 @@ async function commitPhase() {
     await run("git", ["commit", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
     await run("git", ["push", "-u", "origin", branch]);
     const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
-    await run("gh", ["pr", "create", "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
+    // Use --head=<branch> so gh creates the PR for the branch we just pushed
+    // even when the working tree has unrelated uncommitted changes (build
+    // artifacts, caches). Without it, gh aborts with "you must first push the
+    // current branch to a remote, or use the --head flag".
+    await run("gh", ["pr", "create", "--head", branch, "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
+    console.log(`[commit] PR opened for ${branch}`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
     console.error(`[commit] your files are staged at contributions/${HANDLE}/media — finish by hand.`);
