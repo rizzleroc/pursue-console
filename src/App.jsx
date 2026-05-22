@@ -27,6 +27,17 @@ import MediaView from "./views/MediaView.jsx";
 // lazy-load it so first paint isn't gated on that bundle.
 const SemanticSearchView = lazy(() => import("./views/SemanticSearchView.jsx"));
 
+// Collapse the free-form `type` field into the four record categories
+// war.gov/UFO filters by (the "ALL TYPES" dropdown). Mirrors LiveFeedView's
+// mediaTypeOf so the taxonomy is consistent across the app.
+function recordType(e) {
+  const t = (e.type || "").toLowerCase();
+  if (e.videoId || /video/.test(t)) return "Video";
+  if (/audio/.test(t)) return "Audio";
+  if (/image|imagery|photo/.test(t)) return "Image";
+  return "Document";
+}
+
 export default function App() {
   // LIVE is home — it's where the freshly-arrived data shows up, and it's
   // the view that carries the hero band. Every other view is "instrument."
@@ -40,6 +51,11 @@ export default function App() {
   // view change so subsequent dossier visits don't show a stale banner.
   const [selectionMatch, setSelectionMatch] = useState(null);
   const [volunteerOpen, setVolunteerOpen] = useState(false);
+  // war.gov/UFO-style record filters (Header dropdowns). Release is a single
+  // value today (Release 01) but kept as a filter so future tranches slot in.
+  const [filterAgency, setFilterAgency] = useState("all");
+  const [filterRelease, setFilterRelease] = useState("all");
+  const [filterType, setFilterType] = useState("all");
   // One-time 2.0 launch overlay. Gate is read once on mount; closing the
   // overlay writes the localStorage flag so it never returns on reload.
   const [showLaunch, setShowLaunch] = useState(() => {
@@ -48,16 +64,22 @@ export default function App() {
   });
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return EVENTS;
-    const q = query.toLowerCase();
-    return EVENTS.filter(e =>
-      e.title.toLowerCase().includes(q) ||
-      e.summary.toLowerCase().includes(q) ||
-      e.loc.toLowerCase().includes(q) ||
-      e.agency.toLowerCase().includes(q) ||
-      (e.tags || []).some(t => t.toLowerCase().includes(q))
-    );
-  }, [query]);
+    const q = query.trim().toLowerCase();
+    return EVENTS.filter(e => {
+      if (filterAgency !== "all" && e.agency !== filterAgency) return false;
+      if (filterType !== "all" && recordType(e) !== filterType) return false;
+      // Release: every record is Release 01 today, so selecting it is a no-op.
+      if (filterRelease !== "all" && filterRelease !== "Release 01") return false;
+      if (q && !(
+        e.title.toLowerCase().includes(q) ||
+        e.summary.toLowerCase().includes(q) ||
+        e.loc.toLowerCase().includes(q) ||
+        e.agency.toLowerCase().includes(q) ||
+        (e.tags || []).some(t => t.toLowerCase().includes(q))
+      )) return false;
+      return true;
+    });
+  }, [query, filterAgency, filterRelease, filterType]);
 
   const handleSelect = (event, opts) => {
     setSelected(event);
@@ -100,6 +122,9 @@ export default function App() {
         <Header
           view={view} onViewChange={handleViewChange}
           query={query} onSearch={setQuery}
+          filterAgency={filterAgency} onFilterAgency={setFilterAgency}
+          filterRelease={filterRelease} onFilterRelease={setFilterRelease}
+          filterType={filterType} onFilterType={setFilterType}
           onVolunteer={() => setVolunteerOpen(true)} />
         {!showHero && <CorpusFreshness compact />}
 
