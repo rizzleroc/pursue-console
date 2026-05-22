@@ -1,0 +1,119 @@
+name: Test Akamai reachability (war.gov PDFs)
+
+# As of 2026-05-22 this environment returns HTTP 403 for war.gov —
+# result may differ on GitHub-hosted runners.
+#
+# Purpose: determine whether GitHub Actions runners can reach war.gov
+# PDF URLs that are served behind Akamai CDN. Our cloud environment
+# returns 403; this job tests whether GitHub's IP ranges are also blocked.
+# Results are written to data-raw/.akamai-test.json and uploaded as an
+# artifact so they can be compared across runs.
+
+on:
+  workflow_dispatch:   # manual trigger only — run from the Actions UI
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+
+    outputs:
+      blocked: ${{ steps.verdict.outputs.blocked }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Get runner public IP
+        id: ip
+        run: |
+          RUNNER_IP=$(curl -sf https://checkip.amazonaws.com || echo "unknown")
+          echo "runner_ip=$RUNNER_IP" >> $GITHUB_OUTPUT
+          echo "Runner IP: $RUNNER_IP"
+
+      - name: Probe war.gov PDF URLs
+        id: probe
+        run: |
+          set -euo pipefail
+
+          TESTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          RUNNER_IP="${{ steps.ip.outputs.runner_ip }}"
+
+          URLS=(
+            "https://www.war.gov/medialink/ufo/release_1/fbi-photo-b2.pdf"
+            "https://www.war.gov/medialink/ufo/release_1/dow-uap-d12-mission-report-iraq-may-2022.pdf"
+            "https://www.war.gov/medialink/ufo/release_1/apollo-17.pdf"
+          )
+
+          # Build JSON results array
+          RESULTS="["
+          FIRST=1
+          ANY_BLOCKED=false
+
+          for URL in "${URLS[@]}"; do
+            echo "Testing: $URL"
+
+            # Capture status, time, and bytes; tolerate curl errors (e.g. DNS)
+            RAW=$(curl -s -o /dev/null \
+              -w "%{http_code} %{time_total} %{size_download}" \
+              --max-time 30 \
+              --user-agent "Mozilla/5.0 (compatible; GitHub-Actions-probe/1.0)" \
+              "$URL" 2>/dev/null || echo "000 0 0")
+
+            HTTP_STATUS=$(echo "$RAW" | awk '{print $1}')
+            TIME_S=$(echo "$RAW" | awk '{print $2}')
+            BYTES=$(echo "$RAW" | awk '{print $3}')
+
+            echo "  → HTTP $HTTP_STATUS  time=${TIME_S}s  bytes=$BYTES"
+
+            if [ "$HTTP_STATUS" = "403" ] || [ "$HTTP_STATUS" = "429" ]; then
+              ANY_BLOCKED=true
+            fi
+
+            if [ "$FIRST" = "1" ]; then
+              FIRST=0
+            else
+              RESULTS="$RESULTS,"
+            fi
+
+            RESULTS="$RESULTS{\"url\":\"$URL\",\"http_status\":$HTTP_STATUS,\"time_s\":$TIME_S,\"bytes\":$BYTES}"
+          done
+
+          RESULTS="$RESULTS]"
+
+          echo "blocked=$ANY_BLOCKED" >> $GITHUB_OUTPUT
+
+          # Write JSON artifact
+          mkdir -p data-raw
+          cat > data-raw/.akamai-test.json <<EOF
+          {
+            "tested_at": "$TESTED_AT",
+            "runner_ip": "$RUNNER_IP",
+            "results": $RESULTS
+          }
+          EOF
+
+          # Pretty-print for the log
+          cat data-raw/.akamai-test.json
+
+      - name: Emit blocked verdict
+        id: verdict
+        run: |
+          BLOCKED="${{ steps.probe.outputs.blocked }}"
+          echo "blocked=$BLOCKED" >> $GITHUB_OUTPUT
+          if [ "$BLOCKED" = "true" ]; then
+            echo "::warning::At least one war.gov URL returned 403 or 429 — Akamai is blocking this runner's IP."
+          else
+            echo "::notice::All tested URLs returned non-blocked status codes — runner IP is not blocked by Akamai."
+          fi
+
+      - name: Upload test results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: akamai-test-results
+          path: data-raw/.akamai-test.json
+          retention-days: 30

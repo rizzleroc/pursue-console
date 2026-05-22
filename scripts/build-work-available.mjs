@@ -22,6 +22,7 @@ import { readFile, writeFile, readdir, access } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadConfig, getClaimSummary, CLAIMS_DIR } from "./claim-page.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -108,11 +109,15 @@ async function visualsNeedingContextForEvent(eid) {
   return out.sort((a, b) => a.page - b.page);
 }
 
+const leasingCfg = await loadConfig();
+const visionPhase = leasingCfg.phases.vision || { max_concurrent: 3 };
+
 const byEvent = {};
 let totalPagesNeeded = 0;
 let totalDocsRemaining = 0;
 let totalPagesNeedingReview = 0;
 let totalPagesNeedingVisualContext = 0;
+let totalPagesFullyClaimed = 0;
 // Whole-corpus page totals (across every catalogued scanned doc, not just
 // docs with remaining work) so the volunteer cockpit's CORPUS gauge can show
 // an honest "pages search-ready / total" instead of a records-vs-pages mashup.
@@ -129,9 +134,19 @@ for (const ev of EVENTS) {
   if (totalPages === 0) continue;
 
   const visionPages = await visionPageCount(ev.id);
-  const queue = [];
+  const queue = [];           // open: can accept ≥1 more vision claim
+  const fullClaimedQueue = [];  // consensus-full: max_concurrent active vision claims
+  const pageClaims = {};        // { "<page>": { vision: ["alice"], visual: [] } }
   for (let p = 1; p <= totalPages; p++) {
-    if (!visionPages.has(p)) queue.push(p);
+    if (visionPages.has(p)) continue;
+    const claims = await getClaimSummary(ev.id, p);
+    const activeVision = (claims.vision || []).length;
+    if (Object.keys(claims).length) pageClaims[p] = claims;
+    if (activeVision >= visionPhase.max_concurrent) {
+      fullClaimedQueue.push(p);
+    } else {
+      queue.push(p);
+    }
   }
   // Pages where Gemini + GPT-vision (or any 2 sources) disagree enough
   // to warrant a human typing it up. These are higher-leverage than
@@ -147,7 +162,7 @@ for (const ev of EVENTS) {
   corpusPagesCompleted += visionPages.size;
 
   // If a doc has no work AND no review queue AND no visuals queue, skip.
-  if (queue.length === 0 && reviewQueue.length === 0 && visualsQueue.length === 0) continue;
+  if (queue.length === 0 && fullClaimedQueue.length === 0 && reviewQueue.length === 0 && visualsQueue.length === 0) continue;
 
   byEvent[ev.id] = {
     title: ev.title,
@@ -157,15 +172,19 @@ for (const ev of EVENTS) {
     totalPages,
     pagesCompleted: visionPages.size,
     pagesNeeded: queue.length,
+    pagesFullyClaimed: fullClaimedQueue.length,
     pagesNeedingReview: reviewQueue.length,
     pagesNeedingVisualContext: visualsQueue.length,
     queue,
+    fullClaimedQueue,
+    ...(Object.keys(pageClaims).length ? { pageClaims } : {}),
     reviewQueue,
     visualsNeedingContext: visualsQueue,
   };
   totalPagesNeeded += queue.length;
   totalPagesNeedingReview += reviewQueue.length;
   totalPagesNeedingVisualContext += visualsQueue.length;
+  totalPagesFullyClaimed += fullClaimedQueue.length;
   if (queue.length > 0) totalDocsRemaining++;
 }
 
@@ -182,13 +201,15 @@ const out = {
   // Whole-corpus page progress for the volunteer cockpit CORPUS gauge.
   corpusPagesTotal,
   corpusPagesCompleted,
+  // Claim totals for the dashboard.
+  totalPagesFullyClaimed,
   byEvent,
 };
 
 await writeFile(OUT, JSON.stringify(out));
 const { stat } = await import("node:fs/promises");
 const sz = (await stat(OUT)).size;
-console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} pages need vision OCR · ${totalPagesNeedingReview} pages need human review · ${totalPagesNeedingVisualContext} pages need visual context`);
+console.log(`[work-available] wrote ${OUT}  ${(sz/1024).toFixed(0)} KB  ${totalDocsRemaining} docs · ${totalPagesNeeded} open · ${totalPagesFullyClaimed} claimed · ${totalPagesNeedingReview} need review · ${totalPagesNeedingVisualContext} need visual context`);
 // Top 5 biggest remaining
 const top = Object.entries(byEvent).sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded).slice(0,5);
 for (const [eid, w] of top) {

@@ -93,48 +93,63 @@ Ideas surfaced during 2.0 + 2.1 work that are worth pursuing if/when someone has
 
 ## R7 · Volunteer work leasing (claim tracking + stale reclaim)
 
-**Status:** DESIGNED + config scaffolded, **not wired**. Full design + brutal
-analysis in [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md). The
-Phase-1 config artifact `config/leasing.json` is already committed
-(`default_lease_secs: 86400` + per-phase ocr/media/review windows), but nothing
-consumes it yet: `scripts/build-work-available.mjs` does not read it and no
-`public/claims/<eid>/p<NNN>.json` ledger is written. So Phase 1 is half-landed —
-the knob exists, the mechanism doesn't.
+**Status — Phase 1: SHIPPED (2026-05-22).** Full design + brutal analysis in
+[design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).
 
-**Request:** a live-tracking server that records who's working on which page and
-auto-reassigns a page to the next volunteer after a configurable timeout
-(default 10 min, set in admin settings).
+**What was built (2026-05-22):**
 
-**Verdict (see design doc for the full argument):** the *need* — don't let two
-volunteers duplicate a page; don't let a claim sit forever — is real and already
-flagged in R6. The *requested implementation* (an always-on, authenticated,
-admin-configurable tracking server) is the wrong order for a static-site /
-fork-and-PR project that deliberately has no backend, no auth, and promises *"no
-central server holds your work."* A lease here can only ever be advisory
-(submission is a GitHub PR, which knows nothing about leases), and an advisory
-lease needs a **file, not a server**. The 10-minute timeout is also
-mis-calibrated: real work units run 30 min (OCR slice) to days (visuals
-claim→fill→commit), so a 10-min reassign would *cause* duplicate PRs.
+- `config/leasing.json` — global config: `consensus_passes: 3`, per-phase lease
+  windows (vision 24 h / visual 48 h / review 24 h / revalidation 24 h).
+- `scripts/claim-page.mjs` — core module: claim read, write, check, and
+  garbage-collection logic.
+- `scripts/build-work-available.mjs` updated — reads `public/claims/`, annotates
+  every queue entry with active claim counts, and splits output into `queue`
+  (open slots remain) vs `fullClaimedQueue` (consensus-full / capacity reached).
+- `scripts/volunteer.mjs` updated — consults claim data from `work-available.json`
+  before selecting pages; writes claim files to
+  `contributions/<handle>/claims/`.
+- `scripts/volunteer-media.mjs` updated — writes visual claim files before media
+  capture begins.
+- `scripts/import-contributions.mjs` updated — merges volunteer claim files from
+  `contributions/<handle>/claims/` into `public/claims/` on PR import.
+- `scripts/gc-claims.mjs` — standalone garbage-collector: expires stale claim
+  files from `public/claims/`.
+
+**Claim-concurrency rules implemented:**
+
+| Phase | Max concurrent claimants | Behavior at cap |
+|---|---|---|
+| vision | 3 (consensus building) | locked after 3 |
+| visual | 1 | locked after 1 |
+| review | 1 | locked after 1 |
+| revalidation | 2 | locked after 2 |
+
+Different task types always coexist freely (one person vision + another visual on the same page = fine).
+
+Volunteer claims flow via PR (`contributions/<handle>/claims/`); the maintainer writes `public/claims/` directly on merge.
+
+**Phase 0 note:** direct PDF download from cloud runners tested against Akamai (war.gov) — HTTP 403 confirmed; the Denis mirror path remains the only viable import source.
+
+**What's still open (Phase 1 gaps):**
+
+- Auto-merge of claim PRs — claim PRs still require manual maintainer merge before other volunteers see the new claim in `public/claims/`. Until that's wired, there's a git-round-trip latency window where two volunteers could race.
+- UI surface — claim status (how many claimants, whether a page is locked) is not yet exposed in the volunteer cockpit / dashboard.
 
 **Phased plan:**
 1. **Phase 0 — local dedup (done).** Volunteer scripts skip pages that already
    have a local contribution/staged template. Killed the "re-serves the same
    lot" bug. Zero infra.
-2. **Phase 1 — static claims ledger (recommended next; config already committed).**
-   `public/claims/<eid>/p<NNN>.json` with `{handle, claimed_at, lease_secs}`;
-   default lease **24h** (matched to the real work unit), configurable via the
-   already-committed `config/leasing.json`. **What's left:** wire
-   `build-work-available.mjs` (or the volunteer scripts) to read `leasing.json`,
-   write/read the `public/claims/` ledger, and skip pages another volunteer
-   claimed inside the lease window. Delivers tracking + expiry + reassignment +
-   configurable timeout with no server, no auth, no privacy regression. Wire it
-   when a *second* real volunteer exists (i.e. after R1).
+2. **Phase 1 — static claims ledger (SHIPPED 2026-05-22).** `public/claims/`
+   ledger with per-phase concurrency caps; `gc-claims.mjs` for expiry;
+   `build-work-available.mjs` annotates the queue; volunteer scripts read and
+   write claims. No server, no auth, no privacy regression.
 3. **Phase 2 — serverless claim function (deferred behind a trigger).** A single
    stateless Worker/KV endpoint, *only* once there are ≥5 concurrent volunteers
    AND duplicate PRs are a measured maintainer burden AND Phase 1's git-latency
    is demonstrably too slow. Still advisory; still never holds the work.
 
-**Owner:** revisit when R1 lands a second contributor.
+**Owner:** Phase 2 — revisit when concurrent-volunteer collisions become a
+measured problem.
 
 ---
 
@@ -172,6 +187,7 @@ re-OCR compute rather than hand-typing.
 
 ---
 
+_Updated 2026-05-22: R7 Phase 1 (volunteer work leasing) shipped — `claim-page.mjs`, `gc-claims.mjs`, updated `build-work-available.mjs` / `volunteer.mjs` / `volunteer-media.mjs` / `import-contributions.mjs`; per-phase concurrency caps (vision 3 / visual 1 / review 1 / revalidation 2); claim PRs still need manual merge (auto-merge and UI surface deferred to Phase 1 gaps)._
 _Updated 2026-05-22: URL normalization bug fixed in `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` — Denis manifest uses hyphenated filenames, `events.js` uses raw war.gov URLs with literal spaces; case-insensitive comparison never matched. Fix: normalize both sides with `.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-")`. Result: Denis manifest matching improved from **68/120 → 112/120 PDFs matched**; 44 previously unlinked events are now matched, unlocking ~800 Denis pages for those events on the next import run. 8 PDFs remain genuinely mismatched due to filename discrepancies (tracked in R5 Denis URL mismatches). Corpus status at audit: 121 events catalogued (65 have pages, 56 do not); 3,394 pages transcribed; 12 pages need vision OCR (7 events, nearly done); 205 visual context pages need human annotation; 4 catalogue placeholders have no URL (japan-2023, indopacom-2024, army-2026, pursue-release-01); 0 review-queue disputes._
 _Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._

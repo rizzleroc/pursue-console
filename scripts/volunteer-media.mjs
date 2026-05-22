@@ -96,6 +96,7 @@ const QUEUE_URL = args["queue-url"] || "https://rizzleroc.github.io/pursue-conso
 const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volunteer"));
 const STAGING = path.resolve(args.staging || path.join(os.homedir(), ".pursue-helper", "media-staging", HANDLE));
 const CONTRIB_DIR = path.join(ROOT, "contributions", HANDLE, "media");
+const CONTRIB_CLAIMS_ROOT = path.join(ROOT, "contributions", HANDLE, "claims");
 
 // --auto-context: after rendering each page, ask the vision daemon to draft the
 // documentary Context from the rendered image so the staged template is
@@ -219,6 +220,17 @@ async function claimPhase() {
   }
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
+
+  // Write claim files so the maintainer (and CI) can see which pages are
+  // in-flight before the contribution PR is merged.
+  const claimedAt = Math.floor(Date.now() / 1000);
+  for (const c of claims) {
+    const pad4 = String(c.page).padStart(4, "0");
+    const claimDir = path.join(CONTRIB_CLAIMS_ROOT, c.eid);
+    await mkdir(claimDir, { recursive: true });
+    const claimPath = path.join(claimDir, `p${pad4}.json`);
+    await writeFile(claimPath, JSON.stringify({ visual: [{ handle: HANDLE, claimed_at: claimedAt, lease_secs: 86400 }] }, null, 2) + "\n", "utf8");
+  }
 
   // pdfjs render. The "Value is none of these types String, Path" failures
   // were NOT a font problem — they came from ctx.clip(path) rejecting pdfjs's
@@ -498,6 +510,7 @@ async function commitPhase() {
   try {
     await run("git", ["checkout", "-b", branch]);
     await run("git", ["add", `contributions/${HANDLE}/media`]);
+    await run("git", ["add", `contributions/${HANDLE}/claims`]);
     await run("git", ["commit", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
     await run("git", ["push", "-u", "origin", branch]);
     const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;

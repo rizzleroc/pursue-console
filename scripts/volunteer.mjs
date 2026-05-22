@@ -85,6 +85,7 @@ if (!CONTRIB_SOURCE) {
   process.exit(1);
 }
 const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);
+const CONTRIB_CLAIMS_ROOT = path.join(ROOT, "contributions", HANDLE, "claims");
 const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/, os.homedir());
 
 async function loadToken() {
@@ -156,7 +157,16 @@ for (const eid of candidateEids) {
   if (remaining <= 0) break;
   const doc = queue.byEvent[eid];
   if (!doc.pdfUrl) continue;
-  const take = doc.queue.slice(0, remaining);
+  // `queue` already excludes fully-claimed pages (build-work-available annotates them).
+  // Skip pages already being worked by this handle in any active claim.
+  const pageClaims = doc.pageClaims || {};
+  const openPages = doc.queue.filter(p => {
+    const pc = pageClaims[p];
+    if (!pc) return true;  // no claims at all — open
+    const myActive = (pc.vision || []).includes(HANDLE);
+    return !myActive;      // skip if this handle already has a vision claim
+  });
+  const take = openPages.slice(0, remaining);
   if (!take.length) continue;
   claims.push({ eid, doc, pages: take });
   remaining -= take.length;
@@ -164,6 +174,33 @@ for (const eid of candidateEids) {
 const total = claims.reduce((s, c) => s + c.pages.length, 0);
 console.log(`[volunteer] claiming ${total} page(s) across ${claims.length} doc(s):`);
 for (const c of claims) console.log(`    ${c.eid.padEnd(28)} pages ${c.pages.join(",")}`);
+
+// ----- write claim files -----
+// Claims land in contributions/<HANDLE>/claims/ and are included in the PR.
+// import-contributions.mjs merges them into public/claims/ at build time,
+// so the next deploy reflects active claims and volunteers don't collide.
+{
+  const now = Math.floor(Date.now() / 1000);
+  const VISION_LEASE = 7200; // 2h, matches vision phase in config/leasing.json
+  for (const c of claims) {
+    for (const p of c.pages) {
+      const pad = String(p).padStart(4, "0");
+      const dir = path.join(CONTRIB_CLAIMS_ROOT, c.eid);
+      await mkdir(dir, { recursive: true });
+      const claimPath = path.join(dir, `p${pad}.json`);
+      let existing = {};
+      if (existsSync(claimPath)) {
+        try { existing = JSON.parse(await readFile(claimPath, "utf8")); } catch {}
+      }
+      if (!existing.vision) existing.vision = [];
+      if (!existing.vision.some(s => s.handle === HANDLE)) {
+        existing.vision.push({ handle: HANDLE, claimed_at: now, lease_secs: VISION_LEASE });
+      }
+      await writeFile(claimPath, JSON.stringify(existing, null, 2) + "\n", "utf8");
+    }
+  }
+  console.log(`[volunteer] wrote ${total} claim file(s) → contributions/${HANDLE}/claims/`);
+}
 
 // ---- progress reporter → MONITOR (separate process from MCP daemon) ----
 // Two parallel write paths:
@@ -486,6 +523,8 @@ function run(cmd, args, opts = {}) {
 try {
   await run("git", ["checkout", "-b", branch]);
   await run("git", ["add", `contributions/${HANDLE}`]);
+  // Include claim files so import-contributions.mjs can merge them into public/claims/.
+  if (existsSync(CONTRIB_CLAIMS_ROOT)) await run("git", ["add", `contributions/${HANDLE}/claims`]);
   const docsTouched = [...new Set(claims.map(c => c.eid))].join(", ");
   await run("git", ["commit", "-m", `corpus: volunteer transcriptions for ${docsTouched}\n\nSubmitted by @${HANDLE} via scripts/volunteer.mjs (${pagesOK} pages).`]);
   await run("git", ["push", "-u", "origin", branch]);

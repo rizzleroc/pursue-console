@@ -20,6 +20,7 @@ const ROOT = path.resolve(__dirname, "..");
 const CONTRIB = path.join(ROOT, "contributions");
 const VIS_CACHE = path.join(ROOT, "data-raw", ".vision-cache");
 const MANIFEST = path.join(ROOT, "data-raw", ".contributions-manifest.json");
+const PUBLIC_CLAIMS = path.join(ROOT, "public", "claims");
 
 const MIN_CHARS = 40;  // anything shorter we treat as effectively empty
 
@@ -36,7 +37,7 @@ async function pageNumFromName(f) {
 
 function pad4(n) { return String(n).padStart(4, "0"); }
 
-const stats = { imported: 0, skipped_empty: 0, skipped_existing_better: 0, overwritten: 0, scanned: 0 };
+const stats = { imported: 0, skipped_empty: 0, skipped_existing_better: 0, overwritten: 0, scanned: 0, claims_imported: 0 };
 const manifest = {};
 // Load existing manifest so re-runs preserve credit for pages we imported in earlier runs.
 if (existsSync(MANIFEST)) {
@@ -321,6 +322,50 @@ for (const handleEnt of await listDirs(CONTRIB)) {
       };
     }
   }
+
+  // Merge volunteer claim files: contributions/<handle>/claims/<eid>/p<NNNN>.json
+  // → public/claims/<eid>/p<NNNN>.json
+  // For each task type, combine arrays from all handles, deduplicating by handle
+  // (last write wins). Claims already in public/claims/ (from prior merges or
+  // the maintainer) are preserved.
+  const CLAIM_TASK_TYPES = ["vision", "visual", "review", "revalidation"];
+  const claimsRoot = path.join(hDir, "claims");
+  for (const eidEnt of await listDirs(claimsRoot)) {
+    if (!eidEnt.isDirectory()) continue;
+    const eid = eidEnt.name;
+    const claimEidDir = path.join(claimsRoot, eid);
+    for (const f of await readdir(claimEidDir)) {
+      if (!/^p\d{4}\.json$/i.test(f)) continue;
+      let volunteerClaims;
+      try { volunteerClaims = JSON.parse(await readFile(path.join(claimEidDir, f), "utf8")); } catch { continue; }
+
+      const pubEidDir = path.join(PUBLIC_CLAIMS, eid);
+      const pubPath = path.join(pubEidDir, f);
+      let existing = {};
+      try { existing = JSON.parse(await readFile(pubPath, "utf8")); } catch {}
+
+      // Merge each task type: existing entries take precedence for same handle,
+      // but volunteer entries for new handles are added. Last write wins means
+      // the volunteer's entry replaces an older entry for the same handle.
+      const merged = {};
+      for (const taskType of CLAIM_TASK_TYPES) {
+        const byHandle = new Map();
+        // Seed with volunteer's entries first, then overlay with existing so
+        // maintainer/prior-merge entries win for the same handle.
+        for (const entry of (volunteerClaims[taskType] || [])) {
+          if (entry?.handle) byHandle.set(entry.handle, entry);
+        }
+        for (const entry of (existing[taskType] || [])) {
+          if (entry?.handle) byHandle.set(entry.handle, entry);
+        }
+        merged[taskType] = [...byHandle.values()];
+      }
+
+      await mkdir(pubEidDir, { recursive: true });
+      await writeFile(pubPath, JSON.stringify(merged, null, 2) + "\n", "utf8");
+      stats.claims_imported++;
+    }
+  }
 }
 
 await writeFile(MANIFEST, JSON.stringify(manifest, null, 2) + "\n", "utf8");
@@ -332,6 +377,7 @@ const credited = Object.values(manifest).reduce((acc, m) => {
 
 console.log(`[import] scanned ${stats.scanned} contribution page(s):`);
 console.log(`         ${stats.imported} new · ${stats.overwritten} replaced · ${stats.skipped_existing_better} kept (canonical better) · ${stats.skipped_empty} skipped (empty)`);
+console.log(`[import] ${stats.claims_imported} claim file(s) merged into public/claims/`);
 console.log(`[import] manifest at data-raw/.contributions-manifest.json — credited handles:`);
 for (const [h, n] of Object.entries(credited).sort((a,b) => b[1]-a[1])) {
   console.log(`           ${h}: ${n} page(s)`);

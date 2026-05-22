@@ -1,0 +1,27 @@
+{
+  "default_lease_secs": 86400,
+  "gc_after_secs": 604800,
+  "consensus_passes": 3,
+  "phases": {
+    "vision": {
+      "max_concurrent": 3,
+      "lease_secs": 7200,
+      "note": "OCR transcription. First 3 concurrent passes build consensus; after that the page is locked for vision unless disputed."
+    },
+    "visual": {
+      "max_concurrent": 1,
+      "lease_secs": 86400,
+      "note": "Media/context capture (screenshot + verbatim documentary context). Single-slot — one volunteer at a time."
+    },
+    "review": {
+      "max_concurrent": 1,
+      "lease_secs": 86400,
+      "note": "Human hand-typing disputed pages. Single-slot; human always wins canonical."
+    },
+    "revalidation": {
+      "max_concurrent": 2,
+      "lease_secs": 7200,
+      "note": "Re-OCR of disputed pages by volunteers (volunteer.mjs --review). Two concurrent allowed for cross-check."
+    }
+  }
+}
