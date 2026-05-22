@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // Single source of truth for "how fresh is the data on screen right now."
 // Polls public/corpus-version.json every 60s and shows a compact strip
@@ -6,7 +7,6 @@ import React, { useEffect, useState } from "react";
 // the deployed site see updates as soon as a new build lands.
 
 let _versionP = null;
-let _statsP = null;
 function loadVersion(bust = false) {
   if (bust || !_versionP) {
     const t = bust ? `?t=${Date.now()}` : "";
@@ -15,15 +15,6 @@ function loadVersion(bust = false) {
       .catch(() => null);
   }
   return _versionP;
-}
-function loadStats(bust = false) {
-  if (bust || !_statsP) {
-    const t = bust ? `?t=${Date.now()}` : "";
-    _statsP = fetch(`${import.meta.env.BASE_URL}corpus-stats.json${t}`, { cache: bust ? "reload" : "default" })
-      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
-      .catch(() => null);
-  }
-  return _statsP;
 }
 
 function fmtAgo(iso) {
@@ -38,15 +29,15 @@ function fmtAgo(iso) {
 
 export default function CorpusFreshness({ compact = false }) {
   const [v, setV] = useState(null);
-  const [s, setS] = useState(null);
+  const { stats: s, reload: reloadStats } = useCorpusStats();
   const [refreshing, setRefreshing] = useState(false);
 
   async function refresh(bust = false) {
     setRefreshing(true);
-    if (bust) { _versionP = null; _statsP = null; }
+    if (bust) { _versionP = null; }
     try {
-      const [ver, st] = await Promise.all([loadVersion(bust), loadStats(bust)]);
-      setV(ver); setS(st);
+      const [ver] = await Promise.all([loadVersion(bust), reloadStats(bust)]);
+      setV(ver);
     } finally { setRefreshing(false); }
   }
   useEffect(() => {
@@ -81,23 +72,6 @@ export default function CorpusFreshness({ compact = false }) {
           {refreshing ? "◌" : "↻"}
         </button>
       </div>
-    );
-  }
-
-  // Legacy expanded compact mode kept as a fallback — never rendered now
-  // that App uses compact={true} everywhere.
-  if (false) {
-    return (
-      <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        {ago}
-        {inventoryTotal != null && (
-          <span className="text-emerald-600">· {catalogued}/{inventoryTotal} catalogued</span>
-        )}
-        {pagesVision != null && (
-          <span className="text-emerald-600">· {pagesVision.toLocaleString()}p vision</span>
-        )}
-      </span>
     );
   }
 

@@ -4,11 +4,12 @@ import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
 import { highlightQuery } from "../lib/highlightQuery.jsx";
+import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // Fallback inventory total — only used if public/corpus-stats.json hasn't
 // loaded yet (or 404s on dev). The real number comes from the corpus DB
 // (scripts/db-rebuild.mjs writes corpus-stats.json on every build).
-const INVENTORY_TOTAL_FALLBACK = 162;
+const INVENTORY_TOTAL_FALLBACK = 173;
 
 // =====================================================================
 // SEMANTIC SEARCH — dense-vector search over the corpus.
@@ -20,7 +21,8 @@ const INVENTORY_TOTAL_FALLBACK = 162;
 // Runtime: load the same model via @huggingface/transformers (INT8
 // quantized, ~25 MB, cached in IndexedDB after first download), embed
 // the query, brute-force cosine against the stored vectors.
-// At 1057 vectors × 384 dim the search is < 5 ms.
+// The index holds a few thousand 384-dim vectors (see embeddings-info.json
+// for the live count); brute-force cosine over them is < 5 ms.
 // =====================================================================
 
 const MODEL = "Xenova/all-MiniLM-L6-v2";
@@ -397,11 +399,7 @@ export default function SemanticSearchView({ onSelect }) {
   }
 
   // Coverage numbers — derives from the DB stats when loaded.
-  const [stats, setStats] = useState(null);
-  useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}corpus-stats.json?t=${Date.now()}`)
-      .then(r => r.ok ? r.json() : null).then(setStats).catch(() => {});
-  }, []);
+  const { stats } = useCorpusStats();
   const coverage = useMemo(() => {
     const inventoryTotal = stats?.inventory?.total ?? INVENTORY_TOTAL_FALLBACK;
     const catalogued = stats?.events?.catalogued ?? EVENTS.length;
@@ -676,7 +674,7 @@ export default function SemanticSearchView({ onSelect }) {
       )}
 
       {searching && modelLoaded && (
-        <div className="font-mono text-[11px] text-emerald-500 mb-3">⏳ embedding query and ranking 1,057 chunks…</div>
+        <div className="font-mono text-[11px] text-emerald-500 mb-3">⏳ embedding query and ranking {(vecState?.info?.count ?? 0).toLocaleString()} chunks…</div>
       )}
 
       {results && (() => {
