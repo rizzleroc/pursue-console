@@ -223,9 +223,10 @@ export default function LaunchOverlay({ onClose }) {
                   className="lo-swap absolute inset-0 w-full h-full"
                   src={`https://www.dvidshub.net/video/embed/${clip.videoId}`}
                   title={`${clip.code} — ${clip.tag}`}
-                  allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                  allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen
                   loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
               </div>
               <div key={`meta-${swapKey}`} className="lo-swap mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
