@@ -138,37 +138,18 @@ claim→fill→commit), so a 10-min reassign would *cause* duplicate PRs.
 
 ---
 
-## R8 · `volunteer.mjs --review` producer (consumer wired, producer absent)
+## R8 · Security review residuals (from the 2.2 sweep)
 
-**Status:** DESIGNED by its consumers, **not built**. Surfaced in the 2.2 sweep.
+The [2.2 security review](./CHANGELOG.md) closed every actionable hardening item. These are the residual / accepted-risk items it surfaced — none is currently exploitable in this app's threat model (static-site, fork-and-PR, localhost-only daemon), but each is worth revisiting if the architecture changes.
 
-`import-contributions.mjs` handles `<handle>/gpt-vision-review/` and
-`<handle>/gemini-review/` source folders (lands them as `p<NNN>.<base>.v2.txt` so
-`compare-sources.mjs` re-scores the dispute), and `judge-disputed.mjs` references
-output from "volunteer.mjs `--review`". But `volunteer.mjs` has **no `--review`
-mode** — nothing produces those folders. The consumer contract is precise (path
-shape + the standardized prompt), so this is buildable; it's just unbuilt.
+| | What | Why deferred / accepted |
+|---|---|---|
+| S1 | **Monitor `POST /progress` auth is optional** (`pursue-vision-mcp/monitor.mjs:566`). `PURSUE_MONITOR_TOKEN` is enforced when set but defaults to no auth. | Bound to `127.0.0.1` only; worst case is a local process injecting cosmetic dashboard state. Making the token mandatory is a behavior change for existing local setups — do it (or default-generate a token like the daemon does) when the monitor is ever exposed beyond localhost. |
+| S2 | **SSRF guard doesn't resolve bare hostnames** (`scripts/safe-fetch.mjs`). Scheme + literal-IP + per-redirect checks are enforced, but a hostname whose DNS points at a private IP (rebinding) would pass. | Download URLs are maintainer-curated (all `https://www.war.gov` today). Add DNS resolution + post-resolve IP checks only if downloads ever accept untrusted/user-supplied URLs. |
+| S3 | **CI installs the fork's lockfile** (`validate-contribution.yml`). Now runs with `--ignore-scripts`, but still resolves the PR's `package*.json`. | Token is read-only and scripts are disabled, so blast radius is small. Consider `npm ci` against the base lockfile + flagging PRs that touch `package*.json` for manual review if dependency-confusion ever becomes a concern. |
+| S4 | **No automated secret-scanning / dependency-audit gate in CI.** The 2.2 review was manual. | Low churn today. When contributor volume grows, add a `gitleaks` (or GitHub secret-scanning) + `npm audit --audit-level=high` gate so regressions are caught without a manual sweep. |
 
-**Why deferred (not built in 2.2):** the REVIEW queue is currently **empty** (0
-disputed pages), and maintainer-side `reevaluate-disputed.mjs` already does
-standardized re-eval through both providers via `/fanout`. A volunteer `--review`
-mode would be a *volunteer-driven* version of that same job. Building ~150 lines
-of new render+prompt+write path for an empty queue, duplicating a working
-maintainer pipeline, is speculative — exactly the kind of half-feature this sweep
-exists to prevent. Note the *human* "settle the REVIEW queue" path (HOW-CAN-I-HELP
-priority 1) is unrelated: that produces a hand-typed `human` source, not a
-`-review` re-OCR.
-
-**Definition of done (when built):** `volunteer.mjs --review [--provider=…]` pulls
-disputed pages from `review-queue.json`, renders + re-transcribes each through
-`scripts/prompts/standard-transcription.txt`, and writes
-`contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt`. **Trigger to
-build:** the REVIEW queue has real disputes AND a volunteer wants to contribute
-re-OCR compute rather than hand-typing.
-
-**Alternative:** if volunteer-driven reeval is never wanted, delete the
-`gpt-vision-review`/`gemini-review` branches from `import-contributions.mjs` +
-`judge-disputed.mjs` to retire the dangling contract.
+**Owner:** revisit S1/S2 if the daemon or fetchers ever take untrusted input; S3/S4 when contributor volume justifies the CI cost.
 
 ---
 
@@ -232,9 +213,44 @@ XHR? does Range chunking work on war.gov's CDN?) is unknown until the first run.
 
 ---
 
+## R10 · `volunteer.mjs --review` producer (consumer wired, producer absent)
+
+**Status:** DESIGNED by its consumers, **not built**. Surfaced in the 2.2 sweep.
+
+`import-contributions.mjs` handles `<handle>/gpt-vision-review/` and
+`<handle>/gemini-review/` source folders (lands them as `p<NNN>.<base>.v2.txt` so
+`compare-sources.mjs` re-scores the dispute), and `judge-disputed.mjs` references
+output from "volunteer.mjs `--review`". But `volunteer.mjs` has **no `--review`
+mode** — nothing produces those folders. The consumer contract is precise (path
+shape + the standardized prompt), so this is buildable; it's just unbuilt.
+
+**Why deferred (not built in 2.2):** the REVIEW queue is currently **empty** (0
+disputed pages), and maintainer-side `reevaluate-disputed.mjs` already does
+standardized re-eval through both providers via `/fanout`. A volunteer `--review`
+mode would be a *volunteer-driven* version of that same job. Building ~150 lines
+of new render+prompt+write path for an empty queue, duplicating a working
+maintainer pipeline, is speculative — exactly the kind of half-feature this sweep
+exists to prevent. Note the *human* "settle the REVIEW queue" path (HOW-CAN-I-HELP
+priority 1) is unrelated: that produces a hand-typed `human` source, not a
+`-review` re-OCR.
+
+**Definition of done (when built):** `volunteer.mjs --review [--provider=…]` pulls
+disputed pages from `review-queue.json`, renders + re-transcribes each through
+`scripts/prompts/standard-transcription.txt`, and writes
+`contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt`. **Trigger to
+build:** the REVIEW queue has real disputes AND a volunteer wants to contribute
+re-OCR compute rather than hand-typing.
+
+**Alternative:** if volunteer-driven reeval is never wanted, delete the
+`gpt-vision-review`/`gemini-review` branches from `import-contributions.mjs` +
+`judge-disputed.mjs` to retire the dangling contract.
+
+---
+
 _Updated 2026-05-22 (later): R9 — MCP-based war.gov collector landed (`pursue-vision-mcp/war-gov-driver.mjs`, daemon endpoints, `scripts/sync-war-gov.mjs`, `npm run corpus:fetch-war-gov`). Marked `@unverified` pending the maintainer's first live run against their real Chrome; Akamai blocks our IPs so neither the agent nor CI can test it._
 _Updated 2026-05-22: added R9 (Release 02 published on war.gov; scaffolded as "incoming", ingest blocked on the DenisSergeevitch/UFO-USA mirror — watch loop polls the upstream manifest)._
+_Updated 2026-05-22: added R8 (security review residuals) after the 2.2 sweep; the volunteer `--review` producer item previously filed as R8 in the punchlist sweep is now R10 (was R9 before R9 was claimed by Release 02 ingestion)._
 _Updated 2026-05-22: URL normalization bug fixed in `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` — Denis manifest uses hyphenated filenames, `events.js` uses raw war.gov URLs with literal spaces; case-insensitive comparison never matched. Fix: normalize both sides with `.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-")`. Result: Denis manifest matching improved from **68/120 → 112/120 PDFs matched**; 44 previously unlinked events are now matched, unlocking ~800 Denis pages for those events on the next import run. 8 PDFs remain genuinely mismatched due to filename discrepancies (tracked in R5 Denis URL mismatches). Corpus status at audit: 121 events catalogued (65 have pages, 56 do not); 3,394 pages transcribed; 12 pages need vision OCR (7 events, nearly done); 205 visual context pages need human annotation; 4 catalogue placeholders have no URL (japan-2023, indopacom-2024, army-2026, pursue-release-01); 0 review-queue disputes._
-_Updated 2026-05-21 (2.2 sweep, follow-up): added R8 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
+_Updated 2026-05-21 (2.2 sweep, follow-up): added R9 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent; was filed as R8 before the security-review R8 superseded it); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._
 _Updated 2026-05-20: added R7 (volunteer leasing) + design doc. To propose a new roadmap item, open an issue with the `roadmap` label._
