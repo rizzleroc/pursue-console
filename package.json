@@ -23,6 +23,7 @@
     "corpus:contributors": "node scripts/build-contributors.mjs",
     "corpus:fetch-missing": "node scripts/fetch-missing-pdfs.mjs",
     "corpus:fetch-war-gov": "node scripts/sync-war-gov.mjs",
+    "corpus:scrape-r02": "node scripts/scrape-release-02-via-whipgen.mjs",
     "corpus:transcribe-videos": "node scripts/transcribe-videos.mjs",
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",
