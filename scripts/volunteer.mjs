@@ -68,6 +68,12 @@ const DAEMON = args.daemon || "http://127.0.0.1:9223";
 const QUEUE_URL = args["queue-url"] || "https://rizzleroc.github.io/pursue-console/work-available.json";
 const DRY = !!args["dry-run"];
 const NO_PR = !!args["no-pr"];
+// --review: claim disputed pages (the reviewQueue) instead of the OCR queue and
+// write an independent re-transcription into gpt-vision-review so the judge can
+// break the tie between disagreeing sources. Without this flag being honored,
+// TAKE REVIEW JOB just grabbed unrelated OCR pages and never cleared the review
+// queue.
+const REVIEW = !!args["review"];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -79,7 +85,9 @@ const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volu
 // adds a second source to the same page rather than overwriting it.
 const PROVIDER = (args.provider || "chatgpt").toLowerCase();
 const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini", claude: "claude" };
-const CONTRIB_SOURCE = PROVIDER_TO_SOURCE[PROVIDER];
+// Review mode targets the review source so it doesn't overwrite the original
+// OCR — the judge sees both sources and resolves the dispute.
+const CONTRIB_SOURCE = REVIEW ? "gpt-vision-review" : PROVIDER_TO_SOURCE[PROVIDER];
 if (!CONTRIB_SOURCE) {
   console.error(`error: --provider must be 'chatgpt', 'gemini', or 'claude' (got '${PROVIDER}')`);
   process.exit(1);
@@ -124,16 +132,29 @@ async function checkGhAuth() {
 await checkGhAuth();
 
 // ----- step 1: fetch the work queue -----
-console.log(`[volunteer] fetching ${QUEUE_URL}`);
-let queue;
-if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
-  const queueRes = await fetch(QUEUE_URL);
-  if (!queueRes.ok) { console.error(`error: queue fetch HTTP ${queueRes.status}`); process.exit(1); }
-  queue = await queueRes.json();
-} else {
-  queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
+// Load the work queue — preferring whichever of {passed queue, deployed remote}
+// has the NEWER generatedAt. The local public/work-available.json can be staler
+// than the deployed GitHub Pages copy (or fresher); trusting the timestamp is
+// what made the dashboard say "1 page needs review" while the worker saw 0.
+const REMOTE_QUEUE = "https://rizzleroc.github.io/pursue-console/work-available.json";
+async function _loadQueue(src) {
+  try {
+    const q = /^https?:\/\//i.test(src)
+      ? await (await fetch(src + (src.includes("?") ? "" : "?t=" + Date.now()))).json()
+      : JSON.parse(await readFile(src, "utf8"));
+    return { q, ts: Date.parse(q.generatedAt) || 0, kind: /^https?:\/\//i.test(src) ? "remote" : "local" };
+  } catch { return null; }
 }
-console.log(`[volunteer] queue gen ${queue.generatedAt} · ${queue.totalDocsRemaining} docs · ${queue.totalPagesNeeded} pages need vision OCR`);
+const _qSources = [await _loadQueue(QUEUE_URL)];
+if (QUEUE_URL !== REMOTE_QUEUE) _qSources.push(await _loadQueue(REMOTE_QUEUE));
+const _qLoaded = _qSources.filter(Boolean).sort((a, b) => b.ts - a.ts);
+if (!_qLoaded.length) { console.error("error: could not load any work queue"); process.exit(1); }
+const queue = _qLoaded[0].q;
+console.log(`[volunteer] using ${_qLoaded[0].kind} queue (gen ${queue.generatedAt})`);
+const _qLabel = REVIEW
+  ? `${queue.totalPagesNeedingReview || 0} pages need review`
+  : `${queue.totalDocsRemaining || 0} docs · ${queue.totalPagesNeeded || 0} pages need vision OCR`;
+console.log(`[volunteer] ${_qLabel}`);
 
 // ----- step 2: pick a slice -----
 // Picking strategy: hash(handle) determines a stable starting event so two
@@ -161,7 +182,10 @@ for (const eid of candidateEids) {
   if (remaining <= 0) break;
   const doc = queue.byEvent[eid];
   if (!doc.pdfUrl) continue;
-  const take = doc.queue.slice(0, remaining);
+  // REVIEW mode targets disputed pages (doc.reviewQueue) so the worker actually
+  // addresses the queue the dashboard shows, not the OCR backlog.
+  const pageList = REVIEW ? (doc.reviewQueue || []) : (doc.queue || []);
+  const take = pageList.slice(0, remaining);
   if (!take.length) continue;
   claims.push({ eid, doc, pages: take });
   remaining -= take.length;
