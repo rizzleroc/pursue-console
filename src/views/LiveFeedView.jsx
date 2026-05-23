@@ -27,6 +27,7 @@ const COLORS = {
 
 const SOURCE = {
   vision: { color: COLORS.cyan,  label: "VISION" },
+  human:  { color: COLORS.green, label: "HUMAN"  },
   ocr:    { color: COLORS.amber, label: "OCR"    },
 };
 
@@ -153,8 +154,8 @@ function BearingDial({ entries }) {
       return {
         x: 50 + Math.cos(rad) * (40 * freshness),
         y: 50 + Math.sin(rad) * (40 * freshness),
-        color: e.source === "vision" ? COLORS.cyan : COLORS.amber,
-        r: e.source === "vision" ? 1.6 : 1.2,
+        color: (SOURCE[e.source] || SOURCE.ocr).color,
+        r: e.source === "ocr" ? 1.2 : 1.6,
       };
     }).filter(Boolean);
   }, [entries]);
@@ -333,11 +334,12 @@ export default function LiveFeedView({ onSelect }) {
       if (!row) { missing++; continue; }
       const v = row.vision || 0;
       const o = row.ocr || 0;
-      if (v === 0 && o === 0) { missing++; continue; }
+      const h = row.human || 0;
+      if (v === 0 && o === 0 && h === 0) { missing++; continue; }
       const lastSeen = recencyByEvent.get(ev.id) || 0;
       if (lastSeen > activeCutoff) activeIds.push(ev.id);
-      if (v > 0 && o > 0) improving++;
-      else if (v > 0) ready++;
+      if ((v > 0 || h > 0) && o > 0) improving++;
+      else if (v > 0 || h > 0) ready++;
       else queued++;
     }
     // TRUE totals — pulled from public/corpus-stats.json (DB-backed) when
@@ -357,15 +359,16 @@ export default function LiveFeedView({ onSelect }) {
 
   // Source counters
   const sourceRates = useMemo(() => {
-    if (!feed) return { vision: 0, ocr: 0 };
+    if (!feed) return { vision: 0, ocr: 0, human: 0 };
     const cut = now - 3600_000;
-    let v = 0, o = 0;
+    let v = 0, o = 0, h = 0;
     for (const e of feed.entries) {
       if (e.modifiedAt < cut) continue;
       if (e.source === "vision") v++;
       else if (e.source === "ocr") o++;
+      else if (e.source === "human") h++;
     }
-    return { vision: v, ocr: o };
+    return { vision: v, ocr: o, human: h };
   }, [feed, now]);
 
   return (
@@ -546,6 +549,9 @@ export default function LiveFeedView({ onSelect }) {
             <Panel title="CHANNELS">
               <div className="space-y-1.5">
                 <ChannelRow label="VISION"    rate={sourceRates.vision} color={COLORS.cyan} />
+                {(stats?.bySource?.human || 0) > 0 && (
+                  <ChannelRow label="HUMAN"   rate={sourceRates.human}  color={COLORS.green} />
+                )}
                 <ChannelRow label="TESSERACT" rate={sourceRates.ocr}    color={COLORS.amber} />
               </div>
             </Panel>
@@ -563,14 +569,14 @@ export default function LiveFeedView({ onSelect }) {
 
             {/* filter row */}
             <div className="flex gap-2 mb-3">
-              {["all", "vision", "ocr"].map(f => (
+              {["all", "vision", ...((stats?.bySource?.human || 0) > 0 ? ["human"] : []), "ocr"].map(f => (
                 <button key={f} onClick={() => setFilter(f)}
                   style={{ transition: `all 150ms ${EASE_OUT}` }}
                   className={`px-2 py-1 rounded-sm border font-mono text-[10px] tracking-widest active:scale-[0.97] ${
                     filter === f
                       ? "border-amber-400/80 text-amber-300 bg-amber-400/10"
                       : "border-emerald-900 text-emerald-500 hover:border-emerald-700"}`}>
-                  {f === "all" ? "ALL" : f === "vision" ? "VISION" : "TESSERACT"}
+                  {f === "all" ? "ALL" : f === "vision" ? "VISION" : f === "human" ? "HUMAN" : "TESSERACT"}
                   <span className="ml-1 opacity-50">{f==="all" ? feed?.entries.length || 0 : (stats?.bySource[f] || 0)}</span>
                 </button>
               ))}
@@ -624,6 +630,11 @@ export default function LiveFeedView({ onSelect }) {
                           <span className="text-[9px] tracking-widest" style={{ color: agencyColor }}>
                             {ev?.agency?.replace("Department of ", "DEPT/")}
                           </span>
+                          {e.contributor && (
+                            <span className="text-[9px] tracking-widest" style={{ color: COLORS.green }}>
+                              ✦ {e.contributor}
+                            </span>
+                          )}
                           <span className="ml-auto text-[10px] text-emerald-700 tabular-nums">PAGE {String(e.page).padStart(3, " ")}</span>
                         </div>
                         {e.snippet && (
@@ -718,14 +729,22 @@ function HelpWantedPanel() {
   const top = queue ? Object.entries(queue.byEvent)
     .sort((a,b) => b[1].pagesNeeded - a[1].pagesNeeded)
     .slice(0, 5) : [];
+  const notPulled = queue?.notYetPulled?.slice(0, 6) || [];
   return (
     <div className="border-2 border-dashed border-amber-700/50 bg-amber-950/20 rounded-sm p-3">
       <div className="flex items-baseline justify-between mb-2">
         <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300">▌ H O W &nbsp; C A N &nbsp; I &nbsp; H E L P ?</div>
         {queue && (
-          <div className="font-mono text-[9px] text-amber-700">
+          <div className="font-mono text-[9px] text-amber-700 text-right">
             <span className="text-amber-300 tabular-nums text-base mr-1">{queue.totalPagesNeeded}</span>
             pages need volunteers
+            {queue.totalDocsNotPulled > 0 && (
+              <div className="text-emerald-700 mt-0.5">
+                + <span className="text-emerald-400 tabular-nums">{queue.totalDocsNotPulled}</span> docs
+                {" · "}
+                <span className="text-emerald-400 tabular-nums">{queue.totalPagesNotPulled}</span> pages awaiting first pull
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -740,6 +759,19 @@ function HelpWantedPanel() {
               <div key={eid} className="font-mono text-[10px] text-emerald-300 flex justify-between gap-2">
                 <span className="truncate">{eid}</span>
                 <span className="text-amber-300 tabular-nums shrink-0">{d.pagesNeeded}p</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {notPulled.length > 0 && (
+        <div className="mb-3">
+          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">▌ AWAITING FIRST PULL · RELEASE BACKLOG</div>
+          <div className="space-y-1">
+            {notPulled.map(d => (
+              <div key={d.eid} className="font-mono text-[10px] text-emerald-400/80 flex justify-between gap-2">
+                <span className="truncate">{d.title}</span>
+                <span className="text-emerald-500 tabular-nums shrink-0">{d.pages}p</span>
               </div>
             ))}
           </div>

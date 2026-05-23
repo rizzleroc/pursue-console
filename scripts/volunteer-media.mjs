@@ -37,19 +37,44 @@
 //   --pdf-root=…           Where to download PDFs (default data-raw/volunteer)
 //   --staging=…            Override staging dir (default ~/.pursue-helper/media-staging)
 
-import { readFile, writeFile, mkdir, readdir, stat, copyFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { readFile, writeFile, mkdir, readdir, stat, copyFile, rm } from "node:fs/promises";
+import { existsSync, readFileSync } from "node:fs";
 import { spawn } from "node:child_process";
-// pdfjs's nested canvas (0.1.x), not the top-level 1.0.x. The 1.0
-// API drifts on Path handling and breaks pdfjs renders for pages
-// with complex vector content. See backfill-media-renders.mjs.
-import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
+import { createCanvas, Path2D, DOMMatrix, ImageData } from "@napi-rs/canvas";
 import path from "node:path";
 import os from "node:os";
+
+// pdfjs builds Path2D objects for clipping and hands them to ctx.clip(). In
+// Node there's no global Path2D, so pdfjs falls back to an internal one that
+// @napi-rs/canvas's clip() rejects with "Value is none of these types String,
+// Path" — which is what made every page render fail. Exposing napi-canvas's
+// own Path2D/DOMMatrix/ImageData as globals makes pdfjs use the compatible one.
+globalThis.Path2D ??= Path2D;
+globalThis.DOMMatrix ??= DOMMatrix;
+globalThis.ImageData ??= ImageData;
+
+// Belt-and-suspenders: pdfjs can still leak async rejections from font/cmap
+// loads that complete after a per-page try/catch moved on. Swallow the known
+// pdfjs ones so a single bad page can't crash a multi-page batch with [exit 1].
+process.on("unhandledRejection", (reason) => {
+  const msg = reason instanceof Error ? reason.message : String(reason);
+  if (/Value is none of these types|AbortException|standardFontDataUrl/.test(msg)) {
+    return;  // expected pdfjs aborts — already logged per-page above
+  }
+  console.error(`[volunteer-media] unhandled rejection: ${msg.slice(0, 200)}`);
+});
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
+
+// Resolve the on-disk path of the pdfjs entry module so we can locate its
+// sibling standard_fonts/ directory regardless of where node_modules lives.
+const _require = createRequire(import.meta.url);
+function pdfjsEntryPath() {
+  return _require.resolve("pdfjs-dist/legacy/build/pdf.mjs");
+}
 
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const m = a.match(/^--([^=]+)(?:=(.*))?$/);
@@ -72,6 +97,20 @@ const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volu
 const STAGING = path.resolve(args.staging || path.join(os.homedir(), ".pursue-helper", "media-staging", HANDLE));
 const CONTRIB_DIR = path.join(ROOT, "contributions", HANDLE, "media");
 
+// --auto-context: after rendering each page, ask the vision daemon to draft the
+// documentary Context from the rendered image so the staged template is
+// commit-ready instead of requiring a human to type it. The volunteer can still
+// open the template and edit before committing. Off by default to preserve the
+// hand-written flow; the dashboard turns it on.
+const AUTO_CONTEXT = !!args["auto-context"];
+const DAEMON = args.daemon || "http://127.0.0.1:9223";
+let DAEMON_TOKEN = process.env.WHIPGEN_TOKEN || process.env.PURSUE_VISION_TOKEN || "";
+if (!DAEMON_TOKEN) {
+  for (const tf of [".whipgen-token", ".pursue-vision-token"]) {
+    try { DAEMON_TOKEN = (await readFile(path.join(os.homedir(), tf), "utf8")).trim(); if (DAEMON_TOKEN) break; } catch {}
+  }
+}
+
 function hash(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return Math.abs(h); }
 async function run(cmd, argv, opts = {}) {
   return new Promise((resolve, reject) => {
@@ -79,6 +118,103 @@ async function run(cmd, argv, opts = {}) {
     p.on("exit", code => code === 0 ? resolve() : reject(new Error(`${cmd} exit ${code}`)));
     p.on("error", reject);
   });
+}
+// Like run() but captures stdout (used for `git rev-parse` etc.).
+async function capture(cmd, argv, opts = {}) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(cmd, argv, { stdio: ["ignore", "pipe", "pipe"], ...opts });
+    let out = ""; p.stdout.on("data", c => out += c);
+    p.on("exit", code => code === 0 ? resolve(out) : reject(new Error(`${cmd} exit ${code}`)));
+    p.on("error", reject);
+  });
+}
+
+// Media pages already MERGED to origin/main, by ANY handle. The queue keeps
+// listing a page until it regenerates, and the local dedup below only sees our
+// own handle's files — so without this we'd re-run the (expensive) vision draft
+// on pages someone already finished. Returns a Set of "<eid>|<page>". Graceful:
+// if git/network is unavailable the set is empty and we fall back to local-only.
+async function fetchPublishedMediaSet() {
+  const set = new Set();
+  try {
+    await run("git", ["fetch", "origin", "main", "--quiet"], { stdio: "ignore", timeout: 8000 });
+    const out = await capture("git", ["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"], { timeout: 8000 });
+    for (const line of out.split(/\r?\n/)) {
+      // contributions/<handle>/media/<eid>/p<NNNN>.json
+      const m = line.match(/^contributions\/[^/]+\/media\/(.+)\/p0*(\d+)\.json$/i);
+      if (m) set.add(`${m[1]}|${Number(m[2])}`);
+    }
+  } catch { /* offline / no git — fall back to local-only dedup */ }
+  return set;
+}
+
+// Ask the vision daemon to draft documentary context for a rendered page.
+// imagePaths is [prevPagePng?, thisPagePng, nextPagePng?] — surrounding pages
+// carry the captions/explanations that make the context meaningful, which is
+// why the template asks "what does the page BEFORE/AFTER say?".
+// Uses http.request (not fetch) for the same reason volunteer.mjs does — no
+// hard headers timeout, so ChatGPT can take as long as it needs.
+async function draftContext(imagePaths, claim, hasPrev, hasNext) {
+  const http = await import("node:http");
+  const order = [];
+  if (hasPrev) order.push(`Image 1 = the page BEFORE (page ${claim.page - 1})`);
+  order.push(`Image ${hasPrev ? 2 : 1} = the target page (page ${claim.page}, the one with the ${claim.kind})`);
+  if (hasNext) order.push(`Image ${imagePaths.length} = the page AFTER (page ${claim.page + 1})`);
+  const prompt = [
+    `These are consecutive pages from a declassified government UFO document (event "${claim.eid}").`,
+    order.join("; ") + ".",
+    `The target page contains a ${claim.kind}${claim.suggestedTitle ? ` — "${claim.suggestedTitle}"` : ""}.`,
+    ``,
+    `Write the DOCUMENTARY CONTEXT for the ${claim.kind} on the target page, using VERBATIM quotes only — no summary, no interpretation:`,
+    `- Any caption or label on or beside the image itself.`,
+    `- What the page BEFORE says that introduces or explains this image.`,
+    `- What the page AFTER says that refers back to it.`,
+    `- Stamps, classification markings, dates, reference numbers near the image.`,
+    `Quote exactly. Mark unreadable text [illegible]. Output plain text only — no preamble, no markdown headers.`,
+  ].join("\n");
+  const payload = JSON.stringify({ filePaths: imagePaths, prompt, freshChat: true, timeoutMs: 1_800_000 });
+  const u = new URL(`${DAEMON}/chat-with-files`);
+  const attempt = () => new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: u.hostname, port: u.port || 80, path: u.pathname, method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload),
+        Authorization: `Bearer ${DAEMON_TOKEN}`,
+      },
+    }, res => {
+      let data = "";
+      res.on("data", c => { data += c; });
+      res.on("end", () => {
+        if (res.statusCode >= 400) return reject(new Error(`daemon HTTP ${res.statusCode}: ${data.slice(0, 160)}`));
+        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(`daemon JSON parse: ${data.slice(0, 100)}`)); }
+      });
+    });
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
+  // Image upload to the browser LLM is occasionally flaky — the model doesn't
+  // acknowledge the attachment, the reply times out, or it comes back empty.
+  // Retry a few times with backoff; freshChat:true means each attempt re-uploads
+  // into a clean chat, so a stuck upload doesn't poison the retry.
+  const MAX_ATTEMPTS = 3;
+  let lastErr;
+  for (let n = 1; n <= MAX_ATTEMPTS; n++) {
+    try {
+      const j = await attempt();
+      const text = (j.text ?? j.result?.text ?? j.output ?? "").trim();
+      if (text) return text;
+      lastErr = new Error("daemon returned empty text (upload may not have attached)");
+    } catch (e) {
+      lastErr = e;
+    }
+    if (n < MAX_ATTEMPTS) {
+      process.stdout.write(`(upload retry ${n}/${MAX_ATTEMPTS - 1}) `);
+      await new Promise(r => setTimeout(r, 2000 * n));
+    }
+  }
+  throw lastErr;
 }
 
 // =====================================================================
@@ -88,8 +224,27 @@ async function claimPhase() {
   await mkdir(STAGING, { recursive: true });
   await mkdir(PDF_ROOT, { recursive: true });
 
-  console.log(`[claim] fetching ${QUEUE_URL}`);
-  const queue = await (await fetch(QUEUE_URL)).json();
+  // Load the work queue, preferring whichever of {the passed queue, the deployed
+  // remote} has the NEWER generatedAt. The monitor passes the local
+  // public/work-available.json, but that can be STALER than the deployed GitHub
+  // Pages copy (or fresher) — so trust the timestamp instead of assuming local
+  // always wins, otherwise a stale local file makes the job find "nothing fresh"
+  // even when real work exists. (fetch() only handles http(s); local = readFile.)
+  const REMOTE_QUEUE = "https://rizzleroc.github.io/pursue-console/work-available.json";
+  async function readQueue(src) {
+    try {
+      const q = /^https?:\/\//i.test(src)
+        ? await (await fetch(src + (src.includes("?") ? "" : "?t=" + Date.now()))).json()
+        : JSON.parse(await readFile(src, "utf8"));
+      return { q, ts: Date.parse(q.generatedAt) || 0, kind: /^https?:\/\//i.test(src) ? "remote" : "local" };
+    } catch { return null; }
+  }
+  const sources = [await readQueue(QUEUE_URL)];
+  if (QUEUE_URL !== REMOTE_QUEUE) sources.push(await readQueue(REMOTE_QUEUE));
+  const loaded = sources.filter(Boolean).sort((a, b) => b.ts - a.ts);
+  if (!loaded.length) { console.error("error: could not load any work queue"); process.exit(1); }
+  const queue = loaded[0].q;
+  console.log(`[claim] using ${loaded[0].kind} queue (newer of ${loaded.length})`);
   if (!queue.byEvent) { console.error("error: queue missing byEvent"); process.exit(1); }
   console.log(`[claim] queue gen ${queue.generatedAt} · ${queue.totalPagesNeedingVisualContext || 0} pages need visual context`);
 
@@ -100,26 +255,66 @@ async function claimPhase() {
   const start = hash(HANDLE) % candidates.length;
   const rotated = candidates.slice(start).concat(candidates.slice(0, start));
 
+  // Skip pages we've already contributed. The server's visualsNeedingContext
+  // queue keeps listing a page until our contribution is merged AND the queue
+  // regenerates, so without this check the deterministic rotation re-serves the
+  // same first N pages every run instead of advancing through the backlog.
+  // A page counts as done if it's already MERGED to origin/main by ANYONE, OR we
+  // have a local contribution JSON, OR a staged template — so we never re-run
+  // vision on work that's already been done (by us or another volunteer).
+  const published = await fetchPublishedMediaSet();
+  if (published.size) console.log(`[claim] ${published.size} media page(s) already published to main — won't re-vision those`);
+  const alreadyDone = (eid, page) => {
+    const pad = String(page).padStart(4, "0");
+    if (published.has(`${eid}|${Number(page)}`)) return true;          // merged to main
+    if (existsSync(path.join(CONTRIB_DIR, eid, `p${pad}.json`))) return true; // local contribution
+    const stagedMd = path.join(STAGING, eid, `p${pad}.md`);
+    if (!existsSync(stagedMd)) return false;
+    // A staged template counts as done (skip) only if it's COMPLETE (real
+    // context) OR auto-context already attempted it (the daemon NOTE marker).
+    // A never-attempted blank — claimed before auto-context existed — is left
+    // re-claimable so a fresh claim re-renders and drafts it instead of leaving
+    // it stuck (incomplete forever: claim skips it, commit skips it).
+    try {
+      const t = readFileSync(stagedMd, "utf8");
+      const attempted = t.includes("auto-generated by the vision daemon");
+      const ctx = (parseTemplate(t).context || "").trim();
+      return ctx.length >= 20 || attempted;
+    } catch { return true; }
+  };
+
   const claims = [];
+  let skippedDone = 0;
   let remaining = SLICE;
   for (const [eid, d] of rotated) {
     if (remaining <= 0) break;
     for (const v of d.visualsNeedingContext) {
       if (remaining <= 0) break;
+      const page = (v && typeof v === "object") ? v.page : v;
+      if (alreadyDone(eid, page)) { skippedDone++; continue; }
       claims.push({ eid, doc: d, ...v });
       remaining--;
     }
   }
+  if (skippedDone) console.log(`[claim] skipped ${skippedDone} page(s) already contributed or staged`);
+  if (!claims.length) {
+    console.log("[claim] nothing fresh to claim — every queued page already has a contribution or staged template. Push/merge your open PR or wait for the queue to regenerate.");
+    process.exit(0);
+  }
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
 
-  // pdfjs render — matches the WORKING classify-visuals config. We
-  // pointedly do NOT pass wasmUrl or standardFontDataUrl: when those
-  // are set, napi-canvas's font loader throws "Value is none of
-  // these types String, Path" on pages with embedded font references
-  // (sketch labels, map city names, weather table annotations) —
-  // testing showed pages that worked WITHOUT the URLs fail WITH them.
+  // pdfjs render. The "Value is none of these types String, Path" failures
+  // were NOT a font problem — they came from ctx.clip(path) rejecting pdfjs's
+  // Path2D because Node had no global Path2D (now polyfilled at the top of this
+  // file from @napi-rs/canvas). With that fixed, the war.gov PDFs render fine,
+  // so the canonical-copy fallback below is a nicety, not a requirement.
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  // standard_fonts dir as an absolute path (forward slashes + trailing slash):
+  // pdfjs's NodeBinaryDataFactory reads it via fs.readFile(url+filename), which
+  // breaks for file:// URL strings on Windows but works for absolute paths.
+  const fontUrl = path.join(path.dirname(pdfjsEntryPath()), "..", "..", "standard_fonts")
+    .split(path.sep).join("/") + "/";
   class NodeCanvasFactory {
     create(w, h) { const cv = createCanvas(w, h); return { canvas: cv, context: cv.getContext("2d") }; }
     reset(c, w, h) { c.canvas.width = w; c.canvas.height = h; }
@@ -165,29 +360,64 @@ async function claimPhase() {
     // so size doesn't matter.
     const pngPath = path.join(outDir, `p${pad4}.png`);
     const tmplPath = path.join(outDir, `p${pad4}.md`);
+    // Adjacent-page temp renders (only used for auto-context drafting).
+    const adjPaths = [];
+    let hasPrev = false, hasNext = false;
     try {
       const pdfPath = await getPdfPath(c.eid, c.doc.pdfUrl);
       const buf = await readFile(pdfPath);
       const doc = await pdfjs.getDocument({
         data: new Uint8Array(buf),
+        standardFontDataUrl: fontUrl,
         useSystemFonts: false,
         disableFontFace: true,
         isEvalSupported: false,
         useWorkerFetch: false,
       }).promise;
-      const page = await doc.getPage(c.page);
-      const baseViewport = page.getViewport({ scale: 1 });
-      const scale = 1200 / Math.max(baseViewport.width, baseViewport.height);
-      const viewport = page.getViewport({ scale });
-      const factory = new NodeCanvasFactory();
-      const cv = factory.create(Math.floor(viewport.width), Math.floor(viewport.height));
-      await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
-      const png = cv.canvas.toBuffer("image/png");
-      factory.destroy(cv);
-      await writeFile(pngPath, png);
+      // Render one page number to a PNG buffer.
+      const renderPageToPng = async (pageNum) => {
+        const page = await doc.getPage(pageNum);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = 1200 / Math.max(baseViewport.width, baseViewport.height);
+        const viewport = page.getViewport({ scale });
+        const factory = new NodeCanvasFactory();
+        const cv = factory.create(Math.floor(viewport.width), Math.floor(viewport.height));
+        await page.render({ canvasContext: cv.context, viewport, canvasFactory: factory, annotationMode: 0 }).promise;
+        const out = cv.canvas.toBuffer("image/png");
+        factory.destroy(cv);
+        return out;
+      };
+      await writeFile(pngPath, await renderPageToPng(c.page));
+      // Render prev/next into the staging dir as hidden temps for the daemon.
+      if (AUTO_CONTEXT) {
+        if (c.page > 1) {
+          try { const p = path.join(outDir, `.ctx-prev-${pad4}.png`); await writeFile(p, await renderPageToPng(c.page - 1)); adjPaths.unshift(p); hasPrev = true; } catch {}
+        }
+        if (c.page < doc.numPages) {
+          try { const p = path.join(outDir, `.ctx-next-${pad4}.png`); await writeFile(p, await renderPageToPng(c.page + 1)); adjPaths.push(p); hasNext = true; } catch {}
+        }
+      }
     } catch (e) {
       console.log(`    ! ${c.eid} p${pad4}: render failed (${e.message})`);
       continue;
+    }
+    // Optionally let the vision daemon draft the Context (target page + the
+    // pages before/after) so the template is commit-ready. Falls back to an
+    // empty Context (manual fill) on any error.
+    let draftedContext = "";
+    if (AUTO_CONTEXT) {
+      try {
+        const imagePaths = hasPrev ? [adjPaths[0], pngPath, ...(hasNext ? [adjPaths[adjPaths.length - 1]] : [])]
+                                   : [pngPath, ...(hasNext ? [adjPaths[adjPaths.length - 1]] : [])];
+        process.stdout.write(`    ◐ ${c.eid} p${pad4}: drafting context (${imagePaths.length} pages) via daemon… `);
+        draftedContext = await draftContext(imagePaths, c, hasPrev, hasNext);
+        console.log(draftedContext ? `✓ ${draftedContext.length} chars` : "∅ empty");
+      } catch (e) {
+        console.log(`✗ ${e.message.slice(0, 80)} (leaving Context blank for manual fill)`);
+      } finally {
+        // Clean up the adjacent-page temps — they're not part of the contribution.
+        for (const p of adjPaths) { try { await rm(p); } catch {} }
+      }
     }
     // Markdown template alongside the rendered page
     await writeFile(tmplPath, `<!--
@@ -216,8 +446,9 @@ ${c.suggestedTitle || ""}
 Quote verbatim from the document. What does the page BEFORE this say about the image?
 What's the caption on this page? What does the page AFTER say? Why is this image in the file?
 Don't summarize. Don't interpret. Quotes only. Mark unreadable text [illegible].
+${AUTO_CONTEXT ? "NOTE: draft below was auto-generated by the vision daemon — review & edit before committing." : ""}
 -->
-
+${draftedContext}
 
 # Article text (newspaper-clipping ONLY)
 <!--
@@ -291,6 +522,7 @@ async function commitPhase() {
   const ALLOWED_KINDS = new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram"]);
   let committed = 0, skipped = 0, badTemplate = 0;
   const touchedEids = new Set();
+  const committedStaging = []; // { dir, pad } of templates committed this run, cleared on success
 
   for (const eid of eids) {
     const dir = path.join(STAGING, eid);
@@ -323,11 +555,21 @@ async function commitPhase() {
       const dstJson = path.join(dstDir, `p${pad}.json`);
       // Preserve the source extension (png if available, jpg fallback)
       const dstImg = path.join(dstDir, `p${pad}${path.extname(imgSrc)}`);
+      // Preserve an existing captured_at so re-committing an already-contributed
+      // page produces NO diff (instead of timestamp-only churn that made the
+      // dashboard show phantom "N to commit" work and wasted volunteer effort).
+      let capturedAt = new Date().toISOString();
+      if (existsSync(dstJson)) {
+        try {
+          const prev = JSON.parse(await readFile(dstJson, "utf8"));
+          if (prev.captured_at) capturedAt = prev.captured_at;
+        } catch {}
+      }
       const out = {
         kind: sec.kind,
         title: sec.title,
         context: sec.context,
-        captured_at: new Date().toISOString(),
+        captured_at: capturedAt,
       };
       const article = sec["article text (newspaper-clipping only)"];
       if (out.kind === "newspaper-clipping" && article) out.article_text = article;
@@ -335,6 +577,7 @@ async function commitPhase() {
       await copyFile(imgSrc, dstImg);
       committed++;
       touchedEids.add(eid);
+      committedStaging.push({ dir, pad });
       console.log(`✓ ${eid} p${pad}  ${sec.kind.padEnd(20)}  "${sec.title.slice(0, 40)}"`);
     }
   }
@@ -346,18 +589,58 @@ async function commitPhase() {
     process.exit(0);
   }
 
-  // git + gh
+  // Stage on the CURRENT branch first so we can tell whether anything actually
+  // changed. If every reviewed page is already committed/merged, the staged
+  // content is byte-identical → nothing to commit. Report that cleanly instead
+  // of erroring with "finish by hand" and leaving an orphan branch.
+  await run("git", ["add", `contributions/${HANDLE}/media`]);
+  let hasChanges = false;
+  try { await run("git", ["diff", "--cached", "--quiet", "--", `contributions/${HANDLE}/media`]); }
+  catch { hasChanges = true; } // non-zero exit from --quiet = staged differences exist
+  if (!hasChanges) {
+    console.log(`[commit] nothing new to publish — all ${committed} reviewed page(s) are already committed or merged. ✓`);
+    console.log(`[commit] you're up to date; the staging templates can be cleared.`);
+    process.exit(0);
+  }
+
+  // There IS genuinely new work — branch, commit, push, open the PR.
+  // Capture the branch we're on first so we can ALWAYS return to it. The monitor
+  // and other tooling share this working tree, so we must never strand it on a
+  // throwaway contrib branch (which is what left the tree on contrib-… and piled
+  // up orphan branches when the PR step failed).
+  let originalBranch = "main";
+  try { originalBranch = (await capture("git", ["rev-parse", "--abbrev-ref", "HEAD"])).trim() || "main"; } catch {}
+
   const branch = `contrib-${HANDLE}-media-${Date.now().toString(36)}`;
   try {
-    await run("git", ["checkout", "-b", branch]);
-    await run("git", ["add", `contributions/${HANDLE}/media`]);
-    await run("git", ["commit", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
-    await run("git", ["push", "-u", "origin", branch]);
+    // Keep git output OFF the runner log. With 200+ unrelated modified files in
+    // this shared tree (build artifacts) + sparse-checkout, `git checkout` prints
+    // a huge "M …" list and `git commit` lists every created file — that flood
+    // buried the actual commit result and broke the dashboard's outcome banner.
+    await run("git", ["checkout", "-q", "-b", branch], { stdio: "ignore" }); // carries the already-staged changes
+    await run("git", ["commit", "-q", "-m", `media: visual context contributions from @${HANDLE}\n\n${committed} pages across ${touchedEids.size} document(s).`]);
+    await run("git", ["push", "-q", "-u", "origin", branch]);
     const body = `## Media context contribution\n\n${committed} pages with images + verbatim documentary context, across ${touchedEids.size} document(s).\n\nGenerated via \`scripts/volunteer-media.mjs\` by @${HANDLE}.\n\nCI validates schema, image presence, image size (5KB–5MB), and runs safety checks on the title + context text.`;
-    await run("gh", ["pr", "create", "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
+    // --head=<branch> so gh opens the PR for the branch we just pushed even when
+    // the working tree has unrelated uncommitted changes (build artifacts/caches).
+    await run("gh", ["pr", "create", "--head", branch, "--title", `Media context contribution from @${HANDLE}`, "--body", body]);
+    console.log(`[commit] ✓ PR opened for ${branch} — ${committed} page(s)`);
+    // These templates are now submitted — remove them from staging so a second
+    // commit doesn't re-stage the same files and open a DUPLICATE PR. (Only on
+    // success; a failed PR keeps them so the user can retry.)
+    for (const { dir, pad } of committedStaging) {
+      for (const f of [`p${pad}.md`, `p${pad}.png`, `p${pad}.jpg`, `.ctx-prev-${pad}.png`, `.ctx-next-${pad}.png`]) {
+        try { await rm(path.join(dir, f)); } catch {}
+      }
+    }
+    console.log(`[commit] cleared ${committedStaging.length} submitted template(s) from staging`);
   } catch (e) {
     console.error(`[commit] PR step failed: ${e.message}`);
-    console.error(`[commit] your files are staged at contributions/${HANDLE}/media — finish by hand.`);
+    console.error(`[commit] your changes are committed on ${branch}; reopen the PR with: gh pr create --head ${branch}`);
+  } finally {
+    // Always return the shared working tree to where it started (quiet + output
+    // discarded so the sparse-checkout "M …" list doesn't flood the runner log).
+    try { await run("git", ["checkout", "-q", originalBranch], { stdio: "ignore" }); } catch {}
   }
 }
 
