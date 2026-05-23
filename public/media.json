@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-22T19:18:48.608Z",
-  "total": 202,
+  "generatedAt": "2026-05-23T21:38:04.402Z",
+  "total": 203,
   "byKind": {
     "diagram": 16,
     "map": 8,
     "photograph": 82,
-    "hand-drawing": 41,
+    "hand-drawing": 42,
     "newspaper-clipping": 33,
     "photocopied-negative": 6,
     "video": 16
   },
   "byAgency": {
-    "Department of War": 45,
+    "Department of War": 46,
     "Department of State": 1,
     "FBI": 147,
     "NASA": 9
@@ -106,8 +106,9 @@
       "description": "Sketch of circle with crosshair",
       "classifier": "gemini-text-extract",
       "classifiedAt": "2026-05-20T14:25:33.923Z",
-      "imagePath": "media/krasuski-1944/p0004.png",
-      "thumbnailPath": "media/krasuski-1944/p0004.png"
+      "imagePath": null,
+      "thumbnailPath": null,
+      "missingRender": true
     },
     {
       "id": "incident-summaries-p0178",
@@ -362,8 +363,9 @@
       "description": "Diagram Description: A schematic drawing showing a railway track running horizontally. A dashed rectangular box labeled \"BUILDING OUTLINE ---- WITH SIDING INSIDE\" surrounds a section of the track. Inside this box is a \"PIT UNDER TRACKS\".",
       "classifier": "gemini-text-extract",
       "classifiedAt": "2026-05-20T14:25:33.803Z",
-      "imagePath": "media/azerbaijan-1955/p0010.png",
-      "thumbnailPath": "media/azerbaijan-1955/p0010.png"
+      "imagePath": null,
+      "thumbnailPath": null,
+      "missingRender": true
     },
     {
       "id": "azerbaijan-1955-p0005",
@@ -377,8 +379,25 @@
       "description": "Sketch of two dots with arrows pointing to them",
       "classifier": "gemini-text-extract",
       "classifiedAt": "2026-05-20T14:25:33.801Z",
-      "imagePath": "media/azerbaijan-1955/p0005.png",
-      "thumbnailPath": "media/azerbaijan-1955/p0005.png"
+      "imagePath": null,
+      "thumbnailPath": null,
+      "missingRender": true
+    },
+    {
+      "id": "azerbaijan-1955-p0006",
+      "eventId": "azerbaijan-1955",
+      "eventTitle": "USSR Trans-Caucasus Sighting",
+      "agency": "Department of War",
+      "era": "50s",
+      "page": 6,
+      "kind": "hand-drawing",
+      "title": "1: A square grid antenna on a pole",
+      "description": "Sketch 1: A square grid antenna on a pole",
+      "classifier": "gemini-text-extract",
+      "classifiedAt": "2026-05-20T14:25:33.801Z",
+      "imagePath": null,
+      "thumbnailPath": null,
+      "missingRender": true
     },
     {
       "id": "65-hs1-834228961-62-hq-83894-sub-a-p0119",

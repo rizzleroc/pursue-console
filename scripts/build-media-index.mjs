@@ -17,6 +17,7 @@ import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadImage, createCanvas } from "@napi-rs/canvas";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -111,6 +112,40 @@ function curate(sc) {
   return { kind: k, reason: null };
 }
 
+// Pixel-variance check for blank renders. Some pages (hand-drawn sketches
+// on ruled paper from the 50s-era reports) render through pdf.js as a
+// near-white PNG — the source ink lives in an embedded image layer that
+// pdf.js can't reach. The file exists on disk but the tile is a visually-
+// empty box. Detect those here and surface them as "missing render"
+// instead of pretending we have an image.
+//
+// Method: downsample to 200x200, count pixels whose mean brightness is
+// below 200 (i.e. anything appreciably darker than light grey). If <1%
+// of pixels qualify as "ink", treat the render as blank.
+const blankRenderCache = new Map();   // absPath -> boolean
+async function isBlankRender(absPath) {
+  if (blankRenderCache.has(absPath)) return blankRenderCache.get(absPath);
+  let blank = false;
+  try {
+    const img = await loadImage(absPath);
+    const w = Math.min(img.width, 200);
+    const h = Math.min(img.height, 200);
+    const cv = createCanvas(w, h);
+    const ctx = cv.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+    const { data } = ctx.getImageData(0, 0, w, h);
+    const total = data.length / 4;
+    let ink = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      if (brightness < 200) ink++;
+    }
+    blank = ink / total < 0.01;
+  } catch { /* leave blank=false if we can't decode */ }
+  blankRenderCache.set(absPath, blank);
+  return blank;
+}
+
 await mkdir(path.dirname(OUT), { recursive: true });
 
 let eventsMap = {};
@@ -160,8 +195,14 @@ for (const eid of await listDirs(VISUALS_DIR)) {
     // Denis's Gemini bracket markers where we have rich text metadata
     // but no local PDF to render. The UI shows a placeholder tile +
     // the description.
-    const ext = imageAbsPath ? path.extname(imageAbsPath) : null;
-    const imagePath = imageAbsPath ? `media/${eid}/p${pad4}${ext}` : null;
+    //
+    // A second null path: the file exists but the render is blank
+    // (see isBlankRender above). We null imagePath and set
+    // missingRender:true so the UI can group these separately from
+    // "no PDF available" placeholders.
+    const blank = imageAbsPath ? await isBlankRender(imageAbsPath) : false;
+    const ext = (imageAbsPath && !blank) ? path.extname(imageAbsPath) : null;
+    const imagePath = (imageAbsPath && !blank) ? `media/${eid}/p${pad4}${ext}` : null;
     items.push({
       id: `${eid}-p${pad4}`,
       eventId: eid,
@@ -180,6 +221,11 @@ for (const eid of await listDirs(VISUALS_DIR)) {
       classifiedAt: sc.classifiedAt || null,
       imagePath,
       thumbnailPath: imagePath,   // same file for now; reserved for future smaller thumbs
+      // True when a PNG/JPG exists on disk but is visually empty (pdf.js
+      // produced a near-white render for a page whose visual content
+      // lives in an embedded layer it can't reach). Distinguishes the
+      // tile from "no PDF available at all" placeholders.
+      missingRender: blank || undefined,
     });
   }
 }
@@ -252,7 +298,9 @@ await writeFile(OUT, JSON.stringify({
   items,
 }, null, 2) + "\n", "utf8");
 
+const missingRenderCount = items.filter(it => it.missingRender).length;
 console.log(`[media-index] ${items.length} media items across ${Object.keys(byEvent).length} events`);
+if (missingRenderCount) console.log(`[media-index] detected ${missingRenderCount} blank render(s) — tagged missingRender:true (PDF page produced a near-white image; surfaced separately in MEDIA)`);
 if (droppedDuplicates) console.log(`[media-index] dropped ${droppedDuplicates} duplicate image(s) (same content under a different page)`);
 console.log(`[media-index] by kind:`);
 for (const [k, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {
