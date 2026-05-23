@@ -246,7 +246,7 @@ const live = claims.filter(c => !c.skip);
 globalThis.Path2D = Path2D;
 globalThis.DOMMatrix = DOMMatrix;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = getPdfjsAssetUrls();
+const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = await getPdfjsAssetUrls();
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }
