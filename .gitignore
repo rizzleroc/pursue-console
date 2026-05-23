@@ -41,3 +41,4 @@ eng.traineddata
 *.njsproj
 *.sln
 *.sw?
+scripts/__pycache__/
