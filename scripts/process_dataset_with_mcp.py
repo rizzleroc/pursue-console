@@ -316,8 +316,9 @@ def main() -> int:
                 try:
                     import fitz
                     with fitz.open(a.local_path) as doc:
-                        pages = selected_pages(doc.page_count, args.pages, args.max_pages_per_doc)
-                    print(f"  {a.slug}: {a.local_path} ({len(pages)}/{doc.page_count} pages)")
+                        page_count = doc.page_count
+                        pages = selected_pages(page_count, args.pages, args.max_pages_per_doc)
+                    print(f"  {a.slug}: {a.local_path} ({len(pages)}/{page_count} pages)")
                 except Exception as exc:  # noqa: BLE001
                     print(f"  {a.slug}: {a.local_path} (page count error: {exc})")
             else:

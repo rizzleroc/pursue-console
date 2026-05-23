@@ -518,6 +518,21 @@
       <span class="qb-sub" id="qb-commit-sub">stage reviewed templates → contribution</span>
       <span class="qb-cmd">volunteer-media.mjs --commit</span>
     </button>
+    <!--
+      2ND EDITION OCR — vision-OCRs the release-02 PDFs via MCP using
+      the upstream DenisSergeevitch/UFO-USA prompt + YAML+markdown
+      output. The 1st-edition buttons above (OCR/REVIEW/VISUALS) are
+      kept untouched; this button is a parallel entry point for the
+      Denis-style pipeline. Wired to `mode: "ocr2"` in monitor.mjs,
+      which spawns scripts/process_dataset_with_mcp.py.
+    -->
+    <button id="qb-ocr2" class="quick-btn" onclick="quickRun('ocr2', false)"
+            title="2nd-edition OCR: Denis-format per-page Markdown for release-02 PDFs"
+            style="color:var(--amber);border-color:rgba(255,217,61,0.45);background:rgba(255,217,61,0.04);grid-column: span 3">
+      <span class="qb-title">▶ 2 N D &nbsp; E D I T I O N &nbsp; O C R &nbsp; · &nbsp; R E L E A S E - 0 2</span>
+      <span class="qb-sub">per-page Markdown w/ YAML frontmatter · Denis (UFO-USA) prompt · MCP-driven Gemini</span>
+      <span class="qb-cmd">process_dataset_with_mcp.py --metadata config/release_2_manifest.csv</span>
+    </button>
     <button id="qb-ocr-loop" class="quick-btn ocr loop" data-needs="ocr" onclick="quickRun('ocr', true)" title="Loop OCR until queue empty">
       <span class="qb-title">↻ LOOP OCR</span>
       <span class="qb-sub qb-count">keep taking OCR jobs until empty</span>

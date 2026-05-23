@@ -179,6 +179,30 @@ function buildVolunteerArgs(opts) {
     const args = ["scripts/volunteer-media.mjs", `--my-handle=${handle}`, "--commit"];
     return { script: "volunteer-media.mjs", args };
   }
+  if (opts.mode === "ocr2") {
+    // 2nd-edition OCR: vision-OCR each PDF page via MCP using Denis's
+    // upstream UFO-USA prompt + YAML+markdown output format. Today this is
+    // wired to the release-02 manifest; the script (process_dataset_with_mcp.py)
+    // is generic enough to point at any CSV via --metadata.
+    //
+    // Provider pinned to gemini: Denis's process uses gemini-3.1-flash-lite,
+    // and the goal of this mode is byte-identical output format. Override
+    // via opts.provider for one-off cross-checks against another model.
+    const ocr2Provider = opts.provider || "gemini";
+    const args = [
+      "scripts/process_dataset_with_mcp.py",
+      "--metadata", "config/release_2_manifest.csv",
+      "--downloads-dir", ".",
+      "--output-dir", "data-raw/war-gov/release_2/converted",
+      "--daemon", daemon,
+      "--provider", ocr2Provider,
+    ];
+    // Resolve a python interpreter: env override → py launcher on Windows →
+    // python3 on Unix. Spawned via the override below (command), not Node.
+    const py = process.env.PURSUE_PYTHON
+      || (process.platform === "win32" ? "py" : "python3");
+    return { script: "process_dataset_with_mcp.py", args, command: py };
+  }
 
   const args = [
     "scripts/volunteer.mjs",
@@ -353,8 +377,11 @@ function resetProgressIdle() {
 
 async function spawnVolunteer(opts) {
   if (runningProc) throw new Error("a volunteer run is already in progress — stop it first");
-  const { args } = buildVolunteerArgs(opts);
-  console.log(`[monitor] spawn: node ${args.join(" ")}`);
+  const { args, command } = buildVolunteerArgs(opts);
+  // Modes that wire a different interpreter (e.g. ocr2 → python) set
+  // `command`. Default is the same Node binary the monitor is running on.
+  const cmd = command || process.execPath;
+  console.log(`[monitor] spawn: ${cmd} ${args.join(" ")}`);
   const cleaned = await autoCleanStubs(opts.handle || state.handle);
   if (cleaned > 0) console.log(`[monitor] auto-cleaned ${cleaned} stub file(s) before spawn`);
   // Probe both possible daemon-token files to find which one the live daemon
@@ -362,10 +389,11 @@ async function spawnVolunteer(opts) {
   // (uses ~/.pursue-vision-token) or whipgen (uses ~/.whipgen-token) — passing
   // the wrong one yields HTTP 401.
   const probeEnv = await pickDaemonTokenEnv();
-  const proc = spawn(process.execPath, args, {
+  const proc = spawn(cmd, args, {
     cwd: SCRIPTS_ROOT,
     stdio: ["ignore", "pipe", "pipe"],
     env: { ...process.env, ...probeEnv },
+    shell: process.platform === "win32" && cmd !== process.execPath,  // py.exe needs shell on Win
   });
   runningProc  = proc;
   runningMeta  = { mode: opts.mode, eid: opts.eid || null, slice: opts.slice, loop: !!opts.loop, startedAt: Date.now() };
@@ -642,8 +670,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "POST" && req.url === "/run") {
       const body = await readBody(req);
-      if (!["ocr", "review", "visuals", "visuals-commit", "doc"].includes(body.mode)) {
-        return sendJson(res, 400, { error: "mode must be ocr | review | visuals | visuals-commit | doc" });
+      if (!["ocr", "review", "visuals", "visuals-commit", "doc", "ocr2"].includes(body.mode)) {
+        return sendJson(res, 400, { error: "mode must be ocr | review | visuals | visuals-commit | doc | ocr2" });
       }
       if (body.mode === "doc" && !body.eid) {
         return sendJson(res, 400, { error: "eid required for doc mode" });
