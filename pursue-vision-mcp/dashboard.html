@@ -862,7 +862,7 @@
     });
   }
 
-  function populateQueuePanel(data) {
+  async function populateQueuePanel(data) {
     const events = Object.entries(data.byEvent || {});
     const totalOCR    = data.totalPagesNeeded ?? 0;
     const totalReview = data.totalPagesNeedingReview ?? 0;
@@ -885,9 +885,20 @@
     renderQueueDocs("q-rev-docs",  events, "reviewQueue",           "var(--amber)");
     renderQueueDocs("q-vis-docs",  events, "visualsNeedingContext", "var(--cyan)");
 
-    // Disable quick-launch buttons whose queue has nothing to do — saves
-    // the user from clicking a button that just no-ops with "0 pages claimed".
-    syncQuickBtnEnablement({ ocr: totalOCR, review: totalReview, visuals: totalVisual });
+    // Disable quick-launch buttons whose queue has nothing FRESH to do
+    // (queue ∩ not-already-merged-to-main). The raw totals from
+    // work-available.json count pages that may already be merged via this
+    // handle's previous PRs — clicking TAKE OCR then would no-op instantly.
+    // The /queue-counts endpoint runs the same findFreshWork() check as
+    // /run-any. Fall back to raw totals if the endpoint fails.
+    const rawCounts = { ocr: totalOCR, review: totalReview, visuals: totalVisual };
+    let freshCounts = null;
+    try {
+      const handle = $("ctrl-handle")?.value || "";
+      const r = await fetch("/queue-counts" + (handle ? "?handle=" + encodeURIComponent(handle) : ""));
+      if (r.ok) freshCounts = (await r.json()).counts;
+    } catch {}
+    syncQuickBtnEnablement(freshCounts || rawCounts);
 
     const gen = data.generatedAt ? new Date(data.generatedAt).toISOString().replace("T"," ").slice(0,19) + " UTC" : "";
     $("q-ts").textContent = "queue generated " + gen + " · refreshes every 5 min";
@@ -907,8 +918,8 @@
       if (remaining === 0) {
         btn.dataset.queueEmpty = "1";
         if (sub) sub.textContent = need === "any"
-          ? "all queues empty — nothing left to do · refresh in 5 min"
-          : `${need.toUpperCase()} queue empty — nothing to do`;
+          ? "all queues already submitted by you — wait for the queue to refresh"
+          : `${need.toUpperCase()} queue empty for you — all listed pages already submitted/merged`;
       } else {
         delete btn.dataset.queueEmpty;
         if (sub) {

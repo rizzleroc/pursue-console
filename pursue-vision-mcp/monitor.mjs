@@ -681,6 +681,42 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { alive, port: state.daemonPort });
     }
 
+    // Fresh-work counts for the dashboard's quick-launch buttons. The raw
+    // queue's totalPagesNeeded counts pages whose ORIGINAL OCR is incomplete
+    // — but if every one of them has already been submitted/merged to main by
+    // this handle (the common case after the auto-refresh workflow hasn't
+    // re-run yet), clicking TAKE OCR / LOOP OCR is an instant no-op. This
+    // endpoint runs the same findFreshWork() check /run-any does and returns
+    // per-queue counts of pages this handle still has fresh work for. The
+    // dashboard uses these (not the raw queue totals) to drive button
+    // enablement so users don't see "12 available" while it's actually zero.
+    if (req.method === "GET" && req.url.startsWith("/queue-counts")) {
+      const u = new URL(req.url, "http://localhost");
+      const handle = u.searchParams.get("handle") || state.handle || "Rizzleroc";
+      try {
+        const queue = await fetchQueue();
+        const buckets = [
+          { mode: "ocr",     dir: "gpt-vision",        field: "queue" },
+          { mode: "review",  dir: "gpt-vision-review", field: "reviewQueue" },
+          { mode: "visuals", dir: "media-staging",     field: "visualsNeedingContext" },
+        ];
+        const counts = { ocr: 0, review: 0, visuals: 0 };
+        const raw    = {
+          ocr:     queue.totalPagesNeeded ?? 0,
+          review:  queue.totalPagesNeedingReview ?? 0,
+          visuals: queue.totalPagesNeedingVisualContext ?? 0,
+        };
+        for (const b of buckets) {
+          const { totalFresh } = await findFreshWork(handle, b.dir, queue.byEvent || {}, b.field);
+          counts[b.mode] = totalFresh;
+        }
+        return sendJson(res, 200, { counts, raw, handle, checkedAt: Date.now() });
+      } catch (e) {
+        return sendJson(res, 500, { error: e.message });
+      }
+    }
+
+
     // Visuals staging state — so the COMMIT VISUALS button reflects reality
     // instead of always looking "ready". `committable` = filled templates that
     // would actually produce a contribution (Title ≥4, Context ≥20, image
