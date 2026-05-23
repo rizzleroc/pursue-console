@@ -13,14 +13,17 @@ export const URL_BASE = "https://www.war.gov/medialink/ufo/release_1/";
 export const URL_BASE_R2 = "release_2/";
 
 // Records that aren't in URL_BASE (Release 01). Anything else is assumed
-// to be release_1 unless `release` is set explicitly.
+// to be release_1 unless `release` is set explicitly. Uses the canonical
+// AGENCY-UAP-NNN identifiers shown by war.gov so they merge cleanly with
+// the rest of the Release 02 catalogue (videos / audio scraped by the
+// whipgen MCP web tools, not by sync-war-gov.mjs).
 const RELEASE_FOR = {
-  "cia-uap-d001-ussr-1973":     "Release 02",
-  "doe-uap-d001-pantex":        "Release 02",
-  "doe-uap-d002-jamestuck":     "Release 02",
-  "doe-uap-d003-pajarito":      "Release 02",
-  "dow-uap-d017-sandia":        "Release 02",
-  "odni-uap-d001-usper-narrative": "Release 02",
+  "CIA-UAP-D001": "Release 02",
+  "DOE-UAP-D001": "Release 02",
+  "DOE-UAP-D002": "Release 02",
+  "DOE-UAP-D003": "Release 02",
+  "DOW-UAP-D017": "Release 02",
+  "ODNI-UAP-D001": "Release 02",
 };
 
 const RAW = [
@@ -78,20 +81,21 @@ const RAW = [
   { id: "pursue-release-01", title: "PURSUE Release 01 — Public Disclosure", date: "2026-05-08", sort: 20260508, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", summary: "Cleared for public release: 162 records (120 PDFs, 28 videos, 14 images, 4,185 PDF pages, 2.3 GB total) hosted at war.gov/UFO. Interagency effort: White House, ODNI (Tulsi Gabbard), DOE, AARO, NASA (Jared Isaacman), FBI (Kash Patel), Department of War (Pete Hegseth). Rolling tranches every few weeks. All cases marked UNRESOLVED.", url: "", tags: ["PURSUE","Hegseth","Trump","Gabbard","Isaacman","Patel","disclosure","TODAY"] },
 
   // ===== Release 02 — 2026-05-22 =====
-  // Six declassified PDFs (CIA / DOE×3 / DOW / ODNI). The other 58 items
-  // in the release are 51 videos + 7 audio hosted on DVIDS — they need
-  // their public URLs/IDs harvested from the war.gov press release page,
-  // which our egress can't reach. Add those entries here when the list
-  // is available; the schema is identical (use `videoId: "<dvids-id>"`
-  // and set `release: "Release 02"` to surface them under the dropdown).
-  { id: "cia-uap-d001-ussr-1973", title: "CIA — Intelligence Information Report, USSR (1973)", date: "1973", sort: 19730101, era: "70s", loc: "USSR", region: "Europe", coords: [55.75, 37.6], agency: "CIA", type: "Intelligence Report", flag: "high", redacted: true, summary: "Declassified CIA intelligence information report covering a Soviet-era UAP-relevant case. Released in Release 02 (May 22 2026) alongside the DOE, DOW, and ODNI documents.", url: "CIA-UAP-D001_Intelligence_Information_Report_USSR_1973.pdf", release: "Release 02", tags: ["CIA","USSR","Cold War","release-02"], docType: "report" },
-  { id: "doe-uap-d001-pantex", title: "DOE — PANTEX Image (DOE-UAP-D001)", date: "Undated", sort: 20260522, era: "modern", loc: "Pantex Plant, Texas", region: "North America", coords: [35.32, -101.56], agency: "DOE", type: "Image", flag: "high", redacted: true, summary: "Declassified DOE imagery from the PANTEX (Pantex Plant — Department of Energy weapons assembly/disassembly facility). Part of Release 02.", url: "DOE-UAP-D001_PANTEX_Image.pdf", release: "Release 02", tags: ["DOE","PANTEX","release-02"], docType: "image" },
-  { id: "doe-uap-d002-jamestuck", title: "DOE — James Tuck Correspondence (DOE-UAP-D002)", date: "Undated", sort: 20260522, era: "modern", loc: "Los Alamos, New Mexico", region: "North America", coords: [35.88, -106.30], agency: "DOE", type: "Correspondence", flag: "med", redacted: true, summary: "Declassified correspondence relating to physicist James L. Tuck (Manhattan Project / Los Alamos). Part of Release 02.", url: "DOE-UAP-D002_JamesTuck_Correspondence.pdf", release: "Release 02", tags: ["DOE","James Tuck","Los Alamos","release-02"], docType: "correspondence" },
-  { id: "doe-uap-d003-pajarito", title: "DOE — Pajarito Astronomers (DOE-UAP-D003)", date: "Undated", sort: 20260522, era: "modern", loc: "Pajarito Plateau, New Mexico", region: "North America", coords: [35.86, -106.32], agency: "DOE", type: "Astronomer Report", flag: "med", redacted: true, summary: "Declassified report concerning astronomers' observations from the Pajarito Plateau (Los Alamos area). Part of Release 02.", url: "DOE-UAP-D003_Pajarito_Astronomers.pdf", release: "Release 02", tags: ["DOE","Pajarito","astronomers","New Mexico","release-02"], docType: "report" },
-  { id: "dow-uap-d017-sandia", title: "DOW — General Correspondence of Sandia (DOW-UAP-D017)", date: "Undated", sort: 20260522, era: "modern", loc: "Sandia National Laboratories, New Mexico", region: "North America", coords: [35.05, -106.54], agency: "Department of War", type: "General Correspondence", flag: "high", redacted: true, summary: "Department of War general correspondence concerning Sandia National Laboratories. The largest single PDF in Release 02 (~67 MB).", url: "DOW-UAP-D017_General_Correspondence_Of_Sandia.pdf", release: "Release 02", tags: ["DOW","Sandia","correspondence","release-02"], docType: "correspondence" },
-  { id: "odni-uap-d001-usper-narrative", title: "ODNI — USPER Narrative, Senior USIC (ODNI-UAP-D001)", date: "Undated", sort: 20260522, era: "modern", loc: "United States", region: "North America", coords: [38.9, -77.0], agency: "ODNI", type: "USPER Narrative", flag: "anchor", redacted: true, summary: "ODNI-declassified narrative attributed to a senior US Intelligence Community official (USPER). Part of Release 02.", url: "ODNI-UAP-D001_USPER_Narrative_Senior_USIC.pdf", release: "Release 02", tags: ["ODNI","USPER","senior USIC","release-02"], docType: "narrative" },
+  // Six declassified PDFs hand-curated here; the rest of Release 02 (PR
+  // mission reports + DVIDS videos + audio briefings) lands via the
+  // whipgen MCP web-tool scrape (whipgen_web_search / _open / _extract).
+  // IDs match the war.gov canonical AGENCY-UAP-NNN format so this block
+  // merges cleanly with the scraped entries (same e.id → React keys
+  // line up, dedup is by id elsewhere). The PDFs themselves are
+  // committed under public/release_2/ and served from the deploy.
+  { id: "CIA-UAP-D001", title: "CIA-UAP-D001, Intelligence Information Report, USSR, 1973", date: "1973-12-20", sort: 19731220, era: "70s", loc: "USSR", region: "Europe", coords: [55.75, 37.6], agency: "Central Intelligence Agency", type: "Intelligence Information Report", flag: "high", redacted: true, summary: "Declassified CIA intelligence information report covering a Soviet-era UAP-relevant case (December 20, 1973). Released in Release 02 alongside the DOE, DOW, and ODNI documents.", url: "CIA-UAP-D001_Intelligence_Information_Report_USSR_1973.pdf", release: "Release 02", tags: ["CIA","USSR","Cold War","release-02"], docType: "report" },
+  { id: "DOE-UAP-D001", title: "DOE-UAP-D001, Enhanced PANTEX Imagery", date: "Undated", sort: 20260522, era: "modern", loc: "Pantex Plant, Texas", region: "North America", coords: [35.32, -101.56], agency: "Department of Energy", type: "Enhanced Imagery", flag: "high", redacted: true, summary: "Declassified DOE imagery from the Pantex Plant (Department of Energy weapons assembly/disassembly facility, Texas). Part of Release 02.", url: "DOE-UAP-D001_PANTEX_Image.pdf", release: "Release 02", tags: ["DOE","PANTEX","release-02"], docType: "image" },
+  { id: "DOE-UAP-D002", title: "DOE-UAP-D002, James Tuck Correspondence, 1970s", date: "1970s", sort: 19750101, era: "70s", loc: "Los Alamos, New Mexico", region: "North America", coords: [35.88, -106.30], agency: "Department of Energy", type: "Correspondence", flag: "med", redacted: true, summary: "Declassified correspondence relating to physicist James L. Tuck (Manhattan Project / Los Alamos). Part of Release 02.", url: "DOE-UAP-D002_JamesTuck_Correspondence.pdf", release: "Release 02", tags: ["DOE","James Tuck","Los Alamos","release-02"], docType: "correspondence" },
+  { id: "DOE-UAP-D003", title: "DOE-UAP-D003, Pajarito Astronomers Invitation, 1986", date: "1986-05-20", sort: 19860520, era: "80s", loc: "Pajarito Plateau, New Mexico", region: "North America", coords: [35.86, -106.32], agency: "Department of Energy", type: "Astronomer Invitation", flag: "med", redacted: true, summary: "Declassified invitation/report concerning astronomers' observations from the Pajarito Plateau, Los Alamos area, May 20 1986. Part of Release 02.", url: "DOE-UAP-D003_Pajarito_Astronomers.pdf", release: "Release 02", tags: ["DOE","Pajarito","astronomers","New Mexico","release-02"], docType: "report" },
+  { id: "DOW-UAP-D017", title: "DOW-UAP-D017, UAP Reported at Sandia Base, 1948-1950", date: "1948-1950", sort: 19490101, era: "40s", loc: "Sandia National Laboratories, New Mexico", region: "North America", coords: [35.05, -106.54], agency: "Department of War", type: "General Correspondence", flag: "high", redacted: true, summary: "Department of War general correspondence concerning UAP reports at Sandia Base, 1948-1950. Largest single PDF in Release 02 (~67 MB).", url: "DOW-UAP-D017_General_Correspondence_Of_Sandia.pdf", release: "Release 02", tags: ["DOW","Sandia","correspondence","release-02"], docType: "correspondence" },
+  { id: "ODNI-UAP-D001", title: "ODNI-UAP-D001, USPER Narrative, Senior USIC Official", date: "2025", sort: 20250101, era: "20s", loc: "Western United States", region: "North America", coords: [39.0, -116.0], agency: "Office of the Director of National Intelligence", type: "USPER Narrative", flag: "anchor", redacted: true, summary: "ODNI-declassified narrative attributed to a senior US Intelligence Community official (USPER), Western United States, 2025. Part of Release 02.", url: "ODNI-UAP-D001_USPER_Narrative_Senior_USIC.pdf", release: "Release 02", tags: ["ODNI","USPER","senior USIC","release-02"], docType: "narrative" },
 
-  { id: "pursue-release-02", title: "PURSUE Release 02 — Public Disclosure", date: "2026-05-22", sort: 20260522, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", release: "Release 02", summary: "Second public release: 64 records (6 PDFs, 51 videos, 7 audio). PDFs catalogued locally; video/audio inventory pending war.gov mirror. War.gov press release: https://www.war.gov/News/Releases/Release/Article/4499305/", url: "", tags: ["PURSUE","release 02","disclosure"] },
+  { id: "pursue-release-02", title: "PURSUE Release 02 — Public Disclosure", date: "2026-05-22", sort: 20260522, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", release: "Release 02", summary: "Second public release: 64 records (6 PDFs, 51 videos, 7 audio). PDFs mirrored locally at public/release_2/; video / audio inventory scraped via whipgen MCP web tools. War.gov press release: https://www.war.gov/News/Releases/Release/Article/4499305/", url: "", tags: ["PURSUE","release 02","disclosure"] },
 ];
 
 // Concat auto-catalogued stubs from the Gemini-corpus import. These fill
@@ -123,10 +127,13 @@ export const AGENCY_COLORS = {
   "Department of War": "#7CFFB2",
   "Department of State": "#FFD93D",
   "NASA": "#82B6FF",
-  // Release 02 brought CIA / DOE / ODNI into the catalogue.
-  "CIA":  "#B388FF",
-  "DOE":  "#FFB86B",
-  "ODNI": "#FF6B9D",
+  // Release 02 brought CIA / DOE / ODNI into the catalogue. Use the full
+  // agency names that match the war.gov canonical column (whipgen scrape
+  // produces these strings verbatim), so dropdown options dedupe instead
+  // of showing both "DOE" and "Department of Energy".
+  "Central Intelligence Agency":                       "#B388FF",
+  "Department of Energy":                              "#FFB86B",
+  "Office of the Director of National Intelligence":   "#FF6B9D",
 };
 
 export const FLAG_LABEL = { anchor: "PRIORITY", high: "ELEVATED", med: "ROUTINE", low: "TRIVIAL" };
