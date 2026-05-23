@@ -1,5 +1,5 @@
 {
-  "_comment": "Known war.gov/UFO (PURSUE program) data releases and mirror status. The site ingests a release once DenisSergeevitch/UFO-USA mirrors its PDFs (war.gov blocks our IPs). 'mirrored' releases are live in the corpus; 'pending-mirror' releases are surfaced as 'incoming' on the site and picked up automatically when corpus:sync sees the upstream manifest grow. Edit here; the next build of public/work-available.json reflects changes.",
+  "_comment": "Known war.gov/UFO (PURSUE program) data releases and mirror status. The site ingests a release once DenisSergeevitch/UFO-USA mirrors its PDFs (war.gov blocks our IPs). 'mirrored' releases are live in the corpus; 'pending-mirror' releases are surfaced as 'incoming' on the site and picked up automatically when corpus:sync sees the upstream manifest grow. The 'paths.localDir' field tells the war.gov MCP collector (corpus:fetch-war-gov) where to drop downloaded files. Edit here; the next build of public/work-available.json reflects changes.",
   "releases": [
     {
       "id": "release-01",
@@ -8,6 +8,7 @@
       "status": "mirrored",
       "files": { "total": 162, "pdf": 120, "video": 28, "image": 14 },
       "source": "https://www.war.gov/ufo",
+      "paths": { "localDir": "data-raw/war-gov/release_1" },
       "note": "First PURSUE release. Mirrored and transcribed — this is the live corpus."
     },
     {
@@ -17,7 +18,8 @@
       "status": "pending-mirror",
       "files": { "total": 64, "pdf": 6, "audio": 7, "video": 51 },
       "source": "https://www.war.gov/News/Releases/Release/Article/4499305/department-of-war-publishes-second-release-of-unidentified-anomalous-phenomena/",
-      "note": "Second PURSUE release. Video/audio-heavy (only 6 PDFs). Awaiting DenisSergeevitch/UFO-USA mirror before ingest."
+      "paths": { "localDir": "data-raw/war-gov/release_2" },
+      "note": "Second PURSUE release. Video/audio-heavy (only 6 PDFs). MCP-based war.gov collector landed (corpus:fetch-war-gov, @unverified); still awaiting first live run + DenisSergeevitch/UFO-USA mirror as a parallel path."
     }
   ]
 }
