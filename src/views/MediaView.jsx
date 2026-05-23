@@ -38,6 +38,18 @@ const KIND_COLORS = {
 
 const ALL_KINDS = Object.keys(KIND_LABELS);
 
+// Map the Header's "ALL TYPES" dropdown (Document/Video/Image/Audio) into
+// the media-kind taxonomy so the header filter actually subsets the grid.
+// Document = pages without a visible image (e.g. table forms), Image =
+// every visual kind, Video = video tiles, Audio = nothing today (no audio
+// in MEDIA yet, so the filter empties the grid honestly).
+const HEADER_TYPE_TO_KINDS = {
+  Image: new Set(["photograph", "hand-drawing", "photocopied-negative", "newspaper-clipping", "map", "diagram", "table"]),
+  Video: new Set(["video"]),
+  Document: new Set(["table", "photocopied-negative"]),
+  Audio: new Set(),
+};
+
 // IR-scope poster for video tiles — reticle + scanlines + play affordance.
 // DVIDS clips can't be embedded, so this stands in for a thumbnail and the
 // whole tile/modal links out to dvidshub.net.
@@ -70,14 +82,20 @@ function VideoPoster({ label, big }) {
   );
 }
 
-export default function MediaView({ onSelect }) {
+export default function MediaView({ onSelect, headerFilters }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
   const [filterKinds, setFilterKinds] = useState(new Set(ALL_KINDS));
-  const [filterAgency, setFilterAgency] = useState("all");
   const [filterEvent, setFilterEvent] = useState("all");
-  const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(null);
+  // The Header's search input + ALL AGENCIES / ALL TYPES dropdowns drive
+  // these — keeping them as props instead of local state means typing in
+  // the header bar filters MEDIA immediately. The in-page kind/event
+  // selectors and placeholder toggle stay local because they have no
+  // counterpart in the header.
+  const query        = headerFilters?.query        ?? "";
+  const filterAgency = headerFilters?.filterAgency ?? "all";
+  const filterType   = headerFilters?.filterType   ?? "all";
   // Default: only show tiles with a real rendered image. The
   // text-only/placeholder tiles (extracted from Denis's Gemini
   // bracket markers on pages we can't render) are useful metadata
@@ -94,17 +112,19 @@ export default function MediaView({ onSelect }) {
   const filtered = useMemo(() => {
     if (!data?.items) return [];
     const q = query.trim().toLowerCase();
+    const typeKinds = filterType !== "all" ? HEADER_TYPE_TO_KINDS[filterType] : null;
     return data.items.filter(it => {
       // Videos have no local image but must always be visible — they're
       // the release footage, not a metadata-only placeholder.
       if (!includePlaceholders && !it.imagePath && it.kind !== "video") return false;
       if (!filterKinds.has(it.kind)) return false;
+      if (typeKinds && !typeKinds.has(it.kind)) return false;
       if (filterAgency !== "all" && (it.agency || "—") !== filterAgency) return false;
       if (filterEvent !== "all" && it.eventId !== filterEvent) return false;
       if (q && !`${it.title} ${it.description} ${it.eventTitle}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [data, filterKinds, filterAgency, filterEvent, query, includePlaceholders]);
+  }, [data, filterKinds, filterAgency, filterType, filterEvent, query, includePlaceholders]);
 
   // Counts of with-image vs placeholder-only for the toggle label.
   const counts = useMemo(() => {
@@ -241,16 +261,9 @@ export default function MediaView({ onSelect }) {
             ? <>ALL <span className="opacity-60 ml-0.5">{counts.withImage + counts.placeholder}</span></>
             : <>WITH IMAGE <span className="opacity-60 ml-0.5">{counts.withImage}</span><span className="opacity-40 ml-1.5">+ {counts.placeholder} hidden</span></>}
         </button>
-        <input value={query} onChange={(e) => setQuery(e.target.value)}
-          placeholder="search title / description"
-          className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 placeholder-emerald-800 font-mono text-xs w-48 focus:outline-none focus:border-amber-400" />
-        <select value={filterAgency} onChange={(e) => setFilterAgency(e.target.value)}
-          className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs">
-          <option value="all">all agencies</option>
-          {Object.entries(data.byAgency || {}).sort((a, b) => b[1] - a[1]).map(([a, n]) => (
-            <option key={a} value={a}>{a} ({n})</option>
-          ))}
-        </select>
+        {/* Title/description search + agency dropdown have moved to the
+            header filter bar so they share state across the whole site.
+            The per-event selector is kept here — it's media-specific. */}
         <select value={filterEvent} onChange={(e) => setFilterEvent(e.target.value)}
           className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs max-w-xs">
           <option value="all">all events</option>

@@ -182,8 +182,15 @@ const SAMPLE_QUERIES = [
   "operator unable to positively identify the contact",
 ];
 
-export default function SemanticSearchView({ onSelect }) {
-  const [query, setQuery] = useState("");
+export default function SemanticSearchView({ onSelect, headerFilters }) {
+  // Pre-seed from the Header's search box. SEMANTIC needs the user to
+  // click Search (it's an expensive vector search), so we only update
+  // the input — we don't auto-trigger a query.
+  const [query, setQuery] = useState(headerFilters?.query || "");
+  useEffect(() => {
+    if ((headerFilters?.query ?? "") !== query) setQuery(headerFilters?.query || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headerFilters?.query]);
   const [committed, setCommitted] = useState("");      // query that triggered last search
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);

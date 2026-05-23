@@ -23,7 +23,7 @@ function ConfidenceBadge({ confidence, agreement }) {
   );
 }
 
-export default function ReviewView({ onSelect }) {
+export default function ReviewView({ onSelect, headerFilters }) {
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -37,7 +37,29 @@ export default function ReviewView({ onSelect }) {
       .catch(e => setError(e.message));
   }, []);
 
-  const selected = queue?.queue?.[selectedIdx] || null;
+  // Subset the review queue by the Header's search + agency dropdown. The
+  // Header's filterType (Document/Video/Image/Audio) doesn't have a sensible
+  // mapping for review entries (they're always text-on-text disagreements),
+  // so we deliberately ignore it here.
+  const filteredQueue = useMemo(() => {
+    if (!queue?.queue) return null;
+    const q = (headerFilters?.query || "").trim().toLowerCase();
+    const agency = headerFilters?.filterAgency || "all";
+    const list = queue.queue.filter(r => {
+      if (agency !== "all" && (r.agency || "—") !== agency) return false;
+      if (q && !`${r.title || ""} ${r.eventId || ""} ${r.agency || ""}`.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    return { ...queue, queue: list, total: list.length };
+  }, [queue, headerFilters?.query, headerFilters?.filterAgency]);
+
+  // When the filter narrows the list, keep selectedIdx in range.
+  useEffect(() => {
+    if (!filteredQueue) return;
+    if (selectedIdx >= filteredQueue.queue.length) setSelectedIdx(0);
+  }, [filteredQueue, selectedIdx]);
+
+  const selected = filteredQueue?.queue?.[selectedIdx] || null;
   useEffect(() => {
     if (!selected) { setPageData(null); return; }
     setLoadingPage(true);
@@ -48,14 +70,14 @@ export default function ReviewView({ onSelect }) {
   }, [selectedIdx, queue]);
 
   const byAgency = useMemo(() => {
-    if (!queue?.queue) return {};
+    if (!filteredQueue?.queue) return {};
     const acc = {};
-    for (const r of queue.queue) {
+    for (const r of filteredQueue.queue) {
       const k = r.agency || "—";
       acc[k] = (acc[k] || 0) + 1;
     }
     return acc;
-  }, [queue]);
+  }, [filteredQueue]);
 
   if (error) {
     return <div className="p-4 text-rose-400 font-mono text-xs">REVIEW unavailable: {error}</div>;
@@ -74,6 +96,17 @@ export default function ReviewView({ onSelect }) {
       </div>
     );
   }
+  if (filteredQueue && !filteredQueue.queue.length) {
+    return (
+      <div className="p-8 max-w-3xl mx-auto text-center">
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">NO MATCHES</div>
+        <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
+          The current header filters exclude every page in the review queue.<br/>
+          Clear the search box or pick "ALL AGENCIES" to see the {queue.total} pages.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3 p-3 min-h-[calc(100vh-200px)]">
@@ -86,12 +119,15 @@ export default function ReviewView({ onSelect }) {
       <aside className="lg:w-72 shrink-0 border border-emerald-900/50 bg-black/40 rounded-sm">
         <div className="px-3 py-2 border-b border-emerald-900/50 flex items-center justify-between">
           <div className="font-mono text-[10px] tracking-widest text-emerald-400">
-            {queue.total} PAGES
+            {filteredQueue?.total ?? queue.total} PAGES
+            {filteredQueue && filteredQueue.total !== queue.total && (
+              <span className="ml-1.5 text-emerald-700">of {queue.total}</span>
+            )}
           </div>
           <div className="font-mono text-[9px] text-emerald-700">worst first</div>
         </div>
         <ul className="max-h-[60vh] lg:max-h-[calc(100vh-280px)] overflow-y-auto">
-          {queue.queue.map((r, i) => (
+          {(filteredQueue?.queue || queue.queue).map((r, i) => (
             <li key={`${r.eventId}-${r.page}`}>
               <button
                 onClick={() => setSelectedIdx(i)}

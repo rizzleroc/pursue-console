@@ -99,6 +99,10 @@ export default function App() {
   // get to it from anywhere.
   const showHero  = view === "live";
   const showFooter = view === "live" || view === "help";
+  // Bundle the header filter state so each view can apply whatever subset
+  // is relevant to its dataset (LIVE filters live-feed.json signals,
+  // MEDIA filters media.json items, REVIEW filters the review queue, etc).
+  const headerFilters = { query, filterAgency, filterType, filterRelease };
 
   return (
     <div className="min-h-screen bg-[#020806] text-emerald-300 relative overflow-x-hidden" style={{
@@ -133,10 +137,10 @@ export default function App() {
           {view === "atlas"    && <AtlasView    events={filtered} onSelect={handleSelect} />}
           {view === "globe"    && <GlobeView    events={filtered} onSelect={handleSelect} />}
           {view === "network"  && <NetworkView  events={filtered} onSelect={handleSelect} />}
-          {view === "search"   && <SearchView   onSelect={handleSelect} />}
-          {view === "live"     && <LiveFeedView onSelect={handleSelect} />}
-          {view === "review"   && <ReviewView   onSelect={handleSelect} />}
-          {view === "media"    && <MediaView    onSelect={handleSelect} />}
+          {view === "search"   && <SearchView   onSelect={handleSelect} headerFilters={headerFilters} />}
+          {view === "live"     && <LiveFeedView onSelect={handleSelect} headerFilters={headerFilters} />}
+          {view === "review"   && <ReviewView   onSelect={handleSelect} headerFilters={headerFilters} />}
+          {view === "media"    && <MediaView    onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "help"     && <HelpView onViewChange={handleViewChange} />}
           {view === "semantic" && (
             <Suspense fallback={
@@ -153,7 +157,7 @@ export default function App() {
                 </div>
               </div>
             }>
-              <SemanticSearchView onSelect={handleSelect} />
+              <SemanticSearchView onSelect={handleSelect} headerFilters={headerFilters} />
             </Suspense>
           )}
           {view === "dossier" && (
