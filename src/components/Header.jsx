@@ -95,17 +95,18 @@ export default function Header({
         </div>
       )}
 
-      {/* primary nav */}
-      <nav className="px-1 sm:px-4 flex overflow-x-auto no-scrollbar border-t border-emerald-700/30" role="tablist">
+      {/* Unified nav — primary tabs first, then a thin divider, then the
+          analysis tabs. Combined into a single row so the header filter
+          bar above sits over one consolidated nav surface and the order
+          of tabs reads left-to-right without the user wondering why
+          there are two rails. */}
+      <nav className="px-1 sm:px-4 flex items-center overflow-x-auto no-scrollbar border-t border-emerald-700/30" role="tablist">
         {PRIMARY.map(v => (
           <NavTab key={v.id} v={v} active={view === v.id} onClick={() => onViewChange(v.id)}
             badge={v.id === "review" && reviewN > 0 ? reviewN : null} badgeColor="amber" />
         ))}
-      </nav>
-
-      {/* analysis nav — same row pattern, dimmer */}
-      <nav className="px-1 sm:px-4 flex overflow-x-auto no-scrollbar border-t border-emerald-900/30 bg-black/20" role="tablist">
-        <span className="font-mono text-[9px] tracking-[0.3em] text-emerald-800 px-3 py-2 flex items-center select-none">ANALYSIS</span>
+        <span aria-hidden="true" className="mx-2 sm:mx-3 h-5 w-px bg-emerald-900/60 shrink-0" />
+        <span className="font-mono text-[9px] tracking-[0.3em] text-emerald-800 px-2 py-2 flex items-center select-none shrink-0">ANALYSIS</span>
         {ANALYSIS.map(v => (
           <NavTab key={v.id} v={v} active={view === v.id} onClick={() => onViewChange(v.id)} dim />
         ))}
