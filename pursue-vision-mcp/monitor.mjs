@@ -201,7 +201,11 @@ let lastRun = null;
 
 function summarizeLog(allLines, exitCode) {
   const text = allLines.join("\n");
-  const skipCount = (text.match(/⊖.*already submitted/g) || []).length;
+  // volunteer.mjs prints "⊖ <eid> p<N> already done (local or merged to main)"
+  // — the older "already submitted" pattern never matched, so skipCount was
+  // always 0 and the dashboard headline collapsed to a generic "NO NEW WORK"
+  // instead of "NO NEW WORK · N pages already submitted".
+  const skipCount = (text.match(/⊖.*already (?:submitted|done)/g) || []).length;
   const okMatch   = text.match(/done\.\s*ok=(\d+)\s*err=(\d+)/);
   const okCount   = okMatch ? Number(okMatch[1]) : 0;
   const errCount  = okMatch ? Number(okMatch[2]) : 0;

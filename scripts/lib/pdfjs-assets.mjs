@@ -47,6 +47,10 @@ export async function getPdfjsAssetUrls() {
     createReadStream(filePath).on("error", () => res.end()).pipe(res);
   });
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  // Without unref(), the listening socket keeps the event loop alive, and on
+  // Windows process.exit() can hit a libuv UV_HANDLE_CLOSING race tearing down
+  // an unused listener (Assertion failed in src\win\async.c → exit 3221226505).
+  server.unref();
   const { port } = server.address();
   const base = `http://127.0.0.1:${port}`;
   return {
