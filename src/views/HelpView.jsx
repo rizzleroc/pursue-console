@@ -52,6 +52,7 @@ export default function HelpView({ onViewChange }) {
   }, [docs, filter]);
 
   const totalPagesNeeded = queue?.totalPagesNeeded || 0;
+  const incomingReleases = queue?.incomingReleases || [];
   // Rough time estimate: ~2 min/page at 25s pacing with breaks
   const hoursEstimate = totalPagesNeeded * 2 / 60;
 
@@ -97,6 +98,43 @@ export default function HelpView({ onViewChange }) {
           {queue ? <>QUEUE GEN {queue.generatedAt?.slice(0,16).replace("T"," ")} · {Object.keys(queue.byEvent).length} DOCS · {totalPagesNeeded} PAGES</> : "LOADING…"}
         </div>
       </div>
+
+      {/* ============ HEADS UP — INCOMING RELEASE ============ */}
+      {incomingReleases.length > 0 && (
+        <div className="border border-amber-700/50 bg-amber-950/20 rounded-sm p-4 mb-6">
+          <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300 mb-3">▌ HEADS UP — INCOMING RELEASE</div>
+          <div className="space-y-3">
+            {incomingReleases.map(r => {
+              const f = r.files || {};
+              const parts = [
+                f.total != null && `${f.total} files`,
+                f.pdf != null && `${f.pdf} docs`,
+                f.audio != null && `${f.audio} audio`,
+                f.video != null && `${f.video} video`,
+                f.image != null && `${f.image} image`,
+              ].filter(Boolean);
+              return (
+                <div key={r.id} className="border-t border-amber-900/40 pt-3 first:border-t-0 first:pt-0">
+                  <div className="flex items-baseline justify-between flex-wrap gap-2 mb-1">
+                    <span className="font-mono text-emerald-100 text-[13px]">{r.label}</span>
+                    <span className="font-mono text-[9px] text-amber-700 tracking-widest">{r.published}</span>
+                  </div>
+                  <div className="font-mono text-[11px] text-amber-200 tabular-nums mb-1.5">{parts.join(" · ")}</div>
+                  <div className="font-mono text-[11px] text-emerald-400 leading-snug">
+                    Mirroring pending — transcription work opens once the upstream mirror lands. Nothing to do yet; check back.
+                  </div>
+                  {r.source && (
+                    <a href={r.source} target="_blank" rel="noopener noreferrer"
+                      className="font-mono text-[9px] text-emerald-600 hover:text-amber-300 mt-1 inline-block">
+                      ANNOUNCEMENT ↗
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ============ PRIORITY LADDER ============ */}
       {/* Per-event breakdowns from stats + queue — volunteers can see
