@@ -21,7 +21,7 @@
 //     under the directory you started the daemon from. No reading /etc.
 
 import http from "node:http";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -29,6 +29,7 @@ import { randomBytes } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { ChatGPTDriver } from "./chatgpt-driver.mjs";
 import { GeminiDriver }  from "./gemini-driver.mjs";
+import { WarGovDriver }  from "./war-gov-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -47,6 +48,16 @@ function jailPath(p) {
   if (!existsSync(abs)) throw new Error(`not found: ${p}`);
   return abs;
 }
+// Like jailPath, but for output directories that don't exist yet (the
+// caller will mkdir -p). Validates jail without requiring existence.
+function jailDestDir(p) {
+  if (!p || typeof p !== "string") throw new Error("destDir required");
+  const abs = path.resolve(p);
+  if (!ALLOWED_ROOTS.some(root => abs === root || abs.startsWith(root + path.sep))) {
+    throw new Error(`forbidden destDir (must be under home or cwd): ${p}`);
+  }
+  return abs;
+}
 
 async function loadToken() {
   if (process.env.PURSUE_VISION_TOKEN) return process.env.PURSUE_VISION_TOKEN;
@@ -58,14 +69,21 @@ async function loadToken() {
 }
 const TOKEN = await loadToken();
 
-// Two driver instances, two single-slot queues — one per provider. That
-// way a /fanout-style "send to both at the same time" call can really
-// run in parallel (different browser tabs, different network paths).
+// Three driver instances, three single-slot queues — one per provider.
+// That way a /fanout-style "send to both at the same time" call can
+// really run in parallel (different browser tabs, different network
+// paths). The warGov driver lives alongside the LLM drivers but talks
+// to the war.gov tab instead, for raw-corpus collection (Release 02+).
 const drivers = {
   chatgpt: new ChatGPTDriver({ cdpPort: CDP_PORT }),
   gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
+  warGov:  new WarGovDriver({  cdpPort: CDP_PORT }),
 };
-const queues = { chatgpt: Promise.resolve(), gemini: Promise.resolve() };
+const queues = {
+  chatgpt: Promise.resolve(),
+  gemini:  Promise.resolve(),
+  warGov:  Promise.resolve(),
+};
 function enqueue(provider, fn) {
   const cur = queues[provider] ?? Promise.resolve();
   const next = cur.then(fn, fn);
@@ -119,6 +137,7 @@ const server = http.createServer(async (req, res) => {
         providers: {
           chatgpt: { connected: drivers.chatgpt.isConnected(), history: drivers.chatgpt.callCount },
           gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
+          warGov:  { connected: drivers.warGov.isConnected(),  history: drivers.warGov.callCount },
         },
       });
     }
@@ -178,6 +197,80 @@ const server = http.createServer(async (req, res) => {
       })));
       return sendJson(res, 200, { results, totalDurationMs: Date.now() - t0 });
     }
+    // /war-gov/index — fetch the war.gov/UFO release-files index for one
+    // release (default 2). The driver this delegates to is annotated
+    // 'unverified' (see war-gov-driver.mjs header) — never run live.
+    // Long-poll: keep the request open until the driver returns the
+    // filtered, normalized record list.
+    if (req.method === "GET" && req.url.startsWith("/war-gov/index")) {
+      const u = new URL(req.url, "http://x");
+      const release = u.searchParams.get("release") || "2";
+      enqueue("warGov", async () => {
+        try {
+          const records = await drivers.warGov.fetchIndex({ release });
+          sendJson(res, 200, { release, count: records.length, records });
+        } catch (e) {
+          console.error(`[/war-gov/index] ${e.message}`);
+          sendJson(res, 500, { error: e.message });
+        }
+      });
+      return;
+    }
+
+    // /war-gov/download — download a list of war.gov URLs into a jailed
+    // destDir. Long-running: holds the connection open until every file
+    // either lands or fails, then returns the per-file results.
+    if (req.method === "POST" && req.url === "/war-gov/download") {
+      const body = await readBody(req);
+      const { urls, destDir } = body;
+      if (!Array.isArray(urls) || !urls.length) {
+        return sendJson(res, 400, { error: "urls[] (non-empty) required" });
+      }
+      let safeDestDir;
+      try { safeDestDir = jailDestDir(destDir); }
+      catch (e) { return sendJson(res, 403, { error: e.message }); }
+      try { await mkdir(safeDestDir, { recursive: true }); }
+      catch (e) { return sendJson(res, 500, { error: `mkdir failed: ${e.message}` }); }
+      // Sanity-cap to keep one request from monopolizing the queue for
+      // hours of opaque time. The maintainer's typical batch is ≤ 64
+      // (= Release 02 total). Anything bigger should be split.
+      if (urls.length > 256) {
+        return sendJson(res, 400, { error: `too many urls (${urls.length}); split into batches ≤ 256` });
+      }
+      const t0 = Date.now();
+      enqueue("warGov", async () => {
+        const results = [];
+        for (const url of urls) {
+          // Best-effort URL → filename. We resolve filenames here (not
+          // in the driver) so the driver stays single-responsibility.
+          let fileName;
+          try { fileName = decodeURIComponent(path.basename(new URL(url).pathname)) || "file.bin"; }
+          catch { fileName = "file.bin"; }
+          const destPath = path.join(safeDestDir, fileName);
+          const pt0 = Date.now();
+          try {
+            const out = await drivers.warGov.downloadFile({ url, destPath });
+            results.push({ url, ok: true, bytes: out.bytes, destPath, durationMs: Date.now() - pt0 });
+          } catch (e) {
+            console.error(`[/war-gov/download] ${url} → ${e.message}`);
+            results.push({ url, ok: false, error: e.message, durationMs: Date.now() - pt0 });
+            // Akamai blocks tend to be sticky once they fire; bail out
+            // rather than burn the rest of the batch on the same block.
+            if (/akamai\s*block/i.test(e.message)) {
+              results.push({ url: "__abort__", ok: false, error: "aborting batch on Akamai block" });
+              break;
+            }
+          }
+        }
+        sendJson(res, 200, {
+          destDir: safeDestDir,
+          totalDurationMs: Date.now() - t0,
+          results,
+        });
+      });
+      return;
+    }
+
     sendJson(res, 404, { error: "not found" });
   } catch (e) {
     console.error("[daemon] unhandled:", e);
