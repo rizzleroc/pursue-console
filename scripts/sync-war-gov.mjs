@@ -188,7 +188,24 @@ try {
 } catch (e) {
   console.error(`error: ${e.message}`);
   if (usingMcp) {
-    console.error("       (is the daemon up?  npm start --prefix pursue-vision-mcp)");
+    // A 404 specifically means the daemon answered but doesn't ship the
+    // /war-gov/* routes — that's the giveaway that the user is actually
+    // talking to a different MCP (e.g. whipgen) on the same port, not
+    // pursue-vision-mcp. pursue-vision-mcp's start.mjs skips starting
+    // when it sees a primary on :9223 — so the war.gov routes never came
+    // up. Make this explicit instead of "is the daemon up?".
+    if (/\b404\b/.test(e.message)) {
+      console.error("       The MCP on :9223 doesn't implement /war-gov/* — likely a different");
+      console.error("       MCP (whipgen) running on the same port. Two ways to fix:");
+      console.error("       (a) stop that primary MCP, then:");
+      console.error("           npm start --prefix pursue-vision-mcp -- --no-primary");
+      console.error("       (b) keep the primary up, run pursue-vision-mcp on a side port,");
+      console.error("           then pass --daemon=http://127.0.0.1:<port> to this command:");
+      console.error("           $env:PURSUE_VISION_PORT='9233'; npm start --prefix pursue-vision-mcp -- --no-primary");
+      console.error("           npm run corpus:fetch-war-gov -- --release=02 --prefer-mcp --daemon=http://127.0.0.1:9233");
+    } else {
+      console.error("       (is the daemon up?  npm start --prefix pursue-vision-mcp)");
+    }
   } else {
     console.error("       (direct fetch likely hit Akamai; try the daemon path instead)");
   }

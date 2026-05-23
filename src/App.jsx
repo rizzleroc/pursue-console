@@ -68,8 +68,10 @@ export default function App() {
     return EVENTS.filter(e => {
       if (filterAgency !== "all" && e.agency !== filterAgency) return false;
       if (filterType !== "all" && recordType(e) !== filterType) return false;
-      // Release: every record is Release 01 today, so selecting it is a no-op.
-      if (filterRelease !== "all" && filterRelease !== "Release 01") return false;
+      // Release tag lives on the event (defaulting to "Release 01" in
+      // events.js for legacy records); compare directly so Release 02
+      // / future releases actually subset the catalogue.
+      if (filterRelease !== "all" && (e.release || "Release 01") !== filterRelease) return false;
       if (q && !(
         e.title.toLowerCase().includes(q) ||
         e.summary.toLowerCase().includes(q) ||

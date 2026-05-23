@@ -4,6 +4,28 @@
 // =================================================================
 export const URL_BASE = "https://www.war.gov/medialink/ufo/release_1/";
 
+// Release 02 PDFs live in the repo at public/release_2/ — Vite copies that
+// folder to the deploy root, so links resolve to
+// https://rizzleroc.github.io/pursue-console/release_2/<file>. We host them
+// locally because war.gov's WAF rejects automated fetches and the upstream
+// DenisSergeevitch/UFO-USA mirror hasn't published release 02 yet (status
+// in config/releases.json was "pending-mirror" before this commit).
+export const URL_BASE_R2 = "release_2/";
+
+// Records that aren't in URL_BASE (Release 01). Anything else is assumed
+// to be release_1 unless `release` is set explicitly. Uses the canonical
+// AGENCY-UAP-NNN identifiers shown by war.gov so they merge cleanly with
+// the rest of the Release 02 catalogue (videos / audio scraped by the
+// whipgen MCP web tools, not by sync-war-gov.mjs).
+const RELEASE_FOR = {
+  "CIA-UAP-D001": "Release 02",
+  "DOE-UAP-D001": "Release 02",
+  "DOE-UAP-D002": "Release 02",
+  "DOE-UAP-D003": "Release 02",
+  "DOW-UAP-D017": "Release 02",
+  "ODNI-UAP-D001": "Release 02",
+};
+
 const RAW = [
   { id: "fbi-62hq83894", title: "FBI Flying Discs Case File 62-HQ-83894", date: "1947-06", sort: 19470615, era: "40s", loc: "United States (multi-site)", region: "North America", coords: [38.9, -77.0], agency: "FBI", type: "Document Collection", flag: "anchor", summary: "21-year, 18-section investigative archive on UFOs and flying discs. Includes Oak Ridge TN photo evidence, propulsion proposals, eyewitness testimonies, and conventions. Many sections newly declassified with fewer redactions than the FBI Vault version.", url: "65_hs1-834228961_62-hq-83894_section_1.pdf", tags: ["flying discs","Oak Ridge","propulsion","Cold War","FBI Vault"], note: "18 sections in release" },
   { id: "shaef-1945", title: "SHAEF Foo Fighters & Night Phenomena", date: "1945-03-18", sort: 19450318, era: "40s", loc: "Germany", region: "Europe", coords: [51.0, 10.0], agency: "Department of War", type: "Intelligence Memo", flag: "high", summary: 'SHAEF messages on "night phenomena (foofighters)," flak rockets, unidentified cylindrical objects, and blinking lights. Repeated references to observations by the 415th Night Fighter Squadron over Germany.', url: "331_120752_numeric_files_1944–1945_37153_german_armament_equipment_documents.pdf", tags: ["foo fighters","415th NFS","WWII","cylindrical"], docType: "mixed" },
@@ -57,6 +79,23 @@ const RAW = [
   { id: "usper-2025", title: 'USPER — "Super-Hot Orb" at US Military Facility', date: "Late 2025", sort: 20251101, era: "20s", loc: "United States (military facility)", region: "North America", coords: [37.0, -116.0], agency: "FBI", type: "FBI 302 Interview", flag: "anchor", redacted: true, summary: 'FBI 302 interview with a SENIOR US INTELLIGENCE OFFICIAL. After helicopter searches at a US military facility, found a "super-hot" orb hovering over the ground. The orb "travelled for 20 miles at a speed too fast for the helicopter in pursuit." A "swarm" of lights was seen moving in all directions, then 4–5 additional orbs flaring up and down across the area for 30 minutes. First-hand testimony from a senior intelligence officer is exceptional within Release 01.', url: "usper-statement-redacted.pdf", tags: ["senior intel official","super-hot","20 miles","swarm","first-hand"] },
   { id: "army-2026", title: "Department of the Army 2026 (PR-49)", date: "2026", sort: 20260315, era: "20s", loc: "North America", region: "North America", coords: [39.0, -98.0], agency: "Department of War", type: "Mission Report + Video", flag: "high", redacted: true, summary: '1 minute 49 seconds of IR video. Sensor tracks an initial area of interest, then disengages and pans to track TWO areas of contrast. The most recent UAP video in Release 01.', url: "", videoId: "1006111", tags: ["Army","most recent","two objects"] },
   { id: "pursue-release-01", title: "PURSUE Release 01 — Public Disclosure", date: "2026-05-08", sort: 20260508, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", summary: "Cleared for public release: 162 records (120 PDFs, 28 videos, 14 images, 4,185 PDF pages, 2.3 GB total) hosted at war.gov/UFO. Interagency effort: White House, ODNI (Tulsi Gabbard), DOE, AARO, NASA (Jared Isaacman), FBI (Kash Patel), Department of War (Pete Hegseth). Rolling tranches every few weeks. All cases marked UNRESOLVED.", url: "", tags: ["PURSUE","Hegseth","Trump","Gabbard","Isaacman","Patel","disclosure","TODAY"] },
+
+  // ===== Release 02 — 2026-05-22 =====
+  // Six declassified PDFs hand-curated here; the rest of Release 02 (PR
+  // mission reports + DVIDS videos + audio briefings) lands via the
+  // whipgen MCP web-tool scrape (whipgen_web_search / _open / _extract).
+  // IDs match the war.gov canonical AGENCY-UAP-NNN format so this block
+  // merges cleanly with the scraped entries (same e.id → React keys
+  // line up, dedup is by id elsewhere). The PDFs themselves are
+  // committed under public/release_2/ and served from the deploy.
+  { id: "CIA-UAP-D001", title: "CIA-UAP-D001, Intelligence Information Report, USSR, 1973", date: "1973-12-20", sort: 19731220, era: "70s", loc: "USSR", region: "Europe", coords: [55.75, 37.6], agency: "Central Intelligence Agency", type: "Intelligence Information Report", flag: "high", redacted: true, summary: "Declassified CIA intelligence information report covering a Soviet-era UAP-relevant case (December 20, 1973). Released in Release 02 alongside the DOE, DOW, and ODNI documents.", url: "CIA-UAP-D001_Intelligence_Information_Report_USSR_1973.pdf", release: "Release 02", tags: ["CIA","USSR","Cold War","release-02"], docType: "report" },
+  { id: "DOE-UAP-D001", title: "DOE-UAP-D001, Enhanced PANTEX Imagery", date: "Undated", sort: 20260522, era: "modern", loc: "Pantex Plant, Texas", region: "North America", coords: [35.32, -101.56], agency: "Department of Energy", type: "Enhanced Imagery", flag: "high", redacted: true, summary: "Declassified DOE imagery from the Pantex Plant (Department of Energy weapons assembly/disassembly facility, Texas). Part of Release 02.", url: "DOE-UAP-D001_PANTEX_Image.pdf", release: "Release 02", tags: ["DOE","PANTEX","release-02"], docType: "image" },
+  { id: "DOE-UAP-D002", title: "DOE-UAP-D002, James Tuck Correspondence, 1970s", date: "1970s", sort: 19750101, era: "70s", loc: "Los Alamos, New Mexico", region: "North America", coords: [35.88, -106.30], agency: "Department of Energy", type: "Correspondence", flag: "med", redacted: true, summary: "Declassified correspondence relating to physicist James L. Tuck (Manhattan Project / Los Alamos). Part of Release 02.", url: "DOE-UAP-D002_JamesTuck_Correspondence.pdf", release: "Release 02", tags: ["DOE","James Tuck","Los Alamos","release-02"], docType: "correspondence" },
+  { id: "DOE-UAP-D003", title: "DOE-UAP-D003, Pajarito Astronomers Invitation, 1986", date: "1986-05-20", sort: 19860520, era: "80s", loc: "Pajarito Plateau, New Mexico", region: "North America", coords: [35.86, -106.32], agency: "Department of Energy", type: "Astronomer Invitation", flag: "med", redacted: true, summary: "Declassified invitation/report concerning astronomers' observations from the Pajarito Plateau, Los Alamos area, May 20 1986. Part of Release 02.", url: "DOE-UAP-D003_Pajarito_Astronomers.pdf", release: "Release 02", tags: ["DOE","Pajarito","astronomers","New Mexico","release-02"], docType: "report" },
+  { id: "DOW-UAP-D017", title: "DOW-UAP-D017, UAP Reported at Sandia Base, 1948-1950", date: "1948-1950", sort: 19490101, era: "40s", loc: "Sandia National Laboratories, New Mexico", region: "North America", coords: [35.05, -106.54], agency: "Department of War", type: "General Correspondence", flag: "high", redacted: true, summary: "Department of War general correspondence concerning UAP reports at Sandia Base, 1948-1950. Largest single PDF in Release 02 (~67 MB).", url: "DOW-UAP-D017_General_Correspondence_Of_Sandia.pdf", release: "Release 02", tags: ["DOW","Sandia","correspondence","release-02"], docType: "correspondence" },
+  { id: "ODNI-UAP-D001", title: "ODNI-UAP-D001, USPER Narrative, Senior USIC Official", date: "2025", sort: 20250101, era: "20s", loc: "Western United States", region: "North America", coords: [39.0, -116.0], agency: "Office of the Director of National Intelligence", type: "USPER Narrative", flag: "anchor", redacted: true, summary: "ODNI-declassified narrative attributed to a senior US Intelligence Community official (USPER), Western United States, 2025. Part of Release 02.", url: "ODNI-UAP-D001_USPER_Narrative_Senior_USIC.pdf", release: "Release 02", tags: ["ODNI","USPER","senior USIC","release-02"], docType: "narrative" },
+
+  { id: "pursue-release-02", title: "PURSUE Release 02 — Public Disclosure", date: "2026-05-22", sort: 20260522, era: "20s", loc: "Washington, DC", region: "North America", coords: [38.87, -77.05], agency: "Department of War", type: "Public Disclosure", flag: "anchor", release: "Release 02", summary: "Second public release: 64 records (6 PDFs, 51 videos, 7 audio). PDFs mirrored locally at public/release_2/; video / audio inventory scraped via whipgen MCP web tools. War.gov press release: https://www.war.gov/News/Releases/Release/Article/4499305/", url: "", tags: ["PURSUE","release 02","disclosure"] },
 ];
 
 // Concat auto-catalogued stubs from the Gemini-corpus import. These fill
@@ -69,9 +108,18 @@ import { EVENTS_AUTO } from "./events-auto.js";
 const _curatedIds = new Set(RAW.map(e => e.id));
 const _autoMinusDupes = EVENTS_AUTO.filter(e => !_curatedIds.has(e.id));
 
+// Release 02 entries link to /release_2/<file> (served from public/); every
+// other relative URL still resolves against the Release 01 war.gov base.
+function resolveUrl(e) {
+  if (!e.url || e.url.startsWith("http") || e.url.startsWith("/")) return e.url;
+  const release = e.release || RELEASE_FOR[e.id] || "Release 01";
+  return (release === "Release 02" ? URL_BASE_R2 : URL_BASE) + e.url;
+}
+
 export const EVENTS = [...RAW, ..._autoMinusDupes].map(e => ({
   ...e,
-  url: e.url && !e.url.startsWith("http") ? URL_BASE + e.url : e.url,
+  release: e.release || RELEASE_FOR[e.id] || "Release 01",
+  url: resolveUrl(e),
 }));
 
 export const AGENCY_COLORS = {
@@ -79,6 +127,13 @@ export const AGENCY_COLORS = {
   "Department of War": "#7CFFB2",
   "Department of State": "#FFD93D",
   "NASA": "#82B6FF",
+  // Release 02 brought CIA / DOE / ODNI into the catalogue. Use the full
+  // agency names that match the war.gov canonical column (whipgen scrape
+  // produces these strings verbatim), so dropdown options dedupe instead
+  // of showing both "DOE" and "Department of Energy".
+  "Central Intelligence Agency":                       "#B388FF",
+  "Department of Energy":                              "#FFB86B",
+  "Office of the Director of National Intelligence":   "#FF6B9D",
 };
 
 export const FLAG_LABEL = { anchor: "PRIORITY", high: "ELEVATED", med: "ROUTINE", low: "TRIVIAL" };
