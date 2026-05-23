@@ -107,7 +107,7 @@ async function checkGhAuth() {
   if (NO_PR || DRY) return;
   const { spawn } = await import("node:child_process");
   await new Promise(resolve => {
-    const p = spawn("gh", ["auth", "status"], { stdio: "ignore", shell: process.platform === "win32" });
+    const p = spawn("gh", ["auth", "status"], { stdio: "ignore" });
     p.on("close", code => {
       if (code !== 0) {
         console.error("error: GitHub CLI is not authenticated. Run `gh auth login` (or pass --no-pr to skip the PR step).");
@@ -378,7 +378,7 @@ await mkdir(PNG_STAGE, { recursive: true });
 // offline/no-git falls back to the local existsSync(txt) check below.
 async function publishedOcrSet() {
   const cap = (argv) => new Promise((res) => {
-    const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000, shell: process.platform === "win32" });
+    const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000 });
     let out = ""; p.stdout.on("data", c => out += c);
     p.on("exit", code => res(code === 0 ? out : "")); p.on("error", () => res(""));
   });

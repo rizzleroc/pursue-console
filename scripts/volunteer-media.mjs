@@ -498,7 +498,7 @@ function parseTemplate(md) {
 async function checkGhAuth() {
   if (NO_PR) return;
   await new Promise(resolve => {
-    const p = spawn("gh", ["auth", "status"], { stdio: "ignore", shell: process.platform === "win32" });
+    const p = spawn("gh", ["auth", "status"], { stdio: "ignore" });
     p.on("close", code => {
       if (code !== 0) {
         console.error("error: GitHub CLI is not authenticated. Run `gh auth login` (or pass --no-pr to skip the PR step).");

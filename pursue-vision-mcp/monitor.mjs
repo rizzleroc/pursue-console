@@ -565,7 +565,7 @@ async function findFreshWork(handle, dir, byEvent, field) {
 // ----- run external command, return stdout (rejects on non-zero exit) -----
 function runCmd(cmd, args, opts = {}) {
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"], shell: process.platform === "win32", ...opts });
+    const p = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"], ...opts });
     let out = "", err = "";
     p.stdout.on("data", c => { out += c; });
     p.stderr.on("data", c => { err += c; });
