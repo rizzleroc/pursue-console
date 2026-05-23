@@ -101,6 +101,13 @@ export default function MediaView({ onSelect, headerFilters }) {
   // bracket markers on pages we can't render) are useful metadata
   // but look like noise when most of the grid is empty boxes.
   const [includePlaceholders, setIncludePlaceholders] = useState(false);
+  // Same idea, but for blank renders — pages where a PNG exists on
+  // disk but pdf.js produced a visually-empty image (typically 50s-era
+  // hand-sketch pages). Tagged missingRender:true by the index builder.
+  // Kept separate from placeholders because the cause is different
+  // (broken render vs. no PDF) and the user wanted them surfaced as
+  // their own group.
+  const [includeMissingRenders, setIncludeMissingRenders] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}media.json?t=${Date.now()}`)
@@ -116,7 +123,15 @@ export default function MediaView({ onSelect, headerFilters }) {
     return data.items.filter(it => {
       // Videos have no local image but must always be visible — they're
       // the release footage, not a metadata-only placeholder.
-      if (!includePlaceholders && !it.imagePath && it.kind !== "video") return false;
+      // Blank renders also have imagePath:null but are gated by a
+      // separate toggle (different cause from regular placeholders).
+      if (it.kind !== "video") {
+        if (it.missingRender) {
+          if (!includeMissingRenders) return false;
+        } else if (!it.imagePath) {
+          if (!includePlaceholders) return false;
+        }
+      }
       if (!filterKinds.has(it.kind)) return false;
       if (typeKinds && !typeKinds.has(it.kind)) return false;
       if (filterAgency !== "all" && (it.agency || "—") !== filterAgency) return false;
@@ -124,32 +139,40 @@ export default function MediaView({ onSelect, headerFilters }) {
       if (q && !`${it.title} ${it.description} ${it.eventTitle}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [data, filterKinds, filterAgency, filterType, filterEvent, query, includePlaceholders]);
+  }, [data, filterKinds, filterAgency, filterType, filterEvent, query, includePlaceholders, includeMissingRenders]);
 
-  // Counts of with-image vs placeholder-only for the toggle label.
+  // Counts by bucket for the toggle labels. Three groups:
+  //   withImage      — a real rendered PNG/JPG is attached
+  //   placeholder    — no local PDF, just Gemini-transcript metadata
+  //   missingRender  — a PNG exists but is visually blank (render failed)
   const counts = useMemo(() => {
-    if (!data?.items) return { withImage: 0, placeholder: 0 };
+    if (!data?.items) return { withImage: 0, placeholder: 0, missingRender: 0 };
     return data.items.reduce((acc, it) => {
-      if (it.imagePath) acc.withImage++;
-      else if (it.kind !== "video") acc.placeholder++;   // videos aren't placeholders
+      if (it.kind === "video") return acc;     // videos aren't in any of these buckets
+      if (it.missingRender) acc.missingRender++;
+      else if (it.imagePath) acc.withImage++;
+      else acc.placeholder++;
       return acc;
-    }, { withImage: 0, placeholder: 0 });
+    }, { withImage: 0, placeholder: 0, missingRender: 0 });
   }, [data]);
 
-  // Per-kind counts honoring the placeholder toggle. Without this, the
-  // filter pills show `data.byKind` (all items) — so PHOTOGRAPH would
-  // read "82" even when the grid is hiding 64 placeholders and only
-  // showing 18 actual photos. That mismatch is the "filter calls out
-  // images but has none attached" confusion.
+  // Per-kind counts honoring both toggles. Without this, the filter
+  // pills show `data.byKind` (all items) — so PHOTOGRAPH would read
+  // "82" even when the grid is hiding 64 placeholders and only showing
+  // 18 actual photos. That mismatch is the "filter calls out images
+  // but has none attached" confusion.
   const kindCounts = useMemo(() => {
     if (!data?.items) return {};
     const out = {};
     for (const it of data.items) {
-      if (!includePlaceholders && !it.imagePath && it.kind !== "video") continue;
+      if (it.kind !== "video") {
+        if (it.missingRender && !includeMissingRenders) continue;
+        if (!it.missingRender && !it.imagePath && !includePlaceholders) continue;
+      }
       out[it.kind] = (out[it.kind] || 0) + 1;
     }
     return out;
-  }, [data, includePlaceholders]);
+  }, [data, includePlaceholders, includeMissingRenders]);
 
   // Kinds that have any items at all (image OR placeholder) across the
   // full dataset. Used to suppress filter pills for kinds that aren't
@@ -201,13 +224,15 @@ export default function MediaView({ onSelect, headerFilters }) {
         </h2>
         <div className="font-mono text-[10px] text-emerald-700">
           {/*
-            Denominator matches the placeholder toggle — without this,
-            "X of 198" stays static even when 115 placeholders are
-            hidden, so the user sees "18 of 198" and can't tell whether
-            their filters threw out 180 tiles or whether 115 were
-            placeholders hidden by the toggle.
+            Denominator matches whichever buckets the user has toggled
+            on — without this, "X of 198" stays static even when 115
+            placeholders are hidden, so the user sees "18 of 198" and
+            can't tell whether their filters threw out 180 tiles or
+            whether 115 were placeholders hidden by the toggle.
           */}
-          {filtered.length} of {includePlaceholders ? counts.withImage + counts.placeholder : counts.withImage} visuals · {data.eventCount} events
+          {filtered.length} of {counts.withImage
+            + (includePlaceholders ? counts.placeholder : 0)
+            + (includeMissingRenders ? counts.missingRender : 0)} visuals · {data.eventCount} events
         </div>
       </div>
 
@@ -250,7 +275,7 @@ export default function MediaView({ onSelect, headerFilters }) {
         */}
         <button onClick={() => setIncludePlaceholders(v => !v)}
           title={includePlaceholders
-            ? `showing all ${counts.withImage + counts.placeholder} visuals (incl. ${counts.placeholder} metadata-only placeholders)`
+            ? `also showing ${counts.placeholder} metadata-only placeholders (no local PDF)`
             : `showing only ${counts.withImage} pages with a rendered image · click to also show ${counts.placeholder} placeholder entries (no local PDF available)`}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
             includePlaceholders
@@ -258,9 +283,35 @@ export default function MediaView({ onSelect, headerFilters }) {
               : "text-emerald-300 border-emerald-700/50 hover:border-emerald-500/60"}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${includePlaceholders ? "bg-cyan-400" : "bg-emerald-400"}`} />
           {includePlaceholders
-            ? <>ALL <span className="opacity-60 ml-0.5">{counts.withImage + counts.placeholder}</span></>
+            ? <>+ PLACEHOLDERS <span className="opacity-60 ml-0.5">{counts.placeholder}</span></>
             : <>WITH IMAGE <span className="opacity-60 ml-0.5">{counts.withImage}</span><span className="opacity-40 ml-1.5">+ {counts.placeholder} hidden</span></>}
         </button>
+        {/*
+          Missing-render toggle. A separate bucket from placeholders:
+          here a PNG actually exists on disk but pdf.js produced a
+          visually-blank render (typical of hand-sketches in 50s-era
+          reports where the visual lives in a layer pdf.js can't reach).
+          The classifier still has a useful description from Gemini's
+          transcript, so we surface the metadata via the same tile UI
+          but flag the broken render distinctly. Hidden until the user
+          opts in — only renders this affects today are 4 pages across
+          Krasuski + USSR Trans-Caucasus.
+        */}
+        {counts.missingRender > 0 && (
+          <button onClick={() => setIncludeMissingRenders(v => !v)}
+            title={includeMissingRenders
+              ? `also showing ${counts.missingRender} pages whose PDF render produced a blank image`
+              : `${counts.missingRender} pages have a description but the PDF rendered blank · click to surface them`}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
+              includeMissingRenders
+                ? "text-amber-300 border-amber-500/50 bg-amber-950/20"
+                : "text-emerald-300 border-emerald-700/50 hover:border-amber-500/60"}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${includeMissingRenders ? "bg-amber-400" : "bg-amber-700"}`} />
+            {includeMissingRenders
+              ? <>+ MISSING RENDER <span className="opacity-60 ml-0.5">{counts.missingRender}</span></>
+              : <>MISSING RENDER <span className="opacity-40 ml-1.5">{counts.missingRender} hidden</span></>}
+          </button>
+        )}
         {/* Title/description search + agency dropdown have moved to the
             header filter bar so they share state across the whole site.
             The per-event selector is kept here — it's media-specific. */}
@@ -284,6 +335,18 @@ export default function MediaView({ onSelect, headerFilters }) {
                 ) : it.thumbnailPath ? (
                   <img src={`${import.meta.env.BASE_URL}${it.thumbnailPath}`} alt={it.title || it.kind}
                     className="w-full h-full object-cover opacity-90 group-hover:opacity-100" loading="lazy" />
+                ) : it.missingRender ? (
+                  // PNG exists on disk but pdf.js produced a blank
+                  // render — distinct amber treatment so the user can
+                  // see at a glance these are broken renders, not the
+                  // cyan "no PDF available" placeholders.
+                  <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-amber-950/20">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 mb-2" />
+                    <span className="font-mono text-[9px] tracking-widest text-amber-300 opacity-80 mb-1">MISSING RENDER</span>
+                    <span className="font-mono text-[10px] text-amber-200 opacity-90 text-center line-clamp-4">
+                      {it.description || it.title || it.kind}
+                    </span>
+                  </div>
                 ) : (
                   // No local render available (e.g. extracted from a Gemini
                   // transcript marker for an event we don't have the PDF
@@ -379,6 +442,21 @@ export default function MediaView({ onSelect, headerFilters }) {
               ) : focused.imagePath ? (
                 <img src={`${import.meta.env.BASE_URL}${focused.imagePath}`} alt={focused.title || focused.kind}
                   className="max-w-full max-h-[70vh] object-contain" />
+              ) : focused.missingRender ? (
+                <div className="text-center max-w-xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-amber-500/40 mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span className="font-mono text-[10px] tracking-widest text-amber-300">
+                      {KIND_LABELS[focused.kind]} · MISSING RENDER
+                    </span>
+                  </div>
+                  <div className="font-mono text-amber-100 text-sm leading-relaxed text-left">
+                    {focused.description || focused.title}
+                  </div>
+                  <div className="font-mono text-amber-700 text-[10px] mt-4 leading-relaxed">
+                    The source PDF contains this visual but pdf.js rendered the page as a blank image — typically a hand-sketch on otherwise-empty paper whose ink lives in a layer pdf.js can't reach. The description above came from Gemini's transcript of the same page. Open the original document at war.gov/UFO to see the actual sketch.
+                  </div>
+                </div>
               ) : (
                 <div className="text-center max-w-xl">
                   <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-sm border ${KIND_COLORS[focused.kind].ring} mb-4`}>
