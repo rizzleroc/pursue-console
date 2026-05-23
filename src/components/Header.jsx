@@ -32,6 +32,7 @@ const ANALYSIS = [
 export default function Header({
   view, onViewChange, onVolunteer, query, onSearch,
   filterAgency, onFilterAgency, filterRelease, onFilterRelease, filterType, onFilterType,
+  showFilters,
 }) {
   const { stats } = useCorpusStats();
 
@@ -75,8 +76,13 @@ export default function Header({
       </div>
 
       {/* Record filter bar — mirrors war.gov/UFO: search + agency / release /
-          type dropdowns. Drives App.filtered (the catalogued-records views). */}
-      {onSearch && (
+          type dropdowns. Drives App.filtered (the catalogued-records views).
+          Hidden on views that don't honor App.filtered (LIVE / SEARCH /
+          SEMANTIC / REVIEW / MEDIA / DOSSIER / HELP) — those either have
+          their own in-page search input (MEDIA, SEARCH, SEMANTIC) or
+          aren't filterable by EVENTS metadata at all — so showing a dead
+          control on them made the user think the bar was broken. */}
+      {showFilters && onSearch && (
         <div className="px-3 sm:px-6 py-2 flex items-center gap-2 flex-wrap border-t border-emerald-900/40 bg-black/20">
           <div className="relative flex-1 min-w-[160px]">
             <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-700 text-[11px]">⌕</span>

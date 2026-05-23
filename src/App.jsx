@@ -99,6 +99,12 @@ export default function App() {
   // get to it from anywhere.
   const showHero  = view === "live";
   const showFooter = view === "live" || view === "help";
+  // The Header's filter bar only drives App.filtered, which is consumed
+  // by the four catalogued-records views below. Other views either have
+  // their own in-page search (MEDIA, SEARCH, SEMANTIC) or don't filter
+  // by EVENTS metadata — so the bar is hidden there.
+  const CATALOGUE_VIEWS = new Set(["timeline", "atlas", "globe", "network"]);
+  const showFilters = CATALOGUE_VIEWS.has(view);
 
   return (
     <div className="min-h-screen bg-[#020806] text-emerald-300 relative overflow-x-hidden" style={{
@@ -125,6 +131,7 @@ export default function App() {
           filterAgency={filterAgency} onFilterAgency={setFilterAgency}
           filterRelease={filterRelease} onFilterRelease={setFilterRelease}
           filterType={filterType} onFilterType={setFilterType}
+          showFilters={showFilters}
           onVolunteer={() => setVolunteerOpen(true)} />
         {!showHero && <CorpusFreshness compact />}
 
