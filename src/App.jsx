@@ -177,7 +177,7 @@ export default function App() {
         ) : (
           <footer className="border-t border-emerald-900/30 mt-6 px-3 sm:px-8 py-3 text-center">
             <span className="font-mono text-[9px] text-emerald-800 tracking-widest">
-              ▌ war.gov/UFO · release 01 · all cases unresolved
+              ▌ war.gov/UFO · release 02 incoming · release 01 catalogued
             </span>
           </footer>
         )}
