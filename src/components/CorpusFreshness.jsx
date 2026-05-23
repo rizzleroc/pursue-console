@@ -98,6 +98,7 @@ export default function CorpusFreshness({ compact = false }) {
             {s.bySource.human > 0 && <span className="text-amber-300 ml-1">{s.bySource.human}H</span>}
             {s.bySource.gptVision > 0 && <span className="text-cyan-300 ml-1">{s.bySource.gptVision.toLocaleString()}G5</span>}
             {s.bySource.gemini > 0 && <span className="text-emerald-400 ml-1">{s.bySource.gemini.toLocaleString()}Gem</span>}
+            {s.bySource.claude > 0 && <span className="text-orange-300 ml-1">{s.bySource.claude.toLocaleString()}Cl</span>}
             {s.bySource.ocr > 0 && <span className="text-emerald-600 ml-1">{s.bySource.ocr.toLocaleString()}OCR</span>}
           </span>
         )}

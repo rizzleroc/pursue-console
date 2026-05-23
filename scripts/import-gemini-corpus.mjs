@@ -28,7 +28,7 @@ const ROOT = path.resolve(__dirname, "..");
 const UPSTREAM = path.join(ROOT, "data-raw", "upstream-gemini", "converted");
 const VIS_CACHE = path.join(ROOT, "data-raw", ".vision-cache");
 
-const SOURCE_PRIORITY = ["human", "gpt-vision", "gemini", "ocr"];
+const SOURCE_PRIORITY = ["human", "gpt-vision", "gemini", "claude", "ocr"];
 
 function priorityOf(source) {
   const i = SOURCE_PRIORITY.indexOf(source);

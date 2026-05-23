@@ -160,7 +160,7 @@ export default function HelpView({ onViewChange }) {
           count={queue?.totalPagesNeeded ?? "—"}
           unit="PAGES NEED OCR"
           title="Transcribe new pages"
-          body={<>Your own logged-in browser does the OCR via ChatGPT or Gemini. The volunteer script picks unclaimed pages, opens a PR.</>}
+          body={<>Your own logged-in browser does the OCR via ChatGPT, Gemini, or Claude. The volunteer script picks unclaimed pages, opens a PR.</>}
           breakdown={Object.entries(queue?.byEvent || {})
             .filter(([, d]) => d.pagesNeeded > 0)
             .map(([eid, d]) => ({ eid, n: d.pagesNeeded }))

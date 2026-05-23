@@ -34,7 +34,7 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 | **Records inventoried** | 162 (121 catalogued · 41 awaiting enumeration) |
 | **Pages transcribed** | 3,394 across 65 events |
 | **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
-| **Per source** | 3,370 Gemini · 427 GPT-vision · 4 OCR · 18 contributor-submitted |
+| **Per source** | 3,370 Gemini · 427 GPT-vision · 0 Claude · 4 OCR · 18 contributor-submitted |
 | **Multi-source pages** | 425 (cross-checked for agreement) |
 | **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
@@ -49,7 +49,7 @@ Pages streaming in from machine OCR + volunteer submissions. Per-event progress 
 Hybrid lexical (MiniSearch) + dense semantic (sentence-transformers + FAISS). All embeddings run in the browser; nothing leaves the page. FAISS index auto-rebuilds every 4 hours when input data changes (skip-on-unchanged hash check, no commit pollution).
 
 ### REVIEW · cross-source disagreement queue
-The site's most consequential surface. Pages where Gemini ↔ ChatGPT ↔ (future) human disagree appear here worst-first. Click any item to see every source's text side-by-side with pairwise agreement scores. A "FIX IT" button points at the volunteer flow. When a human resolves a page, it becomes canonical, and we learn how each machine source scored vs. that gold for that page.
+The site's most consequential surface. Pages where Gemini ↔ ChatGPT ↔ Claude ↔ (future) human disagree appear here worst-first. Click any item to see every source's text side-by-side with pairwise agreement scores. A "FIX IT" button points at the volunteer flow. When a human resolves a page, it becomes canonical, and we learn how each machine source scored vs. that gold for that page.
 
 ### MEDIA library
 Every page classified as containing visual content — photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, diagrams. Grid view, filter by kind / agency / event. Click → modal with description + deep-link straight to that page in DOSSIER.
@@ -135,7 +135,7 @@ Pages where machine sources disagree. Type the correct version from the source P
 → Open the **REVIEW** tab on the live console (count badge in the nav).
 
 ### 2. Transcribe new pages
-Run the volunteer script. Your own logged-in browser does OCR via ChatGPT *or* Gemini. The MCP daemon now supports both providers in parallel (`POST /fanout`).
+Run the volunteer script. Your own logged-in browser does OCR via ChatGPT, Gemini, *or* Claude. The MCP daemon now supports all three providers in parallel (`POST /fanout`).
 
 ```bash
 # Setup once (~10 MB sparse clone, not the full ~1 GB repo):
@@ -144,9 +144,10 @@ iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex         
 
 # Then:
 cd pursue-helper
-npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini tabs
+npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini + claude.ai tabs
 npm run volunteer -- --my-handle=YOU --slice=20                   # ChatGPT
 npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini # Gemini
+npm run volunteer -- --my-handle=YOU --slice=20 --provider=claude # Claude
 ```
 
 ### 3. Image + context capture
@@ -210,8 +211,9 @@ pursue-console/
 ├── pursue-vision-mcp/                MIT, shipped to volunteers
 │   ├── chatgpt-driver.mjs            ChatGPT browser tab driver
 │   ├── gemini-driver.mjs             Gemini browser tab driver (NEW in 2.0)
+│   ├── claude-driver.mjs             Claude (claude.ai) browser tab driver
 │   ├── daemon.mjs                    /chat-with-files (provider routing) + /fanout
-│   ├── start.mjs                     opens both tabs · launches daemon + monitor
+│   ├── start.mjs                     opens all tabs · launches daemon + monitor
 │   └── monitor.mjs                   helper dashboard on :9224
 │
 ├── data-raw/                         the canonical source — gitignored binaries,
@@ -231,6 +233,7 @@ pursue-console/
 ├── contributions/<handle>/            volunteer submissions
 │   ├── gpt-vision/<eid>/p<NNN>.txt    ChatGPT OCR via volunteer.mjs
 │   ├── gemini/<eid>/p<NNN>.txt        Gemini OCR via volunteer.mjs
+│   ├── claude/<eid>/p<NNN>.txt        Claude OCR via volunteer.mjs
 │   ├── human/<eid>/p<NNN>.txt         hand-typed (always wins canonical)
 │   └── media/<eid>/p<NNN>.{json,jpg}  image + verbatim context
 │
@@ -297,4 +300,4 @@ When new Release tranches drop, that's where new event records come from.
 
 ## License
 
-[MIT](./LICENSE) © 2026 PURSUE Console contributors. The bundled `pursue-vision-mcp/` is also MIT and can be used by any project that needs a slim ChatGPT-or-Gemini browser-tab driver.
+[MIT](./LICENSE) © 2026 PURSUE Console contributors. The bundled `pursue-vision-mcp/` is also MIT and can be used by any project that needs a slim ChatGPT / Gemini / Claude browser-tab driver.

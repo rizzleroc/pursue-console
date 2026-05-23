@@ -78,7 +78,10 @@ if (token) {
       if (providers) {
         for (const [name, p] of Object.entries(providers)) {
           if (p.connected) ok(`${name} tab connected (${p.history || 0} prior calls)`);
-          else { fail(`${name} tab NOT connected`); info(`fix: sign in at ${name === "gemini" ? "https://gemini.google.com/app" : "https://chatgpt.com"} in the CDP Chrome window`); }
+          else {
+            const signinUrl = { chatgpt: "https://chatgpt.com", gemini: "https://gemini.google.com/app", claude: "https://claude.ai/new" }[name] || "the provider's site";
+            fail(`${name} tab NOT connected`); info(`fix: sign in at ${signinUrl} in the CDP Chrome window`);
+          }
         }
       } else {
         info(`unknown /status shape — daemon may be older than 0.2`);

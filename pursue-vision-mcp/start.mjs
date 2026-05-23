@@ -100,6 +100,7 @@ async function ensureChrome() {
     // matches at request time. Sign in once in each.
     "https://chatgpt.com",
     "https://gemini.google.com/app",
+    "https://claude.ai/new",
     // Plus the war.gov/UFO tab, used by the warGov driver to pull the
     // release-files index + binaries through Chrome (it's the only TLS
     // fingerprint Akamai will accept). On first visit the maintainer
@@ -107,7 +108,7 @@ async function ensureChrome() {
     // gives the rest of the session a cookie that unblocks fetches.
     "https://www.war.gov/UFO/",
   ], { detached: true, stdio: "ignore" }).unref();
-  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, www.war.gov/UFO/");
+  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, claude.ai/new, www.war.gov/UFO/");
   console.log("[start] note — the war.gov tab may show a one-time Akamai challenge; solve it once in your browser before running the war.gov collector.");
   // Give Chrome a moment to bind the port
   for (let i = 0; i < 20; i++) {

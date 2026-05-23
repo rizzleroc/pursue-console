@@ -55,7 +55,7 @@ await mkdir(VIS_CACHE, { recursive: true });
 // automation. `gpt-vision` is what the volunteer.mjs flow writes (which
 // runs ChatGPT vision on rendered page images). New machine sources
 // can be added here as their importers come online.
-const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "ocr"]);
+const KNOWN_SOURCES = new Set(["human", "gpt-vision", "gemini", "claude", "ocr"]);
 
 // Review-mode sources: a volunteer re-ran a disputed page through the
 // standardized prompt via volunteer.mjs --review. These do NOT replace

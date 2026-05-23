@@ -43,6 +43,7 @@ const rows = db.prepare(`
     COUNT(p.page_num) AS pages_touched,
     SUM(p.has_gemini)     AS gemini,
     SUM(p.has_gpt_vision) AS gptVision,
+    SUM(p.has_claude)     AS claude,
     SUM(p.has_human)      AS human,
     SUM(p.has_ocr)        AS ocr,
     SUM(CASE WHEN p.has_gemini=1 AND p.has_gpt_vision=1 THEN 1 ELSE 0 END) AS bothMachineSources,
@@ -61,7 +62,7 @@ const out = rows.map(r => {
   // neither Gemini nor GPT (and not even tesseract OCR text). If
   // pdf_pages is null we can only say "pages_touched" but flag the
   // gap as unknown.
-  const pagesWithAnySource = (r.gemini || 0) + (r.gptVision || 0) + (r.human || 0) + (r.ocr || 0) > 0
+  const pagesWithAnySource = (r.gemini || 0) + (r.gptVision || 0) + (r.claude || 0) + (r.human || 0) + (r.ocr || 0) > 0
     ? r.pages_touched
     : 0;
   const gapPages = totalPages > 0 ? Math.max(0, totalPages - pagesWithAnySource) : null;
@@ -86,7 +87,8 @@ const out = rows.map(r => {
     geminiOnly: Math.max(0, (r.gemini || 0) - completeMachinePages),
     gptVisionOnly: Math.max(0, (r.gptVision || 0) - completeMachinePages),
     humanPages: r.human || 0,
-    ocrOnlyPages: Math.max(0, (r.ocr || 0) - (r.gemini || 0) - (r.gptVision || 0)),
+    claudeOnly: Math.max(0, (r.claude || 0) - completeMachinePages),
+    ocrOnlyPages: Math.max(0, (r.ocr || 0) - (r.gemini || 0) - (r.gptVision || 0) - (r.claude || 0)),
     gapPages,
     mismatchPages,
     chars: r.chars || 0,

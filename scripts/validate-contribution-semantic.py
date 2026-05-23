@@ -67,7 +67,7 @@ def collect_contributions():
         handle = handle_dir.name
         # contributions/<handle>/<source>/<eid>/p<NNN>.txt is canonical.
         # Legacy <handle>/<eid>/ shape is accepted and tagged gpt-vision.
-        KNOWN_SOURCES = {"human", "gpt-vision", "gemini", "ocr"}
+        KNOWN_SOURCES = {"human", "gpt-vision", "gemini", "claude", "ocr"}
         for child in handle_dir.iterdir():
             if not child.is_dir():
                 continue

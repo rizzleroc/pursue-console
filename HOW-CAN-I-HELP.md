@@ -18,15 +18,15 @@ Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (wi
 
 ### 1. Settle the review queue *(open now · highest leverage)*
 
-Pages where Gemini and ChatGPT disagree on the transcription. Read both side-by-side and type the correct version. **One disputed page resolved = canonical text settled forever, used as gold to grade every machine source going forward.**
+Pages where Gemini, ChatGPT, and Claude disagree on the transcription. Read them side-by-side and type the correct version. **One disputed page resolved = canonical text settled forever, used as gold to grade every machine source going forward.**
 
 → Open [the REVIEW tab](https://rizzleroc.github.io/pursue-console/) on the live console. The current count is shown in the nav as `⚖ N`.
 
 To submit a settlement: drop the corrected `.txt` into `contributions/<your-handle>/human/<eid>/p<NNNN>.txt` and open a PR. No tooling required — just type the page out word-for-word from the source PDF.
 
-### 2. Transcribe new pages *(open now · ChatGPT Plus or Gemini needed)*
+### 2. Transcribe new pages *(open now · ChatGPT Plus, Gemini, or Claude needed)*
 
-Run the volunteer script — your own logged-in browser does the OCR via ChatGPT or Gemini, opens a PR with the transcripts. The setup is below.
+Run the volunteer script — your own logged-in browser does the OCR via ChatGPT, Gemini, or Claude, opens a PR with the transcripts. The setup is below.
 
 ### 3. Screenshot the visuals + context *(open now · ~1 hour per slice)*
 
@@ -73,7 +73,7 @@ node scripts/volunteer.mjs --my-handle=YOU --slice=20
 
 `npm start` brings up two independent processes:
 
-- **MCP daemon** at `http://127.0.0.1:9223` — handles ChatGPT vision OCR. Single-responsibility.
+- **MCP daemon** at `http://127.0.0.1:9223` — handles ChatGPT, Gemini, and Claude vision OCR. Single-responsibility.
 - **Helper monitor** at `http://127.0.0.1:9224` — the live progress dashboard. Auto-opens in your default browser. Persists state to `~/.pursue-helper/progress.json` so it survives daemon restarts.
 
 You can also run them separately:
@@ -115,6 +115,7 @@ contributions/<your-handle>/<source>/<event-id>/p<NNNN>.txt
 |---|---|---|
 | `gpt-vision` | ChatGPT vision through the volunteer flow | Default — what `npm run volunteer` writes |
 | `gemini` | Gemini vision (per Denis's pipeline) | Run a Gemini variant of the volunteer script |
+| `claude` | Claude vision through the volunteer flow | Run `npm run volunteer -- --provider=claude` |
 | `human` | **Typed by a person, word-for-word from the source page** | Drop your `.txt` into `contributions/<handle>/human/<eid>/p<NNNN>.txt` by hand, open a PR |
 | `ocr` | Plain tesseract/poppler output | Maintainer pipeline only |
 

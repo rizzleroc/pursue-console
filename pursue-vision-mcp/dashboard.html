@@ -559,6 +559,16 @@
         </select>
       </div>
 
+      <div class="ctrl-row">
+        <span class="ctrl-label">MODEL</span>
+        <select id="ctrl-provider" style="width:160px" title="Which vision model drives the OCR — needs that provider's tab logged in">
+          <option value="chatgpt">ChatGPT</option>
+          <option value="gemini">Gemini</option>
+          <option value="claude">Claude</option>
+        </select>
+      </div>
+
+
       <div class="ctrl-row" id="eid-row" style="display:none">
         <span class="ctrl-label">DOC ID</span>
         <select id="ctrl-eid" style="width:220px"></select>
@@ -1098,6 +1108,7 @@
     setTimeout(() => { runPending = false; }, 8000);
   }
 
+
   window.ctrlStart = async function() {
     const handle = ($("ctrl-handle")?.value || "").trim();
     if (!handle) { alert("Enter your GitHub handle first"); return; }
@@ -1105,6 +1116,7 @@
     const eid    = mode === "doc" ? ($("ctrl-eid")?.value || "") : undefined;
     const slice  = Number($("ctrl-slice")?.value || 20);
     const loop   = !!$("ctrl-loop")?.checked;
+    const provider = $("ctrl-provider")?.value || "chatgpt";
 
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "STARTING…"; }
@@ -1114,7 +1126,7 @@
       const r = await fetch("/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, eid, slice, loop, handle }),
+        body: JSON.stringify({ mode, eid, slice, loop, handle, provider }),
       });
       const j = await r.json();
       if (!r.ok) {
@@ -1266,6 +1278,7 @@
   setInterval(pollStaging, 3000);
   pollStaging();
 
+
   // ---- clean stubs button (manual trigger; auto-clean also runs before each spawn) ----
   window.cleanStubs = async function() {
     const handle = ($("ctrl-handle")?.value || "").trim() || "Rizzleroc";
@@ -1293,6 +1306,7 @@
     }
     const slice = Number($("ctrl-slice")?.value || 20);
     const loop  = !!$("ctrl-loop")?.checked;
+    const provider = $("ctrl-provider")?.value || "chatgpt";
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = "PICKING QUEUE…"; }
     lockRunControls();
@@ -1300,7 +1314,7 @@
       const r = await fetch("/run-any", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ handle, slice, loop }),
+        body: JSON.stringify({ handle, slice, loop, provider }),
       });
       const j = await r.json();
       if (r.status === 409) {
@@ -1362,6 +1376,7 @@
       if ($("ctrl-handle")) $("ctrl-handle").value = handle;
     }
     const slice = Number($("ctrl-slice")?.value || (mode === "visuals" ? 5 : 20));
+    const provider = $("ctrl-provider")?.value || "chatgpt";
     const statusEl = $("ctrl-status");
     if (statusEl) { statusEl.className = "ctrl-status running"; statusEl.textContent = `STARTING ${mode.toUpperCase()}${loop ? " (LOOP)" : ""}…`; }
     lockRunControls();
@@ -1369,7 +1384,7 @@
       const r = await fetch("/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, slice, loop, handle }),
+        body: JSON.stringify({ mode, slice, loop, handle, provider }),
       });
       const j = await r.json();
       if (!r.ok) {

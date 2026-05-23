@@ -34,6 +34,14 @@ export const SOURCE_STYLES = {
     bg: "bg-cyan-900/30",
     hex: "#22d3ee",
   },
+  claude: {
+    label: "CLAUDE",
+    dot: "bg-orange-400",
+    text: "text-orange-300",
+    ring: "ring-orange-400",
+    bg: "bg-orange-900/30",
+    hex: "#fb923c",
+  },
   ocr: {
     label: "OCR",
     dot: "bg-rose-400",

@@ -51,11 +51,11 @@ export default function VolunteerModal({ open, onClose, onViewChange }) {
           <div className="border border-emerald-900/60 rounded-sm">
             <div className="px-3 py-2 border-b border-emerald-900/40 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="font-mono text-[10px] tracking-widest text-emerald-300">PATH A · MACHINE OCR (CHATGPT PLUS REQUIRED)</span>
+              <span className="font-mono text-[10px] tracking-widest text-emerald-300">PATH A · MACHINE OCR (CHATGPT, GEMINI, OR CLAUDE ACCOUNT REQUIRED)</span>
             </div>
             <div className="px-3 py-3 space-y-2">
               <p className="text-emerald-500 text-[11px]">
-                Picks pages off the public queue, transcribes them via your already-logged-in ChatGPT browser, opens a PR. No API key, no payment, ~30 min of mostly-idle compute.
+                Picks pages off the public queue, transcribes them via your already-logged-in ChatGPT, Gemini, or Claude browser tab, opens a PR. No API key, no payment, ~30 min of mostly-idle compute.
               </p>
               <pre className="bg-black/60 border border-emerald-900/50 rounded-sm p-3 text-emerald-200 text-[11px] overflow-x-auto">
 {`git clone --depth 1 https://github.com/rizzleroc/pursue-console
@@ -64,6 +64,9 @@ npm install --prefix pursue-vision-mcp
 npm start --prefix pursue-vision-mcp
 npm run volunteer -- --my-handle=YOUR_NAME --slice=20`}
               </pre>
+              <p className="text-emerald-700 text-[10px] font-mono">
+                Pick which logged-in tab does the OCR with <code className="text-emerald-300">--provider=chatgpt</code>, <code className="text-emerald-300">--provider=gemini</code>, or <code className="text-orange-300">--provider=claude</code> (<a href="https://claude.ai" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-orange-200">claude.ai</a>). Same flow: sign in once in a browser tab, the daemon attaches — no credentials shared.
+              </p>
               <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md"
                  target="_blank" rel="noreferrer"
                  className="inline-block font-mono text-[10px] tracking-widest text-emerald-400 hover:text-emerald-200 underline underline-offset-2">

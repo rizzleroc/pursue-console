@@ -158,6 +158,10 @@ function buildVolunteerArgs(opts) {
   const handle = opts.handle || state.handle || "volunteer";
   const slice  = Math.max(1, Math.min(200, Number(opts.slice) || 20));
   const daemon = `http://127.0.0.1:${opts.daemonPort || state.daemonPort || 9223}`;
+  // Vision model the daemon should drive. Defaults to chatgpt to preserve the
+  // pre-provider behavior; volunteer.mjs routes the request to the matching
+  // browser tab and writes to contributions/<handle>/<gpt-vision|gemini|claude>/.
+  const provider = ["chatgpt", "gemini", "claude"].includes(opts.provider) ? opts.provider : "chatgpt";
 
   if (opts.mode === "visuals") {
     // volunteer-media.mjs has its own flow. --auto-context lets the daemon draft
@@ -181,6 +185,7 @@ function buildVolunteerArgs(opts) {
     `--my-handle=${handle}`,
     `--slice=${slice}`,
     `--daemon=${daemon}`,
+    `--provider=${provider}`,
     "--no-pr",
   ];
   if (existsSync(LOCAL_QUEUE_PATH)) args.push(`--queue-url=${LOCAL_QUEUE_PATH}`);
@@ -349,6 +354,7 @@ function resetProgressIdle() {
 async function spawnVolunteer(opts) {
   if (runningProc) throw new Error("a volunteer run is already in progress — stop it first");
   const { args } = buildVolunteerArgs(opts);
+  console.log(`[monitor] spawn: node ${args.join(" ")}`);
   const cleaned = await autoCleanStubs(opts.handle || state.handle);
   if (cleaned > 0) console.log(`[monitor] auto-cleaned ${cleaned} stub file(s) before spawn`);
   // Probe both possible daemon-token files to find which one the live daemon
@@ -808,6 +814,7 @@ const server = http.createServer(async (req, res) => {
           slice: effectiveSlice,
           loop: !!body.loop,
           handle,
+          provider: body.provider,
         };
         if (picked.mode !== "visuals") runOpts.eid = targetDoc.eid;
         await spawnVolunteer(runOpts);
