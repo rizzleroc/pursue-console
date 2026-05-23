@@ -2,8 +2,8 @@
   "best": "gpt-vision",
   "sources": {
     "gpt-vision": {
-      "chars": 280,
-      "imported_at": "2026-05-20T14:25:26.013Z",
+      "chars": 249,
+      "imported_at": "2026-05-23T17:26:58.833Z",
       "handle": "Rizzleroc",
       "text_file": "p0068.gpt-vision.txt"
     }

@@ -65,6 +65,17 @@
         "gpt-vision (v2)"
       ]
     },
-    "dispute_kind": "judged"
+    "dispute_kind": "judged",
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0008.gpt-vision.v2.txt",
+          "chars": 383,
+          "imported_at": "2026-05-23T17:26:58.488Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      }
+    }
   }
 }

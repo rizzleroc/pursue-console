@@ -2,8 +2,8 @@
   "best": "gemini",
   "sources": {
     "gpt-vision": {
-      "chars": 1018,
-      "imported_at": "2026-05-20T14:25:26.038Z",
+      "chars": 966,
+      "imported_at": "2026-05-23T17:26:58.940Z",
       "handle": "Rizzleroc",
       "text_file": "p0023.gpt-vision.txt"
     },

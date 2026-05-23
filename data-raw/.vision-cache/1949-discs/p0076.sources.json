@@ -55,6 +55,17 @@
       "judge": "chatgpt",
       "text_length": 173
     },
-    "dispute_kind": "judged"
+    "dispute_kind": "judged",
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0076.gpt-vision.v2.txt",
+          "chars": 71,
+          "imported_at": "2026-05-23T17:26:58.482Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      }
+    }
   }
 }
