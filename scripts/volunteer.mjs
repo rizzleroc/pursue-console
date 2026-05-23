@@ -123,6 +123,26 @@ async function checkGhAuth() {
 }
 await checkGhAuth();
 
+// Probe the OCR daemon before doing anything else. Without this, the
+// volunteer happily downloads PDFs, renders pages, then burns minutes on
+// "↻ upload retry 1/2 — fetch failed" loops + per-page single-page fallback
+// when the daemon is simply not running (or its ChatGPT tab is dead).
+async function daemonAlive(timeoutMs = 2000) {
+  try {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    const r = await fetch(`${DAEMON}/health`, { signal: ac.signal });
+    clearTimeout(t);
+    return r.ok;
+  } catch { return false; }
+}
+if (!DRY && !(await daemonAlive())) {
+  console.error(`error: OCR daemon at ${DAEMON} is unreachable.`);
+  console.error("  → start it with: cd pursue-vision-mcp && npm start");
+  console.error("  → and make sure Chrome is running with --remote-debugging-port=9222, logged into chatgpt.com");
+  process.exit(1);
+}
+
 // ----- step 1: fetch the work queue -----
 console.log(`[volunteer] fetching ${QUEUE_URL}`);
 let queue;
@@ -325,6 +345,16 @@ async function callDaemon(filePaths) {
       raw = j.text ?? j.result?.text ?? j.output ?? "";
       break;
     } catch (e) {
+      // If the daemon itself has gone away (process died, Chrome crashed,
+      // network drop), retrying is pointless — the same fetch will fail
+      // identically. Probe /health once; on the first confirmed-dead probe
+      // bail with a non-retriable error so the volunteer surfaces it instead
+      // of grinding through retries + single-page fallback per page.
+      if (/fetch failed|ECONNREFUSED|ECONNRESET|UND_ERR/i.test(e.message) && !(await daemonAlive(1500))) {
+        const dead = new Error(`OCR daemon at ${DAEMON} stopped responding mid-run — restart it (cd pursue-vision-mcp && npm start)`);
+        dead.daemonDown = true;
+        throw dead;
+      }
       if (n >= 3) throw e;
       console.log(`    ↻ upload retry ${n}/2 — ${e.message.slice(0, 70)}`);
       await new Promise(res => setTimeout(res, 2000 * n));

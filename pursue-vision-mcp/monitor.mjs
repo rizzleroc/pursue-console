@@ -212,7 +212,7 @@ function summarizeLog(allLines, exitCode) {
   const noCommit  = /nothing to commit/.test(text);
   const queueGen  = (text.match(/queue gen ([^\s·]+)/) || [])[1] || null;
 
-  const econnRefused = /ECONNREFUSED.*9223|ECONNREFUSED 127\.0\.0\.1:9223/.test(text);
+  const econnRefused = /ECONNREFUSED.*9223|ECONNREFUSED 127\.0\.0\.1:9223|OCR daemon at .* (?:is unreachable|stopped responding)/.test(text);
   const cdpTimeout   = /connectOverCDP.*Timeout|CDP.*timeout/i.test(text);
   const tokenError   = /unauthorized.*bearer|HTTP 401/i.test(text);
   const pdfRenderFails = (text.match(/render failed \(Value is none of these types/g) || []).length;
