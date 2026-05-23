@@ -513,10 +513,10 @@
       <span class="qb-sub qb-count">render + auto-draft context · one slice</span>
       <span class="qb-cmd">volunteer-media.mjs --auto-context</span>
     </button>
-    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Commit filled templates as a media contribution PR">
-      <span class="qb-title">✓ COMMIT VISUALS</span>
-      <span class="qb-sub" id="qb-commit-sub">stage reviewed templates → contribution</span>
-      <span class="qb-cmd">volunteer-media.mjs --commit</span>
+    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('commit-all', false)" title="Commit whatever's pending — OCR, review, and visuals — as per-source PRs">
+      <span class="qb-title">✓ COMMIT</span>
+      <span class="qb-sub" id="qb-commit-sub">publish all pending work → per-source PRs</span>
+      <span class="qb-cmd">commit-all.mjs</span>
     </button>
     <button id="qb-ocr-loop" class="quick-btn ocr loop" data-needs="ocr" onclick="quickRun('ocr', true)" title="Loop OCR until queue empty">
       <span class="qb-title">↻ LOOP OCR</span>
@@ -1267,22 +1267,27 @@
   pollDaemonHealth();
   setInterval(pollDaemonHealth, 15_000);
 
-  // ---- COMMIT VISUALS readiness ----
-  // Make the commit button reflect actual staging state instead of always
-  // looking ready: enabled + "N ready to commit" only when there are filled
-  // templates, disabled otherwise (so it stops inviting a pointless resubmit).
+  // ---- COMMIT readiness (unified across OCR, review, visuals) ----
+  // The commit button is no longer visuals-only. It calls commit-all.mjs
+  // which scans every contribution source and opens per-source PRs. The
+  // sublabel breaks down what's about to publish so the volunteer knows
+  // before clicking; button stays disabled when nothing is pending.
   async function pollStaging() {
     const btn = $("qb-visuals-commit"), sub = $("qb-commit-sub");
     if (!btn) return;
     if (btn.dataset.runDisabled === "1") return; // a run is active — pollRunner owns the lock
     try {
-      const s = await fetch("/staging", { cache: "no-store" }).then(r => r.json());
-      if (s.committable > 0) {
+      const p = await fetch("/pending", { cache: "no-store" }).then(r => r.json());
+      const parts = [];
+      if (p.ocr)     parts.push(`${p.ocr} OCR`);
+      if (p.review)  parts.push(`${p.review} review`);
+      if (p.visuals) parts.push(`${p.visuals} visuals`);
+      if (p.total > 0) {
         btn.disabled = false;
-        if (sub) sub.textContent = `${s.committable} ready to commit` + (s.incomplete ? ` · ${s.incomplete} still need drafting` : "");
+        if (sub) sub.textContent = `${parts.join(" · ")} ready to publish`;
       } else {
         btn.disabled = true;
-        if (sub) sub.textContent = s.total ? `nothing ready — ${s.total} staged still need drafting` : "no staged visuals to commit";
+        if (sub) sub.textContent = "nothing pending to commit";
       }
     } catch {}
   }
