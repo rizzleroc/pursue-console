@@ -225,7 +225,26 @@ function SweepWedge() {
 // =================================================================
 // Main view
 // =================================================================
-export default function LiveFeedView({ onSelect }) {
+// Match the Header's "ALL TYPES" dropdown (Document/Video/Image/Audio) to
+// LiveFeedView's mediaTypeOf taxonomy (document/photo/video/audio).
+const HEADER_TYPE_TO_MEDIA = {
+  Document: "document", Image: "photo", Video: "video", Audio: "audio",
+};
+
+// Media-type classification per event (from type + docType fields).
+// Hoisted outside the component so the header-filter useMemo above can
+// share the same taxonomy as the per-signal classifier below.
+function mediaTypeOf(ev) {
+  const t  = (ev.type    || "").toLowerCase();
+  const dt = (ev.docType || "").toLowerCase();
+  if (/video/.test(t)) return "video";
+  if (/audio/.test(t)) return "audio";
+  if (/image|imagery|photo|composite|sketch|still/.test(t)) return "photo";
+  if (["photoset", "sketch", "annotated"].includes(dt)) return "photo";
+  return "document";
+}
+
+export default function LiveFeedView({ onSelect, headerFilters }) {
   const [feed, setFeed] = useState(null);
   const { stats: dbStats } = useCorpusStats();  // public/corpus-stats.json — TRUE numbers from the DB
   const [error, setError] = useState(null);
@@ -258,10 +277,39 @@ export default function LiveFeedView({ onSelect }) {
     return () => { cancelled = true; clearInterval(id); };
   }, [reloadAt]);
 
+  // Pre-compute the set of event IDs that pass the Header's search/agency/
+  // type filters so the per-signal filter below is a quick set lookup.
+  // Re-runs only when the header filters change.
+  const allowedEventIds = useMemo(() => {
+    const q = (headerFilters?.query || "").trim().toLowerCase();
+    const agency = headerFilters?.filterAgency || "all";
+    const type   = headerFilters?.filterType   || "all";
+    const typeMedia = type !== "all" ? HEADER_TYPE_TO_MEDIA[type] : null;
+    if (!q && agency === "all" && !typeMedia) return null;  // null = pass-through
+    const set = new Set();
+    for (const ev of EVENTS) {
+      if (agency !== "all" && ev.agency !== agency) continue;
+      if (typeMedia && mediaTypeOf(ev) !== typeMedia) continue;
+      if (q && !(
+        (ev.title    || "").toLowerCase().includes(q) ||
+        (ev.summary  || "").toLowerCase().includes(q) ||
+        (ev.loc      || "").toLowerCase().includes(q) ||
+        (ev.agency   || "").toLowerCase().includes(q) ||
+        (ev.tags || []).some(t => t.toLowerCase().includes(q))
+      )) continue;
+      set.add(ev.id);
+    }
+    return set;
+  }, [headerFilters?.query, headerFilters?.filterAgency, headerFilters?.filterType]);
+
   const entries = useMemo(() => {
     if (!feed) return [];
-    return feed.entries.filter(e => filter === "all" || e.source === filter);
-  }, [feed, filter]);
+    return feed.entries.filter(e => {
+      if (filter !== "all" && e.source !== filter) return false;
+      if (allowedEventIds && !allowedEventIds.has(e.eventId)) return false;
+      return true;
+    });
+  }, [feed, filter, allowedEventIds]);
 
   const stats = feed?.stats;
 
@@ -280,17 +328,6 @@ export default function LiveFeedView({ onSelect }) {
       .sort((a, b) => b.n - a.n).slice(0, 7);
   }, [feed]);
 
-  // Media-type classification per event (from type + docType fields).
-  // Returns one of: video | photo | audio | document
-  function mediaTypeOf(ev) {
-    const t = (ev.type || "").toLowerCase();
-    const dt = (ev.docType || "").toLowerCase();
-    if (/video/.test(t)) return "video";
-    if (/audio/.test(t)) return "audio";
-    if (/image|imagery|photo|composite|sketch|still/.test(t)) return "photo";
-    if (["photoset", "sketch", "annotated"].includes(dt)) return "photo";
-    return "document";
-  }
   const mediaSplit = useMemo(() => {
     const c = { document: 0, photo: 0, video: 0, audio: 0 };
     for (const ev of EVENTS) c[mediaTypeOf(ev)]++;

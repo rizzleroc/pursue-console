@@ -55,8 +55,15 @@ const QUICK_QUERIES = [
   "ellipsoid", "bouncy ball", "orb", "diamond", "bronze", "saucer",
 ];
 
-export default function SearchView({ onSelect }) {
-  const [query, setQuery] = useState("");
+export default function SearchView({ onSelect, headerFilters }) {
+  // Pre-seed from the Header's search box so typing "fbi" up there and
+  // clicking SEARCH lands you on the results immediately. Header changes
+  // push through; editing the in-page input doesn't push back.
+  const [query, setQuery] = useState(headerFilters?.query || "");
+  useEffect(() => {
+    if ((headerFilters?.query ?? "") !== query) setQuery(headerFilters?.query || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headerFilters?.query]);
   const [mini, setMini] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
