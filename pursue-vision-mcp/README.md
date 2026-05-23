@@ -1,11 +1,13 @@
 # pursue-vision-mcp
 
-**Minimal open-source daemon that drives your already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents.** Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
+**Minimal open-source daemon that drives your already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents** — plus a `@unverified` war.gov collector that uses the same logged-in Chrome to bypass Akamai TLS blocking. Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
 
-Two routes:
+Routes:
 
 - **`POST /chat-with-files`** — send N image paths + a prompt to one provider (`chatgpt` or `gemini`), get the model's reply back as text.
 - **`POST /fanout`** — send the SAME prompt + files to BOTH providers in parallel; returns both responses. Used by the corpus's cross-source re-evaluation pipeline (`scripts/reevaluate-disputed.mjs`).
+- **`GET /war-gov/index?release=<n>`** — fetch the war.gov/UFO release-files index for release `<n>` via in-page `fetch()` on a logged-in `www.war.gov/UFO/` tab. ***`@unverified`** — never run end-to-end against live war.gov; first live test is the maintainer's Chrome.*
+- **`POST /war-gov/download`** — `{ urls: string[], destDir: string }`. Downloads each URL via Chrome (8 MB HTTP Range chunks for files >50 MB) into a path-jailed `destDir`. Returns per-file `{ ok, bytes, error? }`. **`@unverified`**.
 
 No image generation, no API keys, no chat memory, no fancy queue, no telemetry. If you have ChatGPT Plus and/or a Gemini account, this is enough to contribute transcriptions to the corpus (see [HOW-CAN-I-HELP.md](../HOW-CAN-I-HELP.md) in the parent project).
 
@@ -41,11 +43,11 @@ npm start
 
 `npm start` will:
 1. Launch Chrome with `--remote-debugging-port=9222` (using a dedicated profile so you stay signed in).
-2. Open BOTH `chatgpt.com` and `gemini.google.com/app` — sign in once in each (or skip the one you don't have).
+2. Open `chatgpt.com`, `gemini.google.com/app`, **and `www.war.gov/UFO/`** — sign in to the LLM tabs once; on the war.gov tab, solve any one-time Akamai challenge it shows (you'll see a CAPTCHA-style "Pardon Our Interruption" or similar). Once cleared, the cookie persists in the profile and the warGov driver can `fetch()` releases.
 3. Start the daemon on `http://127.0.0.1:9223`.
 4. Generate a bearer token at `~/.pursue-vision-token`.
 
-A provider tab missing or signed-out just makes that provider unavailable — the other one keeps working.
+A provider tab missing or signed-out just makes that provider unavailable — the other one keeps working. The war.gov tab is only required when you actually want to run `corpus:fetch-war-gov`.
 
 If you already have Chrome running on port 9222, pass `--no-chrome`:
 
@@ -176,6 +178,47 @@ Errors:
 - `403` — `filePaths` not under your home directory or cwd
 - `500` — driver error (upload didn't acknowledge, reply timed out, the model complained the file wasn't attached)
 
+### `GET /war-gov/index?release=<n>` *(@unverified)*
+
+Asks the daemon to fetch the war.gov/UFO release-files index for release `<n>` by running an in-page `fetch()` on a logged-in `www.war.gov/UFO/` tab. The driver tries three discovery strategies in order: (1) intercept the XHR that loads on initial page navigation, (2) DOM-scrape anchors pointing at `/medialink/ufo/release_<n>/...`, (3) probe likely index URLs (`/UFO/api/records`, `/UFO/index.json`, `/UFO/records.csv`, etc.). Whichever yields records wins; subsequent calls reuse the cached endpoint.
+
+Returns:
+```json
+{
+  "release": "2",
+  "count": 64,
+  "records": [
+    { "filename": "case-001.pdf", "url": "https://www.war.gov/medialink/ufo/release_2/case-001.pdf",
+      "agency": "USAF", "type": "pdf", "sizeBytes": 1234567 }
+  ]
+}
+```
+
+### `POST /war-gov/download` *(@unverified)*
+
+```json
+{
+  "urls": ["https://www.war.gov/medialink/ufo/release_2/case-001.pdf"],
+  "destDir": "/home/you/pursue-console/data-raw/war-gov/release_2"
+}
+```
+
+`destDir` is jail-checked to be under your home directory or daemon cwd. Files >50 MB are downloaded in 8 MB HTTP Range chunks; bytes flow Chrome → base64 → Node → disk via a `.part` rename. On an Akamai block (403 / 429 / challenge body) the request aborts the whole batch rather than write challenge HTML pretending it's a PDF.
+
+Returns:
+```json
+{
+  "destDir": "/home/you/...",
+  "totalDurationMs": 187423,
+  "results": [
+    { "url": "https://...", "ok": true, "bytes": 1234567, "destPath": "/home/you/.../case-001.pdf", "durationMs": 4210 },
+    { "url": "https://...", "ok": false, "error": "war-gov: Akamai block on ..." }
+  ]
+}
+```
+
+The companion CLI is `scripts/sync-war-gov.mjs` in the parent project (`npm run corpus:fetch-war-gov`).
+
 ### `GET /status`
 
 ```json
@@ -184,7 +227,8 @@ Errors:
   "cdpPort": 9222,
   "providers": {
     "chatgpt": { "connected": true,  "history": 47 },
-    "gemini":  { "connected": true,  "history":  3 }
+    "gemini":  { "connected": true,  "history":  3 },
+    "warGov":  { "connected": true,  "history":  0 }
   }
 }
 ```

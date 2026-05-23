@@ -22,6 +22,8 @@
     "corpus:sync-check": "node scripts/diagnose-deploy-sync.mjs",
     "corpus:contributors": "node scripts/build-contributors.mjs",
     "corpus:fetch-missing": "node scripts/fetch-missing-pdfs.mjs",
+    "corpus:fetch-war-gov": "node scripts/sync-war-gov.mjs",
+    "corpus:transcribe-videos": "node scripts/transcribe-videos.mjs",
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",
     "test:parse-template": "node scripts/test-parse-template.mjs",

@@ -153,7 +153,67 @@ The [2.2 security review](./CHANGELOG.md) closed every actionable hardening item
 
 ---
 
-## R9 · `volunteer.mjs --review` producer (consumer wired, producer absent)
+## R9 · Release 02 ingestion (MCP-based collector landed, `@unverified`)
+
+**Status:** MCP-based collection landed, **`@unverified` (awaiting first live run
+against the maintainer's Chrome).**
+
+war.gov/UFO published its **Second Release (Release 02) on 2026-05-22** — 64 files:
+**6 PDFs, 7 audio, 51 videos** ([DoW press release](https://www.war.gov/News/Releases/Release/Article/4499305/department-of-war-publishes-second-release-of-unidentified-anomalous-phenomena/)).
+It's the next drop in the rolling PURSUE program.
+
+**The blocker:** war.gov blocks our IPs via Akamai TLS-fingerprint detection. Every
+Node-side HTTP client we tried (`curl`, `wget`, Playwright `page.request`, native
+`fetch`) fails. The ONLY path that works is `fetch()` called from JavaScript running
+INSIDE a page already loaded on www.war.gov — that request inherits the real
+browser's TLS handshake and slips past the check. We previously waited on the
+community mirror [`DenisSergeevitch/UFO-USA`](https://github.com/DenisSergeevitch/UFO-USA);
+that wait is no longer the critical path.
+
+**What's landed this round (`@unverified`):**
+- `pursue-vision-mcp/war-gov-driver.mjs` — Playwright driver that connects to the
+  user's logged-in Chrome over CDP, finds (or opens) a `www.war.gov/UFO/` tab, and
+  exposes `fetchIndex({ release })` + `downloadFile({ url, destPath })`. Big files
+  (>50 MB videos) stream in 8 MB HTTP Range chunks; bytes shuttle browser → Node
+  via base64.
+- `pursue-vision-mcp/daemon.mjs` — new endpoints `GET /war-gov/index?release=N` and
+  `POST /war-gov/download {urls, destDir}`. Same single-slot queue pattern as the
+  LLM drivers (`queues.warGov`), same bearer-token auth, same path-jail enforcement.
+- `pursue-vision-mcp/start.mjs` — opens the war.gov tab alongside chatgpt + gemini.
+  First visit may show a one-time Akamai challenge to solve in the browser.
+- `scripts/sync-war-gov.mjs` (+ `npm run corpus:fetch-war-gov`) — CLI orchestrator
+  that calls the daemon, filters by type, downloads into
+  `data-raw/war-gov/release_<n>/`.
+- `config/releases.json` — added `paths.localDir` per release; pass-through into
+  `work-available.json`.
+
+**Why `@unverified`:** the entire war.gov-driver path has never been run end-to-end.
+Akamai blocks our IPs, so neither the agent nor the maintainer's CI can test the
+collector — only the maintainer's real Chrome can. The driver compiles, the daemon
+queues it, the script reaches the daemon, but the live behavior (does the index
+actually live at `/UFO/api/records`? does the network intercept catch the right
+XHR? does Range chunking work on war.gov's CDN?) is unknown until the first run.
+`scripts/find-unverified.mjs` surfaces both files in `corpus:unverified`.
+
+**Plan from here:**
+1. Maintainer runs `npm start --prefix pursue-vision-mcp`, solves the Akamai
+   challenge once in the war.gov tab, runs `npm run corpus:fetch-war-gov -- --dry-run`
+   to verify the index discovery, then `npm run corpus:fetch-war-gov` for real.
+2. Patch whichever discovery strategy in `war-gov-driver.mjs` actually matched
+   (network intercept / DOM scrape / candidate URL); remove `@unverified` annotations.
+3. Audio + video files use the existing Whisper transcription path:
+   `npm run corpus:transcribe-videos`. The 7 audio + 51 video files in Release 02
+   flow through `scripts/transcribe-videos.mjs` (which already exists for the
+   release-01 DVIDS clips).
+4. Flip `release-02` to `status: "mirrored"` in `config/releases.json` once ingested.
+5. Denis's mirror, if it materializes, becomes a redundant cross-check rather than
+   the critical path.
+
+**Owner:** maintainer (live test), then auto from there.
+
+---
+
+## R10 · `volunteer.mjs --review` producer (consumer wired, producer absent)
 
 **Status:** DESIGNED by its consumers, **not built**. Surfaced in the 2.2 sweep.
 
@@ -187,7 +247,9 @@ re-OCR compute rather than hand-typing.
 
 ---
 
-_Updated 2026-05-22: added R8 (security review residuals) after the 2.2 sweep; the volunteer `--review` producer item previously filed as R8 in the punchlist sweep is now R9._
+_Updated 2026-05-22 (later): R9 — MCP-based war.gov collector landed (`pursue-vision-mcp/war-gov-driver.mjs`, daemon endpoints, `scripts/sync-war-gov.mjs`, `npm run corpus:fetch-war-gov`). Marked `@unverified` pending the maintainer's first live run against their real Chrome; Akamai blocks our IPs so neither the agent nor CI can test it._
+_Updated 2026-05-22: added R9 (Release 02 published on war.gov; scaffolded as "incoming", ingest blocked on the DenisSergeevitch/UFO-USA mirror — watch loop polls the upstream manifest)._
+_Updated 2026-05-22: added R8 (security review residuals) after the 2.2 sweep; the volunteer `--review` producer item previously filed as R8 in the punchlist sweep is now R10 (was R9 before R9 was claimed by Release 02 ingestion)._
 _Updated 2026-05-22: URL normalization bug fixed in `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` — Denis manifest uses hyphenated filenames, `events.js` uses raw war.gov URLs with literal spaces; case-insensitive comparison never matched. Fix: normalize both sides with `.toLowerCase().replace(/[^a-z0-9.:/-]+/g, "-").replace(/-{2,}/g, "-")`. Result: Denis manifest matching improved from **68/120 → 112/120 PDFs matched**; 44 previously unlinked events are now matched, unlocking ~800 Denis pages for those events on the next import run. 8 PDFs remain genuinely mismatched due to filename discrepancies (tracked in R5 Denis URL mismatches). Corpus status at audit: 121 events catalogued (65 have pages, 56 do not); 3,394 pages transcribed; 12 pages need vision OCR (7 events, nearly done); 205 visual context pages need human annotation; 4 catalogue placeholders have no URL (japan-2023, indopacom-2024, army-2026, pursue-release-01); 0 review-queue disputes._
 _Updated 2026-05-21 (2.2 sweep, follow-up): added R9 (`volunteer.mjs --review` producer is missing — consumer wired, producer absent; was filed as R8 before the security-review R8 superseded it); deleted dead `src/data/threads.js`; fixed stale index.html meta (deleted views + "47 records")._
 _Updated 2026-05-21 (2.2 punchlist sweep): refreshed live counts (173 inventory · 121 catalogued · 3,394 pages · 187 MEDIA tiles · review queue 0); clarified R2 verification-vs-code gaps and the 2.2 gemini-driver guard/disconnect fix; corrected R3/R4 from the pre-sync OCR framing; flagged R7 leasing as config-scaffolded-but-unwired._

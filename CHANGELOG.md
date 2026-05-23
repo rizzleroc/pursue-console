@@ -15,6 +15,20 @@ Comprehensive security review (token-exposure audit + tooling/dependency risk as
 - **SSRF guard on all corpus downloads** — new `scripts/safe-fetch.mjs` enforces https-only and blocks loopback/link-local/private-range hosts, re-validating every redirect hop. Wired into `fetch-pdfs.mjs` and `fetch-missing-pdfs.mjs`, which previously did `fetch(url, { redirect: "follow" })` against URLs from data files with no scheme/host checks. (All current event URLs are `https://www.war.gov` — no legitimate download is affected.)
 - **Dashboard XSS surface tightened** — `pursue-vision-mcp/dashboard.html` now `escapeHTML()`s the live `previewUrl` (into `<img src>`) and recent-item `note` fields that arrive via `POST /progress`, matching the escaping already applied to log lines and PR titles.
 
+## Release 02 collector (2026-05-22, `@unverified`)
+
+A new path for getting raw release files directly from www.war.gov without waiting on a community mirror. Same trick the rest of the MCP uses: connect to the user's logged-in Chrome over CDP, run the actual HTTP from inside a page on the war.gov origin. That inherits the real browser's TLS fingerprint and slips past Akamai's TLS-fingerprint block (the one that defeats `curl`, `wget`, Playwright `page.request`, and Node `fetch`).
+
+What landed:
+- **`pursue-vision-mcp/war-gov-driver.mjs`** — new `WarGovDriver` class with `connect / fetchIndex / downloadFile / disconnect`. Three index-discovery strategies (XHR intercept, DOM scrape, probe likely paths) so the first live run doesn't require us to already know the right URL. Big files (>50 MB) stream via HTTP Range requests in 8 MB chunks, base64-shuttled through `page.evaluate`. Akamai-block detection (403/406/429 status or challenge-body patterns) throws clearly instead of writing the challenge HTML to disk as if it were a PDF.
+- **Daemon endpoints `/war-gov/index` and `/war-gov/download`** — same single-slot queue pattern as the LLM drivers (`queues.warGov`), same bearer auth, same path-jail enforcement. Long-running by design: `/war-gov/download` holds the connection open until every file lands or fails.
+- **`start.mjs`** opens `www.war.gov/UFO/` alongside the chatgpt + gemini tabs. The user solves any one-time Akamai challenge once in their real Chrome; the cookie persists in the dedicated profile.
+- **`scripts/sync-war-gov.mjs`** + `npm run corpus:fetch-war-gov` — CLI orchestrator. Supports `--release=02`, `--types=pdf,audio,video`, `--dry-run`. Reads the token the same way `volunteer.mjs` does. Suggests `npm run corpus:transcribe-videos` as a follow-up for audio/video.
+- **`config/releases.json`** — added `paths.localDir` per release (`data-raw/war-gov/release_<n>`), pass-through into `work-available.json`.
+- **`npm run corpus:transcribe-videos`** — script alias for the existing `scripts/transcribe-videos.mjs` (Whisper); the same Whisper pipeline that handled Release 01 DVIDS clips can handle Release 02 audio/video once it lands locally.
+
+Why **`@unverified`:** the agent that wrote this can't actually exercise it. war.gov blocks our IPs via Akamai; only the maintainer's real Chrome can verify the round-trip. The driver compiles, the daemon queues it, `vite build` passes, `npm run` lists the new script — but the live behavior (does the index live at `/UFO/api/records`? does the network intercept catch the right XHR? does Range chunking survive the CDN?) is unknown until the first live run. `scripts/find-unverified.mjs` surfaces both new files in `corpus:unverified`. See ROADMAP R9 for the verification plan.
+
 ## 2.2 — Punchlist sweep 2 (2026-05-21)
 
 A second brutal-analysis pass over the daemon, the scripts, the React app, and the
