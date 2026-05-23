@@ -244,6 +244,24 @@ export default function MediaView({ onSelect }) {
         <input value={query} onChange={(e) => setQuery(e.target.value)}
           placeholder="search title / description"
           className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 placeholder-emerald-800 font-mono text-xs w-48 focus:outline-none focus:border-amber-400" />
+        {/*
+          Media-type dropdown mirrors the pill row above. Picking a kind
+          narrows filterKinds to {that kind}; picking "all media" restores
+          every kind. When the user toggled pills into a mixed subset, the
+          dropdown reads "all media" since no single kind captures the state.
+        */}
+        <select
+          value={filterKinds.size === 1 ? [...filterKinds][0] : "all"}
+          onChange={(e) => {
+            const v = e.target.value;
+            setFilterKinds(v === "all" ? new Set(ALL_KINDS) : new Set([v]));
+          }}
+          className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs">
+          <option value="all">all media</option>
+          {ALL_KINDS.filter(k => kindsWithAnyItem.has(k)).map(k => (
+            <option key={k} value={k}>{KIND_LABELS[k].toLowerCase()} ({kindCounts[k] || 0})</option>
+          ))}
+        </select>
         <select value={filterAgency} onChange={(e) => setFilterAgency(e.target.value)}
           className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs">
           <option value="all">all agencies</option>
