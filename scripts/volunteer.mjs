@@ -246,7 +246,7 @@ const live = claims.filter(c => !c.skip);
 globalThis.Path2D = Path2D;
 globalThis.DOMMatrix = DOMMatrix;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = await getPdfjsAssetUrls();
+const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL, server: PDFJS_SERVER } = await getPdfjsAssetUrls();
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }
@@ -487,6 +487,13 @@ await reportProgress({
 const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);
 console.log(`[volunteer] files at: ${CONTRIB_ROOT}`);
+
+// Drain the pdfjs assets server before exit — on Windows, calling process.exit()
+// while a TCP listener is still in the event loop can trip a libuv assertion
+// (UV_HANDLE_CLOSING in src\win\async.c) and the process dies with exit code
+// 3221226505 instead of the intended 0/2. The monitor then misclassifies the
+// clean "no new work" result as a crash and re-loops.
+await new Promise(r => PDFJS_SERVER.close(() => r()));
 
 if (pagesOK === 0) { console.log("[volunteer] nothing to commit, exiting."); process.exit(2); }
 
