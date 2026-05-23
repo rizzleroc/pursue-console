@@ -7,7 +7,10 @@ import { EVENTS } from "../data/events.js";
 // (see App.recordType); releases is single today but list-driven so
 // future tranches slot in.
 const AGENCY_OPTIONS = [...new Set(EVENTS.map(e => e.agency).filter(Boolean))].sort();
-const RELEASE_OPTIONS = ["Release 01"];
+// Derived from EVENTS so a new release added in events.js shows up in the
+// dropdown automatically. Falls back to "Release 01" when no release tag
+// is present (legacy entries).
+const RELEASE_OPTIONS = [...new Set(EVENTS.map(e => e.release || "Release 01"))].sort();
 const TYPE_OPTIONS = ["Document", "Video", "Image", "Audio"];
 
 // Two-row nav: primary actions in the top row, analysis views below.
