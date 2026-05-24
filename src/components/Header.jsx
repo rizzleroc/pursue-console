@@ -14,7 +14,13 @@ const PRIMARY = [
   { id: "live",     label: "LIVE",     glyph: "●" },
   { id: "search",   label: "SEARCH",   glyph: "⌕" },
   { id: "semantic", label: "SEMANTIC", glyph: "∿" },
-  { id: "ask",      label: "ASK",      glyph: "?" },
+  // ASK is temporarily pulled from the nav while the hosted RAG backend
+  // is being deployed (PR #56 — pursue-rag-server on Railway). The view
+  // code still lives at src/views/AskView.jsx and the route case in
+  // App.jsx still handles `view === "ask"`, so flipping the tab back
+  // on is a one-line uncomment once the Railway URL is set in
+  // src/lib/askSettings.js → DEFAULT_HOSTED_URL.
+  // { id: "ask",      label: "ASK",      glyph: "?" },
   { id: "review",   label: "REVIEW",   glyph: "⚖" },
   { id: "media",    label: "MEDIA",    glyph: "▦" },
   { id: "dossier",  label: "DOSSIER",  glyph: "❒" },
