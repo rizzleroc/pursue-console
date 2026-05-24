@@ -1,0 +1,309 @@
+Arabian Gulf — 2020 Cluster (10+ Reports)
+=========================================
+
+Agency: Department of War
+Date: 2020 (Jul–Dec)
+Location: Arabian Gulf / Persian Gulf
+Type: Reports + Videos PR-37 to PR-44
+Source extraction: VISION · 7 pages
+
+---
+
+=== Page 1 (vision) ===
+
+(b)(1)1.4a [redacted]
+
+# Misrep 8799515
+
+## Narrative
+(b)(1)1.4a (b)(1)1.4a, (b)(1)1.4c [redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+[redacted]
+
+## Admin
+
+### CLASSIFICATION
+* **Classification:** SECRET
+* **Associated Caveats:** (b)(1)1.4a [redacted]
+* **Classification Source (MS or Classification Guide ID):** (b)(1)1.4a [redacted]
+* **Declassification Date (YYYYMMDD):** 20480603
+
+### OPERATION
+* **Operation:** (b)(1)1.4a [redacted]
+* **Domain:** (b)(1)1.4a [redacted]
+* **Operations Center:** (b)(1)1.4a [redacted]
+* **Major Command (MAJCOM):** AFCENT
+* **Combatant Command (COCOM):** (b)(1)1.4a [redacted]
+
+### MSGID
+* **Report Type:** MISREP
+* **Originator (Unit or Squadron):** (b)(1)1.4a [redacted]
+* **Submit Date (Auto-generated):**
+
+(b)(1)1.4a [redacted]
+
+
+=== Page 2 (vision) ===
+
+(b)(1)1.4a
+
+MSNID
+
+* Tasking Order (ATO): (b)(1)1.4a
+* Mission Type: (b)(1)1.4a
+* ATO Mission Number: (b)(1)1.4a
+* Country Tasked: US - UNITED STATES
+* Service Tasked: A - AIR FORCE
+
+Poc
+
+POC
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b@mail.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+QC
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b@mail.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+APPROVER
+
+* Rank: (b)(6), (b)(3) 10 U.S.C. §130b
+* Full Name: (b)(6), (b)(3) 10 U.S.C. §130b
+* Unit: (b)(6), (b)(3) 10 U.S.C. §130b
+* Wing: (b)(6), (b)(3) 10 U.S.C. §130b
+* Phone Number: (b)(6), (b)(3) 10 U.S.C. §130b
+* Email: (b)(6), (b)(3) 10 U.S.C. §130b.smil.mil
+* Service: Air Force
+* Operations Center: (b)(6), (b)(3) 10 U.S.C. §130b
+
+(b)(1)1.4a
+[redacted]
+
+
+=== Page 3 (vision) ===
+
+[redacted] (b)(1)1.4a
+
+# INGEST
+
+* **Rank:**
+* **Full Name:**
+* **Unit:**
+* **Wing:**
+* **Phone Number:**
+* **Email:**
+* **Service:**
+* **Operations Center:**
+
+# ACEQUIP
+
+## ACEQUIP
+
+* **Aircraft Callsign:** [redacted] (b)(1)1.4a
+* **Radar Name or Destination:**
+* **Radar Software Load or Mission Data:**
+* **Radar Warning Receiver (RWR) Name or Designator:**
+* **RWR Software Load or Mission Data:**
+* **MWS Name or Designator:**
+* **MWS Software Load or Mission Data:**
+* **IRCM Name or Designator:**
+* **IRCM Software Load or Mission Data:**
+* **ECM Name or Designator:**
+* **ECM Software Load or Mission Data:**
+* **CMD Name or Designator:**
+* **Chaff Designator:**
+* **Num Chaff or Cartridges:**
+* **Flare Designator:**
+* **Num Flares:**
+* [redacted] (b)(1)1.4a
+* [redacted]
+* **Type of Radar-Guided AAM:**
+* **Num Radar-Guided AAM:**
+* **Type of IR-Guided AAM:**
+* **Num IR-Guided AAM:**
+* **Gun Name or Designator:**
+* **Num Gun Rounds:**
+* **Air-to-Ground Wpn to Include Num of Each:** [redacted] (b)(1)1.4a
+* **TGT Pod Name or Designator:** [redacted] (b)(1)1.4a
+* **Additional Avionics:** [redacted] (b)(1)1.4a
+
+[redacted] (b)(1)1.4a
+[redacted]
+
+
+=== Page 4 (vision) ===
+
+[redacted: (b)(1)1.4a]
+
+* Data Link:
+* Gentext:
+
+## Timeline
+
+### Takeoff
+* Callsign: [redacted: (b)(1)1.4a]
+* Number of Aircraft: [redacted: (b)(1)1.4a]
+* Asset Type (Aircraft): [redacted: (b)(1)1.4a]
+* Aircraft Tail Number(s): [redacted: (b)(1)1.4a]
+* Takeoff Location (ICAO Code): [redacted: (b)(1)1.4a]
+* Takeoff Time DTG: [redacted: (b)(1)1.4a]
+* Mode 3 (IFF Codes):
+* Gentext/Additional Details: (SECRET//REL TO USA, FVEY) WEATHER WAS (NOT) A FACTOR (EXPLAIN WHY IF IT WAS)
+* Mission Canceled:
+
+### Landing
+* Last Land Location (ICAO Code): [redacted: (b)(1)1.4a]
+* Last Land Time: [redacted: (b)(1)1.4a]
+* Last Engine Shutdown Time: [redacted: (b)(1)1.4a]
+* Total Mission Time: [redacted: (b)(1)1.4a]
+* Gentext/Additional Details:
+
+### ISR
+* Time-on Station DTG: [redacted: (b)(1)1.4a]
+* Time-off Station DTG: [redacted: (b)(1)1.4a]
+* Aircraft Callsign: [redacted: (b)(1)1.4a]
+* Msn Type: [redacted: (b)(1)1.4a]
+* Primary Sensor: [redacted: (b)(1)1.4a]
+* Sensors Available: [redacted: (b)(1)1.4a]
+* Tasking Type: [redacted: (b)(1)1.4a]
+* Tasking or Request Number (JTAR#, AEM#, PRI#, or TIC#): -
+* BE Number (if NTISR): -
+* Tasked Start Point: [redacted: (b)(1)1.4a]
+* Activity Description: ISR
+* FMV or Image File Name (if NTISR): -
+* EEIs Observed:
+* Number of EEIs:
+
+[redacted: (b)(1)1.4a]
+[redacted]
+
+
+=== Page 5 (vision) ===
+
+(b)(1)1.4a (?)
+• Global Campaign Plan:
+(b)(1)1.4a (?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(?)
+(b)(1)1.4a (?)
+
+
+=== Page 6 (vision) ===
+
+[redacted]
+
+* Killbox (Location):
+* Mission Type: [redacted]
+* JTAC Callsign:
+* Gentext/Additional Details:
+* Did not Arrive On Station:
+
+*Off Station*
+
+* Time Off Station DTG: [redacted]
+* Total Time On Station: [redacted]
+* Gentext/Additional Details:
+
+*UAP*
+
+* Initial Contact DTG: [redacted]
+* UAP Event Type: [redacted]
+* UAP Maneuverability Observations:
+* UAP Response to Observer Actions:
+* MDS Type / Asset Type: [redacted]
+* Tail Number: [redacted]
+* Friendly Aircraft Location: [redacted]
+* Friendly Aircraft Altitude/Depth: [redacted]
+* Friendly Aircraft Trajectory:
+* Observer Assessment of UAP:
+* Friendly Aircraft Speed: [redacted]
+* Observation Interrogation of UAP (yes/no; if yes list sensor(s) and returns)::
+* Third-party Observers and/or Reporters:
+* Friendly Aircraft State:
+* Training Range (If applicable):
+* Operational Range:
+* UAP First Seen Location: [redacted]
+* UAP Last Seen Location: [redacted]
+* UAP Altitude, Depth, Velocity, and Trajectory (indicate estimated or measured):
+* UAP Physical State: [redacted]
+* Number of UAP Sighted: [redacted]
+* UAP Propulsion Means:
+* UAP Payload:
+* UAP Under Intelligent Control (yes/no; if yes, describe):
+* UAP Signatures:
+* UAP Advanced Capabilities And/Or Materials (yes/no; if yes, describe): NO
+* UAP RF Frequency:
+* UAP RF Duration:
+* UAP Event Serial Number: -
+
+[redacted]
+[redacted]
+
+
+=== Page 7 (vision) ===
+
+[redacted (b)(1)1.4a]
+
+• UAP Effects on Persons:
+• UAP Objects/Material Recovered (yes/no; if yes, describe):
+• UAP Effects on Equipment:
+• Full Name:
+• Rank/Grade:
+• Email:
+• Phone Number (VOSIP/STE):
+
+GENTEXT/UAP
+
+• UAP Description (e.g., size, shape, color, markings, recognizable features): 4X UAP OBSERVED FLYING IN [redacted (b)(1)1.4a] FOV. CLOUD COVERAGE OBSTRUCTED [redacted (b)(1)1.4a] FROM FOLLOWING AND GETTING A CLEAR VISUAL. (SEE ISR 1).
+• Gentext (UAP Event Description): AT APPROX 1736Z 4 UAP WERE OBSERVED BENEATH [redacted (b)(1)1.4a] 1X UAP OBSERVED AT 17:36:22, 2X UAP OBSERVED SIDE BY SIDE AT 17:36:30, AND 1X UAP OBSERVED AT 17:36:49.
+
+[redacted (b)(1)1.4a]
+[redacted]

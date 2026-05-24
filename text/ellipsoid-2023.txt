@@ -1,0 +1,23 @@
+Ellipsoid Bronze Object — Composite Sketch + 3 FBI 302s
+=======================================================
+
+Agency: FBI
+Date: 2023-09-01
+Location: United States (test site)
+Type: Composite + 302 Interviews
+Source extraction: VISION · 1 pages
+
+---
+
+=== Page 1 (vision) ===
+
+**Document Title:** FBI September 2023 Sighting - Composite Sketch
+**Source File:** FBI September 2023 Sighting - Composite Sketch.pdf
+**Page:** 1 of 1
+**Agency:** FBI
+**Release Date:** 5/8/26
+**Dataset Description:** Incident date: 9/1/23; Incident location: United States
+
+---
+
+This page contains only an image (composite sketch).

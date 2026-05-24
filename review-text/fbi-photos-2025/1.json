@@ -1,0 +1,25 @@
+{
+  "eventId": "fbi-photos-2025",
+  "page": 1,
+  "best": "gemini",
+  "comparison": {
+    "computed_at": "2026-05-24T01:18:46.152Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gemini",
+    "agreement_score": 0.087,
+    "pairs": [
+      {
+        "a": "gemini",
+        "b": "gpt-vision",
+        "score": 0.087
+      }
+    ],
+    "confidence": "low",
+    "needs_review": true
+  },
+  "sources": {
+    "gemini": "**Document title:** FBI Photo B1\n**Source file:** FBI Photo B1.pdf\n**Page:** 1 of 1\n**Agency:** FBI\n**Release date:** 5/8/26\n**Dataset description:** Incident date: Late 2025; Incident location: Western United States\n\n\n[redacted]\n\n[Sensor overlay with central crosshair and horizontal scale markings: 15 | 10 | 5 | 0 | 5 | 10 | 15]\n\n[redacted]\n",
+    "gpt-vision": "(?)\n(?)                 (?)\n15   10   5   5   10   15\n(?)                 (?)\n(?)                 (?)\n12/31/99 18:11:19\n"
+  }
+}

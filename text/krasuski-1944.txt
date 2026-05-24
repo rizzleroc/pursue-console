@@ -5,106 +5,462 @@ Agency: FBI
 Date: 1944
 Location: Germany
 Type: Witness Interview
-Source extraction: VISION · 2 pages
+Source extraction: VISION · 15 pages
 
 ---
 
 === Page 1 (vision) ===
 
 FD-245 (REV. 1-21-80)
-Screened by NARA (RIF)
-11-19-2025 FOIA #
-#0290 DOCID: 34714592
+
+> Screened by NARA (RF)
+> 11-19-2025 FOIA #
+> 80290 DOCID: 34714592
+
 U. S. Department of Justice
-(?) MUST NOT BE REMOVED FROM OR ADDED TO THIS FILE)
-BUREAU
-of
-(?)TIGATION
-Declassification authority
-derived from FBI Automatic
-Declassification Guide,
-Issued May 24, 2007
-CLASSIFICATION NO.
-0100 26505
-Class / Case #
+
+> Declassification authority
+> Derived from FBI Automatic
+> Declassification Guide,
+> Issued May 24, 2007
+
+MUST NOT BE REMOVED FROM OR ADDED TO THIS FILE
+
+BUREAU of INVESTIGATION
+
+**FBI - CENTRAL RECORDS CENTER**
 DE - DETROIT
-Sub
-Vol.
-Serial #
-1
-1
-OPEN
-FBI - CENTRAL RECORDS CENTER
+Class / Case #: 0100 26505
+Sub: 1
+Vol.: 1
+Serial #:
 8/08/374524
-RRP000PJD9
-COPIED FOR FOIPA
-See also Nos.
-SERIALS
-REQUESTERS FULL NAME
-COMPUTER
-NUMBER
-DATE
-BY
-ALL
-Luarest, Michael R.
-245,974
-5-31-85
-Lee
+OPEN
+
+
+**Right Margin:**
+CLASSIFICATION NO.
+100-DE-26505
 Volume Number
 Serials
-90290
-d:34714592 Page 1
-Closed Section
+
+
+COPIED FOR FOIPA
+
+| SERIALS | REQUESTERS FULL NAME | COMPUTER NUMBER | DATE | BY |
+| :--- | :--- | :--- | :--- | :--- |
+| All | Charest, Michael R. | 245,974 | 5-31-85 | Dee |
+
+See also Nos.
+
+*Closed Section*
+
+NW 90290
+DocId:34714592 Page 1
+
+
+=== Page 2 (vision) ===
+
+Notes re: interview with WLADYSLAW KRASUSKI (rec'd 11/7/57(
+
+
+ALL INFORMATION CONTAINED on this envelope
+HEREIN IS UNCLASSIFIED
+DATE 5/22/85 BY SP-6 (?)
+(?)-26515-1(?)
+SEARCHED     INDEXED
+SERIALIZED   FILED
+NOV 18 1957
+FBI - DETROIT
+(?)
+NW 90290
+DocId:34714592 Page 2
+
+
+=== Page 3 (vision) ===
+
+Date Received 11/4/51
+From -
+(Name of Contributor)
+(Address of Contributor)
+By (?)
+(Name of Special Agent)
+To Be Returned    Yes ( )
+No (✓)
+Description:
+File No. 100-260505-1(?)
+ALL INFORMATION CONTAINED in this envelope
+HEREIN IS UNCLASSIFIED
+DATE 5/29/85 BY (?)
+Notes re interview w/
+WLADYSLAW KRASUSKI    11/7/51
+NW 90290
+DocId:34714592 Page 3
+
+
+=== Page 4 (vision) ===
+
+WA 27516 -        11/7/51
+5457 (?) Canyon
+Colby pd
+golden rule     min or 44
+golden is 45
+HOO
+50' water
+100'-150 drop
+50-55 min
+Boulder
+15
+44-45
+2 min
+Saltillo
+Golden
+55 min
+59
+ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 2/23/95 BY (?)
+NW 90290
+DocId:34714592 Page 4
+
+
+=== Page 5 (vision) ===
+
+NW 90290
+DocId:34714592 Page 5
+(?)
+Interview w/ WLADYSLAW KRASUSKI 11/7/57
+100-26505
+
+
+=== Page 6 (vision) ===
+
+Franciszek Grabowski
+NW 90290
+DocId:34714592 Page 6
+
+
+=== Page 7 (vision) ===
+
+Record Request
+FD-125 (5-27-55)
+[ ] Birth  [ ] Credit  [✓] Criminal  [ ] Motor Vehicle
+[ ] Death  [ ] Marriage*  [ ] INS
+To:
+Return to: Raisbaum
+File number 140-26305        Buded
+Name and aliases of subject, applicant or employee & spouse
+WLADYSLAW KRASUSKI
+aka WALTER "
+Addresses
+Residence 5457 (?) Canyon.
+Business Sample (?) Jewelry
+Former
+*Date and place of marriage
+(if pertinent)
+Race
+W
+Sex
+[✓] Male
+[ ] Female
+Birth date
+(?)
+Birthplace
+(?) FOIA(b)(6)
+Age        Height        Weight        Hair        Eyes
+Arrest Number        Fingerprint Classification
+Criminal Specialty
+Specific information desired
+any record
+(See reverse side for results of check)
+NW 90290
+DocId:34714592 Page 7
+
+
+=== Page 8 (vision) ===
+
+URGENT     11-6-57     5-40 PM     CS
+TO SAC, DETROIT
+FROM DIRECTOR        1P
+UNIDENTIFIED FLYING OBJECTS, IS-X.  MR. W. KIASUSKI, complainant
+5 4 5 7
+FIVE FOUR FIVE SEVEN JOS.  CAMPAU, DETROIT ELEVEN MICHIGAN,
+ADDRESSED LETTER DATED NOVEMBER FOURTH TO ROBERT CUTLER,
+WHO IS SPECIAL ASSISTANT TO THE PRESIDENT, STATING QUOTE I
+MIGHT HAVE SOME INFORMATION ABOUT THE ROCKET IN TEXAS.  I
+HEARD ABOUT IT ON THE POLISH RADIO PROGRAM.  I WOULD LIKE
+TO KNOW TO WHOM I COULD SPEAK TO.  UNQUOTE.  IMMEDIATELY
+INTERVIEW KIASUSKI FOR ANY INFORMATION HE MAY HAVE.  BUFILES
+REFLECT NO INFORMATION RE KIASUSKI.  SUTEL.
+ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 5/22/85 BY (?)
+END ACK PLS
+OK FBI DE JH
+SA Chicago/6-5457 RMR 11/6/57
+Name of Subject (?)
+(?)
+11/7/57
+(?)
+SEARCHED     INDEXED
+SERIALIZED   FILED
+NOV 6 1957
+FBI - DETROIT
+NW 90290
+DocId:34714592 Page 8
 
 
 === Page 9 (vision) ===
 
 Detroit 31, Michigan
-November 7,1957
+November 7, 1957
+
 ALL INFORMATION CONTAINED
 HEREIN IS UNCLASSIFIED
-DATE 3/20/15 BY (?)
+DATE 3/20/13 BY [illegible]
+
 UNIDENTIFIED FLYING OBJECTS
-In response to a letter directed by him to Mr.
-Robert Cutler, Special Assistant to President Dwight D.
-Eisenhower,reflecting that he "might have some information
-about the rocket in Texas," Wladyslaw Krasuski, 5457
-Joseph Campau, Detroit, was interviewed November 7, 1957,
-and furnished the following information:
-Born (?) in the State of (?), FOIA(b)(6)
-Krasuski was brought from Poland as a Prisoner of War to
-Gut Alt Golssen,approximately 30 miles east of Berlin, Germany,
-in May, 1942, where he remained until a few weeks after the
-end of World War II.  He spent the following years at the
-Displaced Persons Camps at Kork, Strasburg, Offenburg, Milheim
-and Freiburg, Germany.  He attended a radio technician school
-at Freiburg and for about a year was employed in a textile
-mill at Laurachbaden, Germany.  He arrived in the United
-States at New York, May 2, 1951, via the "S.S. General Stewart"
-as a Displaced Person, destined to the Reverend Father Petro
-Walkowiak, Hamtramck, Michigan; his alien registration number -
-(?)
-Since May, 1951, he has been employed at the Gobel
-Brewery, Detroit.
-News report of mysterious vehicle in Texas causing
-engines to stall prompted him to communicate with the
-United States Government concerning a similar phenomenon
-observed by him in 1944 in the area of Gut Alt Golssen.
-According to Krasuski, during 1944, month not recalled,
-while enroute to work in a field a short distance north of
-Gut Alt Golssen, their tractor engine stalled on a road through
-a swamp area.  No machinery or other vehicle was then visible
-although a noise was heard described as a high-pitched whine
-similar to that produced by a large electric generator.
+
+In response to a letter directed by him to Mr. Robert Cutler, Special Assistant to President Dwight D. Eisenhower, reflecting that he "might have some information about the rocket in Texas," Wladyslaw Krasuski, 5457 Joseph Campau, Detroit, was interviewed November 7, 1957, and furnished the following information:
+
+Born [redacted] in the State of [redacted] FOIA(b)(6)
+Krasuski was brought from Poland as a Prisoner of War to Gut Alt Golssen, approximately 30 miles east of Berlin, Germany, in May, 1942, where he remained until a few weeks after the end of World War II. He spent the following years at Displaced Persons Camps at Kork, Strasburg, Offenburg, Milheim and Freiburg, Germany. He attended a radio technician school at Freiburg and for about a year was employed in a textile mill at Laurachbaden, Germany. He arrived in the United States at New York, May 2, 1951, via the "S.S. General Stewart" as a Displaced Person, destined to the Reverend Father Petro Walkowiak, Hamtramck, Michigan; his alien registration number [redacted] (b)(6)
+
+Since May, 1951, he has been employed at the Gobel Brewery, Detroit.
+
+News report of mysterious vehicle in Texas causing engines to stall prompted him to communicate with the United States Government concerning a similar phenomenon observed by him in 1944 in the area of Gut Alt Golssen.
+
+According to Krasuski, during 1944, month not recalled, while enroute to work in a field a short distance north of Gut Alt Golssen, their tractor engine stalled on a road through a swamp area. No machinery or other vehicle was then visible although a noise was heard described as a high-pitched whine similar to that produced by a large electric generator.
+
 5 - Bureau (RM)
-① - Detroit (100-26505)
-ga CR:JLK
-(6)
-(?)
-M-26505-2
+1 - Detroit (100-26505)
+CR:JLK [handwritten signature]
+
+100-26505-2
+Searched [check]
+Serialized [check]
+Indexed [check]
+Filed [check]
+
+NW 90290
+DocId:34714592 Page 9
+
+
+=== Page 10 (vision) ===
+
+An "SS" guard appeared and talked briefly with the German
+driver of the tractor, who waited five to ten minutes,
+after which the noise stopped and the tractor engine was
+started normally.  Approximately 3 hours later in the same
+swamp area, but away from the road where the work crew was
+cutting "hay", he surreptitiously, because of the German
+in charge of the crew and "SS" guards in the otherwise deserted
+area, observed a circular enclosure approximately 100 to
+150 yards in diameter protected from viewers by a tarpaulin-
+type wall approximately 50 feet high, from which a vehicle
+was observed to slowly rise vertically to a height sufficient
+to clear the wall and then to move slowly horizontally a
+short distance out of his view, which was obstructed by
+nearby trees.
+                 This vehicle, observed from approximately
+500 feet, was described as circular in shape, 75 to 100
+yards in diameter, and about 14 feet high, consisting of
+dark gray stationary top and bottom sections, five to six
+feet high.  The approximate three foot middle section appeared
+to be a rapidly moving segment producing a continuous blur
+similar to an aeroplane propeller, but extending the cir-
+cumference of the vehicle so far as could be observed.  The
+noise emanating from the vehicle was similar but of somewhat
+lower pitch than the noise previously heard.  The engine of
+the tractor again stalled on this occasion and no effort
+was made by the German driver to start the engine until the
+noise stopped, after which the engine started normally.
+                Uninsulated metal, possibly copper,
+cables one and one-half inch to two inches in diameter, on
+and under the surface of the ground, in some places covered
+by water, were observed on this and previous occasions,
+apparently running between the enclosure and a small
+concrete column-like structure between the road and enclosure.
+                This area was not visited by Krasuski
+again until shortly after the end of World War II, when it
+was observed the cables had been removed and the previous
+locations of the concrete structure and the enclosure were
+covered by water.  Krasuski stated he has not been in
+communication since 1945 with any of the work crew of 16
+or 18 men, consisting of Russian, French and Polish POWs,
+who had discussed this incident among themselves many times.
+However, of these, Krasuski was able to recall by name
+only Franciszek Grabowski, no address known, described as
+then about 50 years of age and presumed by Krasuski to have
+returned to Poland after 1945.
+                          -2-
+NW 90290
+DocId:34714592 Page 10
+
+
+=== Page 11 (vision) ===
+
+This report is loaned to you by the FBI,
+and neither it nor its contents are to be distributed
+outside your agency.
+-3-
+NW 90290
+DocId:34714592 Page 11
+
+
+=== Page 12 (vision) ===
+
+11/7/57
+AIRTEL
+AMSD - RM
+TO:  DIRECTOR, FBI
+FROM:  SAC, DETROIT (100-26505)     ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 5/29/13 BY (?)
+UNIDENTIFIED FLYING OBJECTS; IS - X.
+Re Detroit Teletype to Bureau, 11/7/57, captioned "UNIDENTIFIED
+FLYING OBJECTS; IS - X."
+Interview of WLADYSLAW KRASUSKI, aka. WALTER KRASUSKI,
+reported in Blank Memo, five copies of which are enclosed
+herewith for the Bureau, was conducted by SA CASSIUS RATHBUN.
+No indication of irrational or otherwise abnormal behavior
+by KRASUSKI was observed during the interview.
+KRASUSKI advised that his communication was directed to Mr.
+ROBERT CUTLER rather than to President EISENHOWER after
+seeing Mr. CUTLER's picture and identification with the
+President's Office in a local paper.
+KRASUSKI resides with his wife, nee JOANN WISNIEWSKI,
+married in 1952 at Detroit, and four small children,in a
+single residence in an old Polish neighborhood at 5457 Jos.
+Campau Avenue, Detroit.  No previous record located in Detroit
+Indices identifiable with KRASUSKI or his wife.
+On 11/7/57, WILLIAM RECKNAGEL, Manager, advised IC PAUL DESMOND
+that records of the Mich. Merchants Credit Association, reflect
+only credit inquiries concerning WALTER KRASUSKI during 6/56
+and 3/57 and 6/57, which confirm his local address and employment.
+3 - Bureau (Encls.5)(RM)
+1 - Detroit
+(?) CR:JLK (?)
+(4)
+(?) CO (?) 100-26505-3
 Searched
 Serialized
 Indexed
 Filed
 NW 90290
-DocId:34714592 P
+DocId:34714592 Page 12
+
+
+=== Page 13 (vision) ===
+
+FD-36 (Rev. 3-13-56)
+F B I                                      Date: 11/7/57
+Transmit the following message via TELETYPE
+URGENT
+(Priority or Method of Mailing)
+TO:   DIRECTOR, FBI
+FROM: SAC, DETROIT
+UNIDENTIFIED FLYING OBJECTS; IS - X.
+REBUTEL NOV. SIX LAST.  WLAYSLAW KRASUSKI, AKA. WALTER KRASUSKI,
+(?) WAS
+GERMAN POW MAY, NINETEEN FORTY TWO, UNTIL SUMMER OF NINETEEN
+FORTY FIVE.  ARRIVED NY MAY TWO, NINETEEN FIFTY ONE, AS DP,
+AR NO. (?) KRASUSKI UPON
+INTERVIEW ADVISED THAT WHILE GERMAN POW DURING NINETEEN FORTY FOUR,
+OBSERVED A VEHICLE DESCRIBED AS CIRCULAR IN SHAPE, SEVENTY FIVE
+TO ONE HUNDRED YARDS IN DIAMETER, APPROXIMATELY FOURTEEN FEET
+HIGH.  THE VEHICLE WAS OBSERVED TO SLOWLY RISE VERTICALLY TO
+HEIGHTS SUFFICIENT TO CLEAR FIFTY FOOT WALL AND TO MOVE SLOWLY
+HORIZONTALLY A SHORT DISTANCE OUT OF VIEW OBSTRUCTED BY TREES.
+ENGINE OF TRACTOR FAILED TO OPERATE DURING THIS PERIOD AND ON
+ONE
+SEVERAL OTHER OCCASION WHEN HIGH PITCHED WHINLING NOISE HEARD
+IN AREA.  NO INDICATION OF MENTAL INSTABILITY DURING INTERVIEW.
+FURTHER DETAILS FOLLOW AMSD.
+WLS:JLK
+DE 100-26505
+(1)
+ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 4/30/83 BY (?)
+100-26505-4
+Approved:                         Sent H 55 M        Per WFH
+Scanned
+Serialized
+Indexed
+Filed
+NW 90290
+DocId:34714592 Page 13
+
+
+=== Page 14 (vision) ===
+
+The Oklahoma UFO Research Association
+Kerry Liesch, Director                                      Bob Stamps, Co-Director
+3539 N. W. 53rd                                             5024 N. W. 20th
+Oklahoma City, Oklahoma                                     Oklahoma City, Oklahoma
+October 2, 1966
+FBI OFFICE
+913 Federal Building
+Detroit, Michigan
+Dear Sirs:
+My organization would appreciate any information
+that you could send us on Unidentified Flying
+Objects, specifically those sightings in
+your area in early spring of this year.
+We will greatly appreciate any information that
+you could send us on this subject.  I thank you
+for your time and co-operation.
+Sincerely,
+Kerry Liesch  O
+Director, O.U.F.O.R.A.
+KKL/lw
+ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 4/19/95 BY (?)
+5 - (?) - 26505-5
+SEARCHED......INDEXED........
+SERIALIZED....FILED.........
+OCT 7 1966
+FBI — DETROIT
+NW 90290
+DocId:34714592 Page 14
+
+
+=== Page 15 (vision) ===
+
+Post Office Box 2118
+Detroit, Michigan 48231
+October 11, 1966
+Mr. Kerry Liesch
+Director
+The Oklahoma UFO
+Research Association
+3539 N.W. 53rd
+Oklahoma City, Oklahoma
+Dear Mr. Liesch:
+This is to acknowledge your letter of October 2,
+1966.
+Please be advised that this office does not have
+the information you have requested.  It is possible that
+the United States Air Force, Wright-Patterson Air Force
+Base, Dayton, Ohio, may be the proper agency to contact.
+Very truly yours,
+(?)
+Paul H. Stoddard
+Special Agent in Charge
+1-Addressee
+1-Detroit (100-26505)
+IRA:frg
+(2)
+(?)
+ALL INFORMATION CONTAINED
+HEREIN IS UNCLASSIFIED
+DATE 9/15/09 BY (?)
+100 26505-6
+SEARCHED
+SERIALIZED (?)
+INDEXED
+FILED (?)
+NW 90290
+DocId:34714592 Page 15

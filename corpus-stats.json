@@ -1,223 +1,791 @@
 {
-  "generatedAt": "2026-05-21T16:13:05.930Z",
+  "generatedAt": "2026-05-24T01:18:49.200Z",
   "pressReleaseClaim": 162,
   "inventory": {
-    "total": 173,
-    "enumerated": 169,
-    "placeholders": 0,
-    "pdfs": 169,
+    "total": 162,
+    "enumerated": 123,
+    "placeholders": 34,
+    "pdfs": 123,
     "videos": 0,
     "images": 0,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 121,
+    "catalogued": 128,
     "withPdfDownloaded": 0,
-    "withAnyPages": 15,
-    "withVisionPages": 12,
-    "fullyVision": 11
+    "withAnyPages": 65,
+    "withVisionPages": 65,
+    "fullyVision": 63
   },
   "pages": {
-    "totalKnown": 38,
-    "totalIndexed": 56,
-    "vision": 38,
-    "ocrOnly": 0,
+    "totalKnown": 3394,
+    "totalIndexed": 3394,
+    "vision": 3390,
+    "ocrOnly": 4,
     "visualsAnnotated": 0,
-    "totalChars": 55198
+    "totalChars": 7028845
   },
   "bySource": {
-    "gemini": 0,
-    "gptVision": 38,
+    "gemini": 3370,
+    "claude": 0,
+    "gptVision": 446,
     "human": 0,
-    "ocr": 0,
-    "pagesWithMultipleSources": 0
+    "ocr": 693,
+    "pagesWithMultipleSources": 426
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 38,
-    "gemini": 0,
-    "ocr": 0
+    "gptVision": 437,
+    "gemini": 2953,
+    "claude": 0,
+    "ocr": 4
   },
   "contributions": {
-    "total": 56,
+    "total": 55,
     "contributors": [
       {
         "handle": "Rizzleroc",
-        "pages": 56,
-        "chars": 57917
+        "pages": 55,
+        "chars": 53955
       }
     ]
   },
   "runs": {
     "last": {
-      "ts": "2026-05-21T16:13:05.930Z",
+      "ts": "2026-05-24T01:18:49.200Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 53,
-      "note": "events=121 inventory=173 contributions=56"
+      "duration_ms": 3361,
+      "note": "events=128 inventory=162 contributions=55"
     },
     "recent": [
       {
-        "ts": "2026-05-21T16:13:05.930Z",
+        "ts": "2026-05-24T01:18:49.200Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 53,
-        "note": "events=121 inventory=173 contributions=56"
+        "duration_ms": 3361,
+        "note": "events=128 inventory=162 contributions=55"
       },
       {
-        "ts": "2026-05-21T16:02:49.558Z",
+        "ts": "2026-05-24T01:16:12.173Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 56,
-        "note": "events=121 inventory=173 contributions=56"
+        "duration_ms": 3157,
+        "note": "events=128 inventory=162 contributions=55"
+      },
+      {
+        "ts": "2026-05-22T22:52:24.540Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 6519,
+        "note": "events=121 inventory=162 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T14:25:28.144Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 947,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:50:25.393Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1063,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:49:19.244Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1099,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:47:26.197Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1141,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:25:57.384Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2163,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:10:49.594Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1123,
+        "note": "events=121 inventory=173 contributions=54"
+      },
+      {
+        "ts": "2026-05-20T11:08:39.831Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 1079,
+        "note": "events=121 inventory=173 contributions=54"
       }
     ]
   },
   "gap": {
-    "uncataloguedRecords": 52,
-    "cataloguedButNoPages": 106,
-    "partialOcrNeedsVision": 0
+    "uncataloguedRecords": 34,
+    "cataloguedButNoPages": 63,
+    "partialOcrNeedsVision": 2
   },
   "review": {
-    "pagesNeedingReview": 0,
-    "pagesHighConfidence": 0,
-    "pagesMediumConfidence": 0,
-    "pagesLowConfidence": 0,
-    "topEventsByReviewQueue": [],
-    "reevaluated": 0,
-    "resolvedByPromptStandard": 0,
+    "pagesNeedingReview": 1,
+    "pagesHighConfidence": 389,
+    "pagesMediumConfidence": 36,
+    "pagesLowConfidence": 1,
+    "topEventsByReviewQueue": [
+      {
+        "event_id": "fbi-photos-2025",
+        "n": 1
+      }
+    ],
+    "reevaluated": 22,
+    "resolvedByPromptStandard": 3,
     "pageIntrinsicDisputes": 0,
     "partialImprovementByReeval": 0
   },
   "sourceQuality": {},
   "byEvent": {
     "1949-discs": {
-      "pages": 13,
-      "chars": 0,
-      "sources": [],
-      "dominantBest": null,
+      "pages": 143,
+      "chars": 151359,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-10": {
-      "pages": 4,
-      "chars": 11990,
+      "pages": 182,
+      "chars": 704374,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-2": {
-      "pages": 1,
-      "chars": 533,
+      "pages": 194,
+      "chars": 229753,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-3": {
-      "pages": 3,
-      "chars": 1573,
+      "pages": 189,
+      "chars": 310687,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-4": {
+      "pages": 212,
+      "chars": 381909,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-5": {
-      "pages": 1,
-      "chars": 519,
+      "pages": 209,
+      "chars": 258176,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-6": {
-      "pages": 4,
-      "chars": 2794,
+      "pages": 270,
+      "chars": 405501,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-7": {
-      "pages": 4,
-      "chars": 10569,
+      "pages": 205,
+      "chars": 403984,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-8": {
+      "pages": 217,
+      "chars": 279802,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-section-9": {
+      "pages": 288,
+      "chars": 350372,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-130": {
+      "pages": 126,
+      "chars": 1206293,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-153": {
+      "pages": 9,
+      "chars": 2075,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-serial-164": {
-      "pages": 1,
-      "chars": 1249,
+      "pages": 137,
+      "chars": 138248,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-220": {
+      "pages": 15,
+      "chars": 17731,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-403": {
+      "pages": 3,
+      "chars": 4706,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-438": {
+      "pages": 40,
+      "chars": 38296,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "65-hs1-834228961-62-hq-83894-serial-449": {
+      "pages": 18,
+      "chars": 400139,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-sub-a": {
-      "pages": 1,
-      "chars": 1359,
+      "pages": 124,
+      "chars": 277385,
       "sources": [
+        "gemini",
         "gpt-vision"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "africa-2025": {
+      "pages": 7,
+      "chars": 718,
+      "sources": [
+        "gemini",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "amc-1947": {
-      "pages": 10,
-      "chars": 13383,
+      "pages": 28,
+      "chars": 37648,
       "sources": [
-        "gpt-vision"
+        "gemini",
+        "gpt-vision",
+        "ocr"
       ],
       "dominantBest": "gpt-vision",
       "needsReview": 0
     },
-    "fbi-62hq83894": {
-      "pages": 1,
-      "chars": 366,
+    "apollo-11": {
+      "pages": 11,
+      "chars": 12787,
       "sources": [
-        "gpt-vision"
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "apollo-12": {
+      "pages": 4,
+      "chars": 6487,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "apollo-17": {
+      "pages": 16,
+      "chars": 24238,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "arabian-gulf-2020": {
+      "pages": 7,
+      "chars": 6829,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "azerbaijan-1955": {
+      "pages": 10,
+      "chars": 51887,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "cometa": {
+      "pages": 94,
+      "chars": 308982,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "detroit-1958": {
+      "pages": 1,
+      "chars": 1665,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "ellipsoid-2023": {
+      "pages": 1,
+      "chars": 778,
+      "sources": [
+        "gemini",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "fbi-62hq83894": {
+      "pages": 185,
+      "chars": 232724,
+      "sources": [
+        "gemini",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "fbi-photos-2025": {
+      "pages": 1,
+      "chars": 722,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 1
+    },
+    "gemini-7": {
+      "pages": 4,
+      "chars": 4479,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
       ],
       "dominantBest": "gpt-vision",
       "needsReview": 0
     },
     "general-1948": {
+      "pages": 28,
+      "chars": 31074,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "georgia-2001": {
+      "pages": 5,
+      "chars": 9458,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "greece-jan-2024": {
+      "pages": 7,
+      "chars": 10326,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "greece-oct-2023": {
+      "pages": 7,
+      "chars": 9250,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "gulf-aden-jul-2024": {
+      "pages": 8,
+      "chars": 10855,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "gulf-aden-sept-2020": {
       "pages": 1,
-      "chars": 0,
-      "sources": [],
-      "dominantBest": null,
+      "chars": 3542,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "incident-summaries": {
+      "pages": 209,
+      "chars": 228786,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "indopacom-april-2025": {
       "pages": 2,
-      "chars": 0,
-      "sources": [],
-      "dominantBest": null,
+      "chars": 1251,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "iraq-dec-2022": {
+      "pages": 6,
+      "chars": 8160,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "iraq-may-2022": {
+      "pages": 6,
+      "chars": 7910,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "iraq-may-29-2022": {
+      "pages": 9,
+      "chars": 13785,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "iraq-sept-2024": {
+      "pages": 6,
+      "chars": 219165,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "kazakhstan-1994": {
+      "pages": 3,
+      "chars": 4098,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     },
     "krasuski-1944": {
-      "pages": 4,
-      "chars": 2635,
+      "pages": 15,
+      "chars": 16132,
       "sources": [
-        "gpt-vision"
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "kuwait-may-2022": {
+      "pages": 1,
+      "chars": 698,
+      "sources": [
+        "gemini",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "mexico-2003": {
+      "pages": 7,
+      "chars": 13562,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "middle-east-may-2020": {
+      "pages": 1,
+      "chars": 3642,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "netherlands-1948": {
+      "pages": 7,
+      "chars": 9141,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gpt-vision",
+      "needsReview": 0
+    },
+    "papua-1985": {
+      "pages": 3,
+      "chars": 2983,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "presidential-1963": {
+      "pages": 6,
+      "chars": 12963,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
       ],
       "dominantBest": "gpt-vision",
       "needsReview": 0
     },
     "shaef-1945": {
-      "pages": 6,
-      "chars": 8228,
+      "pages": 17,
+      "chars": 23699,
       "sources": [
-        "gpt-vision"
+        "gemini",
+        "gpt-vision",
+        "ocr"
       ],
-      "dominantBest": "gpt-vision",
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "skylab": {
+      "pages": 11,
+      "chars": 12012,
+      "sources": [
+        "gemini",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "southern-us-2020": {
+      "pages": 6,
+      "chars": 8798,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "state-1952": {
+      "pages": 6,
+      "chars": 12971,
+      "sources": [
+        "gemini",
+        "gpt-vision",
+        "ocr"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "syria-2016": {
+      "pages": 1,
+      "chars": 2023,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "syria-feb-2023": {
+      "pages": 10,
+      "chars": 13676,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "syria-july-2022": {
+      "pages": 7,
+      "chars": 13088,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "syria-nov-2023": {
+      "pages": 10,
+      "chars": 13928,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "syria-oct-2024": {
+      "pages": 10,
+      "chars": 14423,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "turkmenistan-2004": {
+      "pages": 5,
+      "chars": 8407,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "uae-june-2024": {
+      "pages": 8,
+      "chars": 11558,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "uae-oct-2023": {
+      "pages": 9,
+      "chars": 12800,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "usper-2025": {
+      "pages": 3,
+      "chars": 7685,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
+      "needsReview": 0
+    },
+    "western-us-2023": {
+      "pages": 4,
+      "chars": 6262,
+      "sources": [
+        "gemini"
+      ],
+      "dominantBest": "gemini",
       "needsReview": 0
     }
   }

@@ -5,9 +5,4076 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 1 pages
+Source extraction: VISION · 137 pages
 
 ---
+
+=== Page 1 (vision) ===
+
+[Top Right Label]
+62-HQ-83894
+Serials EBF 164
+[Barcode: 62-HQ-83894-EBF 164]
+EBF
+[Handwritten red cross]
+
+[Center Left Label]
+FBI - CENTRAL RECORDS CENTER
+DO NOT DESTROY
+[Handwritten: 002087]
+HQ - HEADQUARTERS
+
+| Class / Case # | Sub | Vol. | Serial # |
+| :--- | :--- | :--- | :--- |
+| 0062 83894 | | 1 | 164 |
+
+ONLY
+[Barcode: 8/11/1274166]
+RRP003IXG8
+
+[Handwritten/Stamped]
+DO NOT DESTROY
+FOIPA # 1142292
+
+[Handwritten vertically]
+62-83894-164
+
+[Bottom Right]
+ENCL BEHIND FILE
+
+[Bottom Center Box]
+Declassification authority derived from FBI Automatic Declassification Guide, issued May 24, 2007.
+
+
+=== Page 2 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+[Handwritten note in left margin]:
+additional
+copies
+behind file
+
+62-83894-164
+ENCLOSURE
+
+RESTRICTED                                                                                                   C9-4892,AF
+
+
+=== Page 3 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 4 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets that may account for
+
+
+=== Page 5 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+
+
+=== Page 6 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 7 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                     RESTRICTED
+
+
+=== Page 8 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+   a. Object.
+   b. Surrounding terrain where observed.
+   c. Place where it contacted earth (if this happened).
+   d. Maneuvers.
+   e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 9 (vision) ===
+
+RESTRICTED
+
+[This page is blank]
+
+RESTRICTED
+
+
+=== Page 10 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892,AF
+
+65-83894-164
+
+
+=== Page 11 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                                                    RESTRICTED
+
+
+=== Page 12 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5
+
+
+=== Page 13 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Showed thru cloud.
+13. Lights.
+
+
+=== Page 14 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+                                Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+                                      RESTRICTED                                                                    - 5 -
+
+
+=== Page 15 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                     RESTRICTED
+
+
+=== Page 16 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+   a. Object.
+   b. Surrounding terrain where observed.
+   c. Place where it contacted earth (if this happened).
+   d. Maneuvers.
+   e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+C. P. Cabell
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 17 (vision) ===
+
+RESTRICTED
+
+[illegible]
+
+RESTRICTED
+
+
+=== Page 18 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65- 83894-164
+
+
+=== Page 19 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 20 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (
+
+
+=== Page 21 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Showed thru cloud.
+13
+
+
+=== Page 22 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 23 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                     RESTRICTED
+
+
+=== Page 24 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 25 (vision) ===
+
+RESTRICTED
+
+[This page is blank]
+
+RESTRICTED
+
+
+=== Page 26 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED
+
+C9-4892, AF
+
+65-83894-164 [Handwritten]
+
+
+=== Page 27 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 28 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+
+4. Number of objects.
+   Formation type (if any), sketch if possible.
+
+5. Observable celestial phenomena or
+
+
+=== Page 29 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on
+
+
+=== Page 30 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 31 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 32 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+   a. Object.
+   b. Surrounding terrain where observed.
+   c. Place where it contacted earth (if this happened).
+   d. Maneuvers.
+   e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 33 (vision) ===
+
+RESTRICTED
+
+[Blank page]
+
+RESTRICTED
+
+
+=== Page 34 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65- 83894-164
+
+
+=== Page 35 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 36 (vision) ===
+
+<center>RESTRICTED</center>
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets
+
+
+=== Page 37 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d.
+
+
+=== Page 38 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 39 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                         RESTRICTED
+
+
+=== Page 40 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+   a. Object.
+   b. Surrounding terrain where observed.
+   c. Place where it contacted earth (if this happened).
+   d. Maneuvers.
+   e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 41 (vision) ===
+
+RESTRICTED
+
+[Page is blank]
+
+RESTRICTED
+
+
+=== Page 42 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65-83894-164
+
+
+=== Page 43 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 44 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+
+4. Number of objects.
+   Formation type (if any), sketch
+
+
+=== Page 45 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on
+
+
+=== Page 46 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+                                    Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+                                    RESTRICTED                                          - 5 -
+
+
+=== Page 47 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                     RESTRICTED
+
+
+=== Page 48 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+
+a. Object.
+
+b. Surrounding terrain where observed.
+
+c. Place where it contacted earth (if this happened).
+
+d. Maneuvers.
+
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 49 (vision) ===
+
+RESTRICTED
+
+[illegible handwritten mark]
+
+RESTRICTED
+
+
+=== Page 50 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED
+C9-4892, AF
+
+63- 83894-164
+
+
+=== Page 51 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 52 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+   Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets that may account for the sighting. (
+
+
+=== Page 53 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Showed thru cloud.
+13
+
+
+=== Page 54 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 55 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 56 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 57 (vision) ===
+
+RESTRICTED
+
+[Blank page]
+
+RESTRICTED
+
+
+=== Page 58 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED
+
+C9-4892, AF
+
+65-83894-164
+
+
+=== Page 59 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 60 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+   Formation type (if any),
+
+
+=== Page 61 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Show
+
+
+=== Page 62 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+**Relative to the Observer**
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 63 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 64 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+   a. Object.
+   b. Surrounding terrain where observed.
+   c. Place where it contacted earth (if this happened).
+   d. Maneuvers.
+   e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 65 (vision) ===
+
+RESTRICTED
+
+[Blank]
+
+RESTRICTED
+
+
+=== Page 66 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65- 83894-164
+
+
+=== Page 67 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                                                    RESTRICTED
+
+
+=== Page 68 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+
+
+=== Page 69 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+
+
+=== Page 70 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 71 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                         RESTRICTED
+
+
+=== Page 72 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 73 (vision) ===
+
+RESTRICTED
+
+[Blank space]
+
+RESTRICTED
+
+
+=== Page 74 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65-83894-164
+
+
+=== Page 75 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 76 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+   Formation type (if any), sketch if possible.
+
+
+=== Page 77 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected
+
+
+=== Page 78 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 79 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 80 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 81 (vision) ===
+
+RESTRICTED
+
+[Page is mostly blank]
+
+RESTRICTED
+
+
+=== Page 82 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+63- 83894-164
+
+
+=== Page 83 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 84 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets
+
+
+=== Page 85 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Showed thru cloud.
+13
+
+
+=== Page 86 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+                                Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 87 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180º), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 88 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 89 (vision) ===
+
+RESTRICTED
+
+[Blank]
+
+RESTRICTED
+
+
+=== Page 90 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65-83894-164
+
+
+=== Page 91 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information on this subject.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 92 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+
+4. Number of objects.
+Formation type (if any),
+
+
+=== Page 93 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Showed thru cloud.
+
+
+=== Page 94 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+                                    Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 95 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 96 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+
+a. Object.
+
+b. Surrounding terrain where observed.
+
+c. Place where it contacted earth (if this happened).
+
+d. Maneuvers.
+
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+C. P. Cabell
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 97 (vision) ===
+
+RESTRICTED
+
+[The remainder of the page is blank]
+
+RESTRICTED
+
+
+=== Page 98 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED
+C9-4892,AF
+
+65- 83894-164
+
+
+=== Page 99 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                                                    RESTRICTED
+
+
+=== Page 100 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets that may account for the sighting
+
+
+=== Page 101 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d.
+
+
+=== Page 102 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                      - 5 -
+
+
+=== Page 103 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                    RESTRICTED
+
+
+=== Page 104 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 105 (vision) ===
+
+RESTRICTED
+
+[Page is blank]
+
+RESTRICTED
+
+
+=== Page 106 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65-83894-164
+
+
+=== Page 107 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 108 (vision) ===
+
+RESTRICTED
+
+b. Air
+   (1) Type aircraft, speed, altitude, direction of flight.
+   (2) Distance and direction from city, town or known landmark.
+   (3) Clock position of object from observer's aircraft.
+   (4) Latitude and longitude.
+c. Sea
+   (1) Latitude and longitude.
+   (2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+   Formation type (if any), sketch if possible.
+5. Observable celestial phenomena or planets that may
+
+
+=== Page 109 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+
+12. Effect on clouds.
+    a. Opened path thru clouds.
+    b. Forced cloud or mists.
+    c. Reflected on cloud.
+    d. Showed thru cloud.
+
+13
+
+
+=== Page 110 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 111 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 - RESTRICTED
+
+
+=== Page 112 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Handwritten signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 113 (vision) ===
+
+RESTRICTED
+
+[The remainder of the page is blank]
+
+RESTRICTED
+
+
+=== Page 114 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65- 83894-164
+
+
+=== Page 115 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 116 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+
+4. Number of objects.
+Formation type (if any), sketch
+
+
+=== Page 117 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c.
+
+
+=== Page 118 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+<center><u>Relative to the Observer</u></center>
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 119 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+<u>Relative to Radar Sightings</u>
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                                                         RESTRICTED
+
+
+=== Page 120 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 121 (vision) ===
+
+RESTRICTED
+
+[Blank]
+
+RESTRICTED
+
+
+=== Page 122 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65-83894-164
+
+
+=== Page 123 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+
+2. Time of sighting (zonal by 24 hr. clock).
+
+3. Where sighted (observer's position):
+
+a. Ground
+
+(1) City, town.
+
+(2) Distance and direction from city or town, road, intersection, etc.
+
+(3) From building (story), yard, etc.
+
+(4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
 
 === Page 124 (vision) ===
 
@@ -73,3 +4140,409 @@ a. Color of smoke.
 'b. Length and width.
 
 RESTRICTED - 3 -
+
+
+=== Page 125 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+
+
+=== Page 126 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 127 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+**Relative to Radar Sightings**
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+**GENERAL**
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 -                                     RESTRICTED
+
+
+=== Page 128 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 129 (vision) ===
+
+RESTRICTED
+
+[Blank page with faint, illegible markings]
+
+RESTRICTED
+
+
+=== Page 130 (vision) ===
+
+RESTRICTED
+
+DEPARTMENT OF THE AIR FORCE
+HEADQUARTERS UNITED STATES AIR FORCE
+DIRECTORATE OF INTELLIGENCE
+WASHINGTON 25, D. C.
+
+15 February 1949
+
+AIR INTELLIGENCE REQUIREMENTS
+MEMORANDUM NUMBER 4
+
+UNCONVENTIONAL AIRCRAFT
+
+PART I - GENERAL
+
+1. PURPOSE
+
+The purpose of this memorandum is twofold:
+
+a. To enunciate continuing Air Force requirements for information pertaining to sightings of unconventional aircraft and unidentified flying objects, including the so-called "Flying Discs."
+
+b. To establish procedures for reporting such information.
+
+2. RESCISSION
+
+Department of the Army Collection Memorandum Number 7, dated 21 January 1948, and letter, CSGID 425.1, dated 25 March 1948, both subject as above, which have been transferred to Air Force agencies for action, are herewith superseded.
+
+3. REPORTING
+
+a. General
+
+(1) As complete an answer to the requirements enunciated in Part II, as may be procurable, should be dispatched by means of electrical transmission immediately after sightings.
+
+(2) Supplementary reports should be forwarded as available by the most expeditious means consistent with the importance of the information reported.
+
+b. Major Air Commands (Overseas) and Air Attaches
+
+(1) Initial and supplementary cabled reports will be transmitted to the Director of Intelligence, Headquarters United States Air Force. Cables will contain the phase, "Pass to COMGENAMC WRIGHT-PATTERSON AFB, DAYTON, OHIO, ATTN: MCIAXO-3."
+
+RESTRICTED                                                                    C9-4892, AF
+
+65- 83894-164
+
+
+=== Page 131 (vision) ===
+
+RESTRICTED
+
+(2) Supplementary written reports, prepared on AF Form 112, will be forwarded to the Director of Intelligence, Headquarters United States Air Force.
+
+(3) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (overseas) and organizations under their control in connection with the development of information on this subject.
+
+c. Major Air Commands (ZI)
+
+(1) Reports will be forwarded direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3 by installations receiving information pertaining to the requirements enunciated in Part II.
+
+(2) Copies of such reports may be supplied the Command Headquarters of the installation concerned.
+
+(3) A copy of all reports sent to Air Materiel Command in accordance with these instructions will be forwarded at the same time to the Director of Intelligence, Headquarters United States Air Force.
+
+(4) Written reports will be submitted on AF Form 112.
+
+(5) Commanding General, Air Materiel Command is authorized direct contact with major Air Commands (ZI) and organizations under their control in connection with the development of information on this subject.
+
+d. Non-Air Force Agencies
+
+(1) Addressees other than those of the United States Air Force are requested to forward reports direct to the Commanding General, Air Materiel Command, Wright-Patterson Air Force Base, Dayton, Ohio, Attn: MCIAXO-3.
+
+(2) In order to reduce the time factor involved in transmission of this type of information it is requested that, wherever communications facilities permit, subordinate elements be authorized to communicate reports direct to the Commanding General, Air Materiel Command.
+
+PART II - REQUIREMENTS
+
+General
+
+1. Date of sighting.
+2. Time of sighting (zonal by 24 hr. clock).
+3. Where sighted (observer's position):
+   a. Ground
+      (1) City, town.
+      (2) Distance and direction from city or town, road, intersection, etc.
+      (3) From building (story), yard, etc.
+      (4) Map coordinates (if feasible) showing latitude and longitude.
+
+- 2 -                                     RESTRICTED
+
+
+=== Page 132 (vision) ===
+
+RESTRICTED
+
+b. Air
+(1) Type aircraft, speed, altitude, direction of flight.
+(2) Distance and direction from city, town or known landmark.
+(3) Clock position of object from observer's aircraft.
+(4) Latitude and longitude.
+c. Sea
+(1) Latitude and longitude.
+(2) Proximity to land. (Name city, country, etc.)
+4. Number of objects.
+Formation type (if any), sketch if possible
+
+
+=== Page 133 (vision) ===
+
+RESTRICTED
+
+c. Odor (if any).
+d. Rate of evaporation.
+e. Does trail vary with sound? (spurts)
+12. Effect on clouds.
+a. Opened path thru clouds.
+b. Forced cloud or mists.
+c. Reflected on cloud.
+d. Show
+
+
+=== Page 134 (vision) ===
+
+RESTRICTED
+
+17. Air ducts.
+    a. Slots.
+    b. Duct openings.
+18. Speed - M.P.H.
+19. Sound.
+    a. Continuous whine or buzz.
+    b. Roar, whistle, whoosh.
+    c. Intermittent.
+20. Manner of disappearance.
+    a. Explode.
+        (1) Possibility of fragments.
+        (2) Other physical evidence.
+    b. Faded from view.
+    c. Disappeared behind obstacle.
+
+Relative to the Observer
+
+1. Name of observer.
+2. Address.
+3. Occupation.
+4. Place of business.
+    a. Employer or employee.
+5. Pertinent hobbies.
+    a. Is observer amateur astronomer, pilot, engineer, etc.
+    b. Length of time engaged in hobby (experience).
+6. Ability to determine:
+    a. Color.
+    b. Speed of moving objects.
+    c. Size at distance.
+7. Reliability of observer.
+    a. Sources.
+
+RESTRICTED                                                                    - 5 -
+
+
+=== Page 135 (vision) ===
+
+RESTRICTED
+
+(1) Neighbors.
+(2) Police Dept.
+(3) FBI records.
+(4) Employer.
+8. Notes relative to observer on:
+a. Sightings in general.
+b. How attention was drawn to object(s).
+(1) Sound.
+(2) Motion.
+(3) Glint of light.
+c. Degree of fatigue and duration of flight at time of sighting in cases where observer is airborne.
+
+9. Witnesses.
+a. Addressees.
+b. Occupation.
+c. Reliability.
+
+10. Comments of interrogator regarding the intelligence and character of person interrogated.
+
+Relative to Radar Sightings
+
+1. Re radars operating on ground.
+a. Observations of range, speed, altitude and size of target.
+b. Did target executive any turns? If so, what angle (180°), etc. and what radius of turn. If radius of turn is not observable, how long did the target stay in the turn and what was its speed?
+c. Note particularly any separation of distant target into several targets upon approach. Track all if possible.
+
+2. If airborne when object sighted.
+a. Were there any radar inductions or extra noise on radio circuits?
+b. Give estimates of size, speed, maneuvers, etc.
+
+GENERAL
+
+1. Teletype sequences of local weather conditions.
+2. Winds aloft report.
+
+- 6 - RESTRICTED
+
+
+=== Page 136 (vision) ===
+
+RESTRICTED
+
+3. Local flight schedules of commercial, private and military aircraft flying in vicinity at the time. (Check Canadian activity if close to that border.)
+
+4. Possible releases of testing devices in vicinity sent aloft by Ordnance, Navy, Air Force, Army, Weather Units, Research Organizations or any other.
+
+5. If object contacted earth, obtain soil samples within and without depression or spot where object landed (and then presumably departed) for purpose of making comparison of soils.
+
+6. If object came sufficiently near other aircraft or known objects check surfaces with Geiger counters for possible radioactivity. Make comparisons with other unaffected aircraft objects, etc.
+
+7. Obtain photographs (or original negatives) where available; if not, secure sketches of:
+a. Object.
+b. Surrounding terrain where observed.
+c. Place where it contacted earth (if this happened).
+d. Maneuvers.
+e. Formation if objects were more than two.
+
+8. Secure signed statement.
+
+9. Obtain fragments or physical evidence where possible.
+
+10. Was any radio antenna to be observed, i.e., (any projections or extentions that might presumably be construed as such).
+
+[Signature: C. P. Cabell]
+C. P. CABELL
+Major General, USAF
+Director of Intelligence, Office of
+Deputy Chief of Staff, Operations
+
+DISTRIBUTION:
+Commanding Generals, Major Air Commands,
+ZI and Overseas
+All United States Air Attaches
+
+Director of Central Intelligence
+Special Assistant for Research and Intelligence,
+Department of State
+Director of Intelligence, GSUSA
+Chief of Naval Intelligence
+Commandant (INT), United States Coast Guard
+Director, Federal Bureau of Investigation
+
+RESTRICTED
+- 7 -
+
+
+=== Page 137 (vision) ===
+
+RESTRICTED
+
+[Blank space]
+
+RESTRICTED
