@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { pipeline, env } from "@huggingface/transformers";
-import { EVENTS, AGENCY_COLORS } from "../data/events.js";
+import { EVENTS, AGENCY_COLORS, RELEASES_LABEL } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
 import { highlightQuery } from "../lib/highlightQuery.jsx";
@@ -455,7 +455,7 @@ export default function SemanticSearchView({ onSelect, headerFilters }) {
         {/* REPO SCOPE */}
         <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 font-mono text-[11px]">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
-            <div className="text-emerald-700 tracking-widest text-[9px]">▌ REPOSITORY SCOPE — RELEASE 01</div>
+            <div className="text-emerald-700 tracking-widest text-[9px]">▌ REPOSITORY SCOPE — {RELEASES_LABEL.toUpperCase()}</div>
             {coverage.droppedDocs > 0 && (
               <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">CLEAR DROPPED ({coverage.droppedDocs})</button>
             )}

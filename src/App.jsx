@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
-import { EVENTS } from "./data/events.js";
+import { EVENTS, RELEASES_LABEL } from "./data/events.js";
 
 // Global handle for cross-view event lookups (MediaView, ReviewView use
 // this when their deep-link buttons only have eid + title, but the
@@ -199,7 +199,7 @@ export default function App() {
         {showFooter ? (
           <footer className="border-t border-emerald-700/30 mt-10 px-3 sm:px-8 py-6">
             <div className="font-mono text-[9px] text-emerald-700 tracking-widest space-y-1">
-              <div>▌ SOURCE: WAR.GOV/UFO RELEASE 01 // CLEARED MAY 8, 2026</div>
+              <div>▌ SOURCE: WAR.GOV/UFO {RELEASES_LABEL.toUpperCase()} // CLEARED MAY 8 + MAY 22, 2026</div>
               <div>▌ ALL CASES UNRESOLVED — GOVERNMENT UNABLE TO MAKE DEFINITIVE DETERMINATION</div>
               <div>▌ INTERAGENCY: WHITE HOUSE / ODNI / DOE / AARO / NASA / FBI / DOW</div>
             </div>
@@ -207,7 +207,7 @@ export default function App() {
         ) : (
           <footer className="border-t border-emerald-900/30 mt-6 px-3 sm:px-8 py-3 text-center">
             <span className="font-mono text-[9px] text-emerald-800 tracking-widest">
-              ▌ war.gov/UFO · release 02 incoming · release 01 catalogued
+              ▌ war.gov/UFO · {RELEASES_LABEL.toLowerCase()} catalogued
             </span>
           </footer>
         )}
