@@ -3,11 +3,11 @@
 ![PURSUE Console](./public/og-card.png)
 
 > **An open, community-built investigation desk for the [war.gov/UFO](https://www.war.gov/UFO) disclosure.**
-> *Department of War — Release 01: May 8 2026 (173 records) · Release 02: May 22 2026 (second tranche). All cases UNRESOLVED.*
+> *Department of War — Release 01: May 8 2026 (162 records) · Release 02: May 22 2026 (64 records, 6/64 mirrored). All cases UNRESOLVED.*
 
 > [!NOTE]
 > **Two different things are called "Release 2" — they are unrelated.**
-> - **war.gov's releases** are the government's UAP document tranches, published on [war.gov/UFO](https://www.war.gov/UFO) under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters) on a rolling basis: **Release 01** dropped **May 8 2026** (173 records); the **Second Release (Release 02)** dropped **May 22 2026** — 40+ videos, NASA mission audio, and D-series military encounter reports.
+> - **war.gov's releases** are the government's UAP document tranches, published on [war.gov/UFO](https://www.war.gov/UFO) under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters) on a rolling basis: **Release 01** dropped **May 8 2026** (162 records after upstream-manifest dedup); the **Second Release (Release 02)** dropped **May 22 2026** — 64 records (6 PDFs + 51 videos + 7 audio). PDFs are mirrored locally at `public/release_2/`; the video / audio ingestion is still pending (`npm run corpus:fetch-war-gov -- --release=02`).
 > - **This project's "Release 2.0"** is just the console's own **software version**. It does not track, mirror, or correspond to war.gov's release numbering. The app version and the government document tranches are wholly separate.
 
 [![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
@@ -31,11 +31,11 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 
 | | |
 |---|---|
-| **Records inventoried** | 162 (121 catalogued · 41 awaiting enumeration) |
+| **Records inventoried** | 162 Release 01 (128 catalogued · 34 awaiting enumeration) + 6 of 64 Release 02 PDFs mirrored |
 | **Pages transcribed** | 3,394 across 65 events |
 | **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
-| **Per source** | 3,370 Gemini · 427 GPT-vision · 0 Claude · 4 OCR · 18 contributor-submitted |
-| **Multi-source pages** | 425 (cross-checked for agreement) |
+| **Per source** | 3,370 Gemini · 446 GPT-vision · 0 Claude · 693 OCR transcripts (4 pages OCR-only · 689 cross-checked against vision) · 55 contributor-submitted |
+| **Multi-source pages** | 426 (cross-checked for agreement) |
 | **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
 ---
@@ -173,7 +173,7 @@ Full spec: [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md).
 pursue-console/
 ├── src/
 │   ├── App.jsx                       view router · volunteer modal · hero gating
-│   ├── data/events.js                catalogued records (121 of 173)
+│   ├── data/events.js                catalogued records (121 of 162 Release 01 + 7 Release 02 = 128 total)
 │   ├── data/entities.js              hand-curated entity graph
 │   ├── components/
 │   │   ├── Header.jsx                primary nav + analysis nav + VOLUNTEER button
