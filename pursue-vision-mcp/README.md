@@ -6,6 +6,7 @@ Routes:
 
 - **`POST /chat-with-files`** — send N image paths + a prompt to one provider (`chatgpt` or `gemini`), get the model's reply back as text.
 - **`POST /fanout`** — send the SAME prompt + files to BOTH providers in parallel; returns both responses. Used by the corpus's cross-source re-evaluation pipeline (`scripts/reevaluate-disputed.mjs`).
+- **`POST /ask`** — RAG endpoint for the browser ASK view. Body: `{ question, contexts: [{eid, page, text}], provider }`. Daemon writes the contexts to a tmp .txt, hands it to the chosen logged-in tab via the same upload flow as `/chat-with-files`, and returns the model's reply. CORS-allowlisted for `https://rizzleroc.github.io` + `localhost:*` so the deployed pursue-console can call straight in.
 - **`GET /war-gov/index?release=<n>`** — fetch the war.gov/UFO release-files index for release `<n>` via in-page `fetch()` on a logged-in `www.war.gov/UFO/` tab. ***`@unverified`** — never run end-to-end against live war.gov; first live test is the maintainer's Chrome.*
 - **`POST /war-gov/download`** — `{ urls: string[], destDir: string }`. Downloads each URL via Chrome (8 MB HTTP Range chunks for files >50 MB) into a path-jailed `destDir`. Returns per-file `{ ok, bytes, error? }`. **`@unverified`**.
 
