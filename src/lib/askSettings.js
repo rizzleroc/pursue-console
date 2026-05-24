@@ -1,20 +1,28 @@
 // =====================================================================
 // localStorage-backed settings for ASK's SMART mode.
 //
-// Two backends:
+// Three backends:
+//
+//   in-browser — A small instruction-tuned LLM (Qwen2.5-0.5B by
+//                default) loaded into the browser via transformers.js,
+//                cached in IndexedDB after first download. No server
+//                of any kind. Just works on github.io — the default.
+//                Trade-off: ~400 MB first-load; smaller models
+//                hallucinate more than frontier ones.
 //
 //   hosted     — Cloud RAG proxy (pursue-rag-server on Railway). The
-//                deployed-site default. Just a URL + optional shared
-//                bearer; the maintainer's Anthropic key sits on the
-//                server, the visitor pastes nothing.
+//                maintainer's Anthropic key sits on the server; the
+//                visitor pastes nothing. Higher quality, but requires
+//                the proxy to be deployed and the URL set below.
 //
 //   local-mcp  — pursue-vision-mcp on 127.0.0.1:9223. The user runs
 //                the daemon themselves and routes through their own
 //                logged-in Claude / ChatGPT / Gemini browser tab.
 //                Needs the bearer token from ~/.pursue-vision-token.
 //
-// Both backends speak the same /ask wire protocol — only the URL +
-// auth shape differs. ragClient.js branches on `backend`.
+// All three backends produce the same answer shape. ragClient.js
+// branches on `backend` and either calls the in-browser pipeline
+// directly or POSTs /ask on the remote service.
 // =====================================================================
 
 const KEY = "pursue:ask:settings:v1";
@@ -24,8 +32,13 @@ const KEY = "pursue:ask:settings:v1";
 // settings panel still take precedence.
 const DEFAULT_HOSTED_URL = "https://pursue-rag-production.up.railway.app";
 
+// Default in-browser model. The curated picker (WEBLLM_MODELS in
+// webllmClient.js) lets users swap without typing model IDs by hand.
+const DEFAULT_MODEL_ID = "onnx-community/Qwen2.5-0.5B-Instruct";
+
 const DEFAULTS = {
-  backend: "hosted",                          // "hosted" | "local-mcp"
+  backend: "in-browser",                      // "in-browser" | "hosted" | "local-mcp"
+  modelId: DEFAULT_MODEL_ID,                  // in-browser only
   hostedUrl: DEFAULT_HOSTED_URL,
   hostedBearer: "",                           // optional shared secret
   daemonUrl: "http://127.0.0.1:9223",         // local-mcp only
@@ -54,8 +67,9 @@ export function saveSettings(s) {
 }
 
 export const BACKENDS = [
-  { id: "hosted",    label: "Hosted (Railway)" },
-  { id: "local-mcp", label: "Local MCP (pursue-vision-mcp)" },
+  { id: "in-browser", label: "In-browser model (no setup)" },
+  { id: "hosted",     label: "Hosted (Railway)" },
+  { id: "local-mcp",  label: "Local MCP (pursue-vision-mcp)" },
 ];
 
 export const PROVIDERS = [
@@ -63,4 +77,3 @@ export const PROVIDERS = [
   { id: "chatgpt", label: "ChatGPT (chatgpt.com tab)" },
   { id: "gemini",  label: "Gemini (gemini.google.com tab)" },
 ];
-

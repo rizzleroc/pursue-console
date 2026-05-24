@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { ask, ASK_EXAMPLES } from "../lib/askEngine.js";
 import { askWithRag, checkBackend } from "../lib/ragClient.js";
 import { loadSettings, saveSettings, BACKENDS, PROVIDERS } from "../lib/askSettings.js";
+import { WEBLLM_MODELS } from "../lib/webllmClient.js";
 import { AGENCY_COLORS, EVENTS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 
@@ -110,6 +111,7 @@ function SmartMode({ query, setQuery, onSelect }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [health, setHealth] = useState(null);   // { ok, error }
   const [status, setStatus] = useState(null);   // { phase, ... }
+  const [modelProgress, setModelProgress] = useState(null); // { file, status, progress }
   const [result, setResult] = useState(null);   // { answer, contexts, durationMs, provider }
   const [error, setError]   = useState(null);
   const [running, setRunning] = useState(false);
@@ -120,8 +122,13 @@ function SmartMode({ query, setQuery, onSelect }) {
   }, []);
 
   // Ping the active backend on first mount + whenever it changes. Cheap
-  // /health probe; tells the user immediately if it isn't up.
-  const backendKey = settings.backend === "local-mcp" ? settings.daemonUrl : settings.hostedUrl;
+  // /health probe; tells the user immediately if it isn't up. The
+  // in-browser backend reports OK trivially (the LLM weights aren't
+  // fetched until the user asks something).
+  const backendKey =
+    settings.backend === "in-browser" ? settings.modelId :
+    settings.backend === "local-mcp"  ? settings.daemonUrl :
+                                        settings.hostedUrl;
   useEffect(() => {
     let dead = false;
     setHealth(null);
@@ -131,23 +138,28 @@ function SmartMode({ query, setQuery, onSelect }) {
   }, [settings.backend, backendKey]);
 
   // First-run UX: open the settings panel automatically only for the
-  // local-mcp backend, since the user has to paste their token there.
-  // The hosted backend works out of the box with the default URL.
+  // local-mcp backend (the user has to paste their token there). The
+  // in-browser and hosted backends both work out of the box.
   useEffect(() => {
     if (settings.backend === "local-mcp" && !settings.token) setSettingsOpen(true);
   }, [settings.backend, settings.token]);
 
   const onSubmit = async () => {
     if (!query.trim()) return;
-    setRunning(true); setError(null); setResult(null); setStatus({ phase: "starting" });
+    setRunning(true); setError(null); setResult(null);
+    setStatus({ phase: "starting" }); setModelProgress(null);
     try {
-      const out = await askWithRag({ question: query, settings, onStatus: setStatus });
+      const out = await askWithRag({
+        question: query, settings,
+        onStatus: setStatus,
+        onModelProgress: setModelProgress,
+      });
       setResult(out);
     } catch (e) {
       setError(e.message);
     } finally {
       setRunning(false);
-      setStatus(null);
+      setStatus(null); setModelProgress(null);
     }
   };
 
@@ -179,7 +191,7 @@ function SmartMode({ query, setQuery, onSelect }) {
 
       {!query && <QuickChips setQuery={setQuery} examples={SMART_EXAMPLES} />}
 
-      {running && <RunningStatus status={status} />}
+      {running && <RunningStatus status={status} modelProgress={modelProgress} />}
       {error && <ErrorCard error={error} />}
       {result && <ResultCard result={result} onSelect={onSelect} />}
     </>
@@ -187,15 +199,23 @@ function SmartMode({ query, setQuery, onSelect }) {
 }
 
 function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }) {
-  const isHosted = settings.backend === "hosted";
-  const summary = isHosted ? settings.hostedUrl : settings.daemonUrl;
+  const isInBrowser = settings.backend === "in-browser";
+  const isHosted    = settings.backend === "hosted";
+  const summary =
+    isInBrowser ? settings.modelId :
+    isHosted    ? settings.hostedUrl :
+                  settings.daemonUrl;
+  const backendLabel =
+    isInBrowser ? "IN-BROWSER" :
+    isHosted    ? "HOSTED"     :
+                  "LOCAL MCP";
   return (
     <div className="border border-emerald-700/30 bg-black/30 rounded-sm mb-4">
       <button
         onClick={onToggle}
         className="w-full px-3 py-1.5 flex items-center justify-between hover:bg-emerald-950/40">
         <span className="font-mono text-[10px] tracking-widest text-emerald-500">
-          ▌ {isHosted ? "HOSTED" : "LOCAL MCP"} · {summary}
+          ▌ {backendLabel} · {summary}
         </span>
         <span className="flex items-center gap-2">
           {health == null && <span className="font-mono text-[9px] text-emerald-700">checking…</span>}
@@ -214,7 +234,22 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
             </select>
           </Row>
 
-          {isHosted ? (
+          {isInBrowser && (
+            <>
+              <Row label="MODEL">
+                <select value={settings.modelId}
+                  onChange={e => onChange({ ...settings, modelId: e.target.value })}
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
+                  {WEBLLM_MODELS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+                </select>
+              </Row>
+              <div className="font-mono text-[10px] text-emerald-700 leading-relaxed pl-32">
+                First ASK downloads the model weights (cached in IndexedDB after that). WebGPU is used when available; falls back to WASM. No request leaves your browser.
+              </div>
+            </>
+          )}
+
+          {isHosted && (
             <>
               <Row label="HOSTED URL">
                 <input value={settings.hostedUrl}
@@ -229,7 +264,9 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
               </Row>
             </>
-          ) : (
+          )}
+
+          {!isInBrowser && !isHosted && (
             <>
               <Row label="DAEMON URL">
                 <input value={settings.daemonUrl}
@@ -283,19 +320,40 @@ function Row({ label, children }) {
   );
 }
 
-function RunningStatus({ status }) {
+function RunningStatus({ status, modelProgress }) {
   const PHASES = {
-    "starting":         "Starting…",
-    "loading-vectors":  "Loading FAISS index (embeddings.bin)…",
-    "loading-model":    "Loading MiniLM embedding model…",
-    "embedding":        "Embedding your question…",
-    "retrieving":       "Cosine-retrieving top-K passages…",
-    "calling-backend":  `Sending to ${status?.backend || "backend"} (${status?.contextCount ?? "?"} passages)…`,
+    "starting":            "Starting…",
+    "loading-vectors":     "Loading FAISS index (embeddings.bin)…",
+    "loading-embed-model": "Loading MiniLM embedding model…",
+    "embedding":           "Embedding your question…",
+    "retrieving":          "Cosine-retrieving top-K passages…",
+    "loading-model":       "Loading chat model (first run: ~400 MB; cached after)…",
+    "generating":          "Generating answer…",
+    "calling-backend":     `Calling ${status?.backend || "backend"} (${status?.contextCount ?? "?"} passages)…`,
   };
+  // transformers.js emits { file, status, progress (0-100) } during
+  // weight downloads. Show the current file + percentage so a long
+  // first-time download doesn't feel frozen.
+  const showProgress = modelProgress
+    && modelProgress.status === "progress"
+    && typeof modelProgress.progress === "number";
   return (
-    <div className="border border-amber-500/40 bg-amber-900/10 rounded-sm p-3 mb-4 font-mono text-[12px] text-amber-200 tracking-wider flex items-center gap-2">
-      <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-      {PHASES[status?.phase] || "Working…"}
+    <div className="border border-amber-500/40 bg-amber-900/10 rounded-sm p-3 mb-4 font-mono text-[12px] text-amber-200 tracking-wider space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        {PHASES[status?.phase] || "Working…"}
+      </div>
+      {showProgress && (
+        <div className="space-y-1">
+          <div className="text-[10px] text-amber-300/80">
+            {modelProgress.file}{" "}· {Math.round(modelProgress.progress)}%
+          </div>
+          <div className="h-1 w-full bg-amber-900/40 rounded-sm overflow-hidden">
+            <div className="h-full bg-amber-400/70 transition-all"
+              style={{ width: `${Math.min(100, Math.max(0, modelProgress.progress))}%` }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -315,7 +373,9 @@ function ResultCard({ result, onSelect }) {
         <div className="flex items-baseline gap-2 flex-wrap mb-2">
           <span className="font-mono text-[9px] tracking-widest text-amber-400">▌ ANSWER</span>
           <span className="font-mono text-[9px] tracking-widest text-emerald-700">
-            · {result.provider?.toUpperCase()} via MCP · {result.contexts.length} passages · {(result.durationMs / 1000).toFixed(1)}s
+            · {result.backend || result.provider}
+            {result.model && <> · {result.model}</>}
+            {" "}· {result.contexts.length} passages · {(result.durationMs / 1000).toFixed(1)}s
           </span>
         </div>
         <pre className="font-mono text-[13px] text-emerald-100 leading-relaxed whitespace-pre-wrap">
