@@ -33,7 +33,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -b gh-pages -t true",
+    "deploy": "gh-pages -d dist -b gh-pages --dotfiles --nojekyll",
     "corpus:fetch": "node scripts/fetch-pdfs.mjs",
     "corpus:extract": "node scripts/extract-text.mjs",
     "corpus:ocr": "node scripts/ocr-scanned.mjs",
