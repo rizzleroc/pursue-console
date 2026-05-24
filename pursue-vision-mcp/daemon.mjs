@@ -21,7 +21,7 @@
 //     under the directory you started the daemon from. No reading /etc.
 
 import http from "node:http";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, unlink } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -101,6 +101,46 @@ function normalizeProvider(p) {
   throw new Error(`unknown provider: ${p}`);
 }
 
+// CORS — the pursue-console static site (deployed at rizzleroc.github.io
+// or run locally on vite's dev port) is HTTPS / cross-origin to this
+// localhost daemon. Without these headers, the browser blocks the response.
+//
+// Allowlist: github.io deploys + any localhost:* / 127.0.0.1:* during dev.
+// Any other origin: no ACAO sent → request blocked. Safer than "*".
+//
+// Private-Network-Access: Chrome 113+ requires Access-Control-Allow-
+// Private-Network on the preflight when a public-origin page (https GH
+// Pages) fetches a private-IP target (127.0.0.1). Without it the fetch
+// fails before the actual request even leaves the browser.
+function allowedOrigin(origin) {
+  if (!origin) return null;
+  if (origin === "https://rizzleroc.github.io") return origin;
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin;
+  return null;
+}
+function setCors(req, res) {
+  const origin = allowedOrigin(req.headers["origin"]);
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Credentials", "false");
+  }
+}
+function handlePreflight(req, res) {
+  setCors(req, res);
+  // Echo back the headers the browser said it wants to send, so any custom
+  // header (X-Pursue-Trace, etc.) works without us hard-coding a list.
+  const reqHeaders = req.headers["access-control-request-headers"];
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", reqHeaders || "Authorization, Content-Type");
+  res.setHeader("Access-Control-Max-Age", "600");
+  // Chrome PNA: explicitly opt in to being fetched from a public site.
+  if (req.headers["access-control-request-private-network"] === "true") {
+    res.setHeader("Access-Control-Allow-Private-Network", "true");
+  }
+  res.writeHead(204);
+  res.end();
+}
 function sendJson(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
@@ -121,6 +161,10 @@ function authOk(req) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    // CORS preflight runs without auth (the browser strips Authorization
+    // from preflight by design). Real requests still go through authOk.
+    if (req.method === "OPTIONS") return handlePreflight(req, res);
+    setCors(req, res);
     if (req.method === "GET" && req.url === "/health") {
       return sendJson(res, 200, { ok: true });
     }
@@ -166,6 +210,84 @@ const server = http.createServer(async (req, res) => {
         } catch (e) {
           console.error(`[/chat-with-files ${provider}] ${e.message}`);
           sendJson(res, 500, { provider, error: e.message });
+        }
+      });
+      return;
+    }
+
+    // /ask — RAG-style endpoint for the browser ASK view. The browser does
+    // FAISS-style cosine over public/embeddings.bin locally, picks the top
+    // K passages, and POSTs them here with the user's question. We bundle
+    // them into a single .txt context file, hand it to the chosen driver
+    // (which uploads it to its logged-in browser tab the same way
+    // /chat-with-files does), and stream back the model's reply.
+    //
+    // Body: {
+    //   question:  string,                                  // user query
+    //   contexts:  [{ eid, page, title?, agency?, text }],  // top-K snippets
+    //   provider:  "chatgpt" | "claude" | "gemini" (default "claude"),
+    //   timeoutMs: number?,
+    //   freshChat: boolean? (default true)
+    // }
+    if (req.method === "POST" && req.url === "/ask") {
+      const body = await readBody(req);
+      const { question, contexts, timeoutMs, freshChat = true } = body;
+      if (!question || typeof question !== "string") {
+        return sendJson(res, 400, { error: "question (string) required" });
+      }
+      if (!Array.isArray(contexts) || contexts.length === 0) {
+        return sendJson(res, 400, { error: "contexts[] (non-empty) required" });
+      }
+      let provider;
+      try { provider = normalizeProvider(body.provider || "claude"); }
+      catch (e) { return sendJson(res, 400, { error: e.message }); }
+
+      // Build a single prompt containing the retrieved passages + the
+      // question + answer instructions. The text-only context goes to a
+      // tmpfile so we can reuse the existing chat-with-files upload flow
+      // (no driver changes needed).
+      const lines = [];
+      lines.push("CONTEXT — these are the top retrieved passages from the");
+      lines.push("PURSUE corpus (war.gov/UFO declassified documents). Each");
+      lines.push("passage shows EID, page, and a snippet of the source text.");
+      lines.push("");
+      for (const c of contexts.slice(0, 32)) {
+        lines.push(`--- ${c.eid || "?"}${c.page != null ? ` · p${c.page}` : ""}${c.title ? ` · ${c.title}` : ""} ---`);
+        lines.push(String(c.text || c.snippet || "").trim());
+        lines.push("");
+      }
+      const contextBlob = lines.join("\n");
+      const tmpPath = path.join(os.tmpdir(), `pursue-ask-${randomBytes(8).toString("hex")}.txt`);
+      await writeFile(tmpPath, contextBlob, "utf8");
+
+      const prompt = [
+        `Question from the user: "${question}"`,
+        "",
+        `Answer the question using ONLY the attached context file (top retrieved`,
+        `passages from the PURSUE corpus). When you reference a passage, cite it`,
+        `inline as [eid · page] using the EID exactly as it appears in the file.`,
+        `If the context doesn't contain enough to answer, say so plainly — do not`,
+        `invent facts. Keep it under 300 words, terse and analytic.`,
+      ].join("\n");
+
+      const t0 = Date.now();
+      enqueue(provider, async () => {
+        try {
+          const { text } = await drivers[provider].chatWithFiles({
+            filePaths: [tmpPath], prompt, timeoutMs, freshChat,
+          });
+          sendJson(res, 200, {
+            provider, text,
+            durationMs: Date.now() - t0,
+            contextCount: contexts.length,
+          });
+        } catch (e) {
+          console.error(`[/ask ${provider}] ${e.message}`);
+          sendJson(res, 500, { provider, error: e.message });
+        } finally {
+          // Best-effort cleanup. If unlink races with the driver still
+          // holding the upload open, we'd see EBUSY on Windows — ignore.
+          unlink(tmpPath).catch(() => {});
         }
       });
       return;
