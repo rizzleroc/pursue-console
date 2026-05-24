@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-22T22:52:24.540Z",
+  "generatedAt": "2026-05-24T15:27:09.234Z",
   "pressReleaseClaim": 162,
   "inventory": {
     "total": 162,
-    "enumerated": 117,
-    "placeholders": 41,
-    "pdfs": 117,
+    "enumerated": 123,
+    "placeholders": 34,
+    "pdfs": 123,
     "videos": 0,
     "images": 0,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 121,
+    "catalogued": 128,
     "withPdfDownloaded": 0,
     "withAnyPages": 65,
     "withVisionPages": 65,
@@ -27,36 +27,45 @@
   },
   "bySource": {
     "gemini": 3370,
-    "gptVision": 445,
+    "claude": 0,
+    "gptVision": 446,
     "human": 0,
     "ocr": 693,
-    "pagesWithMultipleSources": 425
+    "pagesWithMultipleSources": 426
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 438,
-    "gemini": 2952,
+    "gptVision": 436,
+    "gemini": 2954,
+    "claude": 0,
     "ocr": 4
   },
   "contributions": {
-    "total": 54,
+    "total": 55,
     "contributors": [
       {
         "handle": "Rizzleroc",
-        "pages": 54,
-        "chars": 55529
+        "pages": 55,
+        "chars": 53955
       }
     ]
   },
   "runs": {
     "last": {
-      "ts": "2026-05-22T22:52:24.540Z",
+      "ts": "2026-05-24T15:27:09.234Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 6519,
-      "note": "events=121 inventory=162 contributions=54"
+      "duration_ms": 4197,
+      "note": "events=128 inventory=162 contributions=55"
     },
     "recent": [
+      {
+        "ts": "2026-05-24T15:27:09.234Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 4197,
+        "note": "events=128 inventory=162 contributions=55"
+      },
       {
         "ts": "2026-05-22T22:52:24.540Z",
         "kind": "db-rebuild",
@@ -119,19 +128,12 @@
         "outcome": "ok",
         "duration_ms": 2201,
         "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T10:51:25.147Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 2281,
-        "note": "events=121 inventory=173 contributions=54"
       }
     ]
   },
   "gap": {
-    "uncataloguedRecords": 41,
-    "cataloguedButNoPages": 56,
+    "uncataloguedRecords": 34,
+    "cataloguedButNoPages": 63,
     "partialOcrNeedsVision": 2
   },
   "review": {
@@ -442,6 +444,7 @@
       "chars": 722,
       "sources": [
         "gemini",
+        "gpt-vision",
         "ocr"
       ],
       "dominantBest": "gemini",

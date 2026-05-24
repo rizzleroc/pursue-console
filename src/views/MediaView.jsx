@@ -141,19 +141,24 @@ export default function MediaView({ onSelect, headerFilters }) {
     });
   }, [data, filterKinds, filterAgency, filterType, filterEvent, query, includePlaceholders, includeMissingRenders]);
 
-  // Counts by bucket for the toggle labels. Three groups:
+  // Counts by bucket for the toggle labels. Four groups:
   //   withImage      — a real rendered PNG/JPG is attached
   //   placeholder    — no local PDF, just Gemini-transcript metadata
   //   missingRender  — a PNG exists but is visually blank (render failed)
+  //   video          — video items aren't toggle-gated (always shown when
+  //                    their kind filter is on), but they ARE visible
+  //                    tiles, so the "X of Y" denominator must include
+  //                    them or the numerator overshoots the denominator
+  //                    once any video is on screen.
   const counts = useMemo(() => {
-    if (!data?.items) return { withImage: 0, placeholder: 0, missingRender: 0 };
+    if (!data?.items) return { withImage: 0, placeholder: 0, missingRender: 0, video: 0 };
     return data.items.reduce((acc, it) => {
-      if (it.kind === "video") return acc;     // videos aren't in any of these buckets
+      if (it.kind === "video") { acc.video++; return acc; }
       if (it.missingRender) acc.missingRender++;
       else if (it.imagePath) acc.withImage++;
       else acc.placeholder++;
       return acc;
-    }, { withImage: 0, placeholder: 0, missingRender: 0 });
+    }, { withImage: 0, placeholder: 0, missingRender: 0, video: 0 });
   }, [data]);
 
   // Per-kind counts honoring both toggles. Without this, the filter
@@ -231,6 +236,7 @@ export default function MediaView({ onSelect, headerFilters }) {
             whether 115 were placeholders hidden by the toggle.
           */}
           {filtered.length} of {counts.withImage
+            + counts.video
             + (includePlaceholders ? counts.placeholder : 0)
             + (includeMissingRenders ? counts.missingRender : 0)} visuals · {data.eventCount} events
         </div>

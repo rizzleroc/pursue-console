@@ -382,7 +382,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
     // TRUE totals — pulled from public/corpus-stats.json (DB-backed) when
     // available, fall back to the press-release claim only if stats hasn't
     // loaded yet. Single source of truth, not three hardcodes.
-    const totalInventory = dbStats?.inventory?.total ?? 173;
+    const totalInventory = dbStats?.inventory?.total ?? 162;
     const cataloguedTotal = dbStats?.events?.catalogued ?? EVENTS.length;
     const uncatalogued = dbStats?.gap?.uncataloguedRecords ?? Math.max(0, totalInventory - cataloguedTotal);
     return {
@@ -408,6 +408,16 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
     return { vision: v, ocr: o, human: h };
   }, [feed, now]);
 
+  // Stale-feed detection — when the newest entry in live-feed.json is more
+  // than 24h old, the LIVE page is "live" only in name. Without this banner
+  // the IngestHistogram (empty bars) and Oscilloscope (synthetic noise that
+  // keeps moving regardless of activity) make a frozen pipeline look healthy.
+  // Threshold = 24h: any longer than that means at least one batch was
+  // expected but didn't arrive.
+  const feedNewest = docProgress?.feedNewest || 0;
+  const feedStaleHours = feedNewest ? (now - feedNewest) / 3_600_000 : null;
+  const isStale = feedStaleHours != null && feedStaleHours >= 24;
+
   return (
     <div className="relative" style={{ backgroundColor: "#020806" }}>
       <div className="relative z-20 px-4 sm:px-8 py-6">
@@ -428,6 +438,21 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
           Pages stream in as machine + volunteer transcriptions land. Each event below carries a
           source-mix dot row showing which engines have transcribed it. Click any to open the dossier.
         </div>
+
+        {/* Stale-feed banner. Surfaces when no new pages have landed in >24h
+            so the empty histogram + drifting oscilloscope don't read as
+            "everything's running." */}
+        {isStale && (
+          <div className="mb-6 px-3 py-2 border rounded-sm font-mono text-[10px] tracking-widest flex items-center justify-between flex-wrap gap-2"
+            style={{ borderColor: `${COLORS.amber}55`, backgroundColor: `${COLORS.amber}0A`, color: COLORS.amber }}>
+            <span>
+              ⚠ INGEST IDLE · newest page in feed is {Math.round(feedStaleHours)}h old
+            </span>
+            <span className="text-emerald-700">
+              displays below reflect the corpus at last build; no transcription activity since
+            </span>
+          </div>
+        )}
 
         {/* ── TELEMETRY ── halved scale, no more billboard ── */}
         {stats && (
