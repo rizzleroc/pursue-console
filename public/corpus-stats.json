@@ -1,6 +1,42 @@
 {
-  "generatedAt": "2026-05-24T15:27:09.234Z",
+  "generatedAt": "2026-05-24T16:28:00.783Z",
   "pressReleaseClaim": 162,
+  "byRelease": {
+    "Release 01": {
+      "id": "release-01",
+      "published": "2026-05-08",
+      "status": "mirrored",
+      "inventoryTotal": 162,
+      "catalogued": 121,
+      "uncatalogued": 41,
+      "files": {
+        "total": 162,
+        "pdf": 120,
+        "video": 28,
+        "image": 14
+      },
+      "mirrored": null
+    },
+    "Release 02": {
+      "id": "release-02",
+      "published": "2026-05-22",
+      "status": "partial-mirror",
+      "inventoryTotal": 64,
+      "catalogued": 7,
+      "uncatalogued": 57,
+      "files": {
+        "total": 64,
+        "pdf": 6,
+        "audio": 7,
+        "video": 51
+      },
+      "mirrored": {
+        "pdf": 6,
+        "audio": 0,
+        "video": 0
+      }
+    }
+  },
   "inventory": {
     "total": 162,
     "enumerated": 123,
@@ -52,13 +88,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-24T15:27:09.234Z",
+      "ts": "2026-05-24T16:28:00.783Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 4197,
+      "duration_ms": 2564,
       "note": "events=128 inventory=162 contributions=55"
     },
     "recent": [
+      {
+        "ts": "2026-05-24T16:28:00.783Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2564,
+        "note": "events=128 inventory=162 contributions=55"
+      },
       {
         "ts": "2026-05-24T15:27:09.234Z",
         "kind": "db-rebuild",
@@ -120,13 +163,6 @@
         "kind": "db-rebuild",
         "outcome": "ok",
         "duration_ms": 1079,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T10:59:27.987Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 2201,
         "note": "events=121 inventory=173 contributions=54"
       }
     ]
