@@ -5,8 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Pages source can be one of two settings in the repo: "GitHub Actions"
+# (consumed by actions/deploy-pages below) OR "Deploy from a branch:
+# gh-pages" (consumed by the gh-pages push step). Without knowing which is
+# selected, this workflow does BOTH on every run so the live site updates
+# either way. Cheap — they share the same `npm run build` artifact.
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,6 +22,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      dist-ready: ${{ steps.mark.outputs.ready }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,11 +32,21 @@ jobs:
           cache: npm
       - run: npm install --no-audit --no-fund
       - run: npm run build
+      - run: touch dist/.nojekyll  # belt-and-suspenders against Jekyll preprocessing
+      - id: mark
+        run: echo "ready=1" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-  deploy:
+
+  # Pages source = "GitHub Actions"
+  deploy-pages:
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -38,3 +55,28 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true   # if Pages source is set to gh-pages branch, this no-ops gracefully
+
+  # Pages source = "Deploy from a branch: gh-pages"
+  deploy-branch:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Publish to gh-pages branch
+        run: |
+          npx --yes gh-pages@6 \
+            --dist dist \
+            --branch gh-pages \
+            --dotfiles \
+            --nojekyll \
+            --message "Deploy ${{ github.sha }}" \
+            --repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
