@@ -137,8 +137,101 @@ async function jsonFetchDaemon(method, urlPath, body) {
 }
 
 async function fetchIndexViaMcp() {
-  const indexRes = await jsonFetchDaemon("GET", `/war-gov/index?release=${RELEASE_N}`);
-  return Array.isArray(indexRes.records) ? indexRes.records : [];
+  try {
+    const indexRes = await jsonFetchDaemon("GET", `/war-gov/index?release=${RELEASE_N}`);
+    return Array.isArray(indexRes.records) ? indexRes.records : [];
+  } catch (e) {
+    // The daemon on :9223 might not be pursue-vision-mcp at all — most
+    // commonly it's whipgen, which doesn't ship /war-gov/* but DOES
+    // ship the generic web tools (whipgen_web_open / _extract). Fall
+    // back to those: scrape the war.gov press release + UFO index
+    // pages and parse the file URLs out of the rendered text.
+    if (/\b404\b/.test(e.message)) {
+      console.error(`[sync-war-gov] /war-gov/index 404'd — falling back to whipgen web tools`);
+      return await fetchIndexViaWhipgen();
+    }
+    throw e;
+  }
+}
+
+// Fallback: call whipgen_web_open via the standard MCP JSON-RPC HTTP
+// transport. Returns an array of {url, filename, type} records shaped
+// like the dedicated /war-gov/index route. Same parser the dedicated
+// scrape-release-02-via-whipgen.mjs script uses, so behaviour is
+// consistent across both entry points.
+async function fetchIndexViaWhipgen() {
+  const pages = [
+    `https://www.war.gov/News/Releases/Release/Article/${RELEASE_N === 2 ? "4499305" : ""}/`,
+    `https://www.war.gov/UFO/`,
+  ];
+  const blobs = [];
+  for (const url of pages) {
+    try {
+      const body = {
+        jsonrpc: "2.0", id: Date.now(),
+        method: "tools/call",
+        params: { name: "whipgen_web_open", arguments: { url } },
+      };
+      const r = await fetch(`${DAEMON}/mcp`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        console.error(`[sync-war-gov]   ${url} → MCP HTTP ${r.status}`);
+        continue;
+      }
+      const j = await r.json();
+      const text = j?.result?.content?.[0]?.text ?? JSON.stringify(j);
+      blobs.push(typeof text === "string" ? text : JSON.stringify(text));
+    } catch (e) {
+      console.error(`[sync-war-gov]   ${url} → ${e.message}`);
+    }
+  }
+  if (!blobs.length) {
+    throw new Error("whipgen fallback couldn't reach war.gov via the MCP either");
+  }
+  const combined = blobs.join("\n\n");
+  // Pull out canonical AGENCY-UAP-NNN ids + any release_2 PDF URLs +
+  // DVIDS video IDs. Synthesize {url, filename, type} records — for
+  // items where only the ID is known (no direct URL), build a probable
+  // war.gov URL and let the downstream download step report the 404
+  // honestly instead of inventing data.
+  const ID_RX    = /\b((?:CIA|DOE|DOW|FBI|ODNI|NASA|DOS|DOJ|DOD|AARO|USPS)-UAP-(?:D|PR)\d{3,4})\b/gi;
+  const DVIDS_RX = /dvidshub\.net\/(?:video|asset|image)\/(\d{6,8})/gi;
+  const PDF_RX   = /https?:\/\/[^\s"'<>]+release_2[^\s"'<>]*\.pdf/gi;
+  const ids   = [...new Set([...combined.matchAll(ID_RX)].map(m => m[1].toUpperCase()))];
+  const dvids = [...new Set([...combined.matchAll(DVIDS_RX)].map(m => m[1]))];
+  const pdfs  = [...new Set([...combined.matchAll(PDF_RX)].map(m => m[0]))];
+  const records = [];
+  for (const url of pdfs) {
+    records.push({
+      url,
+      filename: url.split("/").pop(),
+      type: "pdf",
+    });
+  }
+  for (const id of ids) {
+    // Skip if a PDF for this id was already emitted above (rough match).
+    if (pdfs.some(u => u.includes(id))) continue;
+    const isVideo = /-PR\d/.test(id);
+    records.push({
+      url: `https://www.war.gov/medialink/ufo/release_2/${id}.${isVideo ? "mp4" : "pdf"}`,
+      filename: `${id}.${isVideo ? "mp4" : "pdf"}`,
+      type: isVideo ? "video" : "pdf",
+      id,
+    });
+  }
+  for (const vid of dvids) {
+    records.push({
+      url: `https://www.dvidshub.net/video/${vid}`,
+      filename: `dvids-${vid}.mp4`,
+      type: "video",
+      videoId: vid,
+    });
+  }
+  console.error(`[sync-war-gov] whipgen fallback harvested ${records.length} records (ids=${ids.length}, dvids=${dvids.length}, pdfs=${pdfs.length})`);
+  return records;
 }
 
 async function downloadViaMcp(urls) {

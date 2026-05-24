@@ -10,6 +10,7 @@ if (typeof window !== "undefined") {
 import { ScanlineOverlay } from "./components/Primitives.jsx";
 import CorpusFreshness from "./components/CorpusFreshness.jsx";
 import Header from "./components/Header.jsx";
+import RecordFilterBar from "./components/RecordFilterBar.jsx";
 import VolunteerModal from "./components/VolunteerModal.jsx";
 import LaunchOverlay from "./components/LaunchOverlay.jsx";
 import TimelineView from "./views/TimelineView.jsx";
@@ -101,6 +102,12 @@ export default function App() {
   // get to it from anywhere.
   const showHero  = view === "live";
   const showFooter = view === "live" || view === "help";
+  // Catalogue views — these consume App.filtered directly, so the
+  // RecordFilterBar can render a "showing N / total" count for them.
+  // Other views drive their own datasets (media.json, live-feed.json,
+  // review-queue.json) and surface counts in their own UI; the bar
+  // hides the count there to avoid showing a wrong "N / total".
+  const CATALOGUE_VIEWS = new Set(["timeline", "atlas", "globe", "network"]);
   // Bundle the header filter state so each view can apply whatever subset
   // is relevant to its dataset (LIVE filters live-feed.json signals,
   // MEDIA filters media.json items, REVIEW filters the review queue, etc).
@@ -127,12 +134,27 @@ export default function App() {
       <div className="relative z-10">
         <Header
           view={view} onViewChange={handleViewChange}
-          query={query} onSearch={setQuery}
-          filterAgency={filterAgency} onFilterAgency={setFilterAgency}
-          filterRelease={filterRelease} onFilterRelease={setFilterRelease}
-          filterType={filterType} onFilterType={setFilterType}
           onVolunteer={() => setVolunteerOpen(true)} />
         {!showHero && <CorpusFreshness compact />}
+
+        {/* The filter bar moved out of the header chrome and sits here,
+            directly above the view content, so the search input + agency /
+            release / type dropdowns are visually adjacent to the data
+            they filter. Hidden in DOSSIER (single-record view; the
+            filters wouldn't change anything) and HELP. */}
+        {view !== "dossier" && view !== "help" && (
+          <RecordFilterBar
+            query={query} onSearch={setQuery}
+            filterAgency={filterAgency} onFilterAgency={setFilterAgency}
+            filterRelease={filterRelease} onFilterRelease={setFilterRelease}
+            filterType={filterType} onFilterType={setFilterType}
+            // Only show "X / Y" counts on catalogue views where App.filtered
+            // is the source of truth. Other views (MEDIA / LIVE / etc) drive
+            // their own datasets and surface counts in their own UI.
+            resultCount={CATALOGUE_VIEWS.has(view) ? filtered.length : null}
+            totalCount={CATALOGUE_VIEWS.has(view) ? EVENTS.length : null}
+          />
+        )}
 
         <main>
           {view === "timeline" && <TimelineView events={filtered} onSelect={handleSelect} />}
