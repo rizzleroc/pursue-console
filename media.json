@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-24T01:19:05.690Z",
+  "generatedAt": "2026-05-24T02:15:35.579Z",
   "total": 211,
   "byKind": {
     "hand-drawing": 41,
@@ -31,7 +31,7 @@
       "title": "A large artistic illustration of space, planets, and stars. The word \"ncept\" is",
       "description": "Image: A large artistic illustration of space, planets, and stars. The word \"ncept\" is printed in large white letters at the top left of the image.",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-24T01:18:59.483Z",
+      "classifiedAt": "2026-05-24T02:15:25.018Z",
       "imagePath": "media/cometa/p0088.png",
       "thumbnailPath": "media/cometa/p0088.png"
     },
@@ -46,7 +46,7 @@
       "title": "Photo",
       "description": "Photo",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-24T01:18:59.462Z",
+      "classifiedAt": "2026-05-24T02:15:24.981Z",
       "imagePath": "media/cometa/p0046.png",
       "thumbnailPath": "media/cometa/p0046.png"
     },
@@ -61,7 +61,7 @@
       "title": "Description: A schematic drawing showing a railway track running horizontally. A",
       "description": "Diagram Description: A schematic drawing showing a railway track running horizontally. A dashed rectangular box labeled \"BUILDING OUTLINE ---- WITH SIDING INSIDE\" surrounds a section of the track. Inside this box is a \"PIT UNDER TRACKS\".",
       "classifier": "gemini-text-extract",
-      "classifiedAt": "2026-05-24T01:18:59.432Z",
+      "classifiedAt": "2026-05-24T02:15:24.946Z",
       "imagePath": null,
       "thumbnailPath": null,
       "missingRender": true
