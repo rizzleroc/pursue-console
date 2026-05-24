@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { ask, ASK_EXAMPLES } from "../lib/askEngine.js";
-import { askWithRag, checkDaemon } from "../lib/ragClient.js";
-import { loadSettings, saveSettings, PROVIDERS } from "../lib/askSettings.js";
+import { askWithRag, checkBackend } from "../lib/ragClient.js";
+import { loadSettings, saveSettings, BACKENDS, PROVIDERS } from "../lib/askSettings.js";
 import { AGENCY_COLORS, EVENTS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 
@@ -119,20 +119,23 @@ function SmartMode({ query, setQuery, onSelect }) {
     saveSettings(next);
   }, []);
 
-  // Ping the daemon on first mount + whenever the URL changes. Cheap
-  // /health probe; tells the user immediately if their daemon isn't up.
+  // Ping the active backend on first mount + whenever it changes. Cheap
+  // /health probe; tells the user immediately if it isn't up.
+  const backendKey = settings.backend === "local-mcp" ? settings.daemonUrl : settings.hostedUrl;
   useEffect(() => {
     let dead = false;
     setHealth(null);
-    checkDaemon(settings).then(h => { if (!dead) setHealth(h); });
+    checkBackend(settings).then(h => { if (!dead) setHealth(h); });
     return () => { dead = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.daemonUrl]);
+  }, [settings.backend, backendKey]);
 
-  // Open settings automatically if the token isn't set yet — first-run UX.
+  // First-run UX: open the settings panel automatically only for the
+  // local-mcp backend, since the user has to paste their token there.
+  // The hosted backend works out of the box with the default URL.
   useEffect(() => {
-    if (!settings.token) setSettingsOpen(true);
-  }, [settings.token]);
+    if (settings.backend === "local-mcp" && !settings.token) setSettingsOpen(true);
+  }, [settings.backend, settings.token]);
 
   const onSubmit = async () => {
     if (!query.trim()) return;
@@ -166,13 +169,13 @@ function SmartMode({ query, setQuery, onSelect }) {
         </button>
       </div>
 
-      {/* Settings strip — collapsed by default. Opens automatically on
-          first run because there's no token yet. */}
+      {/* Settings strip — collapsed by default. Opens automatically only
+          when the local-mcp backend is selected without a token. */}
       <SettingsPanel
         open={settingsOpen}
         onToggle={() => setSettingsOpen(o => !o)}
         settings={settings} onChange={persist}
-        health={health} onRecheck={() => checkDaemon(settings).then(setHealth)} />
+        health={health} onRecheck={() => checkBackend(settings).then(setHealth)} />
 
       {!query && <QuickChips setQuery={setQuery} examples={SMART_EXAMPLES} />}
 
@@ -184,52 +187,85 @@ function SmartMode({ query, setQuery, onSelect }) {
 }
 
 function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }) {
+  const isHosted = settings.backend === "hosted";
+  const summary = isHosted ? settings.hostedUrl : settings.daemonUrl;
   return (
     <div className="border border-emerald-700/30 bg-black/30 rounded-sm mb-4">
       <button
         onClick={onToggle}
         className="w-full px-3 py-1.5 flex items-center justify-between hover:bg-emerald-950/40">
         <span className="font-mono text-[10px] tracking-widest text-emerald-500">
-          ▌ MCP CONFIG · {settings.daemonUrl}
+          ▌ {isHosted ? "HOSTED" : "LOCAL MCP"} · {summary}
         </span>
         <span className="flex items-center gap-2">
           {health == null && <span className="font-mono text-[9px] text-emerald-700">checking…</span>}
-          {health?.ok && <span className="font-mono text-[9px] text-emerald-300">● DAEMON UP</span>}
+          {health?.ok && <span className="font-mono text-[9px] text-emerald-300">● BACKEND UP</span>}
           {health && !health.ok && <span className="font-mono text-[9px] text-rose-400">● UNREACHABLE</span>}
           <span className="font-mono text-[10px] text-emerald-700">{open ? "▾" : "▸"}</span>
         </span>
       </button>
       {open && (
         <div className="px-3 py-3 border-t border-emerald-900/40 space-y-2">
-          <Row label="DAEMON URL">
-            <input value={settings.daemonUrl}
-              onChange={e => onChange({ ...settings, daemonUrl: e.target.value })}
-              className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]" />
-          </Row>
-          <Row label="BEARER TOKEN">
-            <input type="password" value={settings.token}
-              onChange={e => onChange({ ...settings, token: e.target.value })}
-              placeholder="cat ~/.pursue-vision-token"
-              className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
-          </Row>
-          <Row label="PROVIDER">
-            <select value={settings.provider}
-              onChange={e => onChange({ ...settings, provider: e.target.value })}
+          <Row label="BACKEND">
+            <select value={settings.backend}
+              onChange={e => onChange({ ...settings, backend: e.target.value })}
               className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
-              {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+              {BACKENDS.map(b => <option key={b.id} value={b.id}>{b.label}</option>)}
             </select>
           </Row>
+
+          {isHosted ? (
+            <>
+              <Row label="HOSTED URL">
+                <input value={settings.hostedUrl}
+                  onChange={e => onChange({ ...settings, hostedUrl: e.target.value })}
+                  placeholder="https://your-app.up.railway.app"
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
+              </Row>
+              <Row label="SHARED BEARER">
+                <input type="password" value={settings.hostedBearer}
+                  onChange={e => onChange({ ...settings, hostedBearer: e.target.value })}
+                  placeholder="(optional — only if PURSUE_RAG_BEARER is set on the server)"
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
+              </Row>
+            </>
+          ) : (
+            <>
+              <Row label="DAEMON URL">
+                <input value={settings.daemonUrl}
+                  onChange={e => onChange({ ...settings, daemonUrl: e.target.value })}
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]" />
+              </Row>
+              <Row label="BEARER TOKEN">
+                <input type="password" value={settings.token}
+                  onChange={e => onChange({ ...settings, token: e.target.value })}
+                  placeholder="cat ~/.pursue-vision-token"
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
+              </Row>
+              <Row label="PROVIDER">
+                <select value={settings.provider}
+                  onChange={e => onChange({ ...settings, provider: e.target.value })}
+                  className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
+                  {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                </select>
+              </Row>
+            </>
+          )}
+
           <Row label="TOP-K PASSAGES">
             <input type="number" min="3" max="32" value={settings.k}
               onChange={e => onChange({ ...settings, k: Number(e.target.value) || 10 })}
               className="w-24 bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]" />
           </Row>
+
           {health && !health.ok && (
             <div className="font-mono text-[11px] text-rose-300 mt-2 leading-relaxed">
-              ⊘ Can't reach the daemon ({health.error}). Start it with:{" "}
-              <code className="text-amber-300">cd pursue-vision-mcp &amp;&amp; npm start</code>{" "}
-              — then click <button className="underline text-amber-300" onClick={onRecheck}>retry</button>.
-              The daemon binds to 127.0.0.1 only; it doesn't leave your machine.
+              ⊘ Can't reach the backend ({health.error}).{" "}
+              {isHosted ? (
+                <>The hosted service may be cold-starting (Railway free tier sleeps after inactivity) — wait ~10s and click <button className="underline text-amber-300" onClick={onRecheck}>retry</button>. Or check the URL above.</>
+              ) : (
+                <>Start it with{" "}<code className="text-amber-300">cd pursue-vision-mcp &amp;&amp; npm start</code>{" "}— then click <button className="underline text-amber-300" onClick={onRecheck}>retry</button>. The daemon binds to 127.0.0.1 only; it never leaves your machine.</>
+              )}
             </div>
           )}
         </div>
@@ -254,7 +290,7 @@ function RunningStatus({ status }) {
     "loading-model":    "Loading MiniLM embedding model…",
     "embedding":        "Embedding your question…",
     "retrieving":       "Cosine-retrieving top-K passages…",
-    "calling-daemon":   `Sending to ${status?.provider || "LLM"} via local MCP (${status?.contextCount ?? "?"} passages)…`,
+    "calling-backend":  `Sending to ${status?.backend || "backend"} (${status?.contextCount ?? "?"} passages)…`,
   };
   return (
     <div className="border border-amber-500/40 bg-amber-900/10 rounded-sm p-3 mb-4 font-mono text-[12px] text-amber-200 tracking-wider flex items-center gap-2">
