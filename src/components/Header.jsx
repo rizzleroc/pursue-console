@@ -14,6 +14,7 @@ const PRIMARY = [
   { id: "live",     label: "LIVE",     glyph: "●" },
   { id: "search",   label: "SEARCH",   glyph: "⌕" },
   { id: "semantic", label: "SEMANTIC", glyph: "∿" },
+  { id: "ask",      label: "ASK",      glyph: "?" },
   { id: "review",   label: "REVIEW",   glyph: "⚖" },
   { id: "media",    label: "MEDIA",    glyph: "▦" },
   { id: "dossier",  label: "DOSSIER",  glyph: "❒" },

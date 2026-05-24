@@ -23,6 +23,7 @@ import HelpView from "./views/HelpView.jsx";
 import DossierView from "./views/DossierView.jsx";
 import ReviewView from "./views/ReviewView.jsx";
 import MediaView from "./views/MediaView.jsx";
+import AskView from "./views/AskView.jsx";
 
 // Semantic search pulls in transformers.js (~25MB INT8 model + ORT wasm) —
 // lazy-load it so first paint isn't gated on that bundle.
@@ -165,6 +166,7 @@ export default function App() {
           {view === "live"     && <LiveFeedView onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "review"   && <ReviewView   onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "media"    && <MediaView    onSelect={handleSelect} headerFilters={headerFilters} />}
+          {view === "ask"      && <AskView      onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "help"     && <HelpView onViewChange={handleViewChange} />}
           {view === "semantic" && (
             <Suspense fallback={
