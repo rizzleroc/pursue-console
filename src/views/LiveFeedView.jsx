@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { EVENTS, AGENCY_COLORS } from "../data/events.js";
+import { EVENTS, AGENCY_COLORS, RELEASES_LABEL } from "../data/events.js";
 import useCorpusStats from "../hooks/useCorpusStats.js";
 
 // LIVE WATCH — immersive Phosphor Vigil dashboard.
@@ -421,7 +421,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
             </h1>
           </div>
           <div className="font-mono text-[11px] text-emerald-500 tracking-[0.2em]">
-            <UtcClock /> <span className="text-emerald-800 mx-2">·</span> WAR.GOV / UFO / RELEASE 01
+            <UtcClock /> <span className="text-emerald-800 mx-2">·</span> WAR.GOV / UFO / {RELEASES_LABEL.toUpperCase()}
           </div>
         </div>
         <div className="font-mono text-[11px] text-emerald-700 max-w-2xl leading-relaxed mb-6">
@@ -469,7 +469,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
               <div className="flex items-baseline justify-between flex-wrap gap-3 mb-3">
                 <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-300">
                   ▌ D O C U M E N T &nbsp; P R O G R E S S
-                  <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">RELEASE 01 · {dp.totalInventory} INVENTORY</span>
+                  <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">{RELEASES_LABEL.toUpperCase()} · {dp.totalInventory} INVENTORY</span>
                 </div>
                 <div className="flex items-center gap-4 font-mono text-[10px] tracking-widest text-emerald-700">
                   {/* ACTIVE indicator — pulses when something is being worked on */}

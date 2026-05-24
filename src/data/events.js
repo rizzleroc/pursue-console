@@ -137,3 +137,15 @@ export const AGENCY_COLORS = {
 };
 
 export const FLAG_LABEL = { anchor: "PRIORITY", high: "ELEVATED", med: "ROUTINE", low: "TRIVIAL" };
+
+// Derived release metadata — used by the LIVE / SEARCH / SEMANTIC headers
+// and the App footer so "what releases are catalogued?" doesn't have to be
+// hand-updated every time a tranche lands. Just add release-tagged entries
+// to RAW (or RELEASE_FOR above) and these update.
+export const RELEASES = [...new Set(EVENTS.map(e => e.release))].sort();
+export const LATEST_RELEASE = RELEASES[RELEASES.length - 1] || "Release 01";
+// "RELEASE 01–02" style label, en-dash between bookends. Single release →
+// just that release's name. Used in chrome / banner copy.
+export const RELEASES_LABEL = RELEASES.length > 1
+  ? `${RELEASES[0]}–${RELEASES[RELEASES.length - 1].replace(/^Release\s+/, "")}`
+  : RELEASES[0];
