@@ -289,6 +289,11 @@ export default {
     co_occurring: "▌ CO-OCCURRING RECORDS (shared entities)",
     tag_related: "▌ TAG-RELATED",
   },
+  source: {
+    transcribed_by: "Transcribed by: {names}",
+    aria: "Sources: {names}",
+    legend: "SOURCES:",
+  },
   reading: {
     close: "◀ CLOSE",
     label: "▌ READING MODE",
