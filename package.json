@@ -26,6 +26,7 @@
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",
     "corpus:import-candidates": "node scripts/detect-import-candidates.mjs",
+    "corpus:fetch-release-2": "node scripts/fetch-release-2.mjs",
     "test:parse-template": "node scripts/test-parse-template.mjs",
     "corpus:migrate-per-source": "node scripts/migrate-per-source-text.mjs",
     "corpus:db": "node scripts/db-rebuild.mjs",
