@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { sourceStyle, confidenceStyle, SourceLegend } from "../components/SourceMix.jsx";
+import { useT } from "../i18n/context.js";
 
 // REVIEW — cross-source disagreement queue.
 //
@@ -24,6 +25,7 @@ function ConfidenceBadge({ confidence, agreement }) {
 }
 
 export default function ReviewView({ onSelect, headerFilters }) {
+  const t = useT();
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -80,18 +82,17 @@ export default function ReviewView({ onSelect, headerFilters }) {
   }, [filteredQueue]);
 
   if (error) {
-    return <div className="p-4 text-rose-400 font-mono text-xs">REVIEW unavailable: {error}</div>;
+    return <div className="p-4 text-rose-400 font-mono text-xs">{t("review.unavailable", { error })}</div>;
   }
   if (!queue) {
-    return <div className="p-4 text-emerald-700 font-mono text-xs">LOADING REVIEW QUEUE…</div>;
+    return <div className="p-4 text-emerald-700 font-mono text-xs">{t("review.loading")}</div>;
   }
   if (!queue.queue.length) {
     return (
       <div className="p-8 max-w-3xl mx-auto text-center">
-        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">REVIEW QUEUE EMPTY</div>
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">{t("review.empty_title")}</div>
         <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
-          Every page with two or more transcription sources currently agrees within tolerance.<br/>
-          New disagreements will appear here as Gemini ↔ GPT-vision ↔ human inputs continue to land.
+          {t("review.empty_body")}
         </div>
       </div>
     );
@@ -99,10 +100,9 @@ export default function ReviewView({ onSelect, headerFilters }) {
   if (filteredQueue && !filteredQueue.queue.length) {
     return (
       <div className="p-8 max-w-3xl mx-auto text-center">
-        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">NO MATCHES</div>
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">{t("review.no_matches_title")}</div>
         <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
-          The current header filters exclude every page in the review queue.<br/>
-          Clear the search box or pick "ALL AGENCIES" to see the {queue.total} pages.
+          {t("review.no_matches_body", { total: queue.total })}
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function ReviewView({ onSelect, headerFilters }) {
   return (
     <div className="flex flex-col gap-3 p-3 min-h-[calc(100vh-200px)]">
       <div className="flex items-baseline justify-between flex-wrap gap-2 px-1">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-xl tracking-[0.2em]">⚖ REVIEW QUEUE</h2>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-xl tracking-[0.2em]">{t("review.title")}</h2>
         <SourceLegend />
       </div>
       <div className="flex flex-col lg:flex-row gap-3">
@@ -119,12 +119,12 @@ export default function ReviewView({ onSelect, headerFilters }) {
       <aside className="lg:w-72 shrink-0 border border-emerald-900/50 bg-black/40 rounded-sm">
         <div className="px-3 py-2 border-b border-emerald-900/50 flex items-center justify-between">
           <div className="font-mono text-[10px] tracking-widest text-emerald-400">
-            {filteredQueue?.total ?? queue.total} PAGES
+            {t("review.pages", { n: filteredQueue?.total ?? queue.total })}
             {filteredQueue && filteredQueue.total !== queue.total && (
-              <span className="ml-1.5 text-emerald-700">of {queue.total}</span>
+              <span className="ml-1.5 text-emerald-700">{t("review.of", { n: queue.total })}</span>
             )}
           </div>
-          <div className="font-mono text-[9px] text-emerald-700">worst first</div>
+          <div className="font-mono text-[9px] text-emerald-700">{t("review.worst_first")}</div>
         </div>
         <ul className="max-h-[60vh] lg:max-h-[calc(100vh-280px)] overflow-y-auto">
           {(filteredQueue?.queue || queue.queue).map((r, i) => (
@@ -149,24 +149,24 @@ export default function ReviewView({ onSelect, headerFilters }) {
           ))}
         </ul>
         <div className="px-3 py-2 border-t border-emerald-900/50 font-mono text-[9px] text-emerald-700">
-          by agency: {Object.entries(byAgency).slice(0, 4).map(([a, n]) => `${a}=${n}`).join("  ")}
+          {t("review.by_agency")} {Object.entries(byAgency).slice(0, 4).map(([a, n]) => `${a}=${n}`).join("  ")}
         </div>
       </aside>
 
       {/* Right pane — sources side by side */}
       <main className="flex-1 min-w-0">
         {!selected ? (
-          <div className="text-emerald-700 font-mono text-xs p-4">Select a page from the queue.</div>
+          <div className="text-emerald-700 font-mono text-xs p-4">{t("review.select_a_page")}</div>
         ) : (
           <>
             <div className="border border-emerald-900/50 bg-black/40 rounded-sm px-3 py-2 mb-3">
               <div className="flex items-baseline justify-between flex-wrap gap-2">
                 <div>
-                  <div className="font-mono text-[10px] text-emerald-700 tracking-widest">FLAGGED FOR REVIEW</div>
+                  <div className="font-mono text-[10px] text-emerald-700 tracking-widest">{t("review.flagged")}</div>
                   <div className="text-emerald-300 font-mono text-sm mt-0.5">{selected.title}</div>
                   <div className="text-emerald-700 font-mono text-[10px] mt-0.5">
-                    {selected.agency || "—"} · page {selected.page} ·
-                    {" "}canonical: <span className="text-amber-300">{pageData?.best || selected.confidence}</span>
+                    {selected.agency || "—"} · {t("review.page_n", { n: selected.page })} ·
+                    {" "}{t("review.canonical_label")} <span className="text-amber-300">{pageData?.best || selected.confidence}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -178,21 +178,21 @@ export default function ReviewView({ onSelect, headerFilters }) {
                         { page: selected.page }
                       )}
                       className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
-                      OPEN DOSSIER →
+                      {t("review.open_dossier")}
                     </button>
                   )}
                   <a
                     href={`https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md`}
                     target="_blank" rel="noreferrer"
                     className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
-                    FIX IT →
+                    {t("review.fix_it")}
                   </a>
                 </div>
               </div>
               {/* Pairwise scores summary */}
               {selected.pairs?.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] text-emerald-700">
-                  <span className="text-emerald-700/70">pairwise:</span>
+                  <span className="text-emerald-700/70">{t("review.pairwise")}</span>
                   {selected.pairs.map(p => (
                     <span key={`${p.a}-${p.b}`}>
                       <span className={sourceStyle(p.a).text}>{sourceStyle(p.a).label}</span>
@@ -205,7 +205,7 @@ export default function ReviewView({ onSelect, headerFilters }) {
               )}
               {selected.againstHuman && (
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px]">
-                  <span className="text-amber-500/80">vs human (gold):</span>
+                  <span className="text-amber-500/80">{t("review.vs_human")}</span>
                   {Object.entries(selected.againstHuman).map(([n, s]) => (
                     <span key={n} className={sourceStyle(n).text}>{sourceStyle(n).label} {s.toFixed(2)}</span>
                   ))}
@@ -214,7 +214,7 @@ export default function ReviewView({ onSelect, headerFilters }) {
             </div>
 
             {loadingPage && (
-              <div className="text-emerald-700 font-mono text-xs p-4">LOADING PAGE SOURCES…</div>
+              <div className="text-emerald-700 font-mono text-xs p-4">{t("review.loading_sources")}</div>
             )}
             {pageData && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -228,9 +228,9 @@ export default function ReviewView({ onSelect, headerFilters }) {
                         <div className="flex items-center gap-2">
                           <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
                           <span className={`font-mono text-[10px] tracking-widest ${meta.text}`}>{meta.label}</span>
-                          {isBest && <span className="font-mono text-[9px] text-amber-300 tracking-widest">· CANONICAL</span>}
+                          {isBest && <span className="font-mono text-[9px] text-amber-300 tracking-widest">{t("review.canonical_tag")}</span>}
                         </div>
-                        <span className="font-mono text-[10px] text-emerald-700">{text.length.toLocaleString()} chars</span>
+                        <span className="font-mono text-[10px] text-emerald-700">{t("review.chars", { n: text.length.toLocaleString() })}</span>
                       </div>
                       <pre className="px-3 py-2 text-emerald-200/90 text-[12px] leading-snug whitespace-pre-wrap break-words max-h-[55vh] overflow-y-auto font-mono">
 {text}
