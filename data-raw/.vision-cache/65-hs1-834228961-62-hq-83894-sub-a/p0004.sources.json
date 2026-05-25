@@ -1,5 +1,5 @@
 {
-  "best": "gemini",
+  "best": "gpt-vision",
   "sources": {
     "gemini": {
       "chars": 769,
@@ -7,6 +7,12 @@
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:50:06.120018+00:00",
       "text_file": "p0004.gemini.txt"
+    },
+    "gpt-vision": {
+      "chars": 797,
+      "imported_at": "2026-05-25T23:31:09.191Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0004.gpt-vision.txt"
     }
   }
 }
