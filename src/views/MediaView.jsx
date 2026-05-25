@@ -1,26 +1,37 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { GlitchText } from "../components/Primitives.jsx";
+import { useT } from "../i18n/context.js";
 
 // MEDIA — every visually-meaningful page across the corpus, categorized
 // by kind. Each tile is a page screenshot (~800px JPEG), not a bbox
 // crop; click → modal with the full description + a deep-link straight
 // to that page in DOSSIER (no scrolling required).
 
-const KIND_LABELS = {
-  // Release videos (DVIDS sensor footage). Listed first so the footage is
-  // the first thing the library surfaces. These tiles link out to DVIDS.
-  "video":                 "VIDEO / FOOTAGE",
-  "photograph":            "PHOTOGRAPH",
-  "hand-drawing":          "HAND DRAWING",
-  "photocopied-negative":  "PHOTOCOPIED NEGATIVE",
-  "newspaper-clipping":    "NEWSPAPER CLIPPING",
-  "map":                   "MAP",
-  "diagram":               "DIAGRAM",
-  // `table` is created by the indexer's curate() pass — it scoops up
-  // the typewritten checklists and forms that the vision classifier
-  // labels as photocopied-negative because of the inverted-tone scan
-  // style. See scripts/build-media-index.mjs.
-  "table":                 "TABLE / FORM",
+// Stable kind ids used by the index (`build-media-index.mjs`) and the
+// classifier sidecars — never localized, only used as keys into the
+// `media.kind.*` translation tree.
+const KIND_IDS = [
+  "video",
+  "photograph",
+  "hand-drawing",
+  "photocopied-negative",
+  "newspaper-clipping",
+  "map",
+  "diagram",
+  "table",
+];
+
+// kind → translation-key suffix. Hyphens in kind ids don't work as dot
+// path segments, so we normalize once here.
+const KIND_TKEY = {
+  "video": "video",
+  "photograph": "photograph",
+  "hand-drawing": "hand_drawing",
+  "photocopied-negative": "photocopied_negative",
+  "newspaper-clipping": "newspaper_clipping",
+  "map": "map",
+  "diagram": "diagram",
+  "table": "table",
 };
 
 const KIND_COLORS = {
@@ -36,7 +47,7 @@ const KIND_COLORS = {
   "table":                 { dot: "bg-sky-400",     text: "text-sky-300",     ring: "ring-sky-500/40" },
 };
 
-const ALL_KINDS = Object.keys(KIND_LABELS);
+const ALL_KINDS = KIND_IDS;
 
 // Map the Header's "ALL TYPES" dropdown (Document/Video/Image/Audio) into
 // the media-kind taxonomy so the header filter actually subsets the grid.
@@ -54,6 +65,9 @@ const HEADER_TYPE_TO_KINDS = {
 // DVIDS clips can't be embedded, so this stands in for a thumbnail and the
 // whole tile/modal links out to dvidshub.net.
 function VideoPoster({ label, big }) {
+  // Caller provides the label so we don't need to thread `t` into a
+  // purely-presentational SVG. Defaults to the English DVIDS CTA when
+  // a caller skips the prop.
   return (
     <div className="relative w-full h-full bg-[#020806] overflow-hidden">
       <div className="absolute inset-0" style={{
@@ -83,6 +97,8 @@ function VideoPoster({ label, big }) {
 }
 
 export default function MediaView({ onSelect, headerFilters }) {
+  const t = useT();
+  const kindLabel = (k) => t(`media.kind.${KIND_TKEY[k] || k}`, undefined, k);
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
   const [filterKinds, setFilterKinds] = useState(new Set(ALL_KINDS));
@@ -201,15 +217,14 @@ export default function MediaView({ onSelect, headerFilters }) {
     return [...map.values()].sort((a, b) => b.n - a.n);
   }, [data]);
 
-  if (err) return <div className="p-4 text-rose-400 font-mono text-xs">MEDIA unavailable: {err}</div>;
-  if (!data) return <div className="p-4 text-emerald-700 font-mono text-xs">LOADING MEDIA LIBRARY…</div>;
+  if (err) return <div className="p-4 text-rose-400 font-mono text-xs">{t("media.unavailable", { error: err })}</div>;
+  if (!data) return <div className="p-4 text-emerald-700 font-mono text-xs">{t("media.loading")}</div>;
   if (!data.items.length) {
     return (
       <div className="p-8 max-w-2xl mx-auto text-center">
-        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">MEDIA LIBRARY EMPTY</div>
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">{t("media.empty_title")}</div>
         <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
-          No pages classified as visual yet.<br/>
-          Maintainer kicks off classification with: <code className="text-amber-300">npm run corpus:classify</code>
+          {t("media.empty_body", { cmd: "npm run corpus:classify" })}
         </div>
       </div>
     );
@@ -225,7 +240,7 @@ export default function MediaView({ onSelect, headerFilters }) {
     <div className="px-3 sm:px-6 py-4">
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]">
-          <GlitchText>▦ MEDIA</GlitchText>
+          <GlitchText>{t("media.title")}</GlitchText>
         </h2>
         <div className="font-mono text-[10px] text-emerald-700">
           {/*
@@ -235,10 +250,14 @@ export default function MediaView({ onSelect, headerFilters }) {
             can't tell whether their filters threw out 180 tiles or
             whether 115 were placeholders hidden by the toggle.
           */}
-          {filtered.length} of {counts.withImage
-            + counts.video
-            + (includePlaceholders ? counts.placeholder : 0)
-            + (includeMissingRenders ? counts.missingRender : 0)} visuals · {data.eventCount} events
+          {t("media.of_visuals", {
+            shown: filtered.length,
+            total: counts.withImage
+              + counts.video
+              + (includePlaceholders ? counts.placeholder : 0)
+              + (includeMissingRenders ? counts.missingRender : 0),
+            events: data.eventCount,
+          })}
         </div>
       </div>
 
@@ -259,13 +278,13 @@ export default function MediaView({ onSelect, headerFilters }) {
           const empty = n === 0;
           return (
             <button key={k} onClick={() => toggleKind(k)}
-              title={empty ? `no ${KIND_LABELS[k]} tiles visible — try toggling "include placeholders"` : undefined}
+              title={empty ? t("media.no_pill_title", { kind: kindLabel(k) }) : undefined}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
                 active && !empty ? `${c.text} border-current`
                 : active && empty ? "text-emerald-800 border-emerald-900/40 opacity-40"
                 : "text-emerald-800 border-emerald-900/50 opacity-50"}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${c.dot} ${empty ? "opacity-40" : ""}`} />
-              {KIND_LABELS[k]} <span className="opacity-60">{n}</span>
+              {kindLabel(k)} <span className="opacity-60">{n}</span>
             </button>
           );
         })}
@@ -281,16 +300,16 @@ export default function MediaView({ onSelect, headerFilters }) {
         */}
         <button onClick={() => setIncludePlaceholders(v => !v)}
           title={includePlaceholders
-            ? `also showing ${counts.placeholder} metadata-only placeholders (no local PDF)`
-            : `showing only ${counts.withImage} pages with a rendered image · click to also show ${counts.placeholder} placeholder entries (no local PDF available)`}
+            ? t("media.placeholder_title_on", { n: counts.placeholder })
+            : t("media.placeholder_title_off", { with_image: counts.withImage, placeholder: counts.placeholder })}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
             includePlaceholders
               ? "text-cyan-300 border-cyan-500/50 bg-cyan-950/20"
               : "text-emerald-300 border-emerald-700/50 hover:border-emerald-500/60"}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${includePlaceholders ? "bg-cyan-400" : "bg-emerald-400"}`} />
           {includePlaceholders
-            ? <>+ PLACEHOLDERS <span className="opacity-60 ml-0.5">{counts.placeholder}</span></>
-            : <>WITH IMAGE <span className="opacity-60 ml-0.5">{counts.withImage}</span><span className="opacity-40 ml-1.5">+ {counts.placeholder} hidden</span></>}
+            ? <>{t("media.placeholders_on")} <span className="opacity-60 ml-0.5">{counts.placeholder}</span></>
+            : <>{t("media.with_image_label")} <span className="opacity-60 ml-0.5">{counts.withImage}</span><span className="opacity-40 ml-1.5">{t("media.with_image_hidden", { n: counts.placeholder })}</span></>}
         </button>
         {/*
           Missing-render toggle. A separate bucket from placeholders:
@@ -306,16 +325,16 @@ export default function MediaView({ onSelect, headerFilters }) {
         {counts.missingRender > 0 && (
           <button onClick={() => setIncludeMissingRenders(v => !v)}
             title={includeMissingRenders
-              ? `also showing ${counts.missingRender} pages whose PDF render produced a blank image`
-              : `${counts.missingRender} pages have a description but the PDF rendered blank · click to surface them`}
+              ? t("media.missing_render_title_on", { n: counts.missingRender })
+              : t("media.missing_render_title_off", { n: counts.missingRender })}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-mono text-[10px] tracking-wider transition-colors ${
               includeMissingRenders
                 ? "text-amber-300 border-amber-500/50 bg-amber-950/20"
                 : "text-emerald-300 border-emerald-700/50 hover:border-amber-500/60"}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${includeMissingRenders ? "bg-amber-400" : "bg-amber-700"}`} />
             {includeMissingRenders
-              ? <>+ MISSING RENDER <span className="opacity-60 ml-0.5">{counts.missingRender}</span></>
-              : <>MISSING RENDER <span className="opacity-40 ml-1.5">{counts.missingRender} hidden</span></>}
+              ? <>{t("media.missing_render_on")} <span className="opacity-60 ml-0.5">{counts.missingRender}</span></>
+              : <>{t("media.missing_render_off")} <span className="opacity-40 ml-1.5">{t("media.with_image_hidden", { n: counts.missingRender })}</span></>}
           </button>
         )}
         {/* Title/description search + agency dropdown have moved to the
@@ -323,7 +342,7 @@ export default function MediaView({ onSelect, headerFilters }) {
             The per-event selector is kept here — it's media-specific. */}
         <select value={filterEvent} onChange={(e) => setFilterEvent(e.target.value)}
           className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs max-w-xs">
-          <option value="all">all events</option>
+          <option value="all">{t("media.all_events")}</option>
           {eventList.map(e => <option key={e.id} value={e.id}>{e.title} ({e.n})</option>)}
         </select>
       </div>
@@ -337,7 +356,7 @@ export default function MediaView({ onSelect, headerFilters }) {
               className={`group block text-left bg-black/40 border border-emerald-900/40 hover:${c.ring} hover:ring-2 hover:border-transparent rounded-sm overflow-hidden transition-all`}>
               <div className="aspect-[3/4] bg-black overflow-hidden">
                 {it.kind === "video" ? (
-                  <VideoPoster />
+                  <VideoPoster label={t("media.play_dvids")} />
                 ) : it.thumbnailPath ? (
                   <img src={`${import.meta.env.BASE_URL}${it.thumbnailPath}`} alt={it.title || it.kind}
                     className="w-full h-full object-cover opacity-90 group-hover:opacity-100" loading="lazy" />
@@ -348,9 +367,9 @@ export default function MediaView({ onSelect, headerFilters }) {
                   // cyan "no PDF available" placeholders.
                   <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-amber-950/20">
                     <span className="w-2 h-2 rounded-full bg-amber-400 mb-2" />
-                    <span className="font-mono text-[9px] tracking-widest text-amber-300 opacity-80 mb-1">MISSING RENDER</span>
+                    <span className="font-mono text-[9px] tracking-widest text-amber-300 opacity-80 mb-1">{t("media.missing_render_tag")}</span>
                     <span className="font-mono text-[10px] text-amber-200 opacity-90 text-center line-clamp-4">
-                      {it.description || it.title || it.kind}
+                      {it.description || it.title || kindLabel(it.kind)}
                     </span>
                   </div>
                 ) : (
@@ -360,9 +379,9 @@ export default function MediaView({ onSelect, headerFilters }) {
                   // metadata is still useful.
                   <div className="w-full h-full flex flex-col items-center justify-center p-3 bg-emerald-950/30">
                     <span className={`w-2 h-2 rounded-full ${c.dot} mb-2`} />
-                    <span className={`font-mono text-[9px] tracking-widest ${c.text} opacity-70 mb-1`}>NO LOCAL IMAGE</span>
+                    <span className={`font-mono text-[9px] tracking-widest ${c.text} opacity-70 mb-1`}>{t("media.no_local_image")}</span>
                     <span className={`font-mono text-[10px] ${c.text} opacity-90 text-center line-clamp-4`}>
-                      {it.description || it.title || it.kind}
+                      {it.description || it.title || kindLabel(it.kind)}
                     </span>
                   </div>
                 )}
@@ -370,13 +389,13 @@ export default function MediaView({ onSelect, headerFilters }) {
               <div className="px-2 py-1.5">
                 <div className="flex items-center gap-1.5">
                   <span className={`w-1 h-1 rounded-full ${c.dot}`} />
-                  <span className={`font-mono text-[8.5px] tracking-widest ${c.text}`}>{KIND_LABELS[it.kind]}</span>
+                  <span className={`font-mono text-[8.5px] tracking-widest ${c.text}`}>{kindLabel(it.kind)}</span>
                 </div>
                 <div className="font-mono text-[11px] text-emerald-200 leading-snug mt-0.5 line-clamp-2">
-                  {it.title || it.description || `page ${it.page}`}
+                  {it.title || it.description || t("media.page_short", { n: it.page })}
                 </div>
                 <div className="font-mono text-[9px] text-emerald-700 mt-0.5 truncate">
-                  {it.kind === "video" ? `${it.eventTitle} · DVIDS` : `${it.eventTitle} · p${it.page}`}
+                  {it.kind === "video" ? `${it.eventTitle} · DVIDS` : `${it.eventTitle} · ${t("media.page_p_short", { n: it.page })}`}
                 </div>
               </div>
             </button>
@@ -384,7 +403,7 @@ export default function MediaView({ onSelect, headerFilters }) {
         })}
       </div>
       {filtered.length === 0 && (
-        <div className="p-8 text-center text-emerald-700 font-mono text-xs">no media matches current filters</div>
+        <div className="p-8 text-center text-emerald-700 font-mono text-xs">{t("media.no_matches")}</div>
       )}
 
       {/* Modal */}
@@ -397,18 +416,18 @@ export default function MediaView({ onSelect, headerFilters }) {
             <div className="px-4 py-2 border-b border-emerald-900/50 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
                 <span className={`w-1.5 h-1.5 rounded-full ${KIND_COLORS[focused.kind].dot}`} />
-                <span className={`font-mono text-[10px] tracking-widest ${KIND_COLORS[focused.kind].text}`}>{KIND_LABELS[focused.kind]}</span>
+                <span className={`font-mono text-[10px] tracking-widest ${KIND_COLORS[focused.kind].text}`}>{kindLabel(focused.kind)}</span>
                 <span className="font-mono text-[10px] text-emerald-700">·</span>
                 <span className="font-mono text-[11px] text-emerald-200 truncate">{focused.eventTitle}</span>
                 <span className="font-mono text-[10px] text-emerald-700">·</span>
-                <span className="font-mono text-[10px] text-emerald-500">{focused.kind === "video" ? "DVIDS" : `p${focused.page}`}</span>
+                <span className="font-mono text-[10px] text-emerald-500">{focused.kind === "video" ? "DVIDS" : t("media.page_p_short", { n: focused.page })}</span>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {focused.kind === "video" && (
                   <a href={focused.dvidsUrl || `https://www.dvidshub.net/video/${focused.videoId}`}
                     target="_blank" rel="noopener noreferrer"
                     className="font-mono text-[10px] tracking-widest border border-blue-600/60 text-blue-300 hover:bg-blue-900/30 px-2 py-1 rounded-sm">
-                    PLAY ON DVIDS ↗
+                    {t("media.play_dvids")}
                   </a>
                 )}
                 {onSelect && (
@@ -425,10 +444,10 @@ export default function MediaView({ onSelect, headerFilters }) {
                       { page: focused.page }
                     )}
                     className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
-                    OPEN IN DOSSIER →
+                    {t("media.open_in_dossier")}
                   </button>
                 )}
-                <button onClick={() => setFocused(null)} aria-label="Close"
+                <button onClick={() => setFocused(null)} aria-label={t("volunteer.close")}
                   className="text-emerald-700 hover:text-amber-300 font-mono text-sm px-2">×</button>
               </div>
             </div>
@@ -453,14 +472,14 @@ export default function MediaView({ onSelect, headerFilters }) {
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm border border-amber-500/40 mb-4">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                     <span className="font-mono text-[10px] tracking-widest text-amber-300">
-                      {KIND_LABELS[focused.kind]} · MISSING RENDER
+                      {t("media.missing_render_modal_label", { kind: kindLabel(focused.kind) })}
                     </span>
                   </div>
                   <div className="font-mono text-amber-100 text-sm leading-relaxed text-left">
                     {focused.description || focused.title}
                   </div>
                   <div className="font-mono text-amber-700 text-[10px] mt-4 leading-relaxed">
-                    The source PDF contains this visual but pdf.js rendered the page as a blank image — typically a hand-sketch on otherwise-empty paper whose ink lives in a layer pdf.js can't reach. The description above came from Gemini's transcript of the same page. Open the original document at war.gov/UFO to see the actual sketch.
+                    {t("media.missing_render_explainer")}
                   </div>
                 </div>
               ) : (
@@ -468,14 +487,14 @@ export default function MediaView({ onSelect, headerFilters }) {
                   <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-sm border ${KIND_COLORS[focused.kind].ring} mb-4`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${KIND_COLORS[focused.kind].dot}`} />
                     <span className={`font-mono text-[10px] tracking-widest ${KIND_COLORS[focused.kind].text}`}>
-                      {KIND_LABELS[focused.kind]} · NO LOCAL RENDER
+                      {t("media.no_local_render_modal_label", { kind: kindLabel(focused.kind) })}
                     </span>
                   </div>
                   <div className="font-mono text-emerald-300 text-sm leading-relaxed text-left">
                     {focused.description || focused.title}
                   </div>
                   <div className="font-mono text-emerald-700 text-[10px] mt-4 leading-relaxed">
-                    This visual reference was extracted from Gemini's transcript of the source PDF. We don't have the PDF locally to render it. Open the original document at war.gov/UFO to view the actual image; the OPEN IN DOSSIER button above jumps to this event's record.
+                    {t("media.no_local_render_explainer")}
                   </div>
                 </div>
               )}
@@ -485,7 +504,7 @@ export default function MediaView({ onSelect, headerFilters }) {
                 {focused.title && <div className="font-mono text-emerald-200 text-sm leading-snug">{focused.title}</div>}
                 {focused.description && <div className="font-mono text-emerald-500 text-[12px] mt-1 leading-snug">{focused.description}</div>}
                 <div className="font-mono text-[9px] text-emerald-800 mt-2 tracking-widest">
-                  classified by {focused.classifier || "?"} · {focused.classifiedAt?.slice(0, 10)}
+                  {t("media.classified_by", { classifier: focused.classifier || "?", date: focused.classifiedAt?.slice(0, 10) || "—" })}
                 </div>
               </div>
             )}

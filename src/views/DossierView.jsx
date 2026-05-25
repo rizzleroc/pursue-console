@@ -4,6 +4,7 @@ import { ENTITY_KIND, EVENT_ENTITIES, ENTITIES } from "../data/entities.js";
 import { GlitchText, MiniChip, DocTypeBadge, DOC_TYPE_BADGE } from "../components/Primitives.jsx";
 import ReadingMode from "../components/ReadingMode.jsx";
 import { highlightQuery } from "../lib/highlightQuery.jsx";
+import { useT } from "../i18n/context.js";
 
 // Lazy-load the per-doc extracts JSON once. The DossierView renders excerpts
 // + document profile sections when the entry for this event id exists.
@@ -51,6 +52,7 @@ const FLAG_COLOR = {
 const FLAG_LABELS = { date: "DATE", clock: "TIME", entity: "ENTITY", shape: "SHAPE", behavior: "BEHAVIOR", sensor: "SENSOR", number: "NUMBER" };
 
 export default function DossierView({ event, onClose, onSelect, allEvents, selectionPage, selectionMatch }) {
+  const t = useT();
   const [reading, setReading] = useState(false);
   const [expandedPages, setExpandedPages] = useState(new Set());
   const { data: extracts, loading: extractsLoading } = useExtracts(event?.id || "");
@@ -70,8 +72,8 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
   if (!event) {
     return (
       <div className="px-3 sm:px-8 py-12 text-center">
-        <div className="font-mono text-emerald-700 text-sm tracking-widest">▽ NO RECORD SELECTED</div>
-        <div className="font-mono text-emerald-800 text-xs mt-2">Tap any event in TIMELINE, GLOBE, ATLAS, or NETWORK</div>
+        <div className="font-mono text-emerald-700 text-sm tracking-widest">{t("dossier.no_record_title")}</div>
+        <div className="font-mono text-emerald-800 text-xs mt-2">{t("dossier.no_record_body")}</div>
       </div>
     );
   }
@@ -97,9 +99,15 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
 
   const color = AGENCY_COLORS[event.agency] || "#7CFFB2";
 
+  const docTypeCopyKey = event.docType === "photoset" ? "dossier.open_photoset"
+    : event.docType === "handwritten" ? "dossier.open_handwritten"
+    : event.docType === "sketch" ? "dossier.open_sketch"
+    : event.docType === "annotated" ? "dossier.open_annotated"
+    : "dossier.open_pdf";
+
   return (
     <div className="px-3 sm:px-8 py-6 max-w-5xl mx-auto">
-      <button onClick={onClose} className="font-mono text-[11px] text-emerald-500 hover:text-amber-400 mb-4 tracking-wider">◀ BACK TO INDEX</button>
+      <button onClick={onClose} className="font-mono text-[11px] text-emerald-500 hover:text-amber-400 mb-4 tracking-wider">{t("dossier.back")}</button>
 
       <div className="border-l-2 pl-4 sm:pl-6 mb-6" style={{ borderColor: color }}>
         <div className="flex items-center gap-3 flex-wrap">
@@ -108,13 +116,13 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
           <span className={`font-mono text-[10px] tracking-wider ${event.flag === "anchor" ? "text-amber-400 animate-pulse" : "text-emerald-600"}`}>
             {event.flag === "anchor" ? "▲ " : ""}{FLAG_LABEL[event.flag]}
           </span>
-          {event.redacted && <span className="font-mono text-[10px] text-rose-400">⊘ REDACTED</span>}
+          {event.redacted && <span className="font-mono text-[10px] text-rose-400">{t("dossier.redacted_tag")}</span>}
         </div>
         <h1 className="font-mono text-emerald-100 text-xl sm:text-3xl mt-2 leading-tight"><GlitchText>{event.title}</GlitchText></h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 font-mono text-[11px]">
-          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">DATE</div><div className="text-amber-300">{event.date}</div></div>
-          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">LOCATION</div><div className="text-emerald-300">{event.loc}</div></div>
-          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">REGION</div><div className="text-emerald-300">{event.region}</div></div>
+          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">{t("dossier.date")}</div><div className="text-amber-300">{event.date}</div></div>
+          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">{t("dossier.location")}</div><div className="text-emerald-300">{event.loc}</div></div>
+          <div><div className="text-emerald-700 text-[9px] tracking-widest mb-0.5">{t("dossier.region")}</div><div className="text-emerald-300">{event.region}</div></div>
         </div>
       </div>
 
@@ -123,24 +131,20 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
         <button onClick={() => setReading(true)}
           className="w-full block border border-emerald-400/50 bg-emerald-400/5 hover:bg-emerald-400/10 rounded-sm p-3 mb-5 font-mono text-xs text-emerald-200 transition-colors text-left">
           <div className="text-[9px] text-emerald-400/80 tracking-widest mb-1 flex items-center gap-2">
-            ▌ OPEN THE DOCUMENT
+            {t("dossier.open_document")}
             <DocTypeBadge docType={event.docType} size="lg" />
           </div>
           <div className="flex items-baseline justify-between gap-3 flex-wrap">
             <span className="text-emerald-100">
-              {event.docType === "photoset" ? "→ View the image set in Reading Mode"
-                : event.docType === "handwritten" ? "→ View the handwritten document in Reading Mode"
-                : event.docType === "sketch" ? "→ View the sketch / composite in Reading Mode"
-                : event.docType === "annotated" ? "→ View the annotated image in Reading Mode"
-                : "→ Open the PDF in Reading Mode"}
+              {t(docTypeCopyKey)}
             </span>
-            <span className="text-[10px] text-emerald-600">embeds war.gov source</span>
+            <span className="text-[10px] text-emerald-600">{t("dossier.embeds_source")}</span>
           </div>
         </button>
       )}
 
       <div className="border border-emerald-700/30 bg-black/40 rounded-sm p-4 sm:p-6 mb-5">
-        <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-3">▌ SUMMARY</div>
+        <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-3">{t("dossier.summary")}</div>
         <p className="text-emerald-100 leading-relaxed text-sm sm:text-base font-mono">{event.summary}</p>
         {event.note && (
           <div className="mt-3 pt-3 border-t border-emerald-700/30 font-mono text-[11px] text-amber-300">◇ {event.note}</div>
@@ -155,16 +159,16 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
         return (
           <div className="border border-emerald-700/30 bg-black/30 rounded-sm p-4 sm:p-6 mb-5">
             <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
-              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">▌ DOCUMENT PROFILE</div>
+              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("dossier.profile")}</div>
               <div className="font-mono text-[9px] tracking-widest" style={{ color: srcColor }}>
-                {p.source?.toUpperCase()} · {p.pages}p · {p.chars?.toLocaleString()} chars
+                {t("dossier.profile_meta", { source: p.source?.toUpperCase() ?? "—", pages: p.pages, chars: p.chars?.toLocaleString() ?? "—" })}
               </div>
             </div>
 
             {/* Signatures (shape / behavior / sensor) */}
             {sigEntries.length > 0 && (
               <div className="mb-4">
-                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ SIGHTING SIGNATURES (from extracted text)</div>
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.signatures")}</div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {sigEntries.map(([cat, vals]) => (
                     <div key={cat}>
@@ -185,11 +189,11 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
             {/* Entities mined from text */}
             {p.entities?.length > 0 && (
               <div className="mb-4">
-                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ ENTITIES MENTIONED (proper nouns, agencies)</div>
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.entities")}</div>
                 <div className="flex flex-wrap gap-1">
                   {p.entities.slice(0, 18).map(en => (
                     <span key={en.name} className="font-mono text-[10px] px-1.5 py-0.5 rounded-sm bg-blue-950/40 border border-blue-700/40 text-blue-200"
-                      title={`${en.count} mentions`}>
+                      title={t("dossier.mentions", { n: en.count })}>
                       {en.name} <span className="text-blue-500">×{en.count}</span>
                     </span>
                   ))}
@@ -200,7 +204,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
             {/* Dates referenced */}
             {p.dates?.length > 0 && (
               <div className="mb-4">
-                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ DATES REFERENCED</div>
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.dates")}</div>
                 <div className="flex flex-wrap gap-1">
                   {p.dates.slice(0, 14).map((d, i) => (
                     <span key={i} className="font-mono text-[10px] px-1.5 py-0.5 rounded-sm bg-amber-950/40 border border-amber-700/40 text-amber-200">
@@ -211,16 +215,17 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
               </div>
             )}
 
-            {/* Distinctive terms */}
+            {/* Distinctive terms — bound to a local name `terms` so it
+                doesn't shadow the `t` translator imported at the top. */}
             {p.distinctive?.length > 0 && (
               <div>
-                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TOP TERMS (by frequency)</div>
+                <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.distinctive")}</div>
                 <div className="flex flex-wrap gap-1">
-                  {p.distinctive.slice(0, 14).map(t => (
-                    <span key={t.term} className="font-mono text-[10px] text-emerald-400"
-                      style={{ fontSize: `${10 + Math.min(6, t.count / 8)}px` }}
-                      title={`${t.count} occurrences`}>
-                      {t.term}
+                  {p.distinctive.slice(0, 14).map(term => (
+                    <span key={term.term} className="font-mono text-[10px] text-emerald-400"
+                      style={{ fontSize: `${10 + Math.min(6, term.count / 8)}px` }}
+                      title={t("dossier.occurrences", { n: term.count })}>
+                      {term.term}
                     </span>
                   ))}
                 </div>
@@ -240,8 +245,10 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
           <div className="border border-cyan-700/30 bg-cyan-950/10 rounded-sm p-4 sm:p-6 mb-5">
             <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
               <div className="font-mono text-[9px] text-cyan-400 tracking-widest">
-                ▌ VISUAL CONTENT  <span className="text-emerald-600 ml-1">
-                  ({extracts.profile?.visualCount || 0} elements across {pages.length} page{pages.length===1?"":"s"})
+                {t("dossier.visual_content")}  <span className="text-emerald-600 ml-1">
+                  {pages.length === 1
+                    ? t("dossier.visual_meta_one", { n: extracts.profile?.visualCount || 0 })
+                    : t("dossier.visual_meta_n", { n: extracts.profile?.visualCount || 0, pages: pages.length })}
                 </span>
               </div>
               {extracts.profile?.visualKinds && (
@@ -258,7 +265,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
             <div className="space-y-2">
               {pages.map(pn => (
                 <div key={pn} className="border-l border-cyan-700/40 pl-3">
-                  <div className="font-mono text-[9px] tracking-widest text-cyan-700 mb-1">PAGE {pn}</div>
+                  <div className="font-mono text-[9px] tracking-widest text-cyan-700 mb-1">{t("dossier.page_n", { n: pn })}</div>
                   <ul className="space-y-1">
                     {extracts.visuals[pn].map((v, i) => {
                       const k = (v.kind || "image").toLowerCase();
@@ -287,10 +294,10 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
         return (
           <div className="border border-emerald-700/30 bg-black/30 rounded-sm p-4 sm:p-6 mb-5">
             <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
-              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">▌ EXCERPTS BY PAGE  <span className="text-emerald-500 ml-1">({pageNums.length} pages with extractable content)</span></div>
+              <div className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("dossier.excerpts")}  <span className="text-emerald-500 ml-1">{t("dossier.excerpts_meta", { n: pageNums.length })}</span></div>
               <button onClick={() => setExpandedPages(allExpanded ? new Set() : new Set(pageNums))}
                 className="font-mono text-[10px] text-emerald-500 hover:text-amber-300 tracking-widest">
-                {allExpanded ? "▽ COLLAPSE ALL" : "▷ EXPAND ALL"}
+                {allExpanded ? t("dossier.collapse_all") : t("dossier.expand_all")}
               </button>
             </div>
             <div className="space-y-1.5">
@@ -309,7 +316,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
                     }}
                       className="w-full px-3 py-1.5 text-left flex items-baseline gap-3 hover:bg-emerald-900/20">
                       <span className="font-mono text-[9px] tracking-widest text-emerald-700 w-12 shrink-0">
-                        PAGE {String(pn).padStart(3)}
+                        {t("dossier.page_n", { n: String(pn).padStart(3) })}
                       </span>
                       {entry.source && (
                         <span className="font-mono text-[8px] tracking-widest" style={{ color: sourceColor }}>
@@ -338,8 +345,8 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
                         {selectionPage === pn && selectionMatch && (
                           <div className="border border-amber-400/60 bg-amber-400/10 rounded-sm p-2.5 mb-1">
                             <div className="flex items-baseline justify-between gap-2 mb-1.5">
-                              <span className="font-mono text-[9px] tracking-widest text-amber-300">↪ SEARCH MATCH</span>
-                              <span className="font-mono text-[8px] tracking-widest text-emerald-700">this is the chunk your query hit</span>
+                              <span className="font-mono text-[9px] tracking-widest text-amber-300">{t("dossier.search_match")}</span>
+                              <span className="font-mono text-[8px] tracking-widest text-emerald-700">{t("dossier.search_match_hint")}</span>
                             </div>
                             <div className="font-mono text-[12px] text-amber-100/95 leading-relaxed pl-2 border-l-2 border-amber-400">
                               {highlightQuery(selectionMatch.text, selectionMatch.terms)}
@@ -355,7 +362,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
                                   {FLAG_LABELS[k]}
                                 </span>
                               ))}
-                              <span className="text-[8px] text-emerald-700 ml-auto">score {ex.score}</span>
+                              <span className="text-[8px] text-emerald-700 ml-auto">{t("dossier.score", { n: ex.score })}</span>
                             </div>
                             {/*
                               Also highlight query terms in the curated extracts
@@ -381,7 +388,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
       })()}
 
       {extractsLoading && (
-        <div className="font-mono text-[10px] text-emerald-700 mb-5 text-center">◌ loading per-page excerpts…</div>
+        <div className="font-mono text-[10px] text-emerald-700 mb-5 text-center">{t("dossier.excerpts_loading")}</div>
       )}
 
       {reading && <ReadingMode event={event} onClose={() => setReading(false)} />}
@@ -389,7 +396,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
       {/* CONNECTIVE TISSUE — entities */}
       {ents.length > 0 && (
         <div className="mb-5 border border-emerald-700/30 bg-black/40 rounded-sm p-4">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-3">▌ CONNECTS THROUGH</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-3">{t("dossier.connects_through")}</div>
           <div className="flex flex-wrap gap-1.5">
             {ents.map(en => (
               <span key={en.id} className="px-2 py-0.5 rounded-sm font-mono text-[11px] border"
@@ -404,7 +411,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
 
       {event.tags && event.tags.length > 0 && (
         <div className="mb-5">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TAGS</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.tags")}</div>
           <div className="flex flex-wrap gap-1.5">
             {event.tags.map(t => <span key={t} className="px-2 py-0.5 bg-emerald-950/60 border border-emerald-700/30 text-emerald-300 font-mono text-[10px] rounded-sm">{t}</span>)}
           </div>
@@ -414,17 +421,17 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
       {event.url && (
         <a href={event.url} target="_blank" rel="noopener noreferrer"
           className="block border border-amber-400/50 bg-amber-400/5 hover:bg-amber-400/10 rounded-sm p-3 mb-5 font-mono text-xs text-amber-300 transition-colors">
-          <div className="text-[9px] text-amber-400/70 tracking-widest mb-1">▌ ACCESS PRIMARY SOURCE</div>
+          <div className="text-[9px] text-amber-400/70 tracking-widest mb-1">{t("dossier.access_source")}</div>
           <div className="break-all">{event.url}</div>
-          <div className="mt-1 text-amber-400 text-[10px]">→ OPEN ON WAR.GOV ↗</div>
+          <div className="mt-1 text-amber-400 text-[10px]">{t("dossier.open_on_war_gov")}</div>
         </a>
       )}
 
       {event.videoId && (
         <div className="border border-blue-400/40 bg-blue-400/5 rounded-sm p-3 mb-5 font-mono text-xs text-blue-300">
-          <div className="text-[9px] text-blue-400/70 tracking-widest mb-1">▌ VIDEO</div>
-          <div>DVIDS Video ID: <span className="text-blue-200">{event.videoId}</span></div>
-          <a href={`https://www.dvidshub.net/video/${event.videoId}`} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-blue-400 text-[10px]">→ OPEN ON DVIDS ↗</a>
+          <div className="text-[9px] text-blue-400/70 tracking-widest mb-1">{t("dossier.video")}</div>
+          <div>{t("dossier.dvids_id")} <span className="text-blue-200">{event.videoId}</span></div>
+          <a href={`https://www.dvidshub.net/video/${event.videoId}`} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-blue-400 text-[10px]">{t("dossier.open_on_dvids")}</a>
         </div>
       )}
 
@@ -433,9 +440,9 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
         <div className="mb-5">
           <div className="flex items-baseline justify-between mb-2">
             <div className="font-mono text-[9px] text-cyan-400 tracking-widest">
-              ▌ SEMANTICALLY RELATED RECORDS
+              {t("dossier.semantic_related")}
             </div>
-            <div className="font-mono text-[9px] text-emerald-700 tracking-widest">FAISS · cosine on mean event vector</div>
+            <div className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("dossier.semantic_method")}</div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {semanticNeighbors.slice(0, 6).map(n => {
@@ -462,7 +469,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
 
       {coOccur.length > 0 && (
         <div className="mb-5">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ CO-OCCURRING RECORDS (shared entities)</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.co_occurring")}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {coOccur.map(({e, score}) => (
               <div key={e.id} className="relative">
@@ -475,7 +482,7 @@ export default function DossierView({ event, onClose, onSelect, allEvents, selec
       )}
       {tagRelated.length > 0 && (
         <div>
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TAG-RELATED</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("dossier.tag_related")}</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{tagRelated.map(({e}) => <MiniChip key={e.id} event={e} onClick={onSelect} />)}</div>
         </div>
       )}
