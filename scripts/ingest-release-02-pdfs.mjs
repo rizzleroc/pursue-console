@@ -40,14 +40,17 @@ const FORCE = process.env.FORCE === "1";
 const { EVENTS } = await import("../src/data/events.js");
 const R02 = EVENTS.filter(e => e.release === "Release 02" && e.url && e.url.includes("release_2"));
 
-// Per-file kind hint. DOE-UAP-D001 is the only one that's actually a
-// photograph (its filename says "_Image"); the rest are scanned typed
-// correspondence/reports — the existing classifier labels those
-// "photocopied-negative" by convention (see build-media-index curate()).
+// Per-file kind hint. Most R02 PDFs are typed correspondence / narratives
+// / intelligence reports with no embedded imagery — those classify as
+// "text-only", which build-media-index excludes from the MEDIA grid
+// (see VISIBLE_KINDS). DOE-UAP-D001 (PANTEX_Image) is the one image-
+// heavy doc and gets "photograph". Without a vision API we can't
+// pick out the occasional sketch/diagram inside a mostly-text doc;
+// vision MCP would do better here.
 function kindFor(eid, filename) {
-  const lower = filename.toLowerCase();
-  if (/image|photo|pantex/.test(lower)) return "photograph";
-  return "photocopied-negative";
+  // DOE-UAP-D001 = PANTEX radar-tower image + Sandia enhanced images.
+  if (eid === "DOE-UAP-D001") return "photograph";
+  return "text-only";
 }
 
 async function pageCount(pdfPath) {
@@ -119,9 +122,14 @@ for (const ev of R02) {
   await mkdir(ocrDir, { recursive: true });
   await mkdir(cacheDir, { recursive: true });
   await mkdir(visualsDir, { recursive: true });
-  await mkdir(mediaDir, { recursive: true });
 
   const kind = kindFor(ev.id, filename);
+  // Only render thumbnail PNGs for events that will actually appear in
+  // MEDIA. text-only events get the OCR + visuals-sidecar treatment but
+  // no rendered images — nothing reads public/media/<eid> outside the
+  // MEDIA grid (which filters text-only out via VISIBLE_KINDS).
+  const renderThumbs = kind !== "text-only";
+  if (renderThumbs) await mkdir(mediaDir, { recursive: true });
   const nowIso = new Date().toISOString();
 
   for (let p = 1; p <= pp; p++) {
@@ -132,15 +140,20 @@ for (const ev of R02) {
     const sidecarPath  = path.join(cacheDir,   `${tag}.sources.json`);
     const visualPath   = path.join(visualsDir, `${tag}.json`);
 
-    if (!FORCE && existsSync(canonOcrPath) && existsSync(thumbPath) && existsSync(sidecarPath) && existsSync(visualPath)) {
+    const thumbOk = renderThumbs ? existsSync(thumbPath) : true;
+    if (!FORCE && existsSync(canonOcrPath) && thumbOk && existsSync(sidecarPath) && existsSync(visualPath)) {
       pagesSkipped++;
       continue;
     }
 
+    // text-only events still need an OCR pass but no kept thumbnail.
+    // Render to a tmp PNG, OCR it, then either keep or discard the PNG.
+    const renderTarget = renderThumbs ? thumbPath : path.join(tmpdir(), `r02-discard-${randomBytes(4).toString("hex")}.png`);
     let tmp = null;
     try {
-      tmp = await renderPage(pdfPath, p, thumbPath);
-      const text = await ocrPng(thumbPath);
+      tmp = await renderPage(pdfPath, p, renderTarget);
+      const text = await ocrPng(renderTarget);
+      if (!renderThumbs) await unlink(renderTarget);
       await writeFile(canonOcrPath, text, "utf8");
       await writeFile(perSrcPath, text, "utf8");
       await writeFile(sidecarPath, JSON.stringify({
