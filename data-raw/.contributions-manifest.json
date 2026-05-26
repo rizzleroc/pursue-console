@@ -1,416 +1,482 @@
 {
   "amc-1947/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.204Z",
+    "importedAt": "2026-05-26T21:46:41.901Z",
     "chars": 1989,
     "source": "gpt-vision"
   },
   "amc-1947/p0002.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.206Z",
+    "importedAt": "2026-05-26T21:46:41.902Z",
     "chars": 824,
     "source": "gpt-vision"
   },
   "amc-1947/p0003.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.207Z",
+    "importedAt": "2026-05-26T21:46:41.903Z",
     "chars": 2554,
     "source": "gpt-vision"
   },
   "amc-1947/p0004.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.208Z",
+    "importedAt": "2026-05-26T21:46:41.904Z",
     "chars": 1253,
     "source": "gpt-vision"
   },
   "amc-1947/p0005.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.209Z",
+    "importedAt": "2026-05-26T21:46:41.905Z",
     "chars": 425,
     "source": "gpt-vision"
   },
   "amc-1947/p0006.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.211Z",
+    "importedAt": "2026-05-26T21:46:41.907Z",
     "chars": 1453,
     "source": "gpt-vision"
   },
   "amc-1947/p0013.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.212Z",
+    "importedAt": "2026-05-26T21:46:41.908Z",
     "chars": 2414,
     "source": "gpt-vision"
   },
   "amc-1947/p0022.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.213Z",
+    "importedAt": "2026-05-26T21:46:41.909Z",
     "chars": 366,
     "source": "gpt-vision"
   },
   "amc-1947/p0023.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.214Z",
+    "importedAt": "2026-05-26T21:46:41.910Z",
     "chars": 966,
     "source": "gpt-vision"
   },
   "amc-1947/p0024.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.216Z",
+    "importedAt": "2026-05-26T21:46:41.911Z",
     "chars": 827,
     "source": "gpt-vision"
   },
   "krasuski-1944/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.270Z",
+    "importedAt": "2026-05-26T21:46:41.916Z",
     "chars": 610,
     "source": "gpt-vision"
   },
   "krasuski-1944/p0009.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.271Z",
+    "importedAt": "2026-05-26T21:46:41.917Z",
     "chars": 1934,
     "source": "gpt-vision"
   },
   "shaef-1945/p0003.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.272Z",
+    "importedAt": "2026-05-26T21:46:41.918Z",
     "chars": 944,
     "source": "gpt-vision"
   },
   "shaef-1945/p0004.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.273Z",
+    "importedAt": "2026-05-26T21:46:41.919Z",
     "chars": 1980,
     "source": "gpt-vision"
   },
   "shaef-1945/p0005.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.274Z",
+    "importedAt": "2026-05-26T21:46:41.920Z",
     "chars": 1010,
     "source": "gpt-vision"
   },
   "shaef-1945/p0006.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.276Z",
+    "importedAt": "2026-05-26T21:46:41.921Z",
     "chars": 869,
     "source": "gpt-vision"
   },
   "shaef-1945/p0007.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.280Z",
+    "importedAt": "2026-05-26T21:46:41.924Z",
     "chars": 2033,
     "source": "gpt-vision"
   },
   "shaef-1945/p0008.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.278Z",
+    "importedAt": "2026-05-26T21:46:41.923Z",
     "chars": 1244,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-10/p0026.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.163Z",
+    "importedAt": "2026-05-26T21:46:41.785Z",
     "chars": 152,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-10/p0043.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.164Z",
+    "importedAt": "2026-05-26T21:46:41.786Z",
     "chars": 170,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-10/p0083.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.165Z",
+    "importedAt": "2026-05-26T21:46:41.788Z",
     "chars": 11042,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-10/p0154.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.167Z",
+    "importedAt": "2026-05-26T21:46:41.790Z",
     "chars": 305,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-2/p0172.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.168Z",
+    "importedAt": "2026-05-26T21:46:41.791Z",
     "chars": 517,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-3/p0156.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.169Z",
+    "importedAt": "2026-05-26T21:46:41.793Z",
     "chars": 820,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-3/p0166.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.170Z",
+    "importedAt": "2026-05-26T21:46:41.794Z",
     "chars": 71,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-3/p0185.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.172Z",
+    "importedAt": "2026-05-26T21:46:41.795Z",
     "chars": 638,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-5/p0071.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.173Z",
+    "importedAt": "2026-05-26T21:46:41.798Z",
     "chars": 493,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-6/p0032.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.175Z",
+    "importedAt": "2026-05-26T21:46:41.800Z",
     "chars": 368,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-6/p0176.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.176Z",
+    "importedAt": "2026-05-26T21:46:41.801Z",
     "chars": 62,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-6/p0220.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.177Z",
+    "importedAt": "2026-05-26T21:46:41.802Z",
     "chars": 259,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-7/p0068.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.180Z",
+    "importedAt": "2026-05-26T21:46:41.804Z",
     "chars": 249,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-7/p0115.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.181Z",
+    "importedAt": "2026-05-26T21:46:41.805Z",
     "chars": 3575,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-7/p0116.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.182Z",
+    "importedAt": "2026-05-26T21:46:41.806Z",
     "chars": 3723,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-7/p0117.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.183Z",
+    "importedAt": "2026-05-26T21:46:41.807Z",
     "chars": 2773,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-serial-164/p0124.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.185Z",
+    "importedAt": "2026-05-26T21:46:41.810Z",
     "chars": 1188,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0064.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.202Z",
+    "importedAt": "2026-05-26T21:46:41.897Z",
     "chars": 1304,
     "source": "gpt-vision"
   },
   "1949-discs/p0008.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.759Z",
+    "importedAt": "2026-05-26T21:46:41.372Z",
     "chars": 41,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0059.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.760Z",
+    "importedAt": "2026-05-26T21:46:41.373Z",
     "chars": 73,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0066.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.761Z",
+    "importedAt": "2026-05-26T21:46:41.374Z",
     "chars": 78,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0068.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.762Z",
+    "importedAt": "2026-05-26T21:46:41.376Z",
     "chars": 64,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0070.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.763Z",
+    "importedAt": "2026-05-26T21:46:41.377Z",
     "chars": 56,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0076.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.764Z",
+    "importedAt": "2026-05-26T21:46:41.378Z",
     "chars": 71,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0087.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.765Z",
+    "importedAt": "2026-05-26T21:46:41.379Z",
     "chars": 168,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0088.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.767Z",
+    "importedAt": "2026-05-26T21:46:41.380Z",
     "chars": 533,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0120.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.768Z",
+    "importedAt": "2026-05-26T21:46:41.381Z",
     "chars": 67,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0123.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.769Z",
+    "importedAt": "2026-05-26T21:46:41.382Z",
     "chars": 201,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0125.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-20T14:25:25.980Z",
-    "chars": 40,
+    "importedAt": "2026-05-26T21:46:41.383Z",
+    "chars": 36,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0127.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-20T14:25:25.981Z",
-    "chars": 40,
+    "importedAt": "2026-05-26T21:46:41.384Z",
+    "chars": 36,
     "source": "gpt-vision-review"
   },
   "1949-discs/p0135.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-20T14:25:25.981Z",
-    "chars": 40,
+    "importedAt": "2026-05-26T21:46:41.385Z",
+    "chars": 36,
     "source": "gpt-vision-review"
   },
   "general-1948/p0008.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.772Z",
+    "importedAt": "2026-05-26T21:46:41.389Z",
     "chars": 383,
     "source": "gpt-vision-review"
   },
   "incident-summaries/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.773Z",
+    "importedAt": "2026-05-26T21:46:41.390Z",
     "chars": 188,
     "source": "gpt-vision-review"
   },
   "incident-summaries/p0209.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.774Z",
+    "importedAt": "2026-05-26T21:46:41.391Z",
     "chars": 59,
     "source": "gpt-vision-review"
   },
   "krasuski-1944/p0004.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.775Z",
+    "importedAt": "2026-05-26T21:46:41.392Z",
     "chars": 247,
     "source": "gpt-vision-review"
   },
   "krasuski-1944/p0005.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:08.776Z",
+    "importedAt": "2026-05-26T21:46:41.393Z",
     "chars": 83,
     "source": "gpt-vision-review"
   },
   "fbi-photos-2025/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.161Z",
+    "importedAt": "2026-05-26T21:46:41.784Z",
     "chars": 119,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-section-6/p0268.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.178Z",
+    "importedAt": "2026-05-26T21:46:41.803Z",
     "chars": 2022,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.187Z",
+    "importedAt": "2026-05-26T21:46:41.812Z",
     "chars": 520,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0002.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.189Z",
+    "importedAt": "2026-05-26T21:46:41.813Z",
     "chars": 2288,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0003.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.190Z",
+    "importedAt": "2026-05-26T21:46:41.814Z",
     "chars": 1470,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0004.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.191Z",
+    "importedAt": "2026-05-26T21:46:41.815Z",
     "chars": 797,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0005.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.193Z",
+    "importedAt": "2026-05-26T21:46:41.816Z",
     "chars": 2745,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0006.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.195Z",
+    "importedAt": "2026-05-26T21:46:41.890Z",
     "chars": 1940,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0007.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.196Z",
+    "importedAt": "2026-05-26T21:46:41.891Z",
     "chars": 2652,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0008.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.197Z",
+    "importedAt": "2026-05-26T21:46:41.892Z",
     "chars": 1866,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0009.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.199Z",
+    "importedAt": "2026-05-26T21:46:41.893Z",
     "chars": 3259,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0010.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.200Z",
+    "importedAt": "2026-05-26T21:46:41.895Z",
     "chars": 2681,
     "source": "gpt-vision"
   },
   "65-hs1-834228961-62-hq-83894-sub-a/p0011.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.201Z",
+    "importedAt": "2026-05-26T21:46:41.896Z",
     "chars": 3626,
     "source": "gpt-vision"
   },
   "fbi-62hq83894/p0001.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.266Z",
+    "importedAt": "2026-05-26T21:46:41.912Z",
     "chars": 586,
     "source": "gpt-vision"
   },
   "fbi-62hq83894/p0120.txt": {
     "handle": "Rizzleroc",
-    "importedAt": "2026-05-25T23:31:09.268Z",
+    "importedAt": "2026-05-26T21:46:41.915Z",
     "chars": 352,
+    "source": "gpt-vision"
+  },
+  "gemini-7/p0003.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.387Z",
+    "chars": 30,
+    "source": "gpt-vision-review"
+  },
+  "65-hs1-834228961-62-hq-83894-section-10/p0048.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.787Z",
+    "chars": 7,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-10/p0120.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.789Z",
+    "chars": 12,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-3/p0126.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.792Z",
+    "chars": 7,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-4/p0055.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.796Z",
+    "chars": 19,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-4/p0093.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.797Z",
+    "chars": 7,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-9/p0018.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.808Z",
+    "chars": 30,
+    "source": "gpt-vision"
+  },
+  "65-hs1-834228961-62-hq-83894-section-9/p0270.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.809Z",
+    "chars": 7,
+    "source": "gpt-vision"
+  },
+  "africa-2025/p0001.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.898Z",
+    "chars": 6,
+    "source": "gpt-vision"
+  },
+  "africa-2025/p0006.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.899Z",
+    "chars": 6,
+    "source": "gpt-vision"
+  },
+  "fbi-62hq83894/p0091.txt": {
+    "handle": "Rizzleroc",
+    "importedAt": "2026-05-26T21:46:41.913Z",
+    "chars": 11,
     "source": "gpt-vision"
   }
 }
