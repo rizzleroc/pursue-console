@@ -294,6 +294,14 @@ export default {
     aria: "Sources: {names}",
     legend: "SOURCES:",
   },
+  doctype: {
+    photoset: "PHOTOS",
+    handwritten: "HANDWRITTEN",
+    sketch: "SKETCH",
+    annotated: "ANNOTATED",
+    mixed: "MIXED",
+    title_prefix: "Primarily visual: {label}",
+  },
   live: {
     title: "LIVE WATCH",
     utc: "U T C",
