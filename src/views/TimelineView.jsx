@@ -3,7 +3,11 @@ import { AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, flagBg, DocTypeBadge } from "../components/Primitives.jsx";
 import SourceMix from "../components/SourceMix.jsx";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
 
+// Decade labels are stable numeric ranges and don't translate; the
+// "1944–1949" string is meaningful in every script. Only the section
+// header + total-count line are translatable.
 const ERAS = [
   { id: "40s", label: "1944–1949" }, { id: "50s", label: "1950–1959" },
   { id: "60s", label: "1960–1969" }, { id: "70s", label: "1970–1979" },
@@ -13,6 +17,7 @@ const ERAS = [
 ];
 
 export default function TimelineView({ events, onSelect }) {
+  const t = useT();
   const sorted = [...events].sort((a,b) => a.sort - b.sort);
   const { stats } = useCorpusStats();
   const byEvent = stats?.byEvent || null;
@@ -20,9 +25,9 @@ export default function TimelineView({ events, onSelect }) {
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-6 flex-wrap gap-2">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]">
-          <GlitchText>┃ CHRONOLOGY</GlitchText>
+          <GlitchText>{t("timeline.title")}</GlitchText>
         </h2>
-        <div className="font-mono text-[10px] text-emerald-700">{sorted.length} RECORDS // 1944—2026</div>
+        <div className="font-mono text-[10px] text-emerald-700">{t("timeline.records_range", { n: sorted.length })}</div>
       </div>
       <div className="space-y-10">
         {ERAS.map((era) => {
@@ -47,7 +52,7 @@ export default function TimelineView({ events, onSelect }) {
                       <div className="flex items-center gap-1">
                         <DocTypeBadge docType={event.docType} />
                         {event.flag === "anchor" && <span className="text-amber-400 text-[10px]">▲</span>}
-                        {event.redacted && <span className="font-mono text-[8px] text-rose-400/70">REDACT</span>}
+                        {event.redacted && <span className="font-mono text-[8px] text-rose-400/70">{t("timeline.redact_tag")}</span>}
                       </div>
                     </div>
                     <div className="text-emerald-100 text-[13px] leading-snug mt-1 group-hover:text-amber-200 transition-colors">{event.title}</div>

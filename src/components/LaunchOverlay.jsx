@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useT } from "../i18n/context.js";
 
 // One-time launch overlay for the 2.0 drop. Hypes the release and plays
 // the declassified DVIDS sensor footage inline via the DVIDS embed player,
@@ -128,6 +129,7 @@ function RadarCanvas() {
 }
 
 export default function LaunchOverlay({ onClose }) {
+  const t = useT();
   const [active, setActive] = useState(0);
   const [closing, setClosing] = useState(false);
   const [swapKey, setSwapKey] = useState(0);
@@ -154,7 +156,7 @@ export default function LaunchOverlay({ onClose }) {
     <div
       className={`fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md ${closing ? "lo-backdrop-out" : "lo-backdrop-in"}`}
       onClick={dismiss}
-      role="dialog" aria-modal="true" aria-label="PURSUE Console 2.0 launch"
+      role="dialog" aria-modal="true" aria-label={t("launch.aria_label")}
       style={{ fontFamily: "'IBM Plex Mono','JetBrains Mono',monospace" }}
     >
       <style>{`
@@ -189,7 +191,7 @@ export default function LaunchOverlay({ onClose }) {
         <RadarCanvas />
 
         <button
-          onClick={dismiss} aria-label="Close"
+          onClick={dismiss} aria-label={t("launch.close")}
           className="absolute top-3 right-3 z-20 text-emerald-700 hover:text-emerald-200 text-lg leading-none w-7 h-7 flex items-center justify-center rounded-sm border border-emerald-900/60 hover:border-emerald-600/60 transition-colors"
         >×</button>
 
@@ -197,21 +199,19 @@ export default function LaunchOverlay({ onClose }) {
           {/* Eyebrow */}
           <div className="lo-rise flex items-center gap-2 text-[10px] tracking-[0.4em] text-emerald-600" style={{ animationDelay: "60ms" }}>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 lo-pulse" />
-            INCOMING TRANSMISSION · WAR.GOV/UFO
+            {t("launch.eyebrow")}
           </div>
 
           {/* Hero */}
           <div className="lo-rise mt-3" style={{ animationDelay: "120ms" }}>
             <h1 className="leading-[0.85] font-semibold text-emerald-100">
-              <span className="block text-[13px] sm:text-[15px] tracking-[0.5em] text-emerald-500 mb-1">PURSUE CONSOLE</span>
+              <span className="block text-[13px] sm:text-[15px] tracking-[0.5em] text-emerald-500 mb-1">{t("launch.title_eyebrow")}</span>
               <span className="block text-[64px] sm:text-[104px] tracking-tight text-emerald-300" style={{ textShadow: "0 0 40px rgba(52,211,153,0.45)" }}>
                 2.0<span className="text-amber-300">.</span>
               </span>
             </h1>
             <p className="mt-3 max-w-2xl text-[12px] sm:text-[13px] leading-relaxed text-emerald-400">
-              The disclosure drop is <span className="text-emerald-100">live</span>. Declassified sensor footage,
-              full-text reading mode, the entity-network graph, semantic search — all unlocked.
-              Start with the clips the analysts couldn't explain.
+              {t("launch.intro_p1_a")} <span className="text-emerald-100">{t("launch.intro_p1_live")}</span>{t("launch.intro_p1_b")}
             </p>
           </div>
 
@@ -231,7 +231,7 @@ export default function LaunchOverlay({ onClose }) {
                 />
               </div>
               <div key={`meta-${swapKey}`} className="lo-swap mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className={`text-[9px] tracking-[0.25em] px-1.5 py-0.5 border rounded-sm ${FLAG_COLOR[clip.flag]}`}>{clip.flag.toUpperCase()}</span>
+                <span className={`text-[9px] tracking-[0.25em] px-1.5 py-0.5 border rounded-sm ${FLAG_COLOR[clip.flag]}`}>{t(`launch.flag.${clip.flag}`)}</span>
                 <span className="text-[12px] tracking-[0.18em] text-emerald-200">{clip.code} · {clip.tag}</span>
                 <span className="text-[10px] tracking-widest text-emerald-600">{clip.loc}</span>
                 <a
@@ -245,7 +245,7 @@ export default function LaunchOverlay({ onClose }) {
 
             {/* Clip selector */}
             <div className="flex flex-col gap-1.5">
-              <div className="text-[9px] tracking-[0.3em] text-emerald-700 mb-0.5">▌ DECLASSIFIED REEL · {CLIPS.length}</div>
+              <div className="text-[9px] tracking-[0.3em] text-emerald-700 mb-0.5">{t("launch.reel", { count: CLIPS.length })}</div>
               <div className="flex flex-col gap-1.5 max-h-[340px] overflow-y-auto no-scrollbar pr-0.5">
                 {CLIPS.map((c, i) => (
                   <button
@@ -273,9 +273,9 @@ export default function LaunchOverlay({ onClose }) {
             <button
               onClick={dismiss}
               className="lo-cta w-full sm:w-auto px-7 py-2.5 rounded-sm bg-emerald-400 text-[#020806] text-[12px] font-semibold tracking-[0.25em] hover:bg-emerald-300"
-            >ENTER CONSOLE →</button>
-            <span className="text-[9px] tracking-[0.25em] text-emerald-700">ALL CASES UNRESOLVED · RELEASE 01 · MAY 8 2026</span>
-            <button onClick={dismiss} className="text-[9px] tracking-[0.25em] text-emerald-800 hover:text-emerald-500 sm:ml-auto">SKIP INTRO</button>
+            >{t("launch.enter")}</button>
+            <span className="text-[9px] tracking-[0.25em] text-emerald-700">{t("launch.sub")}</span>
+            <button onClick={dismiss} className="text-[9px] tracking-[0.25em] text-emerald-800 hover:text-emerald-500 sm:ml-auto">{t("launch.skip")}</button>
           </div>
         </div>
       </div>

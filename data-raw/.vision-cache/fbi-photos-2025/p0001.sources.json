@@ -10,7 +10,7 @@
     },
     "gpt-vision": {
       "chars": 119,
-      "imported_at": "2026-05-25T23:31:09.161Z",
+      "imported_at": "2026-05-26T21:46:41.784Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.gpt-vision.txt"
     }
@@ -21,7 +21,7 @@
         "gpt-vision": {
           "text_file": "p0001.gpt-vision.v2.txt",
           "chars": 172,
-          "imported_at": "2026-05-25T23:31:08.770Z",
+          "imported_at": "2026-05-26T21:46:41.386Z",
           "contributor": "Rizzleroc",
           "via": "volunteer-review"
         }

@@ -1,0 +1,121 @@
+name: Uptime monitor
+
+# Every 5 minutes: probe the live GitHub Pages site and open/update a
+# tracking issue if it's down. Recovery comment + close on next healthy run.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run healthcheck
+        id: check
+        continue-on-error: true
+        run: |
+          set +e
+          OUTPUT=$(node scripts/healthcheck-site.mjs)
+          EXIT_CODE=$?
+          echo "$OUTPUT"
+          REPORT=$(echo "$OUTPUT" | tail -n 1)
+          echo "report=$REPORT" >> "$GITHUB_OUTPUT"
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
+      - name: Find existing incident issue
+        id: incident
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NUM=$(gh issue list --label uptime-incident --state open --json number --jq '.[0].number // empty' || echo "")
+          echo "number=$NUM" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update incident issue
+        if: steps.check.outputs.healthy == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ${{ steps.check.outputs.report }}
+          ISSUE_NUMBER: ${{ steps.incident.outputs.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SITE_URL: https://rizzleroc.github.io/pursue-console/
+        run: |
+          TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          BODY_FILE=$(mktemp)
+          if [ -n "$ISSUE_NUMBER" ]; then
+            {
+              echo "Still down at $TS."
+              echo ""
+              echo "Workflow run: $RUN_URL"
+              echo ""
+              echo '```json'
+              echo "$REPORT"
+              echo '```'
+            } > "$BODY_FILE"
+            gh issue comment "$ISSUE_NUMBER" --body-file "$BODY_FILE"
+          else
+            gh label create uptime-incident \
+              --description "Live site is failing the scheduled uptime probe" \
+              --color B60205 \
+              --force >/dev/null
+            {
+              echo "The live site is failing its uptime probe."
+              echo ""
+              echo "- URL: $SITE_URL"
+              echo "- Detected at: $TS"
+              echo "- Workflow run: $RUN_URL"
+              echo ""
+              echo "Latest report:"
+              echo ""
+              echo '```json'
+              echo "$REPORT"
+              echo '```'
+            } > "$BODY_FILE"
+            gh issue create \
+              --title "[uptime] pursue-console is down" \
+              --label uptime-incident \
+              --body-file "$BODY_FILE"
+          fi
+
+      - name: Close incident on recovery
+        if: steps.check.outputs.healthy == 'true' && steps.incident.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ${{ steps.check.outputs.report }}
+          ISSUE_NUMBER: ${{ steps.incident.outputs.number }}
+        run: |
+          TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          BODY_FILE=$(mktemp)
+          {
+            echo "Recovered at $TS."
+            echo ""
+            echo "Latest report:"
+            echo ""
+            echo '```json'
+            echo "$REPORT"
+            echo '```'
+          } > "$BODY_FILE"
+          gh issue close "$ISSUE_NUMBER" --comment "$(cat "$BODY_FILE")"
+
+      - name: Fail run if unhealthy
+        if: steps.check.outputs.healthy == 'false'
+        run: exit 1
