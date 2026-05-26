@@ -64,18 +64,36 @@ export default function CorpusFreshness({ compact = false }) {
   const contribPages   = s?.contributions?.total ?? null;
   const contribCount   = s?.contributions?.contributors?.length ?? 0;
   const uncatalogued   = s?.gap?.uncataloguedRecords ?? null;
+  // Per-release catalogued-vs-inventory ratios (corpus-stats.byRelease).
+  // When ≥2 releases exist we render the breakdown instead of the legacy
+  // single ratio — a "121/162 + 7/64" pair is unambiguous, where the
+  // single number "128/162" mixed Release 02's events against Release 01's
+  // press-release ceiling.
+  const releaseEntries = s?.byRelease ? Object.entries(s.byRelease) : [];
+  const hasMultiRelease = releaseEntries.length >= 2;
+  // Compact per-release label like "R01 121/162" — matches the chrome
+  // density of the rest of the strip.
+  const shortLabel = (label) => label.replace(/^Release\s+0?/i, "R");
+  const recordsLabel = hasMultiRelease
+    ? releaseEntries.map(([label, r]) => `${shortLabel(label)} ${r.catalogued}/${r.inventoryTotal}`).join(" · ")
+    : `${catalogued}/${inventoryTotal}`;
+  const recordsTooltip = hasMultiRelease
+    ? releaseEntries.map(([label, r]) => `${label}: ${r.catalogued} catalogued of ${r.inventoryTotal} (status: ${r.status})`).join(" · ")
+    : "Records catalogued of war.gov press-release inventory total";
 
   if (compact) {
     return (
       <div className="px-3 sm:px-6 py-1.5 border-b border-emerald-900/40 bg-black/30 flex items-center justify-between gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest">
+        <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest" title={recordsTooltip}>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          {t("freshness.records_pages", {
-            catalogued,
-            total: inventoryTotal,
-            pages: pagesIndexed?.toLocaleString() ?? "—",
-            ago,
-          })}
+          {hasMultiRelease
+            ? `${recordsLabel} records · ${pagesIndexed?.toLocaleString() ?? "—"} pages · refreshed ${ago}`
+            : t("freshness.records_pages", {
+                catalogued,
+                total: inventoryTotal,
+                pages: pagesIndexed?.toLocaleString() ?? "—",
+                ago,
+              })}
         </span>
         <button onClick={() => refresh(true)} disabled={refreshing}
           aria-label={t("freshness.refresh")}
@@ -94,9 +112,25 @@ export default function CorpusFreshness({ compact = false }) {
           {t("freshness.refreshed")} <span className="text-emerald-400 ml-1">{ago}</span>
         </span>
         {inventoryTotal != null && (
-          <span className="text-emerald-600" title="Records claimed by war.gov press release (will be a live scrape count once the scraper lands)">
-            ·  <span className="text-emerald-400">{catalogued}</span> of <span className="text-emerald-400">{inventoryTotal}</span> records catalogued
-          </span>
+          hasMultiRelease ? (
+            <span className="text-emerald-600" title={recordsTooltip}>
+              ·  {releaseEntries.map(([label, r], i) => (
+                <React.Fragment key={label}>
+                  {i > 0 && <span className="text-emerald-800 mx-1">·</span>}
+                  <span className="text-emerald-700">{shortLabel(label)}</span>
+                  {' '}
+                  <span className="text-emerald-400">{r.catalogued}</span>
+                  <span className="text-emerald-800">/</span>
+                  <span className="text-emerald-400">{r.inventoryTotal}</span>
+                </React.Fragment>
+              ))}
+              <span className="ml-1">records catalogued</span>
+            </span>
+          ) : (
+            <span className="text-emerald-600" title="Records claimed by war.gov press release (will be a live scrape count once the scraper lands)">
+              ·  <span className="text-emerald-400">{catalogued}</span> of <span className="text-emerald-400">{inventoryTotal}</span> records catalogued
+            </span>
+          )
         )}
         {pagesIndexed != null && (
           <span className="text-emerald-600" title="Per-page rows in the corpus DB across all events">

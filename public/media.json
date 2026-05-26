@@ -1,23 +1,54 @@
 {
-  "generatedAt": "2026-05-26T18:34:51.486Z",
-  "total": 220,
+  "generatedAt": "2026-05-26T23:41:46.187Z",
+  "total": 222,
   "byKind": {
+    "photograph": 84,
     "video": 33,
     "diagram": 16,
     "map": 8,
-    "photograph": 82,
     "hand-drawing": 42,
     "newspaper-clipping": 33,
     "photocopied-negative": 6
   },
   "byAgency": {
+    "Department of Energy": 2,
     "Department of War": 63,
     "Department of State": 1,
     "FBI": 147,
     "NASA": 9
   },
-  "eventCount": 61,
+  "eventCount": 62,
   "items": [
+    {
+      "id": "DOE-UAP-D001-p0001",
+      "eventId": "DOE-UAP-D001",
+      "eventTitle": "DOE-UAP-D001, Enhanced PANTEX Imagery",
+      "agency": "Department of Energy",
+      "era": "modern",
+      "page": 1,
+      "kind": "photograph",
+      "title": "DOE-UAP-D001, Enhanced PANTEX Imagery · page 1",
+      "description": "BEN sie erin we Pantex Unidentified Object Incident Report [Image from Ground Surveillance Radar Tower ENE Pages of 6",
+      "classifier": "ingest-release-02-pdfs (filename-heuristic)",
+      "classifiedAt": "2026-05-25T17:42:50.499Z",
+      "imagePath": "media/DOE-UAP-D001/p0001.png",
+      "thumbnailPath": "media/DOE-UAP-D001/p0001.png"
+    },
+    {
+      "id": "DOE-UAP-D001-p0002",
+      "eventId": "DOE-UAP-D001",
+      "eventTitle": "DOE-UAP-D001, Enhanced PANTEX Imagery",
+      "agency": "Department of Energy",
+      "era": "modern",
+      "page": 2,
+      "kind": "photograph",
+      "title": "DOE-UAP-D001, Enhanced PANTEX Imagery · page 2",
+      "description": "Pantex vent ot eer ue Pantex Unidentified Object incident Report Sandia National Labs Enhanced Images of the Object UCNE Page 6of 6",
+      "classifier": "ingest-release-02-pdfs (filename-heuristic)",
+      "classifiedAt": "2026-05-25T17:42:50.499Z",
+      "imagePath": "media/DOE-UAP-D001/p0002.png",
+      "thumbnailPath": "media/DOE-UAP-D001/p0002.png"
+    },
     {
       "id": "dow-uap-pr050-video",
       "eventId": "DOW-UAP-PR050",
@@ -2944,7 +2975,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "middle-east-may-2020-video",
@@ -2961,7 +2994,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "southern-us-2020-video",
@@ -2978,7 +3013,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "iraq-may-2022-video",
@@ -2995,7 +3032,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "iraq-may-29-2022-video",
@@ -3012,7 +3051,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "syria-july-2022-video",
@@ -3029,7 +3070,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "iraq-dec-2022-video",
@@ -3046,7 +3089,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "uae-oct-2023-video",
@@ -3063,7 +3108,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "greece-oct-2023-video",
@@ -3080,7 +3127,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "japan-2023-video",
@@ -3097,7 +3146,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "greece-jan-2024-video",
@@ -3114,7 +3165,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "indopacom-2024-video",
@@ -3131,7 +3184,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "uae-june-2024-video",
@@ -3148,7 +3203,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "syria-oct-2024-video",
@@ -3165,7 +3222,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "africa-2025-video",
@@ -3182,7 +3241,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "army-2026-video",
@@ -3199,7 +3260,9 @@
       "classifier": "release-video",
       "classifiedAt": "2026-05-08",
       "imagePath": null,
-      "thumbnailPath": null
+      "thumbnailPath": null,
+      "views": null,
+      "viewsFetchedAt": null
     },
     {
       "id": "dow-uap-pr27-unresolved-uap-report-united-arab-emirates-october-2023-video",

@@ -471,9 +471,45 @@ db.prepare(`
 const q = (sql, ...args) => db.prepare(sql).get(...args);
 const qAll = (sql, ...args) => db.prepare(sql).all(...args);
 
+// Per-release breakdown. The legacy inventory.total ceiling = 162 was the
+// Release 01 press-release count; once Release 02 events landed in
+// events.js, the catalogued-vs-inventory ratio became a mixed-release
+// number. byRelease pulls denominators from config/releases.json (the
+// authoritative source) and numerators from EVENTS bucketed by their
+// `release` tag, so each release reports against its own ceiling.
+let releasesConfig = [];
+try {
+  const cfg = JSON.parse(await readFile(path.join(ROOT, "config/releases.json"), "utf8"));
+  releasesConfig = Array.isArray(cfg.releases) ? cfg.releases : [];
+} catch {}
+
+const eventsByRelease = new Map();
+for (const ev of EVENTS) {
+  const r = ev.release || "Release 01";
+  if (!eventsByRelease.has(r)) eventsByRelease.set(r, []);
+  eventsByRelease.get(r).push(ev);
+}
+
+const byRelease = {};
+for (const r of releasesConfig) {
+  const label = r.label || r.id;
+  const evs = eventsByRelease.get(label) || [];
+  byRelease[label] = {
+    id: r.id,
+    published: r.published,
+    status: r.status,
+    inventoryTotal: r.files?.total ?? null,
+    catalogued: evs.length,
+    uncatalogued: Math.max(0, (r.files?.total ?? 0) - evs.length),
+    files: r.files || null,
+    mirrored: r.mirrored || null,
+  };
+}
+
 const stats = {
   generatedAt: nowIso,
   pressReleaseClaim: PRESS_RELEASE_TOTAL,
+  byRelease,
   inventory: {
     total: q("SELECT COUNT(*) AS n FROM inventory").n,
     enumerated: q("SELECT COUNT(*) AS n FROM inventory WHERE url IS NOT NULL").n,

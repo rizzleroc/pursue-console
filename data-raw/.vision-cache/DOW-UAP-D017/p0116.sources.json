@@ -1,0 +1,21 @@
+{
+  "best": "ocr",
+  "sources": {
+    "ocr": {
+      "chars": 11,
+      "imported_at": "2026-05-25T17:42:54.105Z",
+      "note": "tesseract eng @ 200dpi via ingest-release-02-pdfs.mjs",
+      "text_file": "p0116.ocr.txt"
+    }
+  },
+  "comparison": {
+    "computed_at": "2026-05-25T17:42:54.105Z",
+    "method": "single-source",
+    "sources_count": 1,
+    "canonical": "ocr",
+    "agreement_score": null,
+    "pairs": [],
+    "confidence": "low",
+    "needs_review": false
+  }
+}

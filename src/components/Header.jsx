@@ -37,6 +37,12 @@ export default function Header({ view, onViewChange, onVolunteer }) {
   const totalInv   = stats?.inventory?.total ?? null;
   const pagesTotal = stats?.pages?.totalIndexed ?? null;
   const reviewN    = stats?.review?.pagesNeedingReview ?? null;
+  // When the corpus spans multiple releases, render per-release ratios
+  // instead of a mixed-release total. The legacy "catalogued/inventoryTotal"
+  // pair compares all-releases events against just the Release 01 ceiling,
+  // which silently overstates Release 01 progress.
+  const releaseEntries = stats?.byRelease ? Object.entries(stats.byRelease) : [];
+  const hasMultiRelease = releaseEntries.length >= 2;
 
   return (
     <header className="border-b border-emerald-700/40 bg-black/40 backdrop-blur-sm sticky top-0 z-20">
@@ -56,8 +62,13 @@ export default function Header({ view, onViewChange, onVolunteer }) {
             </a>
           </span>
           {catalogued != null && totalInv != null && (
-            <span className="hidden sm:inline text-emerald-700 text-[10px] font-mono">
-              {t("header.records", { catalogued, total: totalInv })}
+            <span className="hidden sm:inline text-emerald-700 text-[10px] font-mono"
+              title={hasMultiRelease
+                ? releaseEntries.map(([label, r]) => `${label}: ${r.catalogued}/${r.inventoryTotal} (${r.status})`).join(" · ")
+                : undefined}>
+              {hasMultiRelease
+                ? <>{releaseEntries.map(([label, r]) => `${label.replace(/^Release\s+0?/i, "R")} ${r.catalogued}/${r.inventoryTotal}`).join(" · ")} records</>
+                : t("header.records", { catalogued, total: totalInv })}
               {pagesTotal != null && <> · {t("header.pages", { pages: pagesTotal.toLocaleString() })}</>}
             </span>
           )}
