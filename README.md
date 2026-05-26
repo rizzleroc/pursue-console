@@ -31,7 +31,7 @@ The war.gov inventory is a flat list of PDFs and videos. Reading them one by one
 
 | | |
 |---|---|
-| **Records inventoried** | 162 Release 01 (128 catalogued · 34 awaiting enumeration) + 6 of 64 Release 02 PDFs mirrored |
+| **Records inventoried** | 162 Release 01 + 6 of 64 Release 02 files mirrored (all 6 Release 02 PDFs; 7 audio + 51 video pending). 128 events catalogued total (121 Release 01 + 7 Release 02) |
 | **Pages transcribed** | 3,394 across 65 events |
 | **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
 | **Per source** | 3,370 Gemini · 446 GPT-vision · 0 Claude · 693 OCR transcripts (4 pages OCR-only · 689 cross-checked against vision) · 55 contributor-submitted |
@@ -47,6 +47,9 @@ Pages streaming in from machine OCR + volunteer submissions. Per-event progress 
 
 ### SEARCH + SEMANTIC
 Hybrid lexical (MiniSearch) + dense semantic (sentence-transformers + FAISS). All embeddings run in the browser; nothing leaves the page. FAISS index auto-rebuilds every 4 hours when input data changes (skip-on-unchanged hash check, no commit pollution).
+
+### ASK · natural-language interface
+Two modes against the catalogue. **PATTERN** is a local intent classifier — instant, free, answers dataset-shape questions ("what changed today?", "what's classified as a map?"). **SMART** is real RAG — embeds the question with MiniLM in-browser, retrieves top-K passages via FAISS over `public/embeddings.bin`, then synthesizes an answer with citations. SMART routes through the user's pursue-vision-mcp daemon (Claude / ChatGPT / Gemini browser tab) or a hosted backend or an in-browser WebLLM model — picked in settings. No server-side keys.
 
 ### REVIEW · cross-source disagreement queue
 The site's most consequential surface. Pages where Gemini ↔ ChatGPT ↔ Claude ↔ (future) human disagree appear here worst-first. Click any item to see every source's text side-by-side with pairwise agreement scores. A "FIX IT" button points at the volunteer flow. When a human resolves a page, it becomes canonical, and we learn how each machine source scored vs. that gold for that page.
@@ -182,6 +185,7 @@ pursue-console/
 │   │   └── VolunteerModal.jsx        priority ladder + setup snippets
 │   └── views/
 │       ├── LiveView, SearchView, SemanticSearchView, DossierView
+│       ├── AskView                   natural-language Q&A (PATTERN + SMART RAG)
 │       ├── ReviewView                cross-source disagreement queue
 │       ├── MediaView                 visual library
 │       ├── TimelineView, AtlasView, GlobeView, NetworkView
