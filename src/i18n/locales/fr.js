@@ -160,6 +160,7 @@ export default {
   timeline: {
     title: "┃ CHRONOLOGIE",
     records_range: "{n} DOSSIERS // 1944—2026",
+    redact_tag: "CAVIARDÉ",
   },
   atlas: {
     title: "┃ ATLAS",
@@ -535,6 +536,7 @@ export default {
     edge_all: "TOUTES",
     sim_threshold: "SIM ≥",
     ent_label: "ENT",
+    pat_label: "MOT",
   },
   help: {
     title: "┃ AIDE",

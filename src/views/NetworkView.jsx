@@ -299,7 +299,7 @@ export default function NetworkView({ events, onSelect }) {
           })}
         </div>
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">PAT</span>
+          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("network.pat_label")}</span>
           {PATTERN_KIND_FILTERS.map(k => {
             const meta = PATTERN_KIND_STYLE[k];
             const active = activePatternKinds.has(k);

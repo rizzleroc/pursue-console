@@ -181,6 +181,7 @@ export default {
   timeline: {
     title: "┃ CHRONOLOGY",
     records_range: "{n} RECORDS // 1944—2026",
+    redact_tag: "REDACT",
   },
   atlas: {
     title: "┃ ATLAS",
@@ -561,6 +562,7 @@ export default {
     edge_all: "ALL",
     sim_threshold: "SIM ≥",
     ent_label: "ENT",
+    pat_label: "PAT",
   },
   help: {
     title: "┃ HELP",

@@ -52,7 +52,7 @@ export default function TimelineView({ events, onSelect }) {
                       <div className="flex items-center gap-1">
                         <DocTypeBadge docType={event.docType} />
                         {event.flag === "anchor" && <span className="text-amber-400 text-[10px]">▲</span>}
-                        {event.redacted && <span className="font-mono text-[8px] text-rose-400/70">REDACT</span>}
+                        {event.redacted && <span className="font-mono text-[8px] text-rose-400/70">{t("timeline.redact_tag")}</span>}
                       </div>
                     </div>
                     <div className="text-emerald-100 text-[13px] leading-snug mt-1 group-hover:text-amber-200 transition-colors">{event.title}</div>
