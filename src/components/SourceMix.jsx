@@ -1,4 +1,5 @@
 import React from "react";
+import { useT } from "../i18n/context.js";
 
 // Single source of truth for per-source coloring across the whole UI.
 // When you see a colored dot anywhere — TIMELINE row, ATLAS cell, NETWORK
@@ -80,18 +81,20 @@ export function confidenceStyle(c) { return CONFIDENCE_STYLES[c] || CONFIDENCE_S
 //   <SourceMix sources={["gemini", "gpt-vision"]} />
 //   <SourceMix sources={page.sources} size="xs" />
 export default function SourceMix({ sources, size = "sm", showLabels = false, title }) {
+  const t = useT();
   if (!sources) return null;
   const names = Array.isArray(sources) ? sources : Object.keys(sources);
   if (!names.length) return null;
 
   const dotSize = size === "xs" ? "w-1 h-1" : size === "lg" ? "w-2.5 h-2.5" : "w-1.5 h-1.5";
   const gap = size === "xs" ? "gap-0.5" : "gap-1";
+  const joined = names.join(", ");
 
   return (
     <span
       className={`inline-flex items-center ${gap}`}
-      title={title || `Transcribed by: ${names.join(", ")}`}
-      aria-label={`Sources: ${names.join(", ")}`}>
+      title={title || t("source.transcribed_by", { names: joined })}
+      aria-label={t("source.aria", { names: joined })}>
       {names.map(n => {
         const s = sourceStyle(n);
         return (
@@ -108,9 +111,10 @@ export default function SourceMix({ sources, size = "sm", showLabels = false, ti
 // Legend block — drop once at the top of NETWORK / REVIEW. Documents
 // the encoding so the dots are self-explanatory.
 export function SourceLegend({ className = "" }) {
+  const t = useT();
   return (
     <div className={`inline-flex items-center gap-3 font-mono text-[9px] tracking-widest text-emerald-700 ${className}`}>
-      <span className="opacity-60">SOURCES:</span>
+      <span className="opacity-60">{t("source.legend")}</span>
       {Object.entries(SOURCE_STYLES).filter(([k]) => k !== "pdfjs").map(([name, s]) => (
         <span key={name} className="inline-flex items-center gap-1">
           <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />

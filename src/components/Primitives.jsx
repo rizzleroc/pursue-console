@@ -1,5 +1,6 @@
 import React from "react";
 import { AGENCY_COLORS } from "../data/events.js";
+import { useT } from "../i18n/context.js";
 
 export function ScanlineOverlay() {
   return <div className="pointer-events-none fixed inset-0 z-50" style={{
@@ -16,25 +17,30 @@ export function GlitchText({ children, className = "" }) {
 // Doc-type badge — for records that are primarily visual (photos, sketches,
 // handwritten letters) rather than typed text. Tells the reader: don't expect
 // transcribed prose; open the PDF to look at the actual evidence.
+//
+// The badge map keeps `glyph` + `color` (the visual encoding) baked in; the
+// `label` is resolved at render time via t("doctype.<id>") so it localizes.
 export const DOC_TYPE_BADGE = {
-  photoset:    { label: "PHOTOS",      glyph: "▣", color: "#FF6B9D" },
-  handwritten: { label: "HANDWRITTEN", glyph: "✎", color: "#FFD93D" },
-  sketch:      { label: "SKETCH",      glyph: "✦", color: "#FFD93D" },
-  annotated:   { label: "ANNOTATED",   glyph: "◎", color: "#82B6FF" },
-  mixed:       { label: "MIXED",       glyph: "▥", color: "#B794F4" },
+  photoset:    { glyph: "▣", color: "#FF6B9D" },
+  handwritten: { glyph: "✎", color: "#FFD93D" },
+  sketch:      { glyph: "✦", color: "#FFD93D" },
+  annotated:   { glyph: "◎", color: "#82B6FF" },
+  mixed:       { glyph: "▥", color: "#B794F4" },
 };
 
 export function DocTypeBadge({ docType, size = "sm" }) {
+  const t = useT();
   if (!docType || !DOC_TYPE_BADGE[docType]) return null;
   const b = DOC_TYPE_BADGE[docType];
+  const label = t(`doctype.${docType}`);
   const cls = size === "lg"
     ? "px-2 py-0.5 text-[10px] tracking-widest"
     : "px-1.5 py-0.5 text-[8px] tracking-wider";
   return (
     <span className={`inline-flex items-center gap-1 font-mono rounded-sm border ${cls}`}
       style={{ color: b.color, borderColor: b.color + "60", backgroundColor: b.color + "12" }}
-      title={`Primarily visual: ${b.label.toLowerCase()}`}>
-      <span>{b.glyph}</span>{b.label}
+      title={t("doctype.title_prefix", { label: label.toLowerCase() })}>
+      <span>{b.glyph}</span>{label}
     </span>
   );
 }
@@ -47,6 +53,7 @@ export function flagBg(flag) {
 }
 
 export function MiniChip({ event, onClick }) {
+  const t = useT();
   const color = AGENCY_COLORS[event.agency] || "#7CFFB2";
   return (
     <button onClick={() => onClick(event)}
@@ -58,7 +65,7 @@ export function MiniChip({ event, onClick }) {
         {event.flag === "anchor" && <span className="text-amber-400 text-[8px]">●</span>}
         {event.docType && DOC_TYPE_BADGE[event.docType] && (
           <span className="ml-auto text-[8px]" style={{ color: DOC_TYPE_BADGE[event.docType].color }}
-            title={DOC_TYPE_BADGE[event.docType].label}>
+            title={t(`doctype.${event.docType}`)}>
             {DOC_TYPE_BADGE[event.docType].glyph}
           </span>
         )}

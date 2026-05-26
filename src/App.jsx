@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, Suspense, lazy } from "react";
 import { EVENTS, RELEASES_LABEL } from "./data/events.js";
+import { useT } from "./i18n/context.js";
 
 // Global handle for cross-view event lookups (MediaView, ReviewView use
 // this when their deep-link buttons only have eid + title, but the
@@ -45,6 +46,7 @@ function recordType(e) {
 }
 
 export default function App() {
+  const t = useT();
   // LIVE is home — it's where the freshly-arrived data shows up, and it's
   // the view that carries the hero band. Every other view is "instrument."
   const [view, setView] = useState("live");
@@ -174,7 +176,7 @@ export default function App() {
             <Suspense fallback={
               <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-2" />
-                LOADING ASK
+                {t("app.loading_ask")}
               </div>
             }>
               <AskView onSelect={handleSelect} headerFilters={headerFilters} />
@@ -186,13 +188,13 @@ export default function App() {
               <div className="px-3 sm:px-8 py-12 font-mono text-[11px] text-emerald-600 tracking-widest space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  LOADING SEMANTIC SEARCH ENGINE
+                  {t("app.loading_semantic_title")}
                 </div>
                 <div className="text-emerald-800 text-[10px] tracking-widest">
-                  ~25 MB ORT WASM + INT8 model (first visit only — cached in IndexedDB after)
+                  {t("app.loading_semantic_size")}
                 </div>
                 <div className="text-emerald-800 text-[10px] tracking-widest">
-                  on a slow connection this can take 30+ seconds. SEARCH (lexical) is available now if you'd rather not wait.
+                  {t("app.loading_semantic_hint")}
                 </div>
               </div>
             }>
@@ -212,15 +214,15 @@ export default function App() {
         {showFooter ? (
           <footer className="border-t border-emerald-700/30 mt-10 px-3 sm:px-8 py-6">
             <div className="font-mono text-[9px] text-emerald-700 tracking-widest space-y-1">
-              <div>▌ SOURCE: WAR.GOV/UFO {RELEASES_LABEL.toUpperCase()} // CLEARED MAY 8 + MAY 22, 2026</div>
-              <div>▌ ALL CASES UNRESOLVED — GOVERNMENT UNABLE TO MAKE DEFINITIVE DETERMINATION</div>
-              <div>▌ INTERAGENCY: WHITE HOUSE / ODNI / DOE / AARO / NASA / FBI / DOW</div>
+              <div>{t("footer.source", { releases: RELEASES_LABEL.toUpperCase() })}</div>
+              <div>{t("footer.unresolved")}</div>
+              <div>{t("footer.interagency")}</div>
             </div>
           </footer>
         ) : (
           <footer className="border-t border-emerald-900/30 mt-6 px-3 sm:px-8 py-3 text-center">
             <span className="font-mono text-[9px] text-emerald-800 tracking-widest">
-              ▌ war.gov/UFO · {RELEASES_LABEL.toLowerCase()} catalogued
+              {t("footer.compact", { releases: RELEASES_LABEL.toLowerCase() })}
             </span>
           </footer>
         )}
