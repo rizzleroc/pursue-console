@@ -284,6 +284,94 @@ for (const ev of Object.values(eventsMap)) {
 }
 console.log(`[media-index] + ${videoCount} release videos (DVIDS sensor footage)`);
 
+// Additional release videos from data-raw/uap-data.csv — the canonical
+// war.gov release inventory. The events.js loop above only surfaces
+// videos that are wired to a curated EVENT; the CSV holds the rest of
+// the release-wide video catalog (28 R01 + R02 entries). Dedupe by
+// DVIDS Video ID against the items already added, then by record
+// Title for rows whose DVIDS ID isn't known yet.
+const CSV_PATH = path.join(ROOT, "data-raw", "uap-data.csv");
+let csvVideoCount = 0;
+try {
+  const csvText = await readFile(CSV_PATH, "utf8");
+  // Tokenise into logical rows (fields may contain quoted newlines).
+  const rawRows = [];
+  let cur = "", inQ = false;
+  for (const ch of csvText) {
+    if (ch === '"') inQ = !inQ;
+    if (ch === "\n" && !inQ) { rawRows.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  if (cur) rawRows.push(cur);
+  function splitCsv(row) {
+    const cells = [];
+    let c = "", q = false;
+    for (let j = 0; j < row.length; j++) {
+      const ch = row[j];
+      if (q) {
+        if (ch === '"' && row[j + 1] === '"') { c += '"'; j++; }
+        else if (ch === '"') q = false;
+        else c += ch;
+      } else {
+        if (ch === ",") { cells.push(c); c = ""; }
+        else if (ch === '"') q = true;
+        else c += ch;
+      }
+    }
+    cells.push(c);
+    return cells;
+  }
+  const header = splitCsv(rawRows[0]).map(s => s.trim());
+  const ix = name => header.findIndex(h => h === name);
+  const I = {
+    Type: ix("Type"), Title: ix("Title"), DVID: ix("DVIDS Video ID"),
+    VideoTitle: ix("Video Title"), Agency: ix("Agency"),
+    IncidentDate: ix("Incident Date"), IncidentLocation: ix("Incident Location"),
+    DescriptionBlurb: ix("Description Blurb"), ModalImage: ix("Modal Image"),
+    ReleaseDate: ix("Release Date"),
+  };
+  const seenVid = new Set(items.filter(i => i.videoId).map(i => String(i.videoId)));
+  const seenTitle = new Set(items.filter(i => i.kind === "video" && i.title)
+    .map(i => i.title.toLowerCase()));
+  for (let i = 1; i < rawRows.length; i++) {
+    const f = splitCsv(rawRows[i]);
+    const t = (f[I.Type] || "").trim().toLowerCase();
+    if (t !== "vid" && t !== "video") continue;
+    const recordId = (f[I.Title] || "").replace(/\s+/g, " ").trim();
+    const dvid = (f[I.DVID] || "").trim();
+    if (dvid && seenVid.has(dvid)) continue;
+    const title = (f[I.VideoTitle] || "").replace(/\s+/g, " ").trim() || recordId;
+    if (!dvid && seenTitle.has(title.toLowerCase())) continue;
+    const releaseDate = (f[I.ReleaseDate] || "").trim();
+    const classifiedAt = releaseDate === "5/22/26" ? "2026-05-22" : "2026-05-08";
+    items.push({
+      id: `${recordId.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-video`,
+      eventId: recordId || null,
+      eventTitle: title,
+      agency: (f[I.Agency] || "").trim() || null,
+      era: null,
+      page: null,
+      kind: "video",
+      title,
+      description: (f[I.DescriptionBlurb] || "").replace(/\s+/g, " ").trim() || "",
+      videoId: dvid || null,
+      dvidsUrl: dvid ? `https://www.dvidshub.net/video/${dvid}` : null,
+      classifier: "release-video",
+      classifiedAt,
+      imagePath: null,
+      thumbnailPath: (f[I.ModalImage] || "").trim() || null,
+      incidentDate: (f[I.IncidentDate] || "").trim() || null,
+      incidentLocation: (f[I.IncidentLocation] || "").trim() || null,
+    });
+    if (dvid) seenVid.add(dvid);
+    seenTitle.add(title.toLowerCase());
+    csvVideoCount++;
+  }
+} catch (e) {
+  console.warn(`[media-index] skipping CSV video pass: ${e.message}`);
+}
+console.log(`[media-index] + ${csvVideoCount} release videos from data-raw/uap-data.csv`);
+
 // Default sort: most recent classification first
 items.sort((a, b) => (b.classifiedAt || "").localeCompare(a.classifiedAt || ""));
 
