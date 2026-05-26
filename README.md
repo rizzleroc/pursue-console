@@ -15,6 +15,7 @@ Late 2025, SECRET//NOFORN. An FBI 302 from a senior US intelligence official abo
 - **Browse 162 declassified records** — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
 - **See where the AI transcriptions disagree** — every page is transcribed by up to four sources (Gemini, ChatGPT, Claude, OCR); disputes are queued worst-first. → REVIEW tab.
 - **Fix one disputed page in 30 seconds** — read the source side-by-side with each AI's guess, type the correct version, submit. Becomes the gold standard that grades every machine source forever.
+- **Read it in your own language** — full UI translated into 18 languages including right-to-left Arabic and Hebrew. The site auto-detects your browser locale on first load; switch via the picker in the nav.
 
 ## Why this exists, relative to other projects
 
