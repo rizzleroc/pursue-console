@@ -124,9 +124,15 @@ async function ensureChrome() {
     // may have to solve a one-time Akamai challenge in this tab — that
     // gives the rest of the session a cookie that unblocks fetches.
     "https://www.war.gov/UFO/",
+    // And dvidshub.net, used by the dvids driver to download DVIDS
+    // video assets. DVIDS is a public DoD media site so this tab
+    // shouldn't trigger a challenge — but yt-dlp gets blocked at the
+    // TLS-fingerprint level, so we still need an in-page fetch().
+    "https://www.dvidshub.net/",
   ], { detached: true, stdio: "ignore" }).unref();
-  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, claude.ai/new, www.war.gov/UFO/");
+  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, claude.ai/new, www.war.gov/UFO/, www.dvidshub.net/");
   console.log("[start] note — the war.gov tab may show a one-time Akamai challenge; solve it once in your browser before running the war.gov collector.");
+  console.log("[start] note — dvidshub.net is public and shouldn't show a challenge; the tab is just there so the dvids driver can fetch from a real browser TLS handshake.");
   // Give Chrome a moment to bind the port
   for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 500));
