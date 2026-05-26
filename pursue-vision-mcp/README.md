@@ -1,6 +1,6 @@
 # pursue-vision-mcp
 
-**Minimal open-source daemon that drives your already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents** — plus a `@unverified` war.gov collector that uses the same logged-in Chrome to bypass Akamai TLS blocking. Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
+**Minimal open-source daemon that drives your already-logged-in ChatGPT and Gemini browser tabs to OCR pages of documents** — plus a `@unverified` war.gov collector and a `@unverified` DVIDS video collector that both use the same logged-in Chrome to bypass TLS-fingerprint blocking. Drop-in compatible with the [pursue-console](../README.md) vision-OCR pipeline.
 
 Routes:
 
@@ -8,6 +8,8 @@ Routes:
 - **`POST /fanout`** — send the SAME prompt + files to BOTH providers in parallel; returns both responses. Used by the corpus's cross-source re-evaluation pipeline (`scripts/reevaluate-disputed.mjs`).
 - **`GET /war-gov/index?release=<n>`** — fetch the war.gov/UFO release-files index for release `<n>` via in-page `fetch()` on a logged-in `www.war.gov/UFO/` tab. ***`@unverified`** — never run end-to-end against live war.gov; first live test is the maintainer's Chrome.*
 - **`POST /war-gov/download`** — `{ urls: string[], destDir: string }`. Downloads each URL via Chrome (8 MB HTTP Range chunks for files >50 MB) into a path-jailed `destDir`. Returns per-file `{ ok, bytes, error? }`. **`@unverified`**.
+- **`GET /dvids/resolve?videoId=<n>`** — resolve a numeric DVIDS asset ID to its direct mp4 URL via in-page `fetch()` + DOM scrape on a logged-in `www.dvidshub.net/` tab. ***`@unverified`** — replaces the yt-dlp path that returned `ConnectionResetError(10054)` from dvidshub.net.*
+- **`POST /dvids/download`** — `{ videos: [{videoId, destPath}, ...] }`. Resolves + downloads each video via Chrome (8 MB HTTP Range chunks for clips >50 MB) into path-jailed per-item destPaths. Returns per-item `{ videoId, ok, bytes, mp4Url, error? }`. **`@unverified`**.
 
 No image generation, no API keys, no chat memory, no fancy queue, no telemetry. If you have ChatGPT Plus and/or a Gemini account, this is enough to contribute transcriptions to the corpus (see [HOW-CAN-I-HELP.md](../HOW-CAN-I-HELP.md) in the parent project).
 
@@ -43,7 +45,7 @@ npm start
 
 `npm start` will:
 1. Launch Chrome with `--remote-debugging-port=9222` (using a dedicated profile so you stay signed in).
-2. Open `chatgpt.com`, `gemini.google.com/app`, **and `www.war.gov/UFO/`** — sign in to the LLM tabs once; on the war.gov tab, solve any one-time Akamai challenge it shows (you'll see a CAPTCHA-style "Pardon Our Interruption" or similar). Once cleared, the cookie persists in the profile and the warGov driver can `fetch()` releases.
+2. Open `chatgpt.com`, `gemini.google.com/app`, `www.war.gov/UFO/`, **and `www.dvidshub.net/`** — sign in to the LLM tabs once; on the war.gov tab, solve any one-time Akamai challenge it shows (you'll see a CAPTCHA-style "Pardon Our Interruption" or similar). Once cleared, the cookie persists in the profile and the warGov driver can `fetch()` releases. The dvidshub.net tab is public and should NOT show a challenge — it's there only so the dvids driver can issue in-page `fetch()` calls that inherit Chrome's TLS handshake (yt-dlp gets blocked at the TLS-fingerprint level).
 3. Start the daemon on `http://127.0.0.1:9223`.
 4. Generate a bearer token at `~/.pursue-vision-token`.
 
@@ -219,6 +221,47 @@ Returns:
 
 The companion CLI is `scripts/sync-war-gov.mjs` in the parent project (`npm run corpus:fetch-war-gov`).
 
+### `GET /dvids/resolve?videoId=<n>` *(@unverified)*
+
+Asks the daemon to resolve a numeric DVIDS asset ID (e.g. `1006107`) to its direct mp4 URL. The driver navigates a logged-in `www.dvidshub.net/` tab to `https://www.dvidshub.net/video/<n>`, then tries three strategies in order: (1) `page.waitForResponse` on initial load capturing the player's own mp4 fetch, (2) DOM scrape of `<video>` / `<source>` elements, Open Graph `og:video` meta, and JSON-LD `VideoObject.contentUrl`, (3) regex over the page HTML for keyed JSON like `"videoUrl"` / `"playbackUrl"` / `"mp4Url"`. Whichever yields a `.mp4` URL first wins.
+
+Returns:
+```json
+{
+  "videoId": "1006107",
+  "title": "USS Theodore Roosevelt — incident video",
+  "mp4Url": "https://cdn.dvidshub.net/.../video.mp4",
+  "durationSec": 78.5,
+  "sizeBytes": null
+}
+```
+
+### `POST /dvids/download` *(@unverified)*
+
+```json
+{
+  "videos": [
+    { "videoId": "1006107", "destPath": "/home/you/pursue-console/data-raw/videos/2004-uss-roosevelt.mp4" },
+    { "videoId": "1023456", "destPath": "/home/you/pursue-console/data-raw/videos/2015-nimitz.mp4" }
+  ]
+}
+```
+
+Each `destPath` is jail-checked to be under your home directory or daemon cwd. The daemon resolves the video URL then downloads it (8 MB HTTP Range chunks for clips >50 MB) via the same browser → base64 → Node → disk path the war.gov downloader uses. Batch capped at 32 videos to keep one request from monopolizing the queue. On a CDN block (403 / 429 / challenge body) the batch aborts rather than write challenge HTML pretending it's an mp4.
+
+Returns:
+```json
+{
+  "totalDurationMs": 187423,
+  "results": [
+    { "videoId": "1006107", "ok": true, "bytes": 12345678, "mp4Url": "https://...", "title": "...", "destPath": "/home/you/...", "durationMs": 12410 },
+    { "videoId": "1023456", "ok": false, "error": "dvids: could not find an mp4 URL for video 1023456", "durationMs": 8210 }
+  ]
+}
+```
+
+The companion CLI is `scripts/transcribe-videos.mjs` in the parent project (`npm run corpus:transcribe-videos`), which posts to this endpoint per video, then runs the existing Whisper + (optionally) Gemini multimodal analysis pipeline. The dvidshub.net tab is required; if it's not open the driver opens one in the current context.
+
 ### `GET /status`
 
 ```json
@@ -228,7 +271,8 @@ The companion CLI is `scripts/sync-war-gov.mjs` in the parent project (`npm run 
   "providers": {
     "chatgpt": { "connected": true,  "history": 47 },
     "gemini":  { "connected": true,  "history":  3 },
-    "warGov":  { "connected": true,  "history":  0 }
+    "warGov":  { "connected": true,  "history":  0 },
+    "dvids":   { "connected": true,  "history":  0 }
   }
 }
 ```

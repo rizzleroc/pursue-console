@@ -31,6 +31,7 @@ import { ChatGPTDriver } from "./chatgpt-driver.mjs";
 import { GeminiDriver }  from "./gemini-driver.mjs";
 import { ClaudeDriver } from "./claude-driver.mjs";
 import { WarGovDriver }  from "./war-gov-driver.mjs";
+import { DVIDSDriver }   from "./dvids-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -80,12 +81,14 @@ const drivers = {
   gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
   claude:  new ClaudeDriver({  cdpPort: CDP_PORT }),
   warGov:  new WarGovDriver({  cdpPort: CDP_PORT }),
+  dvids:   new DVIDSDriver({   cdpPort: CDP_PORT }),
 };
 const queues = {
   chatgpt: Promise.resolve(),
   gemini:  Promise.resolve(),
   claude:  Promise.resolve(),
   warGov:  Promise.resolve(),
+  dvids:   Promise.resolve(),
 };
 function enqueue(provider, fn) {
   const cur = queues[provider] ?? Promise.resolve();
@@ -143,6 +146,7 @@ const server = http.createServer(async (req, res) => {
           gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
           claude:  { connected: drivers.claude.isConnected(),  history: drivers.claude.callCount },
           warGov:  { connected: drivers.warGov.isConnected(),  history: drivers.warGov.callCount },
+          dvids:   { connected: drivers.dvids.isConnected(),   history: drivers.dvids.callCount },
         },
       });
     }
@@ -269,6 +273,97 @@ const server = http.createServer(async (req, res) => {
         }
         sendJson(res, 200, {
           destDir: safeDestDir,
+          totalDurationMs: Date.now() - t0,
+          results,
+        });
+      });
+      return;
+    }
+
+    // /dvids/resolve — given a numeric DVIDS asset ID, return the direct
+    // mp4 URL (plus title + best-effort duration/size). The driver this
+    // delegates to is annotated 'unverified' (see dvids-driver.mjs
+    // header) — Akamai-style TLS-fingerprint block at dvidshub.net means
+    // only the maintainer's real Chrome can verify the round-trip.
+    if (req.method === "GET" && req.url.startsWith("/dvids/resolve")) {
+      const u = new URL(req.url, "http://x");
+      const videoId = u.searchParams.get("videoId") || "";
+      if (!/^\d+$/.test(videoId)) {
+        return sendJson(res, 400, { error: "videoId (numeric DVIDS asset id) required" });
+      }
+      enqueue("dvids", async () => {
+        try {
+          const info = await drivers.dvids.resolveVideoUrl({ videoId });
+          sendJson(res, 200, info);
+        } catch (e) {
+          console.error(`[/dvids/resolve] ${e.message}`);
+          sendJson(res, 500, { error: e.message });
+        }
+      });
+      return;
+    }
+
+    // /dvids/download — resolve + download a batch of DVIDS videos into
+    // per-item destPath. Long-running: holds the connection open until
+    // every video either lands or fails. Per-item destPath is path-jailed
+    // (under home or cwd) just like /war-gov/download's destDir.
+    if (req.method === "POST" && req.url === "/dvids/download") {
+      const body = await readBody(req);
+      const { videos } = body;
+      if (!Array.isArray(videos) || !videos.length) {
+        return sendJson(res, 400, { error: "videos[] (non-empty) required" });
+      }
+      // Sanity-cap; the maintainer's realistic batch is the ~51 video
+      // count of Release 02. 32 is below that on purpose so we serialize
+      // smaller chunks — if a batch dies mid-way the user can resume.
+      if (videos.length > 32) {
+        return sendJson(res, 400, { error: `too many videos (${videos.length}); split into batches ≤ 32` });
+      }
+      // Validate each item up front so we don't start a long-running
+      // download and then realize item 17 has a bogus destPath.
+      const items = [];
+      for (const v of videos) {
+        const vid = v?.videoId != null ? String(v.videoId).trim() : "";
+        const dest = v?.destPath || "";
+        if (!/^\d+$/.test(vid)) {
+          return sendJson(res, 400, { error: `each video needs a numeric videoId (got '${vid}')` });
+        }
+        if (!dest || typeof dest !== "string") {
+          return sendJson(res, 400, { error: `each video needs a destPath (videoId=${vid})` });
+        }
+        let safeDest;
+        try { safeDest = jailDestDir(path.dirname(dest)); }
+        catch (e) { return sendJson(res, 403, { error: `${e.message} (for videoId=${vid})` }); }
+        const absDest = path.join(safeDest, path.basename(dest));
+        items.push({ videoId: vid, destPath: absDest });
+      }
+      const t0 = Date.now();
+      enqueue("dvids", async () => {
+        const results = [];
+        for (const { videoId, destPath } of items) {
+          const pt0 = Date.now();
+          try {
+            const info = await drivers.dvids.resolveVideoUrl({ videoId });
+            await drivers.dvids.downloadFile({ url: info.mp4Url, destPath });
+            const { statSync } = await import("node:fs");
+            let bytes = null;
+            try { bytes = statSync(destPath).size; } catch {}
+            results.push({
+              videoId, ok: true, bytes, mp4Url: info.mp4Url, title: info.title,
+              destPath, durationMs: Date.now() - pt0,
+            });
+          } catch (e) {
+            console.error(`[/dvids/download] videoId=${videoId} → ${e.message}`);
+            results.push({ videoId, ok: false, error: e.message, durationMs: Date.now() - pt0 });
+            // CDN blocks tend to be sticky once they fire; bail the
+            // batch rather than burn the rest on the same block.
+            if (/\bblock\b/i.test(e.message)) {
+              results.push({ videoId: "__abort__", ok: false, error: "aborting batch on CDN block" });
+              break;
+            }
+          }
+        }
+        sendJson(res, 200, {
           totalDurationMs: Date.now() - t0,
           results,
         });
