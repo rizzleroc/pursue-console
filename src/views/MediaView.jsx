@@ -49,6 +49,20 @@ const KIND_COLORS = {
 
 const ALL_KINDS = KIND_IDS;
 
+// Compact view-count formatter — "12.3K" / "1.2M" / "847". The grid tile
+// only has room for ~5 characters of badge text and the modal header
+// likewise wants something glanceable, so we collapse anything ≥1000 into
+// a single-decimal K/M form. Drops the trailing ".0" so "10.0K" → "10K".
+// Negative/non-finite inputs fall through to a plain coerced string so we
+// don't accidentally hide bad data.
+function fmtViews(n) {
+  if (typeof n !== "number" || !Number.isFinite(n)) return String(n ?? "");
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (abs >= 1_000)     return `${(n / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(n);
+}
+
 // Map the Header's "ALL TYPES" dropdown (Document/Video/Image/Audio) into
 // the media-kind taxonomy so the header filter actually subsets the grid.
 // Document = pages without a visible image (e.g. table forms), Image =
@@ -124,6 +138,11 @@ export default function MediaView({ onSelect, headerFilters }) {
   // (broken render vs. no PDF) and the user wanted them surfaced as
   // their own group.
   const [includeMissingRenders, setIncludeMissingRenders] = useState(false);
+  // Sort mode for the post-filter list. RECENT preserves the build-time
+  // order (newest classifiedAt first — see scripts/build-media-index.mjs);
+  // POPULAR sorts by `views` desc with nulls last so non-video tiles and
+  // videos missing stats sink to the bottom instead of polluting the top.
+  const [sortMode, setSortMode] = useState("RECENT");
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}media.json?t=${Date.now()}`)
@@ -156,6 +175,17 @@ export default function MediaView({ onSelect, headerFilters }) {
       return true;
     });
   }, [data, filterKinds, filterAgency, filterType, filterEvent, query, includePlaceholders, includeMissingRenders]);
+
+  // Sort runs on top of `filtered` — never mutate the upstream list. For
+  // POPULAR we compare numeric views with nulls treated as -Infinity so
+  // they always fall to the end; for ties we keep the existing order
+  // (Array.prototype.sort is stable in V8/JSC), so non-video items stay
+  // grouped by their original recency without further reshuffling.
+  const sorted = useMemo(() => {
+    if (sortMode !== "POPULAR") return filtered;
+    const v = (it) => typeof it.views === "number" ? it.views : -Infinity;
+    return [...filtered].sort((a, b) => v(b) - v(a));
+  }, [filtered, sortMode]);
 
   // Counts by bucket for the toggle labels. Four groups:
   //   withImage      — a real rendered PNG/JPG is attached
@@ -345,16 +375,26 @@ export default function MediaView({ onSelect, headerFilters }) {
           <option value="all">{t("media.all_events")}</option>
           {eventList.map(e => <option key={e.id} value={e.id}>{e.title} ({e.n})</option>)}
         </select>
+        {/* Sort selector. POPULAR ranks by DVIDS view count (baked into
+            media.json from src/data/video-stats.json). Non-video tiles
+            have no view count and sink to the end; the existing empty-
+            state already handles the "filtered to no videos" case so we
+            don't need a separate branch when POPULAR is active. */}
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)}
+          className="bg-black/60 border border-emerald-700/50 rounded-sm px-2 py-1 text-emerald-300 font-mono text-xs max-w-xs">
+          <option value="RECENT">sort: recent</option>
+          <option value="POPULAR">sort: popular</option>
+        </select>
       </div>
 
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-        {filtered.map(it => {
+        {sorted.map(it => {
           const c = KIND_COLORS[it.kind];
           return (
             <button key={it.id} onClick={() => setFocused(it)}
               className={`group block text-left bg-black/40 border border-emerald-900/40 hover:${c.ring} hover:ring-2 hover:border-transparent rounded-sm overflow-hidden transition-all`}>
-              <div className="aspect-[3/4] bg-black overflow-hidden">
+              <div className="relative aspect-[3/4] bg-black overflow-hidden">
                 {it.kind === "video" ? (
                   <VideoPoster label={t("media.play_dvids")} />
                 ) : it.thumbnailPath ? (
@@ -384,6 +424,17 @@ export default function MediaView({ onSelect, headerFilters }) {
                       {it.description || it.title || kindLabel(it.kind)}
                     </span>
                   </div>
+                )}
+                {/* View-count badge — only for video tiles whose stats
+                    we actually have (typeof check guards against the
+                    `null` we bake in when src/data/video-stats.json is
+                    missing or doesn't cover this videoId). Bottom-right
+                    over the poster, blue-on-near-black to match the IR
+                    scope aesthetic of VideoPoster above. */}
+                {it.kind === "video" && typeof it.views === "number" && (
+                  <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded-sm border border-blue-500/50 bg-black/70 font-mono text-[9px] tracking-wider text-blue-300">
+                    {fmtViews(it.views)}
+                  </span>
                 )}
               </div>
               <div className="px-2 py-1.5">
@@ -421,6 +472,12 @@ export default function MediaView({ onSelect, headerFilters }) {
                 <span className="font-mono text-[11px] text-emerald-200 truncate">{focused.eventTitle}</span>
                 <span className="font-mono text-[10px] text-emerald-700">·</span>
                 <span className="font-mono text-[10px] text-emerald-500">{focused.kind === "video" ? "DVIDS" : t("media.page_p_short", { n: focused.page })}</span>
+                {typeof focused.views === "number" && (
+                  <>
+                    <span className="font-mono text-[10px] text-emerald-700">·</span>
+                    <span className="font-mono text-[10px] text-blue-300">{fmtViews(focused.views)} views</span>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {focused.kind === "video" && (

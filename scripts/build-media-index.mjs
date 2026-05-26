@@ -154,6 +154,22 @@ try {
   eventsMap = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 } catch {}
 
+// Optional sidecar: a sibling task ("scripts/fetch-video-stats.mjs" et al.)
+// produces src/data/video-stats.json keyed by DVIDS videoId. We bake the
+// view counts straight into media.json so the MediaView can sort/badge
+// without a second runtime fetch. If the file isn't there yet we leave
+// `views: null` on every video tile — MediaView treats null as "unknown"
+// and parks those items at the end of the popularity sort.
+const VIDEO_STATS_PATH = path.join(ROOT, "src", "data", "video-stats.json");
+let videoStats = {};
+try {
+  const raw = JSON.parse(await readFile(VIDEO_STATS_PATH, "utf8"));
+  videoStats = raw?.stats || {};
+  console.log(`[media-index] loaded ${Object.keys(videoStats).length} video stat(s) from src/data/video-stats.json`);
+} catch {
+  console.log(`[media-index] no src/data/video-stats.json yet — every video tile will report views:null`);
+}
+
 async function existsDir(p) { try { return (await stat(p)).isDirectory(); } catch { return false; } }
 async function listDirs(p) {
   if (!(await existsDir(p))) return [];
@@ -263,6 +279,7 @@ items.push(...deduped);
 let videoCount = 0;
 for (const ev of Object.values(eventsMap)) {
   if (!ev.videoId) continue;
+  const stat = videoStats[ev.videoId];
   items.push({
     id: `${ev.id}-video`,
     eventId: ev.id,
@@ -279,6 +296,11 @@ for (const ev of Object.values(eventsMap)) {
     classifiedAt: "2026-05-08",
     imagePath: null,
     thumbnailPath: null,
+    // Baked-in stats from src/data/video-stats.json (sibling fetch task).
+    // Null when the stats file is absent or doesn't cover this videoId —
+    // MediaView's POPULAR sort parks nulls at the end.
+    views: stat?.views ?? null,
+    viewsFetchedAt: stat?.fetchedAt ?? null,
   });
   videoCount++;
 }
