@@ -24,6 +24,106 @@ function ConfidenceBadge({ confidence, agreement }) {
   );
 }
 
+// Client-side mirror of scripts/resolve-by-merge.mjs:mergeTexts. Used when
+// the disagreement isn't a real contradiction — each source caught a
+// different region of the page (stamp vs form vs bleed-through). Pick
+// longest as the base, append any line from the others that isn't
+// already a substring of the base. Excludes prior "judge" / "merged"
+// outputs so re-runs don't compound.
+const EXCLUDED_INPUT_SOURCES = new Set(["judge", "merged"]);
+function mergeSourceTexts(sources) {
+  const candidates = Object.entries(sources || {})
+    .filter(([name, text]) => !EXCLUDED_INPUT_SOURCES.has(name) && typeof text === "string" && text.trim().length >= 5)
+    .map(([name, text]) => ({ name, text: text.trim() }));
+  if (!candidates.length) return { merged: "", used: [] };
+  const sorted = [...candidates].sort((a, b) => b.text.length - a.text.length);
+  const base = sorted[0].text;
+  const baseNorm = base.toLowerCase().replace(/\s+/g, " ");
+  const extra = [];
+  const extraNorms = [];
+  for (let i = 1; i < sorted.length; i++) {
+    for (const line of sorted[i].text.split(/\r?\n/)) {
+      const t = line.trim();
+      if (t.length < 3) continue;
+      const norm = t.toLowerCase().replace(/\s+/g, " ");
+      if (baseNorm.includes(norm)) continue;
+      if (extraNorms.some(e => e.includes(norm))) continue;
+      extra.push(t);
+      extraNorms.push(norm);
+    }
+  }
+  const merged = extra.length
+    ? `${base}\n\n--- additional from other sources ---\n${extra.join("\n")}`
+    : base;
+  return { merged, used: sorted.map(c => c.name) };
+}
+
+function CombineModal({ selected, pageData, onClose }) {
+  const { merged, used } = useMemo(
+    () => mergeSourceTexts(pageData?.sources),
+    [pageData]
+  );
+  const [copied, setCopied] = useState(false);
+  const cliCmd = `node scripts/resolve-by-merge.mjs ${selected.eventId}:${selected.page}`;
+  const filename = `p${String(selected.page).padStart(4, "0")}.merged.txt`;
+
+  const copy = async (text, key) => {
+    try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(false), 1500); }
+    catch {}
+  };
+  const download = () => {
+    const blob = new Blob([merged + "\n"], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-start justify-center p-4 overflow-y-auto"
+         onClick={onClose}>
+      <div className="bg-black border border-emerald-700/60 rounded-sm max-w-4xl w-full my-8"
+           onClick={e => e.stopPropagation()}>
+        <div className="px-4 py-3 border-b border-emerald-900/50 flex items-baseline justify-between gap-3">
+          <div>
+            <div className="font-mono text-[10px] text-emerald-700 tracking-widest">COMBINE SOURCES — PREVIEW</div>
+            <div className="text-emerald-300 font-mono text-sm mt-0.5">{selected.title} · p{selected.page}</div>
+            <div className="text-emerald-700 font-mono text-[10px] mt-0.5">
+              merged {used.length} sources: {used.join(", ")} · {merged.length.toLocaleString()} chars
+            </div>
+          </div>
+          <button onClick={onClose}
+                  className="font-mono text-[10px] tracking-widest text-emerald-500 hover:text-emerald-300">
+            CLOSE ✕
+          </button>
+        </div>
+        <div className="px-4 py-3 border-b border-emerald-900/50 flex flex-wrap gap-2">
+          <button onClick={() => copy(merged, "text")}
+                  className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
+            {copied === "text" ? "COPIED ✓" : "COPY MERGED TEXT"}
+          </button>
+          <button onClick={download}
+                  className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
+            DOWNLOAD {filename}
+          </button>
+          <button onClick={() => copy(cliCmd, "cli")}
+                  className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
+            {copied === "cli" ? "COPIED ✓" : "COPY RESOLVE CMD"}
+          </button>
+        </div>
+        <div className="px-4 py-2 border-b border-emerald-900/50 font-mono text-[10px] text-emerald-700 leading-relaxed">
+          To persist this merge as the canonical text + clear <span className="text-emerald-400">needs_review</span>, run the resolve cmd locally:
+          <pre className="mt-1 text-amber-300 text-[11px]">{cliCmd}</pre>
+          Then <span className="text-emerald-400">node scripts/compare-sources.mjs &amp;&amp; node scripts/db-rebuild.mjs &amp;&amp; node scripts/export-review-queue.mjs</span>.
+        </div>
+        <pre className="px-4 py-3 text-emerald-200/90 text-[12px] leading-snug whitespace-pre-wrap break-words max-h-[60vh] overflow-y-auto font-mono">
+{merged || "(no candidate sources to merge)"}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
 export default function ReviewView({ onSelect, headerFilters }) {
   const t = useT();
   const [queue, setQueue] = useState(null);
@@ -31,6 +131,7 @@ export default function ReviewView({ onSelect, headerFilters }) {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [pageData, setPageData] = useState(null);
   const [loadingPage, setLoadingPage] = useState(false);
+  const [combineOpen, setCombineOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}review-queue.json?t=${Date.now()}`)
@@ -64,6 +165,7 @@ export default function ReviewView({ onSelect, headerFilters }) {
   const selected = filteredQueue?.queue?.[selectedIdx] || null;
   useEffect(() => {
     if (!selected) { setPageData(null); return; }
+    setCombineOpen(false);
     setLoadingPage(true);
     fetch(`${import.meta.env.BASE_URL}${selected.textUrl}?t=${Date.now()}`)
       .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
@@ -181,6 +283,13 @@ export default function ReviewView({ onSelect, headerFilters }) {
                       {t("review.open_dossier")}
                     </button>
                   )}
+                  <button
+                    onClick={() => setCombineOpen(true)}
+                    disabled={!pageData || Object.keys(pageData?.sources || {}).filter(n => !EXCLUDED_INPUT_SOURCES.has(n)).length < 2}
+                    title="Merge complementary sources when the low agreement is because each source caught a different region of the page, not because they contradict."
+                    className="font-mono text-[10px] tracking-widest border border-cyan-700/60 text-cyan-300 hover:bg-cyan-900/30 disabled:opacity-40 disabled:cursor-not-allowed px-2 py-1 rounded-sm">
+                    ⊕ COMBINE
+                  </button>
                   <a
                     href={`https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md`}
                     target="_blank" rel="noreferrer"
@@ -244,6 +353,9 @@ export default function ReviewView({ onSelect, headerFilters }) {
         )}
       </main>
       </div>
+      {combineOpen && selected && pageData && (
+        <CombineModal selected={selected} pageData={pageData} onClose={() => setCombineOpen(false)} />
+      )}
     </div>
   );
 }
