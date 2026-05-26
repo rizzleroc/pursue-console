@@ -4,6 +4,7 @@ import { ENTITIES, ENTITY_KIND, EVENT_ENTITIES } from "../data/entities.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
 import { sourceStyle, SourceLegend } from "../components/SourceMix.jsx";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
 
 // FAISS-derived event-event similarity, loaded once and cached.
 let _simP = null;
@@ -108,6 +109,7 @@ const ENTITY_KIND_FILTERS = ["person","program","command","platform","weapon","m
 const PATTERN_KIND_FILTERS = ["shape", "behavior", "sensor"];
 
 export default function NetworkView({ events, onSelect }) {
+  const t = useT();
   const [activeEntityKinds, setActiveEntityKinds] = useState(new Set(ENTITY_KIND_FILTERS));
   const [activePatternKinds, setActivePatternKinds] = useState(new Set(PATTERN_KIND_FILTERS));
   const [hover, setHover] = useState(null);
@@ -245,22 +247,22 @@ export default function NetworkView({ events, onSelect }) {
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ NETWORK</GlitchText></h2>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>{t("network.title")}</GlitchText></h2>
         <div className="font-mono text-[10px] text-emerald-700">
-          {nodes.length} NODES // {links.length} EDGES
-          {sim?.eventCount > 0 && <> // FAISS sim · {sim.eventCount}ev · ≥{sim.minCos} cos · gen {sim.generatedAt?.slice(0,10)}</>}
-          {" // CLICK TO PIN"}
+          {t("network.meta", { nodes: nodes.length, edges: links.length })}
+          {sim?.eventCount > 0 && t("network.meta_sim", { n: sim.eventCount, cos: sim.minCos, date: sim.generatedAt?.slice(0,10) || "—" })}
+          {t("network.click_pin")}
         </div>
       </div>
 
       {/* Graph mode + semantic threshold */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
-        <span className="font-mono text-[9px] text-emerald-700 tracking-widest mr-1">EDGES</span>
+        <span className="font-mono text-[9px] text-emerald-700 tracking-widest mr-1">{t("network.edges_label")}</span>
         {[
-          { id: "entity",   label: "ENTITY",   c: "#7CFFB2" },
-          { id: "patterns", label: "PATTERNS", c: "#FFD93D" },
-          { id: "semantic", label: "SEMANTIC", c: "#82B6FF" },
-          { id: "all",      label: "ALL",      c: "#7CFFB2" },
+          { id: "entity",   label: t("network.edge_entity"),   c: "#7CFFB2" },
+          { id: "patterns", label: t("network.edge_patterns"), c: "#FFD93D" },
+          { id: "semantic", label: t("network.edge_semantic"), c: "#82B6FF" },
+          { id: "all",      label: t("network.edge_all"),      c: "#7CFFB2" },
         ].map(m => (
           <button key={m.id} onClick={() => setGraphMode(m.id)}
             style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)", borderColor: graphMode === m.id ? m.c : "#16382A", color: graphMode === m.id ? m.c : "#549A76" }}
@@ -270,7 +272,7 @@ export default function NetworkView({ events, onSelect }) {
         ))}
         {(graphMode === "semantic" || graphMode === "all") && (
           <span className="font-mono text-[10px] text-emerald-700 ml-3 flex items-center gap-2">
-            <span className="tracking-widest text-[9px]">SIM ≥</span>
+            <span className="tracking-widest text-[9px]">{t("network.sim_threshold")}</span>
             <input type="range" min="0.40" max="0.85" step="0.05" value={minCos}
               onChange={(e) => setMinCos(Number(e.target.value))}
               className="accent-cyan-400 w-24" />
@@ -282,7 +284,7 @@ export default function NetworkView({ events, onSelect }) {
       {/* Kind filters — entities + patterns side by side */}
       <div className="flex flex-wrap gap-x-3 gap-y-2 mb-2">
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">ENT</span>
+          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("network.ent_label")}</span>
           {ENTITY_KIND_FILTERS.map(k => {
             const meta = ENTITY_KIND[k];
             const active = activeEntityKinds.has(k);
@@ -297,7 +299,7 @@ export default function NetworkView({ events, onSelect }) {
           })}
         </div>
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">PAT</span>
+          <span className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("network.pat_label")}</span>
           {PATTERN_KIND_FILTERS.map(k => {
             const meta = PATTERN_KIND_STYLE[k];
             const active = activePatternKinds.has(k);

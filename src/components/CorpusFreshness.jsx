@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
 
 // Single source of truth for "how fresh is the data on screen right now."
 // Polls public/corpus-version.json every 60s and shows a compact strip
@@ -17,17 +18,21 @@ function loadVersion(bust = false) {
   return _versionP;
 }
 
-function fmtAgo(iso) {
+// Locale-aware "x ago" string. Accepts the t() translator so we can pick
+// the right plural form per language (most locales just use a single form
+// for our purposes — translations will refine if needed).
+function fmtAgo(iso, t) {
   if (!iso) return "—";
   const ms = Date.now() - new Date(iso).getTime();
-  if (ms < 0) return "now";
-  if (ms < 60_000)        return `${Math.round(ms/1000)}s ago`;
-  if (ms < 3_600_000)     return `${Math.round(ms/60_000)}m ago`;
-  if (ms < 86_400_000)    return `${Math.round(ms/3_600_000)}h ago`;
-  return `${Math.round(ms/86_400_000)}d ago`;
+  if (ms < 0) return t("freshness.just_now");
+  if (ms < 60_000)     return t("freshness.seconds", { n: Math.round(ms/1000) });
+  if (ms < 3_600_000)  return t("freshness.minutes", { n: Math.round(ms/60_000) });
+  if (ms < 86_400_000) return t("freshness.hours",   { n: Math.round(ms/3_600_000) });
+  return t("freshness.days", { n: Math.round(ms/86_400_000) });
 }
 
 export default function CorpusFreshness({ compact = false }) {
+  const t = useT();
   const [v, setV] = useState(null);
   const { stats: s, reload: reloadStats } = useCorpusStats();
   const [refreshing, setRefreshing] = useState(false);
@@ -47,7 +52,7 @@ export default function CorpusFreshness({ compact = false }) {
   }, []);
 
   if (!v && !s) return null;
-  const ago = fmtAgo((s?.generatedAt) || v?.generatedAt);
+  const ago = fmtAgo((s?.generatedAt) || v?.generatedAt, t);
 
   // Pull TRUE numbers from the DB-derived stats when available; fall back
   // to the version manifest. Single tooltip can explain the breakdown.
@@ -81,9 +86,17 @@ export default function CorpusFreshness({ compact = false }) {
       <div className="px-3 sm:px-6 py-1.5 border-b border-emerald-900/40 bg-black/30 flex items-center justify-between gap-3 flex-wrap">
         <span className="inline-flex items-center gap-2 font-mono text-[10px] text-emerald-700 tracking-widest" title={recordsTooltip}>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          {recordsLabel} records · {pagesIndexed?.toLocaleString()} pages · refreshed {ago}
+          {hasMultiRelease
+            ? `${recordsLabel} records · ${pagesIndexed?.toLocaleString() ?? "—"} pages · refreshed ${ago}`
+            : t("freshness.records_pages", {
+                catalogued,
+                total: inventoryTotal,
+                pages: pagesIndexed?.toLocaleString() ?? "—",
+                ago,
+              })}
         </span>
         <button onClick={() => refresh(true)} disabled={refreshing}
+          aria-label={t("freshness.refresh")}
           className="text-emerald-600 hover:text-amber-300 px-1.5 py-0.5 font-mono text-[10px] tracking-widest disabled:opacity-40">
           {refreshing ? "◌" : "↻"}
         </button>
@@ -96,7 +109,7 @@ export default function CorpusFreshness({ compact = false }) {
       <div className="flex items-center gap-3 flex-wrap">
         <span className="inline-flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          REFRESHED <span className="text-emerald-400 ml-1">{ago}</span>
+          {t("freshness.refreshed")} <span className="text-emerald-400 ml-1">{ago}</span>
         </span>
         {inventoryTotal != null && (
           hasMultiRelease ? (
@@ -153,7 +166,7 @@ export default function CorpusFreshness({ compact = false }) {
         disabled={refreshing}
         style={{ transition: "all 150ms cubic-bezier(0.23, 1, 0.32, 1)" }}
         className="text-emerald-500 hover:text-amber-300 px-2 py-0.5 border border-emerald-900 hover:border-amber-700 rounded-sm active:scale-[0.97] disabled:opacity-40">
-        {refreshing ? "◌" : "↻"} REFRESH
+        {refreshing ? "◌" : "↻"} {t("freshness.refresh")}
       </button>
     </div>
   );

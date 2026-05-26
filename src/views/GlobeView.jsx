@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, MiniChip, groupBy } from "../components/Primitives.jsx";
+import { useT } from "../i18n/context.js";
 
 // =====================================================================
 // HI-DEF ORTHOGRAPHIC GLOBE — Palantir-style.
@@ -68,6 +69,7 @@ function ringToPath(coords, project) {
 }
 
 export default function GlobeView({ events, onSelect }) {
+  const t = useT();
   const [rotation, setRotation] = useState({ lon: -20, lat: 15 });
   const [dragging, setDragging] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -163,8 +165,8 @@ export default function GlobeView({ events, onSelect }) {
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ GEOSPATIAL</GlitchText></h2>
-        <div className="font-mono text-[10px] text-emerald-700">DRAG TO ROTATE · SCROLL TO ZOOM</div>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>{t("globe.title")}</GlitchText></h2>
+        <div className="font-mono text-[10px] text-emerald-700">{t("globe.sub")}</div>
       </div>
       <div className="grid lg:grid-cols-[1.3fr,1fr] gap-6 items-start">
         <div
@@ -289,17 +291,17 @@ export default function GlobeView({ events, onSelect }) {
           </div>
           <div className="absolute top-1 right-1 font-mono text-[8px] text-emerald-700 tracking-[0.25em]">
             <div>NE 110m · ORTHO · LIVE</div>
-            <div className="text-right">RECORDS {earthEvents.length}</div>
+            <div className="text-right">{t("globe.records", { n: earthEvents.length })}</div>
           </div>
         </div>
 
         <div>
           <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 mb-3">
-            <div className="font-mono text-[10px] text-amber-400 tracking-wider mb-2">✦ EXTRA-PLANETARY ASSETS ({spaceEvents.length})</div>
+            <div className="font-mono text-[10px] text-amber-400 tracking-wider mb-2">{t("globe.extra_planetary", { n: spaceEvents.length })}</div>
             <div className="grid sm:grid-cols-2 gap-1.5">{spaceEvents.map(e => <MiniChip key={e.id} event={e} onClick={onSelect} />)}</div>
           </div>
           <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3">
-            <div className="font-mono text-[10px] text-emerald-400 tracking-wider mb-2">⌂ TERRESTRIAL CLUSTERS BY REGION</div>
+            <div className="font-mono text-[10px] text-emerald-400 tracking-wider mb-2">{t("globe.terrestrial")}</div>
             {Object.entries(groupBy(earthEvents, "region")).map(([region, evs]) => (
               <details key={region} className="mb-1 group">
                 <summary className="cursor-pointer font-mono text-[11px] text-emerald-300 hover:text-amber-300 py-1 list-none">

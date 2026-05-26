@@ -161,9 +161,24 @@ for (const eid of await listDirs(VIS)) {
       classifier: "gemini-text-extract",
       classifiedAt: new Date().toISOString(),
     };
-    await mkdir(path.dirname(sidecarPath), { recursive: true });
-    await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
-    stats.written++;
+
+    // Skip the write if only classifiedAt would change — re-stamping a
+    // timestamp on every run produces noisy diffs and pointless commits
+    // when the hourly loop re-ingests with no real change.
+    let unchanged = false;
+    if (existsSync(sidecarPath)) {
+      try {
+        const prev = JSON.parse(await readFile(sidecarPath, "utf8"));
+        const { classifiedAt: _a, ...prevRest } = prev;
+        const { classifiedAt: _b, ...nextRest } = sidecar;
+        unchanged = JSON.stringify(prevRest) === JSON.stringify(nextRest);
+      } catch {}
+    }
+    if (!unchanged) {
+      await mkdir(path.dirname(sidecarPath), { recursive: true });
+      await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
+      stats.written++;
+    }
     stats.by_kind[primary.kind] = (stats.by_kind[primary.kind] || 0) + 1;
 
     // If we have a local PDF, render the page so MEDIA has an image
