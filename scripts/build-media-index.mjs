@@ -379,12 +379,26 @@ const byKind = items.reduce((acc, it) => { acc[it.kind] = (acc[it.kind] || 0) + 
 const byEvent = items.reduce((acc, it) => { acc[it.eventId] = (acc[it.eventId] || 0) + 1; return acc; }, {});
 const byAgency = items.reduce((acc, it) => { acc[it.agency || "—"] = (acc[it.agency || "—"] || 0) + 1; return acc; }, {});
 
-await writeFile(OUT, JSON.stringify({
+const nextBody = {
   generatedAt: new Date().toISOString(),
   total: items.length,
   byKind, byAgency, eventCount: Object.keys(byEvent).length,
   items,
-}, null, 2) + "\n", "utf8");
+};
+
+// Skip rewriting media.json if only generatedAt would change. The
+// hourly loop re-runs this every pass; without this guard, every pass
+// produces a no-op diff that pollutes git history.
+let skipWrite = false;
+try {
+  const prev = JSON.parse(await readFile(OUT, "utf8"));
+  const { generatedAt: _a, ...prevRest } = prev;
+  const { generatedAt: _b, ...nextRest } = nextBody;
+  skipWrite = JSON.stringify(prevRest) === JSON.stringify(nextRest);
+} catch {}
+if (!skipWrite) {
+  await writeFile(OUT, JSON.stringify(nextBody, null, 2) + "\n", "utf8");
+}
 
 const missingRenderCount = items.filter(it => it.missingRender).length;
 console.log(`[media-index] ${items.length} media items across ${Object.keys(byEvent).length} events`);
