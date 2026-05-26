@@ -178,6 +178,7 @@ pursue-console/
 │   │   └── VolunteerModal.jsx        priority ladder + setup snippets
 │   └── views/
 │       ├── LiveView, SearchView, SemanticSearchView, DossierView
+│       ├── AskView                   natural-language Q&A (PATTERN + SMART RAG)
 │       ├── ReviewView                cross-source disagreement queue
 │       ├── MediaView                 visual library
 │       ├── TimelineView, AtlasView, GlobeView, NetworkView
@@ -305,7 +306,7 @@ When new Release tranches drop, that's where new event records come from.
 
 | | |
 |---|---|
-| **Records inventoried** | 162 Release 01 (128 catalogued · 34 awaiting enumeration) + 6 of 64 Release 02 PDFs mirrored |
+| **Records inventoried** | 162 Release 01 + 6 of 64 Release 02 files mirrored (all 6 Release 02 PDFs; 7 audio + 51 video pending). 128 events catalogued total (121 Release 01 + 7 Release 02) |
 | **Pages transcribed** | 3,394 across 65 events |
 | **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
 | **Per source** | 3,370 Gemini · 446 GPT-vision · 0 Claude · 693 OCR transcripts (4 pages OCR-only · 689 cross-checked against vision) · 55 contributor-submitted |
