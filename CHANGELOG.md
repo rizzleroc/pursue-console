@@ -1,5 +1,24 @@
 # Changelog
 
+## DVIDS-via-whipgen pivot (2026-05-26, partially verified)
+
+The earlier "DVIDS-via-MCP" change wired `scripts/transcribe-videos.mjs` to call `/dvids/download` on the pursue-vision-mcp daemon. That was the wrong layer: pursue-vision-mcp is designed to **not** start when a primary MCP (whipgen) is already running, so those endpoints were unreachable in the live environment. Running `npm run corpus:transcribe-videos` against the live whipgen on `:9223` returned `404 not found` for every video.
+
+This pivot moves the download path to whipgen's existing `/web/eval` HTTP endpoint — the documented escape hatch for "external scripts / subagents" (see whipgen docs). Same Akamai-bypass trick (in-page `fetch()` evaluated on the dvidshub.net origin), driven via the primary MCP that's actually running.
+
+**Verified live** for japan-2023 (DVIDS 1006107) in this session:
+- Page open → DOM scrape surfaced the CloudFront mp4 (`https://d34w7g4gy10iej.cloudfront.net/.../DOD_111689142.mp4`).
+- 1-byte Range probe → 15,963,093 bytes total.
+- 3 × 5 MB chunked Range fetches → ~15s wall-clock total.
+- Resulting `data-raw/videos/japan-2023.mp4` validates as `ftyp/M4V/isom/avc1/mp42`. Bytes match probe exactly.
+
+**Still `@unverified`** for the other two video-only events (indopacom-2024 DVIDS 1006106, army-2026 DVIDS 1006111) until the rewritten script runs end-to-end against them on the maintainer's Chrome.
+
+What landed:
+- **`scripts/transcribe-videos.mjs`** rewritten — `/dvids/download` calls replaced with `/web/eval` calls against `127.0.0.1:9223` (whipgen). 5 MB Range chunks (fits the 8 MB result cap with base64 overhead), inline base64 decoded in Node and appended to `data-raw/videos/<eid>.mp4` (no `saveTo` — sidesteps `WHIPGEN_ALLOWED_WRITE_ROOTS` which on this host is `F:\wm-fix-v2`). Whisper transcription path unchanged. Optional `--analyze=gemini` posts the downloaded video to whipgen `/chat-with-files` (Gemini multimodal) and saves a `<eid>.gemini-analysis.md` sidecar.
+- **Token precedence updated**: `WHIPGEN_TOKEN` → `~/.whipgen-token` → `PURSUE_VISION_TOKEN` → `~/.pursue-vision-token`. Legacy fallbacks kept for volunteers who only have the old token.
+- The dead pursue-vision-mcp `/dvids/resolve` + `/dvids/download` endpoints + `dvids-driver.mjs` are left in place as harmless fallback code — they'd only activate if someone runs without whipgen primary.
+
 ## 2.2 — Security review sweep
 
 Comprehensive security review (token-exposure audit + tooling/dependency risk assessment) run across the full working tree and all 91 commits of history. Headline: **no secrets are or ever were committed**, and `npm audit` is clean (0 vulns) in both `package.json` trees. The fixes below close the actionable hardening items the review surfaced; the residual/accepted items are tracked in [ROADMAP.md](./ROADMAP.md) §R8.

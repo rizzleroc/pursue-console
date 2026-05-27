@@ -203,8 +203,12 @@ XHR? does Range chunking work on war.gov's CDN?) is unknown until the first run.
    (network intercept / DOM scrape / candidate URL); remove `@unverified` annotations.
 3. Audio + video files use the existing Whisper transcription path:
    `npm run corpus:transcribe-videos`. The 7 audio + 51 video files in Release 02
-   flow through `scripts/transcribe-videos.mjs` (which already exists for the
-   release-01 DVIDS clips).
+   flow through `scripts/transcribe-videos.mjs`. **Note (2026-05-26 pivot):** that
+   script now downloads via the primary MCP (**whipgen** on `:9223`, using
+   `/web/eval` for in-page DVIDS fetch) rather than the dead pursue-vision-mcp
+   `/dvids/download` endpoints (which never activated because pursue-vision-mcp
+   is designed not to start when whipgen is primary). japan-2023 has been verified
+   end-to-end; indopacom-2024 + army-2026 still pending.
 4. Flip `release-02` to `status: "mirrored"` in `config/releases.json` once ingested.
 5. Denis's mirror, if it materializes, becomes a redundant cross-check rather than
    the critical path.
