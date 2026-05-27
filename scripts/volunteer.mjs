@@ -277,8 +277,12 @@ await mkdir(PDF_ROOT, { recursive: true });
 for (const c of claims) {
   const dest = path.join(PDF_ROOT, `${c.eid}.pdf`);
   if (existsSync(dest)) { console.log(`  ⊖ ${c.eid}.pdf already present`); continue; }
-  console.log(`  ↓ ${c.eid}.pdf  ${c.doc.pdfUrl}`);
-  const r = await fetch(c.doc.pdfUrl);
+  // Release-02 PDFs ship as site-relative paths (e.g. "release_2/X.pdf")
+  // because they're mirrored under public/release_2/ — resolve against the
+  // deployed site so Node's fetch() (which rejects relative URLs) works.
+  const absUrl = /^https?:\/\//i.test(c.doc.pdfUrl) ? c.doc.pdfUrl : new URL(c.doc.pdfUrl, "https://rizzleroc.github.io/pursue-console/").href;
+  console.log(`  ↓ ${c.eid}.pdf  ${absUrl}`);
+  const r = await fetch(absUrl);
   if (!r.ok) { console.error(`    HTTP ${r.status} — skipping doc`); c.skip = true; continue; }
   await writeFile(dest, Buffer.from(await r.arrayBuffer()));
 }

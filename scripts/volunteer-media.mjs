@@ -339,8 +339,12 @@ async function claimPhase() {
     // Fall back to downloading from war.gov into the volunteer scratch dir.
     const filename = path.join(PDF_ROOT, `${eid}.pdf`);
     if (!existsSync(filename)) {
-      console.log(`    ↓ downloading ${url}`);
-      const r = await fetch(url);
+      // Release-02 PDFs ship as site-relative paths (e.g. "release_2/X.pdf")
+      // because they're mirrored under public/release_2/ — resolve against the
+      // deployed site so Node's fetch() (which rejects relative URLs) works.
+      const absUrl = /^https?:\/\//i.test(url) ? url : new URL(url, "https://rizzleroc.github.io/pursue-console/").href;
+      console.log(`    ↓ downloading ${absUrl}`);
+      const r = await fetch(absUrl);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const buf = Buffer.from(await r.arrayBuffer());
       await writeFile(filename, buf);

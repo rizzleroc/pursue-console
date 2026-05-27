@@ -226,7 +226,11 @@ function summarizeLog(allLines, exitCode) {
   const econnRefused = /ECONNREFUSED.*9223|ECONNREFUSED 127\.0\.0\.1:9223|OCR daemon at .* (?:is unreachable|stopped responding)/.test(text);
   const cdpTimeout   = /connectOverCDP.*Timeout|CDP.*timeout/i.test(text);
   const tokenError   = /unauthorized.*bearer|HTTP 401/i.test(text);
-  const pdfRenderFails = (text.match(/render failed \(Value is none of these types/g) || []).length;
+  // Count ANY pdfjs render failure, not just the old napi-canvas "Value is none
+  // of these types" string. A relative pdfUrl that fetch() rejects produces
+  // "Failed to parse URL from ..." which used to slip past this regex and let
+  // the classifier headline a doomed claim as STAGED.
+  const pdfRenderFails = (text.match(/render failed \(/g) || []).length;
   const claimedFromMedia = /\[claim\]/.test(text);
   // Visuals claim phase: "[claim] claiming N page(s)" then "templates written to".
   const mediaClaimMatch = text.match(/\[claim\] claiming (\d+) page/);
