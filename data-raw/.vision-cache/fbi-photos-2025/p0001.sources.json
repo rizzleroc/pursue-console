@@ -26,6 +26,14 @@
           "via": "volunteer-review"
         }
       }
+    },
+    "judge": {
+      "verdict": "gemini",
+      "text": "**Document title:** FBI Photo B1\n**Source file:** FBI Photo B1.pdf\n**Page:** 1 of 1\n**Agency:** FBI\n**Release date:** 5/8/26\n**Dataset description:** Incident date: Late 2025; Incident location: Western United States\n\n\n[redacted]\n\n[Sensor overlay with central crosshair and horizontal scale markings: 15 | 10 | 5 | 0 | 5 | 10 | 15]\n\n[redacted]\n",
+      "confidence": 0.95,
+      "reasoning": "Heavily redacted FBI photo page. Gemini correctly identified the document metadata header (title, source file, page, agency, release date, dataset description), the central [redacted] regions, and the sensor overlay's horizontal scale markings (15|10|5|0|5|10|15). The two gpt-vision attempts only captured the visible scale and an unrelated viewer timestamp ('12/31/99 18:11:19'), marking everything else as (?). Promoted gemini as canonical; this is page-intrinsic redaction, not OCR variance.",
+      "judged_at": "2026-05-27T00:35:37.432Z",
+      "judge": "human:Rizzleroc"
     }
   }
 }
