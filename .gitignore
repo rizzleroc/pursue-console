@@ -34,6 +34,10 @@ data-raw/upstream-gemini/
 eng.traineddata
 *.traineddata
 
+# Claude Code harness scratch — sub-agent worktrees are isolated copies of
+# the repo and don't belong in version control.
+.claude/worktrees/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
