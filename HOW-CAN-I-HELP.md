@@ -7,7 +7,7 @@ A SETI@home-style distributed contribution model for the PURSUE corpus.
 | Priority | Open | Concentrated in |
 |---|---:|---|
 | **P1** Settle disputed pages | **0** | queue is clear — 22 reevaluated, 3 settled by standardized prompt |
-| **P2** Catalogue inventoried records | **159** | Release 02 records pulled from the war.gov CSV but not yet in `src/data/events.js`. Tracked one-issue-per-record under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing). |
+| **P2** Catalogue inventoried records | **81** | Release 02 PDFs / images / audio not yet in `src/data/events.js`. Tracked one-issue-per-record under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing). All 78 R02 **videos** are auto-catalogued — flagged `auto:true` in events.js, ready for promotion to hand-curated entries. |
 | **P3** Image + context capture | live | pages classified as visuals — see the HELP tab for current counts |
 
 Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (with a badge in the nav) and the [HELP tab](https://rizzleroc.github.io/pursue-console/) (with per-event breakdown).
@@ -314,7 +314,7 @@ PR comments are already the discussion thread. Phase 2 adds a tiny UI overlay so
 
 ## Cataloguing (different from OCR)
 
-**159 records** from war.gov's UAP release (mostly Release 02, plus some Release 01 records that pre-dated the canonical-ID scheme) are **not yet in `src/data/events.js`**. The full source CSV is committed at `data-raw/uap-data.csv` (222 records total; the other 63 are already catalogued). Each missing record has its own GitHub issue under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — pick one, claim it by commenting, open a PR.
+**81 records** from war.gov's UAP release (R02 PDFs / images / audio, plus some Release 01 records that pre-dated the canonical-ID scheme) need hand-curated entries in `src/data/events.js`. The 78 R02 videos are already in `events.js` as auto-generated entries (flag `auto: true`) — they appear in the MEDIA library and link to DVIDS, but the title / location / agency / summary fields can still be improved by promoting them to fully hand-curated entries (delete `auto: true`, refine fields). The full source CSV is committed at `data-raw/uap-data.csv` (222 records total; the other 63 are already catalogued). Each missing record has its own GitHub issue under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — pick one, claim it by commenting, open a PR.
 
 Filter the queue by:
 
