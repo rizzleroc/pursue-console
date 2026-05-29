@@ -7,7 +7,7 @@ A SETI@home-style distributed contribution model for the PURSUE corpus.
 | Priority | Open | Concentrated in |
 |---|---:|---|
 | **P1** Settle disputed pages | **0** | queue is clear — 22 reevaluated, 3 settled by standardized prompt |
-| **P2** Catalogue inventoried records | **~100** | Release 02 PDFs / images / audio not yet in `src/data/events.js`. Tracked one-issue-per-record under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — live count is canonical. All 78 R02 **videos** are auto-catalogued — flagged `auto:true` in events.js, ready for promotion to hand-curated entries. |
+| **P2** Catalogue inventoried records | **2** | One R01 NASA audio (`NASA-UAP-D003A`, Gemini 7) and one R01 State Dept memo (`59_64634_711.5612`). Tracked under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — live count is canonical. R01 FBI photo series A1-A8 + B1-B24 are covered by the `fbi-photos-2025` anchor event (individual per-photo stubs would dilute the index). All 78 R02 **videos** are auto-catalogued — flagged `auto:true` in events.js, ready for promotion to hand-curated entries. |
 | **P3** Image + context capture | live | pages classified as visuals — see the HELP tab for current counts |
 
 Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (with a badge in the nav) and the [HELP tab](https://rizzleroc.github.io/pursue-console/) (with per-event breakdown).
@@ -219,9 +219,9 @@ After the latest rebuild, `public/work-available.json` lists what pages still ne
 | `cometa` | ~36 | Easy — clean French scans |
 | `1949-discs` | ~90 | Mid — early FBI files |
 | **partial-vision docs** (apollo-17, shaef, azerbaijan, ...) | ~30 | Mid — page-by-page mop-up |
-| **uncatalogued** | ~52 records | Requires curation, not just OCR — see "Cataloguing" below |
+| **uncatalogued** | 2 records | Requires curation, not just OCR — see "Cataloguing" below |
 
-Total: **~52 records to catalogue.** The raw-OCR backlog is essentially cleared after the 2.0 vision sync; the remaining curation work needs human judgment, not a transcription pass. See the live HELP tab for current counts.
+Total: **2 records to catalogue.** The raw-OCR backlog is essentially cleared after the 2.0 vision sync, and the catalogue backlog was cleared in a sweep that auto-catalogued the bulk into `events-auto.js` and folded the FBI photo series under the `fbi-photos-2025` anchor. See the live HELP tab for current counts.
 
 ---
 
@@ -314,7 +314,7 @@ PR comments are already the discussion thread. Phase 2 adds a tiny UI overlay so
 
 ## Cataloguing (different from OCR)
 
-**~100 records** from war.gov's UAP release (R02 PDFs / images / audio, plus some Release 01 records that pre-dated the canonical-ID scheme) need hand-curated entries in `src/data/events.js` — the [live issue queue](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) is canonical. The 78 R02 videos are already in `events.js` as auto-generated entries (flag `auto: true`) — they appear in the MEDIA library and link to DVIDS, but the title / location / agency / summary fields can still be improved by promoting them to fully hand-curated entries (delete `auto: true`, refine fields). The full source CSV is committed at `data-raw/uap-data.csv` (222 records total; the other 63 are already catalogued). Each missing record has its own GitHub issue under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — pick one, claim it by commenting, open a PR.
+**2 records** from war.gov's UAP release still need hand-curated entries in `src/data/events.js` — the [live issue queue](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) is canonical. The rest of the backlog landed in three sweeps: (a) 65 R01 records auto-catalogued as low-confidence stubs in `src/data/events-auto.js` (slug-IDed, `auto: true`, awaiting promotion to fully hand-curated entries); (b) 78 R02 videos auto-catalogued in `events.js` itself (same `auto: true` flag, linked to DVIDS); (c) 31 FBI photo series records (A1-A8 + B2-B24) covered by the `fbi-photos-2025` anchor event rather than individual stubs. The full source CSV is committed at `data-raw/uap-data.csv` (222 records total). The two remaining issues: `NASA-UAP-D003A` (Gemini 7 audio) and `59_64634_711.5612` (a 1952 State Dept memo whose filename contains a `[` that may need URL-fixing before it resolves on war.gov). Pick one, claim it by commenting, open a PR.
 
 Filter the queue by:
 
