@@ -25,6 +25,7 @@
     "corpus:fetch-war-gov": "node scripts/sync-war-gov.mjs",
     "corpus:scrape-r02": "node scripts/scrape-release-02-via-whipgen.mjs",
     "corpus:transcribe-videos": "node scripts/transcribe-videos.mjs",
+    "corpus:video-stats": "node scripts/fetch-video-stats.mjs",
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",
     "test:parse-template": "node scripts/test-parse-template.mjs",

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { EVENTS, AGENCY_COLORS, RELEASES_LABEL } from "../data/events.js";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
 
 // LIVE WATCH — immersive Phosphor Vigil dashboard.
 // See design/PHOSPHOR-VIGIL.md for the visual philosophy. Composition:
@@ -25,12 +26,18 @@ const COLORS = {
   hair:     "#16382A",
 };
 
+// Stable source ids → color. Display labels come from t("live.signals.*")
+// via SOURCE_LABEL_KEY so they localize without losing the color encoding
+// that runs through the bearing dial and the per-signal row.
 const SOURCE = {
-  vision: { color: COLORS.cyan,  label: "VISION" },
-  human:  { color: COLORS.green, label: "HUMAN"  },
-  ocr:    { color: COLORS.amber, label: "OCR"    },
+  vision: { color: COLORS.cyan,  labelKey: "live.signals.filter_vision" },
+  human:  { color: COLORS.green, labelKey: "live.signals.filter_human" },
+  ocr:    { color: COLORS.amber, labelKey: "live.signals.filter_tesseract" },
 };
 
+// Relative-time helper. Units stay compact (s/m/h/d) regardless of locale —
+// CJK/Arabic users still recognize "5h" as a duration, and translating the
+// suffix would push the column wider than the design tolerates.
 const TIME_AGO = (ts, nowTs = Date.now()) => {
   const s = Math.max(0, (nowTs - ts) / 1000);
   if (s < 60)    return `${Math.round(s)}s`;
@@ -45,7 +52,7 @@ const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 // Sub-components
 // =================================================================
 
-function UtcClock() {
+function UtcClock({ utcLabel }) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -57,7 +64,7 @@ function UtcClock() {
       {now.getUTCFullYear()} <span className="text-emerald-800">·</span> {fmt(now.getUTCMonth()+1)} <span className="text-emerald-800">·</span> {fmt(now.getUTCDate())}
       <span className="mx-3 text-emerald-800">/</span>
       {fmt(now.getUTCHours())} <span className="text-emerald-800">:</span> {fmt(now.getUTCMinutes())} <span className="text-emerald-800">:</span> {fmt(now.getUTCSeconds())}
-      <span className="ml-3 text-emerald-700 text-[9px]">U T C</span>
+      <span className="ml-3 text-emerald-700 text-[9px]">{utcLabel}</span>
     </span>
   );
 }
@@ -245,6 +252,7 @@ function mediaTypeOf(ev) {
 }
 
 export default function LiveFeedView({ onSelect, headerFilters }) {
+  const t = useT();
   const [feed, setFeed] = useState(null);
   const { stats: dbStats } = useCorpusStats();  // public/corpus-stats.json — TRUE numbers from the DB
   const [error, setError] = useState(null);
@@ -427,16 +435,15 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
             <LivePulse active />
             <h1 className="font-mono font-semibold text-emerald-200 tracking-[0.25em] text-xl sm:text-3xl"
               style={{ textShadow: `0 0 12px ${COLORS.green}44` }}>
-              LIVE WATCH
+              {t("live.title")}
             </h1>
           </div>
           <div className="font-mono text-[11px] text-emerald-500 tracking-[0.2em]">
-            <UtcClock /> <span className="text-emerald-800 mx-2">·</span> WAR.GOV / UFO / {RELEASES_LABEL.toUpperCase()}
+            <UtcClock utcLabel={t("live.utc")} /> <span className="text-emerald-800 mx-2">·</span> {t("live.source_label", { releases: RELEASES_LABEL.toUpperCase() })}
           </div>
         </div>
         <div className="font-mono text-[11px] text-emerald-700 max-w-2xl leading-relaxed mb-6">
-          Pages stream in as machine + volunteer transcriptions land. Each event below carries a
-          source-mix dot row showing which engines have transcribed it. Click any to open the dossier.
+          {t("live.lead")}
         </div>
 
         {/* Stale-feed banner. Surfaces when no new pages have landed in >24h
@@ -446,10 +453,10 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
           <div className="mb-6 px-3 py-2 border rounded-sm font-mono text-[10px] tracking-widest flex items-center justify-between flex-wrap gap-2"
             style={{ borderColor: `${COLORS.amber}55`, backgroundColor: `${COLORS.amber}0A`, color: COLORS.amber }}>
             <span>
-              ⚠ INGEST IDLE · newest page in feed is {Math.round(feedStaleHours)}h old
+              {t("live.stale_warning", { hours: Math.round(feedStaleHours) })}
             </span>
             <span className="text-emerald-700">
-              displays below reflect the corpus at last build; no transcription activity since
+              {t("live.stale_sub")}
             </span>
           </div>
         )}
@@ -458,13 +465,13 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
         {stats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 mb-6 border-y border-emerald-900/40">
             {[
-              { label: "PAGES",      value: stats.totalPages.toLocaleString(),    sub: "indexed",       color: COLORS.green },
-              { label: "CHARS",      value: stats.totalChars >= 1e6 ? `${(stats.totalChars/1e6).toFixed(2)}M` : `${(stats.totalChars/1000).toFixed(0)}K`,
-                                                                                  sub: "corpus text",   color: COLORS.green },
-              { label: "VISION",     value: (stats.bySource.vision || 0).toLocaleString(), sub: "machine OCR",  color: COLORS.green },
-              { label: "TESSERACT",  value: (stats.bySource.ocr || 0).toLocaleString(),    sub: "needs re-pass", color: COLORS.amber },
+              { key: "pages",     label: t("live.tel.pages"),     sub: t("live.tel.pages_sub"),     color: COLORS.green, value: stats.totalPages.toLocaleString() },
+              { key: "chars",     label: t("live.tel.chars"),     sub: t("live.tel.chars_sub"),     color: COLORS.green,
+                value: stats.totalChars >= 1e6 ? `${(stats.totalChars/1e6).toFixed(2)}M` : `${(stats.totalChars/1000).toFixed(0)}K` },
+              { key: "vision",    label: t("live.tel.vision"),    sub: t("live.tel.vision_sub"),    color: COLORS.green, value: (stats.bySource.vision || 0).toLocaleString() },
+              { key: "tesseract", label: t("live.tel.tesseract"), sub: t("live.tel.tesseract_sub"), color: COLORS.amber, value: (stats.bySource.ocr || 0).toLocaleString() },
             ].map((c, i) => (
-              <div key={c.label} className={`px-4 py-3 ${i > 0 ? "border-l border-emerald-950" : ""}`}>
+              <div key={c.key} className={`px-4 py-3 ${i > 0 ? "border-l border-emerald-950" : ""}`}>
                 <div className="font-mono text-[9px] tracking-[0.3em] text-emerald-700/80">{c.label}</div>
                 <div className="font-mono font-semibold tabular-nums leading-none mt-2 text-2xl sm:text-3xl"
                   style={{ color: c.color }}>
@@ -479,12 +486,15 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
         {/* ============ DOCUMENT PROGRESS STRIP ============ */}
         {docProgress && (() => {
           const dp = docProgress;
+          // Segment labels + subs translate via t(); the color, value and
+          // key stay structural so the bar tooltip + per-segment grid
+          // stay aligned regardless of locale string length.
           const segs = [
-            { key: "ready",        label: "READY",       value: dp.ready,        color: COLORS.cyan,     sub: "fully vision-OCR'd" },
-            { key: "improving",    label: "IMPROVING",   value: dp.improving,    color: COLORS.green,    sub: "partial vision · in-flight" },
-            { key: "queued",       label: "QUEUED",      value: dp.queued,       color: COLORS.amber,    sub: "tesseract-only · awaiting vision" },
-            { key: "missing",      label: "MISSING",     value: dp.missing,      color: COLORS.greenDim, sub: "no body text yet (or pdfjs-clean)" },
-            { key: "uncatalogued", label: "UNCATALOGUED",value: dp.uncatalogued, color: COLORS.rose,     sub: "records to catalogue" },
+            { key: "ready",        label: t("live.doc_progress.ready"),        value: dp.ready,        color: COLORS.cyan,     sub: t("live.doc_progress.ready_sub") },
+            { key: "improving",    label: t("live.doc_progress.improving"),    value: dp.improving,    color: COLORS.green,    sub: t("live.doc_progress.improving_sub") },
+            { key: "queued",       label: t("live.doc_progress.queued"),       value: dp.queued,       color: COLORS.amber,    sub: t("live.doc_progress.queued_sub") },
+            { key: "missing",      label: t("live.doc_progress.missing"),      value: dp.missing,      color: COLORS.greenDim, sub: t("live.doc_progress.missing_sub") },
+            { key: "uncatalogued", label: t("live.doc_progress.uncatalogued"), value: dp.uncatalogued, color: COLORS.rose,     sub: t("live.doc_progress.uncatalogued_sub") },
           ];
           const totalSegs = segs.reduce((s, x) => s + x.value, 0) || 1;
           const indexed = dp.ready + dp.improving + dp.queued;
@@ -493,8 +503,8 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
             <div className="mb-8 border border-emerald-900/60 bg-black/40 rounded-sm p-4">
               <div className="flex items-baseline justify-between flex-wrap gap-3 mb-3">
                 <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-300">
-                  ▌ D O C U M E N T &nbsp; P R O G R E S S
-                  <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">{RELEASES_LABEL.toUpperCase()} · {dp.totalInventory} INVENTORY</span>
+                  {t("live.doc_progress.title")}
+                  <span className="ml-3 text-emerald-700 text-[9px] tracking-widest">{t("live.doc_progress.inventory", { releases: RELEASES_LABEL.toUpperCase(), total: dp.totalInventory })}</span>
                 </div>
                 <div className="flex items-center gap-4 font-mono text-[10px] tracking-widest text-emerald-700">
                   {/* ACTIVE indicator — pulses when something is being worked on */}
@@ -504,12 +514,12 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
                         <span className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: COLORS.cyan, opacity: 0.4 }} />
                         <span className="relative inline-block w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS.cyan }} />
                       </span>
-                      ACTIVE <span className="tabular-nums text-emerald-100">{dp.active}</span>
+                      {t("live.doc_progress.active")} <span className="tabular-nums text-emerald-100">{dp.active}</span>
                     </span>
                   )}
                   <span>
                     <span className="text-cyan-300 text-base mr-1 tabular-nums">{pctReady}%</span>
-                    toward fully search-ready
+                    {t("live.doc_progress.pct_search_ready")}
                   </span>
                 </div>
               </div>
@@ -518,7 +528,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
               <div className="h-3 flex rounded-sm overflow-hidden mb-3 bg-emerald-950 border border-emerald-950">
                 {segs.map(seg => seg.value > 0 && (
                   <div key={seg.key}
-                    title={`${seg.label} · ${seg.value} docs · ${Math.round((seg.value/totalSegs)*100)}%`}
+                    title={t("live.doc_progress.bar_title", { label: seg.label, n: seg.value, pct: Math.round((seg.value/totalSegs)*100) })}
                     style={{ width: `${(seg.value / totalSegs) * 100}%`, backgroundColor: seg.color }} />
                 ))}
               </div>
@@ -526,15 +536,15 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
               {/* Active processing — which doc the OCR script is currently on */}
               {dp.active > 0 && (
                 <div className="mb-3 font-mono text-[10px] tracking-widest">
-                  <span className="text-cyan-300 mr-2">▸ PROCESSING NOW</span>
+                  <span className="text-cyan-300 mr-2">{t("live.doc_progress.processing_now")}</span>
                   {dp.activeIds.slice(0, 4).map((id, i) => (
                     <span key={id} className="text-emerald-300 mr-2">
                       {i > 0 && <span className="text-emerald-700 mr-2">·</span>}
                       {id.toUpperCase()}
                     </span>
                   ))}
-                  {dp.activeIds.length > 4 && <span className="text-emerald-700">+ {dp.activeIds.length - 4} more</span>}
-                  <span className="text-emerald-700 ml-2">(last 90 min of feed activity)</span>
+                  {dp.activeIds.length > 4 && <span className="text-emerald-700">{t("live.doc_progress.processing_more", { n: dp.activeIds.length - 4 })}</span>}
+                  <span className="text-emerald-700 ml-2">{t("live.doc_progress.processing_hint")}</span>
                 </div>
               )}
 
@@ -547,7 +557,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
                       <div className="font-mono text-[9px] tracking-widest" style={{ color: seg.color }}>{seg.label}</div>
                       <div className="font-mono text-emerald-100 text-lg tabular-nums leading-none mt-0.5">
                         {seg.value}
-                        <span className="text-emerald-700 ml-1 text-[10px]">of {dp.totalInventory}</span>
+                        <span className="text-emerald-700 ml-1 text-[10px]">{t("live.doc_progress.of_total", { total: dp.totalInventory })}</span>
                       </div>
                       <div className="font-mono text-[9px] text-emerald-600 mt-1 leading-tight">{seg.sub}</div>
                     </div>
@@ -557,23 +567,25 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
 
               {/* Sub-line: how many of catalogued have any indexed text */}
               <div className="mt-3 pt-2 border-t border-emerald-950 font-mono text-[10px] text-emerald-700 tracking-widest">
-                <span className="text-emerald-300">{dp.cataloguedTotal}</span> docs catalogued ·
-                <span className="text-emerald-300 ml-1">{indexed}</span> with body text indexed ·
-                <span className="text-cyan-300 ml-1">{dp.ready}</span> at vision quality ·
-                <span className="text-amber-300 ml-1">{dp.queued}</span> still tesseract-only ·
-                <span className="text-emerald-300 ml-1">{(stats?.totalPages || 0).toLocaleString()}</span> pages decoded total
+                {t("live.doc_progress.summary", {
+                  catalogued: dp.cataloguedTotal,
+                  indexed,
+                  ready: dp.ready,
+                  queued: dp.queued,
+                  pages: (stats?.totalPages || 0).toLocaleString(),
+                })}
               </div>
 
               {/* Media-type breakdown across the catalogued events */}
               <div className="mt-2 pt-2 border-t border-emerald-950">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div className="font-mono text-[9px] tracking-[0.3em] text-emerald-700">▌ M E D I A &nbsp; T Y P E S</div>
+                  <div className="font-mono text-[9px] tracking-[0.3em] text-emerald-700">{t("live.doc_progress.media_types")}</div>
                   <div className="flex flex-wrap gap-3 font-mono text-[10px]">
                     {[
-                      { key: "document", label: "DOCUMENT", glyph: "▤", color: COLORS.green,  note: "memos · reports · cables · interviews" },
-                      { key: "photo",    label: "PHOTO",    glyph: "◫", color: COLORS.cyan,   note: "stills · sketches · annotated images" },
-                      { key: "video",    label: "VIDEO",    glyph: "▶", color: COLORS.amber,  note: "DVIDS sensor footage · mission video" },
-                      { key: "audio",    label: "AUDIO",    glyph: "◉", color: COLORS.rose,   note: "radio / transcript" },
+                      { key: "document", glyph: "▤", color: COLORS.green, label: t("live.doc_progress.mt_document"), note: t("live.doc_progress.mt_document_note") },
+                      { key: "photo",    glyph: "◫", color: COLORS.cyan,  label: t("live.doc_progress.mt_photo"),    note: t("live.doc_progress.mt_photo_note") },
+                      { key: "video",    glyph: "▶", color: COLORS.amber, label: t("live.doc_progress.mt_video"),    note: t("live.doc_progress.mt_video_note") },
+                      { key: "audio",    glyph: "◉", color: COLORS.rose,  label: t("live.doc_progress.mt_audio"),    note: t("live.doc_progress.mt_audio_note") },
                     ].map(m => {
                       const n = mediaSplit[m.key] || 0;
                       return (
@@ -600,21 +612,21 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
         <div className="grid grid-cols-12 gap-6">
           {/* ---- LEFT: ingest rate + oscillation + channels ---- */}
           <aside className="col-span-12 lg:col-span-3 space-y-6">
-            <Panel title="INGEST RATE / 24H" sub="pages per hour">
+            <Panel title={t("live.panel.ingest_rate")} sub={t("live.panel.ingest_rate_sub")}>
               <IngestHistogram entries={feed?.entries || []} />
               <Axis labels={["00", "12", "24"]} />
             </Panel>
-            <Panel title="OSCILLATION · LAST 60s" sub="recent activity">
+            <Panel title={t("live.panel.oscillation")} sub={t("live.panel.oscillation_sub")}>
               <Oscilloscope entries={feed?.entries || []} />
               <Axis labels={["−60s", "", "NOW"]} accentRight />
             </Panel>
-            <Panel title="CHANNELS">
+            <Panel title={t("live.panel.channels")}>
               <div className="space-y-1.5">
-                <ChannelRow label="VISION"    rate={sourceRates.vision} color={COLORS.cyan} />
+                <ChannelRow label={t("live.panel.channel_vision")}    rate={sourceRates.vision} color={COLORS.cyan}  perHour={t("live.panel.per_hour_suffix")} />
                 {(stats?.bySource?.human || 0) > 0 && (
-                  <ChannelRow label="HUMAN"   rate={sourceRates.human}  color={COLORS.green} />
+                  <ChannelRow label={t("live.panel.channel_human")}   rate={sourceRates.human}  color={COLORS.green} perHour={t("live.panel.per_hour_suffix")} />
                 )}
-                <ChannelRow label="TESSERACT" rate={sourceRates.ocr}    color={COLORS.amber} />
+                <ChannelRow label={t("live.panel.channel_tesseract")} rate={sourceRates.ocr}    color={COLORS.amber} perHour={t("live.panel.per_hour_suffix")} />
               </div>
             </Panel>
           </aside>
@@ -622,30 +634,36 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
           {/* ---- CENTER: arriving signals rail ---- */}
           <main className="col-span-12 lg:col-span-6 min-w-0">
             <div className="flex items-baseline justify-between mb-2 pb-2 border-b border-emerald-900/60">
-              <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-300">▌ A R R I V I N G &nbsp; S I G N A L S</div>
+              <div className="font-mono text-[10px] tracking-[0.3em] text-emerald-300">{t("live.signals.title")}</div>
               <div className="font-mono text-[9px] tracking-widest text-emerald-700">
-                {filter !== "all" && <span className="text-amber-400 mr-2">[{filter.toUpperCase()}]</span>}
-                VISION × OCR · UTC · MOST RECENT FIRST
+                {filter !== "all" && <span className="text-amber-400 mr-2">[{t(`live.signals.filter_${filter === "ocr" ? "tesseract" : filter}`)}]</span>}
+                {t("live.signals.meta")}
               </div>
             </div>
 
             {/* filter row */}
             <div className="flex gap-2 mb-3">
-              {["all", "vision", ...((stats?.bySource?.human || 0) > 0 ? ["human"] : []), "ocr"].map(f => (
-                <button key={f} onClick={() => setFilter(f)}
-                  style={{ transition: `all 150ms ${EASE_OUT}` }}
-                  className={`px-2 py-1 rounded-sm border font-mono text-[10px] tracking-widest active:scale-[0.97] ${
-                    filter === f
-                      ? "border-amber-400/80 text-amber-300 bg-amber-400/10"
-                      : "border-emerald-900 text-emerald-500 hover:border-emerald-700"}`}>
-                  {f === "all" ? "ALL" : f === "vision" ? "VISION" : f === "human" ? "HUMAN" : "TESSERACT"}
-                  <span className="ml-1 opacity-50">{f==="all" ? feed?.entries.length || 0 : (stats?.bySource[f] || 0)}</span>
-                </button>
-              ))}
+              {["all", "vision", ...((stats?.bySource?.human || 0) > 0 ? ["human"] : []), "ocr"].map(f => {
+                const labelKey = f === "all" ? "live.signals.filter_all"
+                  : f === "vision" ? "live.signals.filter_vision"
+                  : f === "human" ? "live.signals.filter_human"
+                  : "live.signals.filter_tesseract";
+                return (
+                  <button key={f} onClick={() => setFilter(f)}
+                    style={{ transition: `all 150ms ${EASE_OUT}` }}
+                    className={`px-2 py-1 rounded-sm border font-mono text-[10px] tracking-widest active:scale-[0.97] ${
+                      filter === f
+                        ? "border-amber-400/80 text-amber-300 bg-amber-400/10"
+                        : "border-emerald-900 text-emerald-500 hover:border-emerald-700"}`}>
+                    {t(labelKey)}
+                    <span className="ml-1 opacity-50">{f==="all" ? feed?.entries.length || 0 : (stats?.bySource[f] || 0)}</span>
+                  </button>
+                );
+              })}
               <button onClick={() => setReloadAt(Date.now())}
                 style={{ transition: `all 150ms ${EASE_OUT}` }}
                 className="ml-auto px-2 py-1 rounded-sm border border-emerald-900 text-emerald-500 hover:border-emerald-700 font-mono text-[10px] tracking-widest active:scale-[0.97]">
-                ↻ REFRESH
+                {t("live.signals.refresh")}
               </button>
             </div>
 
@@ -655,7 +673,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
               </div>
             )}
             {!feed && !error && (
-              <div className="font-mono text-[11px] text-emerald-700 py-16 text-center">◌ acquiring telemetry…</div>
+              <div className="font-mono text-[11px] text-emerald-700 py-16 text-center">{t("live.signals.acquiring")}</div>
             )}
 
             {feed && (
@@ -680,11 +698,11 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
                         <div className="flex items-baseline gap-3 flex-wrap font-mono">
                           <span className="text-[11px] tracking-widest tabular-nums"
                             style={{ color: isFresh ? COLORS.amber : COLORS.greenDim }}>
-                            T + {TIME_AGO(e.modifiedAt, now)}
+                            {t("live.signals.t_plus", { ago: TIME_AGO(e.modifiedAt, now) })}
                           </span>
                           <span className="text-[11px] tracking-widest font-bold"
                             style={{ color: src.color }}>
-                            {src.label}
+                            {t(src.labelKey)}
                           </span>
                           <span className="text-[11px] tracking-wider text-emerald-300">
                             {(e.eventId || "").toUpperCase()}
@@ -697,7 +715,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
                               ✦ {e.contributor}
                             </span>
                           )}
-                          <span className="ml-auto text-[10px] text-emerald-700 tabular-nums">PAGE {String(e.page).padStart(3, " ")}</span>
+                          <span className="ml-auto text-[10px] text-emerald-700 tabular-nums">{t("live.signals.page_n", { n: String(e.page).padStart(3, " ") })}</span>
                         </div>
                         {e.snippet && (
                           <div className="font-mono text-[12px] mt-1 leading-relaxed pr-4 line-clamp-2"
@@ -715,7 +733,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
 
           {/* ---- RIGHT: agency distribution + bearing dial ---- */}
           <aside className="col-span-12 lg:col-span-3 space-y-6">
-            <Panel title="AGENCY DISTRIBUTION">
+            <Panel title={t("live.panel.agency_distribution")}>
               <div className="space-y-2">
                 {agencyDist.map(a => (
                   <div key={a.name} className="font-mono">
@@ -730,7 +748,7 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
                 ))}
               </div>
             </Panel>
-            <Panel title="GEOSPATIAL BEARING" sub="last 7 days · by event coordinates">
+            <Panel title={t("live.panel.bearing")} sub={t("live.panel.bearing_sub")}>
               <BearingDial entries={feed?.entries || []} />
             </Panel>
             <HelpWantedPanel />
@@ -740,11 +758,11 @@ export default function LiveFeedView({ onSelect, headerFilters }) {
         {/* ============ FOOTER ============ */}
         <div className="h-px bg-emerald-900/60 mt-12" />
         <div className="flex items-baseline justify-between mt-6 font-mono text-[9px] tracking-[0.35em] text-emerald-700">
-          <div>W A T C H K E E P E R &nbsp;·&nbsp; A U T O M A T E D &nbsp;V I G I L &nbsp;·&nbsp; H U M A N - I N - L O O P</div>
-          <div>P H O S P H O R - V I G I L &nbsp;·&nbsp; S E C T I O N &nbsp;A &nbsp;·&nbsp; P A G E &nbsp;0 1</div>
+          <div>{t("live.footer_left")}</div>
+          <div>{t("live.footer_right")}</div>
         </div>
         <div className="mt-2 font-mono text-[9px] tracking-widest text-emerald-800 text-center">
-          {feed ? <>FEED GEN {feed.generatedAt?.slice(0,16).replace("T", " · ")} UTC · regenerated each deploy</> : ""}
+          {feed ? t("live.feed_gen", { at: feed.generatedAt?.slice(0,16).replace("T", " · ") || "—" }) : ""}
         </div>
       </div>
     </div>
@@ -780,6 +798,7 @@ function Axis({ labels, accentRight }) {
 
 // HELP-WANTED — fetches the public work queue and shows volunteers what's open.
 function HelpWantedPanel() {
+  const t = useT();
   const [queue, setQueue] = useState(null);
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}work-available.json?t=${Date.now()}`)
@@ -795,32 +814,32 @@ function HelpWantedPanel() {
   return (
     <div className="border-2 border-dashed border-amber-700/50 bg-amber-950/20 rounded-sm p-3">
       <div className="flex items-baseline justify-between mb-2">
-        <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300">▌ H O W &nbsp; C A N &nbsp; I &nbsp; H E L P ?</div>
+        <div className="font-mono text-[10px] tracking-[0.3em] text-amber-300">{t("live.help.title")}</div>
         {queue && (
           <div className="font-mono text-[9px] text-amber-700 text-right">
             <span className="text-amber-300 tabular-nums text-base mr-1">{queue.totalPagesNeeded}</span>
-            pages need volunteers
+            {t("live.help.pages_need")}
             {queue.totalDocsNotPulled > 0 && (
               <div className="text-emerald-700 mt-0.5">
-                + <span className="text-emerald-400 tabular-nums">{queue.totalDocsNotPulled}</span> docs
+                {t("live.help.backlog_pre")} <span className="text-emerald-400 tabular-nums">{queue.totalDocsNotPulled}</span> {t("live.help.backlog_docs")}
                 {" · "}
-                <span className="text-emerald-400 tabular-nums">{queue.totalPagesNotPulled}</span> pages awaiting first pull
+                <span className="text-emerald-400 tabular-nums">{queue.totalPagesNotPulled}</span> {t("live.help.backlog_pages")}
               </div>
             )}
           </div>
         )}
       </div>
       <div className="font-mono text-[10px] text-emerald-400/90 leading-relaxed mb-3">
-        Run the pursue-vision-mcp daemon on your own machine with your own ChatGPT Plus account. The volunteer script picks pages from this queue, OCRs them, and opens a PR with your transcriptions. <span className="text-amber-300">No API keys, no credentials shared.</span>
+        {t("live.help.daemon_lead_pre")} <span className="text-amber-300">{t("live.help.daemon_lead_emph")}</span>
       </div>
       {top.length > 0 && (
         <div className="mb-3">
-          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">▌ TOP NEEDS</div>
+          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">{t("live.help.top_needs")}</div>
           <div className="space-y-1">
             {top.map(([eid, d]) => (
               <div key={eid} className="font-mono text-[10px] text-emerald-300 flex justify-between gap-2">
                 <span className="truncate">{eid}</span>
-                <span className="text-amber-300 tabular-nums shrink-0">{d.pagesNeeded}p</span>
+                <span className="text-amber-300 tabular-nums shrink-0">{d.pagesNeeded}{t("live.help.pages_suffix")}</span>
               </div>
             ))}
           </div>
@@ -828,12 +847,12 @@ function HelpWantedPanel() {
       )}
       {notPulled.length > 0 && (
         <div className="mb-3">
-          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">▌ AWAITING FIRST PULL · RELEASE BACKLOG</div>
+          <div className="font-mono text-[9px] tracking-widest text-emerald-700 mb-1">{t("live.help.awaiting_first_pull")}</div>
           <div className="space-y-1">
             {notPulled.map(d => (
               <div key={d.eid} className="font-mono text-[10px] text-emerald-400/80 flex justify-between gap-2">
                 <span className="truncate">{d.title}</span>
-                <span className="text-emerald-500 tabular-nums shrink-0">{d.pages}p</span>
+                <span className="text-emerald-500 tabular-nums shrink-0">{d.pages}{t("live.help.pages_suffix")}</span>
               </div>
             ))}
           </div>
@@ -848,18 +867,18 @@ function HelpWantedPanel() {
         target="_blank" rel="noopener noreferrer"
         style={{ transition: "all 150ms cubic-bezier(0.23, 1, 0.32, 1)" }}
         className="block text-center font-mono text-[10px] tracking-widest px-3 py-2 border border-amber-400/60 bg-amber-400/5 text-amber-200 hover:bg-amber-400/15 hover:border-amber-400 rounded-sm active:scale-[0.97]">
-        ＋ &nbsp; R E A D &nbsp; T H E &nbsp; F U L L &nbsp; G U I D E
+        {t("live.help.read_full_guide")}
       </a>
     </div>
   );
 }
 
-function ChannelRow({ label, rate, color }) {
+function ChannelRow({ label, rate, color, perHour = "/hr" }) {
   return (
     <div className="flex items-center justify-between font-mono text-[11px] py-1 border-b border-emerald-950 last:border-0">
       <span className="tracking-wider" style={{ color }}>{label}</span>
       <span className="tabular-nums text-emerald-700">
-        <span className="text-emerald-400">{rate}</span> <span className="text-[9px]">/hr</span>
+        <span className="text-emerald-400">{rate}</span> <span className="text-[9px]">{perHour}</span>
       </span>
     </div>
   );

@@ -1,0 +1,11 @@
+{
+  "best": "gpt-vision",
+  "sources": {
+    "gpt-vision": {
+      "chars": 19,
+      "imported_at": "2026-05-26T21:46:41.796Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0055.gpt-vision.txt"
+    }
+  }
+}

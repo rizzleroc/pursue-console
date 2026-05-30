@@ -5,6 +5,7 @@ import { loadSettings, saveSettings, BACKENDS, PROVIDERS } from "../lib/askSetti
 import { WEBLLM_MODELS } from "../lib/webllmClient.js";
 import { AGENCY_COLORS, EVENTS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
+import { useT } from "../i18n/context.js";
 
 // =====================================================================
 // ASK — natural-language interface over the catalogue.
@@ -21,6 +22,7 @@ import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 
 export default function AskView({ onSelect, headerFilters }) {
+  const t = useT();
   const [mode, setMode] = useState("smart");
   const [query, setQuery] = useState(headerFilters?.query || "");
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function AskView({ onSelect, headerFilters }) {
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
         <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]">
-          <GlitchText>┃ ASK</GlitchText>
+          <GlitchText>{t("ask.title")}</GlitchText>
         </h2>
         <ModeSwitch mode={mode} setMode={setMode} />
       </div>
@@ -45,11 +47,12 @@ export default function AskView({ onSelect, headerFilters }) {
 }
 
 function ModeSwitch({ mode, setMode }) {
+  const t = useT();
   return (
     <div className="inline-flex rounded-sm border border-emerald-700/40 overflow-hidden">
       {[
-        { id: "smart",   label: "SMART · FAISS + MCP" },
-        { id: "pattern", label: "PATTERN · LOCAL" },
+        { id: "smart",   label: t("ask.mode_smart") },
+        { id: "pattern", label: t("ask.mode_pattern") },
       ].map(m => (
         <button
           key={m.id}
@@ -69,13 +72,14 @@ function ModeSwitch({ mode, setMode }) {
 // ---- PATTERN MODE (pure local, no MCP) -------------------------------
 
 function PatternMode({ query, setQuery, onSelect }) {
+  const t = useT();
   const answer = useMemo(() => ask(query), [query]);
 
   return (
     <>
       <div className="mb-3">
         <input value={query} onChange={e => setQuery(e.target.value)} autoFocus
-          placeholder="› ask the dataset — e.g. what's different about the NASA documents"
+          placeholder={t("ask.pattern_placeholder")}
           className="w-full bg-black/60 border border-emerald-700/50 rounded-sm px-3 py-2 text-emerald-200 placeholder-emerald-700 font-mono text-sm focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
       </div>
       {!query && <QuickChips setQuery={setQuery} />}
@@ -107,6 +111,7 @@ const SMART_EXAMPLES = [
 ];
 
 function SmartMode({ query, setQuery, onSelect }) {
+  const t = useT();
   const [settings, setSettings] = useState(() => loadSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [health, setHealth] = useState(null);   // { ok, error }
@@ -171,13 +176,13 @@ function SmartMode({ query, setQuery, onSelect }) {
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !running) onSubmit(); }}
           autoFocus
-          placeholder="› ask anything — FAISS retrieves, your local LLM answers"
+          placeholder={t("ask.smart_placeholder")}
           className="flex-1 bg-black/60 border border-emerald-700/50 rounded-sm px-3 py-2 text-emerald-200 placeholder-emerald-700 font-mono text-sm focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
         <button
           onClick={onSubmit}
           disabled={running || !query.trim()}
           className="px-4 py-2 font-mono text-[11px] tracking-[0.2em] rounded-sm border border-amber-500/70 bg-amber-900/20 text-amber-200 hover:bg-amber-700/30 hover:border-amber-300 disabled:opacity-40 disabled:cursor-not-allowed">
-          {running ? "…" : "ASK"}
+          {running ? "…" : t("ask.submit")}
         </button>
       </div>
 
@@ -199,6 +204,7 @@ function SmartMode({ query, setQuery, onSelect }) {
 }
 
 function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }) {
+  const t = useT();
   const isInBrowser = settings.backend === "in-browser";
   const isHosted    = settings.backend === "hosted";
   const summary =
@@ -206,27 +212,27 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
     isHosted    ? settings.hostedUrl :
                   settings.daemonUrl;
   const backendLabel =
-    isInBrowser ? "IN-BROWSER" :
-    isHosted    ? "HOSTED"     :
-                  "LOCAL MCP";
+    isInBrowser ? t("ask.backend_in_browser") :
+    isHosted    ? t("ask.backend_hosted") :
+                  t("ask.backend_local_mcp");
   return (
     <div className="border border-emerald-700/30 bg-black/30 rounded-sm mb-4">
       <button
         onClick={onToggle}
         className="w-full px-3 py-1.5 flex items-center justify-between hover:bg-emerald-950/40">
         <span className="font-mono text-[10px] tracking-widest text-emerald-500">
-          ▌ {backendLabel} · {summary}
+          {t("ask.backend_label", { backend: backendLabel, summary })}
         </span>
         <span className="flex items-center gap-2">
-          {health == null && <span className="font-mono text-[9px] text-emerald-700">checking…</span>}
-          {health?.ok && <span className="font-mono text-[9px] text-emerald-300">● BACKEND UP</span>}
-          {health && !health.ok && <span className="font-mono text-[9px] text-rose-400">● UNREACHABLE</span>}
+          {health == null && <span className="font-mono text-[9px] text-emerald-700">{t("ask.checking")}</span>}
+          {health?.ok && <span className="font-mono text-[9px] text-emerald-300">{t("ask.backend_up")}</span>}
+          {health && !health.ok && <span className="font-mono text-[9px] text-rose-400">{t("ask.backend_unreachable")}</span>}
           <span className="font-mono text-[10px] text-emerald-700">{open ? "▾" : "▸"}</span>
         </span>
       </button>
       {open && (
         <div className="px-3 py-3 border-t border-emerald-900/40 space-y-2">
-          <Row label="BACKEND">
+          <Row label={t("ask.row_backend")}>
             <select value={settings.backend}
               onChange={e => onChange({ ...settings, backend: e.target.value })}
               className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
@@ -236,7 +242,7 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
 
           {isInBrowser && (
             <>
-              <Row label="MODEL">
+              <Row label={t("ask.row_model")}>
                 <select value={settings.modelId}
                   onChange={e => onChange({ ...settings, modelId: e.target.value })}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
@@ -244,23 +250,23 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
                 </select>
               </Row>
               <div className="font-mono text-[10px] text-emerald-700 leading-relaxed pl-32">
-                First ASK downloads the model weights (cached in IndexedDB after that). WebGPU is used when available; falls back to WASM. No request leaves your browser.
+                {t("ask.in_browser_hint")}
               </div>
             </>
           )}
 
           {isHosted && (
             <>
-              <Row label="HOSTED URL">
+              <Row label={t("ask.row_hosted_url")}>
                 <input value={settings.hostedUrl}
                   onChange={e => onChange({ ...settings, hostedUrl: e.target.value })}
-                  placeholder="https://your-app.up.railway.app"
+                  placeholder={t("ask.hosted_url_placeholder")}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
               </Row>
-              <Row label="SHARED BEARER">
+              <Row label={t("ask.row_shared_bearer")}>
                 <input type="password" value={settings.hostedBearer}
                   onChange={e => onChange({ ...settings, hostedBearer: e.target.value })}
-                  placeholder="(optional — only if PURSUE_RAG_BEARER is set on the server)"
+                  placeholder={t("ask.hosted_bearer_placeholder")}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
               </Row>
             </>
@@ -268,18 +274,18 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
 
           {!isInBrowser && !isHosted && (
             <>
-              <Row label="DAEMON URL">
+              <Row label={t("ask.row_daemon_url")}>
                 <input value={settings.daemonUrl}
                   onChange={e => onChange({ ...settings, daemonUrl: e.target.value })}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]" />
               </Row>
-              <Row label="BEARER TOKEN">
+              <Row label={t("ask.row_bearer")}>
                 <input type="password" value={settings.token}
                   onChange={e => onChange({ ...settings, token: e.target.value })}
-                  placeholder="cat ~/.pursue-vision-token"
+                  placeholder={t("ask.bearer_placeholder")}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 placeholder-emerald-700 font-mono text-[12px]" />
               </Row>
-              <Row label="PROVIDER">
+              <Row label={t("ask.row_provider")}>
                 <select value={settings.provider}
                   onChange={e => onChange({ ...settings, provider: e.target.value })}
                   className="w-full bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]">
@@ -289,7 +295,7 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
             </>
           )}
 
-          <Row label="TOP-K PASSAGES">
+          <Row label={t("ask.row_topk")}>
             <input type="number" min="3" max="32" value={settings.k}
               onChange={e => onChange({ ...settings, k: Number(e.target.value) || 10 })}
               className="w-24 bg-black/60 border border-emerald-800/50 rounded-sm px-2 py-1 text-emerald-200 font-mono text-[12px]" />
@@ -297,11 +303,11 @@ function SettingsPanel({ open, onToggle, settings, onChange, health, onRecheck }
 
           {health && !health.ok && (
             <div className="font-mono text-[11px] text-rose-300 mt-2 leading-relaxed">
-              ⊘ Can't reach the backend ({health.error}).{" "}
+              {t("ask.cant_reach", { error: health.error })}{" "}
               {isHosted ? (
-                <>The hosted service may be cold-starting (Railway free tier sleeps after inactivity) — wait ~10s and click <button className="underline text-amber-300" onClick={onRecheck}>retry</button>. Or check the URL above.</>
+                <>{t("ask.cant_reach_hosted")} <button className="underline text-amber-300" onClick={onRecheck}>{t("ask.retry")}</button>{t("ask.cant_reach_hosted_tail")}</>
               ) : (
-                <>Start it with{" "}<code className="text-amber-300">cd pursue-vision-mcp &amp;&amp; npm start</code>{" "}— then click <button className="underline text-amber-300" onClick={onRecheck}>retry</button>. The daemon binds to 127.0.0.1 only; it never leaves your machine.</>
+                <>{t("ask.cant_reach_local_pre")}{" "}<code className="text-amber-300">{t("ask.cant_reach_local_cmd")}</code>{" "}{t("ask.cant_reach_local_post")} <button className="underline text-amber-300" onClick={onRecheck}>{t("ask.retry")}</button>{t("ask.cant_reach_local_tail")}</>
               )}
             </div>
           )}
@@ -321,15 +327,16 @@ function Row({ label, children }) {
 }
 
 function RunningStatus({ status, modelProgress }) {
+  const t = useT();
   const PHASES = {
-    "starting":            "Starting…",
-    "loading-vectors":     "Loading FAISS index (embeddings.bin)…",
-    "loading-embed-model": "Loading MiniLM embedding model…",
-    "embedding":           "Embedding your question…",
-    "retrieving":          "Cosine-retrieving top-K passages…",
-    "loading-model":       "Loading chat model (first run: ~400 MB; cached after)…",
-    "generating":          "Generating answer…",
-    "calling-backend":     `Calling ${status?.backend || "backend"} (${status?.contextCount ?? "?"} passages)…`,
+    "starting":            t("ask.phases.starting"),
+    "loading-vectors":     t("ask.phases.loading_vectors"),
+    "loading-embed-model": t("ask.phases.loading_embed_model"),
+    "embedding":           t("ask.phases.embedding"),
+    "retrieving":          t("ask.phases.retrieving"),
+    "loading-model":       t("ask.phases.loading_model"),
+    "generating":          t("ask.phases.generating"),
+    "calling-backend":     t("ask.phases.calling_backend", { backend: status?.backend || "backend", n: status?.contextCount ?? "?" }),
   };
   // transformers.js emits { file, status, progress (0-100) } during
   // weight downloads. Show the current file + percentage so a long
@@ -341,7 +348,7 @@ function RunningStatus({ status, modelProgress }) {
     <div className="border border-amber-500/40 bg-amber-900/10 rounded-sm p-3 mb-4 font-mono text-[12px] text-amber-200 tracking-wider space-y-2">
       <div className="flex items-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-        {PHASES[status?.phase] || "Working…"}
+        {PHASES[status?.phase] || t("ask.phases.working")}
       </div>
       {showProgress && (
         <div className="space-y-1">
@@ -367,15 +374,19 @@ function ErrorCard({ error }) {
 }
 
 function ResultCard({ result, onSelect }) {
+  const t = useT();
   return (
     <div className="space-y-4">
       <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 sm:p-4">
         <div className="flex items-baseline gap-2 flex-wrap mb-2">
-          <span className="font-mono text-[9px] tracking-widest text-amber-400">▌ ANSWER</span>
+          <span className="font-mono text-[9px] tracking-widest text-amber-400">{t("ask.answer_label")}</span>
           <span className="font-mono text-[9px] tracking-widest text-emerald-700">
-            · {result.backend || result.provider}
-            {result.model && <> · {result.model}</>}
-            {" "}· {result.contexts.length} passages · {(result.durationMs / 1000).toFixed(1)}s
+            {t("ask.answer_meta", {
+              backend: result.backend || result.provider,
+              model: result.model ? ` · ${result.model}` : "",
+              n: result.contexts.length,
+              seconds: (result.durationMs / 1000).toFixed(1),
+            })}
           </span>
         </div>
         <pre className="font-mono text-[13px] text-emerald-100 leading-relaxed whitespace-pre-wrap">
@@ -385,7 +396,7 @@ function ResultCard({ result, onSelect }) {
 
       <div>
         <div className="font-mono text-[10px] tracking-widest text-emerald-700 mb-2">
-          ▌ LOOKING AT · top {result.contexts.length} retrieved passages (click any to open the record)
+          {t("ask.looking_at", { n: result.contexts.length })}
         </div>
         <div className="space-y-2">
           {result.contexts.map((c, i) => {
@@ -414,7 +425,7 @@ function ResultCard({ result, onSelect }) {
                     <span className="font-mono text-[10px] text-emerald-100">{ev.title}</span>
                   </div>
                   <span className="font-mono text-[9px] text-emerald-700">
-                    p{c.page ?? "—"} · score {c.score.toFixed(3)}
+                    {t("ask.page_score", { page: c.page ?? "—", score: c.score.toFixed(3) })}
                   </span>
                 </div>
                 <div className="font-mono text-[11px] text-emerald-300/80 mt-1 line-clamp-2">{c.text}</div>
@@ -430,10 +441,11 @@ function ResultCard({ result, onSelect }) {
 // ---- shared bits -----------------------------------------------------
 
 function QuickChips({ setQuery, examples }) {
+  const t = useT();
   const list = examples || ASK_EXAMPLES;
   return (
     <div className="mb-4">
-      <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TRY</div>
+      <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("ask.try")}</div>
       <div className="flex flex-wrap gap-1.5">
         {list.map(q => (
           <button
@@ -448,12 +460,13 @@ function QuickChips({ setQuery, examples }) {
 }
 
 function AnswerCard({ answer }) {
+  const t = useT();
   return (
     <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 sm:p-4 mb-4">
       <div className="flex items-baseline gap-2 flex-wrap mb-2">
-        <span className="font-mono text-[9px] tracking-widest text-amber-400">▌ ANSWER</span>
+        <span className="font-mono text-[9px] tracking-widest text-amber-400">{t("ask.answer_label")}</span>
         {answer.intent && answer.intent !== "empty" && (
-          <span className="font-mono text-[9px] tracking-widest text-emerald-700">· INTENT: {answer.intent.toUpperCase()}</span>
+          <span className="font-mono text-[9px] tracking-widest text-emerald-700">{t("ask.intent", { intent: answer.intent.toUpperCase() })}</span>
         )}
         {answer.query?.agency && (
           <span className="font-mono text-[9px] tracking-widest"
@@ -489,7 +502,7 @@ function AnswerCard({ answer }) {
         </div>
       )}
       {answer.hint && (
-        <div className="mt-3 font-mono text-[10px] text-emerald-700 tracking-wider">▌ {answer.hint}</div>
+        <div className="mt-3 font-mono text-[10px] text-emerald-700 tracking-wider">{t("ask.answer_hint", { hint: answer.hint })}</div>
       )}
     </div>
   );
@@ -514,6 +527,7 @@ function Group({ group, onSelect }) {
 }
 
 function EventRow({ event, onSelect }) {
+  const t = useT();
   const color = AGENCY_COLORS[event.agency] || "#7CFFB2";
   return (
     <button
@@ -527,9 +541,9 @@ function EventRow({ event, onSelect }) {
           </span>
           <DocTypeBadge docType={event.docType} />
           {event.flag === "anchor" && <span className="text-amber-400 text-[10px] shrink-0">▲</span>}
-          {event.redacted && <span className="font-mono text-[9px] tracking-widest text-rose-400 shrink-0">REDACTED</span>}
-          {event.videoId && <span className="font-mono text-[9px] tracking-widest text-blue-300 shrink-0">VIDEO</span>}
-          {event.release === "Release 02" && <span className="font-mono text-[9px] tracking-widest text-amber-300 shrink-0">R02</span>}
+          {event.redacted && <span className="font-mono text-[9px] tracking-widest text-rose-400 shrink-0">{t("ask.redacted_tag")}</span>}
+          {event.videoId && <span className="font-mono text-[9px] tracking-widest text-blue-300 shrink-0">{t("ask.video_tag")}</span>}
+          {event.release === "Release 02" && <span className="font-mono text-[9px] tracking-widest text-amber-300 shrink-0">{t("ask.r02_tag")}</span>}
         </div>
         <span className="font-mono text-[10px] text-amber-300 shrink-0">{event.date || "—"}</span>
       </div>

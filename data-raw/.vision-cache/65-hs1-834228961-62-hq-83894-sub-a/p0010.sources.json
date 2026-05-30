@@ -7,6 +7,12 @@
       "model": "gemini-3.1-flash-lite",
       "generated_at": "2026-05-08T15:50:19.237282+00:00",
       "text_file": "p0010.gemini.txt"
+    },
+    "gpt-vision": {
+      "chars": 2681,
+      "imported_at": "2026-05-26T21:46:41.895Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0010.gpt-vision.txt"
     }
   }
 }
