@@ -38,6 +38,20 @@ eng.traineddata
 # the repo and don't belong in version control.
 .claude/worktrees/
 
+# Release-01 PDFs are served at runtime from war.gov directly (see
+# src/data/events.js URL_BASE), so the committed copies were pure
+# processing-pipeline scratch — kept on disk locally for FAISS/dossier/
+# visuals extraction but not needed in the deploy or in git. Release-02
+# PDFs stay committed because the deploy serves them from public/release_2/.
+public/release_1/*.pdf
+# Same logic for any video/audio assets — they're processed locally for
+# frames/transcripts but don't ship in the bundle.
+public/**/*.mp4
+public/**/*.mov
+public/**/*.webm
+public/**/*.avi
+public/**/*.mkv
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

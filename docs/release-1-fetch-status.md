@@ -1,10 +1,10 @@
 # Release-01 PDF fetch status
 
-Tracks the war.gov Release-01 bulk fetch that landed on PR #115.
+Tracks war.gov Release-01 PDF ingestion. **PDFs are NOT committed to the repo** — the deployed site serves them directly from `https://www.war.gov/medialink/ufo/release_1/` (see `src/data/events.js` `URL_BASE`). Local copies under `public/release_1/` exist only for offline processing pipelines (FAISS embeddings, dossier extraction, visuals classification). `public/release_1/*.pdf` is gitignored.
 
-## Completed
+## On-disk status (local)
 
-**64 / 68 PDFs** fetched via whipgen MCP `web_eval` (same-origin in-page fetch — only path that beats Akamai's TLS fingerprinting). All committed under `public/release_1/`. Total on disk: ~434 MB.
+**64 / 68 PDFs** successfully fetched via whipgen MCP `web_eval` (same-origin in-page fetch — only path that beats Akamai's TLS fingerprinting). All present under `public/release_1/`. Total ~434 MB.
 
 Cohorts fetched:
 - 1 POC (`dow-uap-d12`)
@@ -17,22 +17,20 @@ Cohorts fetched:
 
 ## Remaining (4)
 
-Probed total sizes are unexpectedly large — all four are scanned-image-heavy FBI sections that average 1+ MB/page (vs ~150–280 KB/page for the others). **All four exceed GitHub's 100 MB hard file-size limit, so they cannot be committed directly to this repo — they require git-lfs.** Confirmed empirically: a 161 MB push of `box7_173-233` was rejected with `error: File ... is 153.89 MB; this exceeds GitHub's file size limit of 100.00 MB. ... You may want to try Git Large File Storage`.
+Large scanned-image FBI sections, ~1 MB/page. Fetch them to the same local `public/release_1/` location whenever the pipeline needs them — they won't go through git.
 
-| File | Probed total | Chunks @5MB | Notes |
-|---|---|---|---|
-| `65_hs1-834228961_62-hq-83894_section_8.pdf` (217pp) | **255 MB** | 52 | Probed in this run |
-| `65_hs1-834228961_62-hq-83894_section_9.pdf` (290pp) | ~300+ MB est | ~60+ | Largest by page count |
-| `38_143685_box7_incident_summaries_101-172.pdf` (178pp) | ~200 MB est | ~40 | Sibling of 173-233 |
-| `38_143685_box7_incident_summaries_173-233.pdf` (144pp) | **161 MB** | 33 | Successfully fetched + assembled locally; commit rejected by GitHub 100MB limit |
+| File | Probed total | Chunks @5MB |
+|---|---|---|
+| `65_hs1-834228961_62-hq-83894_section_8.pdf` (217pp) | 255 MB | 52 |
+| `65_hs1-834228961_62-hq-83894_section_9.pdf` (290pp) | ~300+ MB est | ~60+ |
+| `38_143685_box7_incident_summaries_101-172.pdf` (178pp) | ~200 MB est | ~40 |
+| `38_143685_box7_incident_summaries_173-233.pdf` (144pp) | 161 MB | 33 |
 
-**To finish these:** set up git-lfs on the repo first (`git lfs install`, then `git lfs track 'public/release_1/65_hs1*section_8*.pdf' …`, then `git add .gitattributes`), then resume the fetch with the protocol below. GitHub LFS has its own bandwidth/storage limits that may be relevant for files in the 250-300 MB range.
-
-Plus 1 known orphan: `nasa-uap-d3-gemini-7-transcript-1965` has no canonical URL in `data-raw/uap-data.csv` — needs human research to locate the file (NASA-UAP-D003 is listed in the CSV row but its `PDF | Image Link` column is empty).
+Plus 1 orphan: `nasa-uap-d3-gemini-7-transcript-1965` has no canonical URL in `data-raw/uap-data.csv` — needs human research to locate the file.
 
 ## Fetch pattern that worked
 
-For future resumes. Per-PDF protocol (small files):
+Per-PDF protocol (small files):
 
 ```js
 // in whipgen_web_eval(returnType="base64", url="https://www.war.gov/Spotlight/UAP/"):
@@ -74,4 +72,5 @@ Notes:
 - Whipgen `web_eval` expression cap is 64 KB; result cap is 8 MB on the wire (large results auto-spill to a file in `/root/.claude/projects/*/tool-results/`).
 - The `url:` arg navigates the browser to set the same-origin context. `https://www.war.gov/Spotlight/UAP/` worked reliably (auto-redirected to `/Spotlights/UAP/`); `/UFO/` and `/ufo/` both hung the daemon.
 - Daemon occasionally wedges on consecutive timeouts — session resume clears it.
-- Page state does NOT persist between `web_eval` calls — `window.__var` set in one call is not visible in the next. Each call gets a fresh JS context. So all data must be returned in the same call that fetches it.
+- Page state does NOT persist between `web_eval` calls — `window.__var` set in one call is not visible in the next. Each call gets a fresh JS context.
+- **Local container is ephemeral** — these PDFs are reclaimed when the session ends. Re-run the fetch in a new session if the processing pipeline needs them.
