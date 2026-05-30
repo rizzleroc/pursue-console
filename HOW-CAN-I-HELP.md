@@ -7,10 +7,12 @@ A SETI@home-style distributed contribution model for the PURSUE corpus.
 | Priority | Open | Concentrated in |
 |---|---:|---|
 | **P1** Settle disputed pages | **0** | queue is clear — 22 reevaluated, 3 settled by standardized prompt |
-| **P2** Catalogue inventoried records | **52** | records inventoried but not yet curated into `src/data/events.js` |
+| **P2** Catalogue inventoried records | **2** | One R01 NASA audio (`NASA-UAP-D003A`, Gemini 7) and one R01 State Dept memo (`59_64634_711.5612`). Tracked under [`label:cataloguing`](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) — live count is canonical. R01 FBI photo series A1-A8 + B1-B24 are covered by the `fbi-photos-2025` anchor event (individual per-photo stubs would dilute the index). All 78 R02 **videos** are auto-catalogued — flagged `auto:true` in events.js, ready for promotion to hand-curated entries. |
 | **P3** Image + context capture | live | pages classified as visuals — see the HELP tab for current counts |
 
 Live counts on the [REVIEW tab](https://rizzleroc.github.io/pursue-console/) (with a badge in the nav) and the [HELP tab](https://rizzleroc.github.io/pursue-console/) (with per-event breakdown).
+
+The cataloguing punchlist is the canonical source-of-truth list (`data-raw/uap-data.csv`, scraped from war.gov via `whipgen_web_eval`) intersected with what's already in `events.js`. Each open issue is one record waiting for a `src/data/events.js` entry. Pick one, claim it by commenting, open a PR.
 
 ## Priority ladder — pick the highest open priority
 
@@ -217,9 +219,9 @@ After the latest rebuild, `public/work-available.json` lists what pages still ne
 | `cometa` | ~36 | Easy — clean French scans |
 | `1949-discs` | ~90 | Mid — early FBI files |
 | **partial-vision docs** (apollo-17, shaef, azerbaijan, ...) | ~30 | Mid — page-by-page mop-up |
-| **uncatalogued** | ~52 records | Requires curation, not just OCR — see "Cataloguing" below |
+| **uncatalogued** | 2 records | Requires curation, not just OCR — see "Cataloguing" below |
 
-Total: **~52 records to catalogue.** The raw-OCR backlog is essentially cleared after the 2.0 vision sync; the remaining curation work needs human judgment, not a transcription pass. See the live HELP tab for current counts.
+Total: **2 records to catalogue.** The raw-OCR backlog is essentially cleared after the 2.0 vision sync, and the catalogue backlog was cleared in a sweep that auto-catalogued the bulk into `events-auto.js` and folded the FBI photo series under the `fbi-photos-2025` anchor. See the live HELP tab for current counts.
 
 ---
 
@@ -312,15 +314,24 @@ PR comments are already the discussion thread. Phase 2 adds a tiny UI overlay so
 
 ## Cataloguing (different from OCR)
 
-52 of the 173 records in Release 01 are **not yet in `src/data/events.js`** at all. Adding a record needs human judgment — the title, the date, the location, the agency, what kind of record it is, a 1-3 sentence summary. This is harder than transcription and can't be automated.
+**2 records** from war.gov's UAP release still need hand-curated entries in `src/data/events.js` — the [live issue queue](https://github.com/rizzleroc/pursue-console/issues?q=is%3Aissue+is%3Aopen+label%3Acataloguing) is canonical. The rest of the backlog landed in three sweeps: (a) 65 R01 records auto-catalogued as low-confidence stubs in `src/data/events-auto.js` (slug-IDed, `auto: true`, awaiting promotion to fully hand-curated entries); (b) 78 R02 videos auto-catalogued in `events.js` itself (same `auto: true` flag, linked to DVIDS); (c) 31 FBI photo series records (A1-A8 + B2-B24) covered by the `fbi-photos-2025` anchor event rather than individual stubs. The full source CSV is committed at `data-raw/uap-data.csv` (222 records total). The two remaining issues: `NASA-UAP-D003A` (Gemini 7 audio) and `59_64634_711.5612` (a 1952 State Dept memo whose filename contains a `[` that may need URL-fixing before it resolves on war.gov). Pick one, claim it by commenting, open a PR.
 
-If you want to catalogue rather than OCR:
+Filter the queue by:
 
-1. Pick an unmoderated record from the war.gov inventory not in `events.js`
-2. Add an entry following the existing shape (look at any current record for template)
-3. Open a PR with just that addition
+- `label:agency:dow` / `agency:fbi` / `agency:nasa` / `agency:dos` / `agency:cia` / `agency:doe` / `agency:odni`
+- `label:type:pdf` / `type:vid` / `type:img` / `type:aud`
+- `label:release-1` / `label:release-2`
 
-Once catalogued, the OCR pipeline can pick it up automatically.
+Adding a record needs human judgment — the title, the date, the location, the agency, what kind of record it is, a 1-3 sentence summary. The issue body gives you the verbatim CSV row plus an acceptance checklist. Once catalogued, the OCR / transcription pipelines can pick it up automatically.
+
+**Bulk-download fallbacks** (no per-record scrape needed for the asset itself):
+
+- R02 videos (5.6 GB): https://d34w7g4gy10iej.cloudfront.net/uap052226.zip
+- R01 videos (1.3 GB): https://d34w7g4gy10iej.cloudfront.net/uapvideos.zip
+
+### How the CSV got there
+
+The war.gov page renders only 10 records at a time via JS-state pagination, and the underlying CSV (`/Portals/1/Interactive/2026/UFO/uap-data.csv`) is Akamai-gated against direct navigation — it only serves to same-origin in-page fetches. The CSV at `data-raw/uap-data.csv` was pulled in one call via the new `whipgen_web_eval` tool (Playwright `page.evaluate` inside a loaded `/UFO/` tab). See `docs/whipgen-web-eval-request.md` for the audit trail; `docs/war-gov-scrape-state.json` tracks the current ingest state.
 
 ---
 

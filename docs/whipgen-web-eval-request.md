@@ -1,8 +1,11 @@
 # Feature request — `whipgen_web_eval`
 
+> **STATUS: SHIPPED 2026-05-26** — whipgen-mcp commit `622b751`+ exposes `whipgen_web_eval` (Playwright `page.evaluate` wrapper) almost exactly as proposed below. The war.gov CSV was pulled end-to-end in 1.8 s on first attempt — see `data-raw/uap-data.csv` (222 records) and `docs/war-gov-scrape-state.json`. This document is preserved as the audit trail of how the requirement was scoped, why the workarounds failed, and what the API contract looks like. The "Workaround until this lands" section at the bottom is now obsolete.
+
 **Target:** [whipgen-mcp](https://github.com/your-org/whipgen-mcp) (paste this into a new issue there)
 
 **Filed by:** pursue-console / war.gov UFO ingest pipeline · 2026-05-25
+**Shipped:** 2026-05-26 (whipgen-mcp commit `622b751`)
 
 ---
 
@@ -105,10 +108,22 @@ async function webEval({ expression, url, returnType, awaitPromise, timeoutMs, s
 
 ## Workaround until this lands
 
-For the war.gov ingest specifically, the operator can do this in their existing logged-in browser:
+~~For the war.gov ingest specifically, the operator can do this in their existing logged-in browser:~~
 
-1. Open `https://www.war.gov/UFO/` in Chrome.
-2. DevTools → Network tab → filter `uap-data.csv` → right-click → Save as → `data-raw/war-gov-uap-data.csv`.
-3. Commit the CSV; the repo's parser can ingest it directly into `events.js` entries.
+~~1. Open `https://www.war.gov/UFO/` in Chrome.~~
+~~2. DevTools → Network tab → filter `uap-data.csv` → right-click → Save as → `data-raw/war-gov-uap-data.csv`.~~
+~~3. Commit the CSV; the repo's parser can ingest it directly into `events.js` entries.~~
 
-This is a one-time manual step per release, but it's the only path that works today.
+~~This is a one-time manual step per release, but it's the only path that works today.~~
+
+**Obsolete.** The actual flow now is one tool call:
+
+```js
+whipgen_web_eval({
+  url: "https://www.war.gov/UFO/",
+  expression: "await fetch('/Portals/1/Interactive/2026/UFO/uap-data.csv').then(r => r.text())",
+  returnType: "text",
+  timeoutMs: 60000,
+})
+// → { value: "<full CSV>", valueSize: 296630, durationMs: 1833 }
+```
