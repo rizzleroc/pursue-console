@@ -17,14 +17,16 @@ Cohorts fetched:
 
 ## Remaining (4)
 
-Probed total sizes are unexpectedly large — all four are scanned-image-heavy FBI sections that average 1+ MB/page (vs ~150–280 KB/page for the others). Fetching them would each take 30–60 range-chunked whipgen calls and add ~900 MB to the repo. **Recommend migrating these to git-lfs before fetching** — committing them raw is unhealthy for the repo.
+Probed total sizes are unexpectedly large — all four are scanned-image-heavy FBI sections that average 1+ MB/page (vs ~150–280 KB/page for the others). **All four exceed GitHub's 100 MB hard file-size limit, so they cannot be committed directly to this repo — they require git-lfs.** Confirmed empirically: a 161 MB push of `box7_173-233` was rejected with `error: File ... is 153.89 MB; this exceeds GitHub's file size limit of 100.00 MB. ... You may want to try Git Large File Storage`.
 
 | File | Probed total | Chunks @5MB | Notes |
 |---|---|---|---|
 | `65_hs1-834228961_62-hq-83894_section_8.pdf` (217pp) | **255 MB** | 52 | Probed in this run |
 | `65_hs1-834228961_62-hq-83894_section_9.pdf` (290pp) | ~300+ MB est | ~60+ | Largest by page count |
 | `38_143685_box7_incident_summaries_101-172.pdf` (178pp) | ~200 MB est | ~40 | Sibling of 173-233 |
-| `38_143685_box7_incident_summaries_173-233.pdf` (144pp) | **161 MB** | 33 | Probed in earlier run |
+| `38_143685_box7_incident_summaries_173-233.pdf` (144pp) | **161 MB** | 33 | Successfully fetched + assembled locally; commit rejected by GitHub 100MB limit |
+
+**To finish these:** set up git-lfs on the repo first (`git lfs install`, then `git lfs track 'public/release_1/65_hs1*section_8*.pdf' …`, then `git add .gitattributes`), then resume the fetch with the protocol below. GitHub LFS has its own bandwidth/storage limits that may be relevant for files in the 250-300 MB range.
 
 Plus 1 known orphan: `nasa-uap-d3-gemini-7-transcript-1965` has no canonical URL in `data-raw/uap-data.csv` — needs human research to locate the file (NASA-UAP-D003 is listed in the CSV row but its `PDF | Image Link` column is empty).
 
