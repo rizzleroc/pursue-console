@@ -1,0 +1,3 @@
+[Diagram of Percentage of Impacts Between Flight Line and Any Radial — Percent vs Theta (deg), curves for A = 1.0 / 2.0 / 3.0 / 4.0 / 6.0, Data for Atlas IIAS with B = 1000, showing fraction of impacts within sectors of increasing half-angle]
+
+Figure 33. Percentage of Impacts Between Flight Line and Any Radial

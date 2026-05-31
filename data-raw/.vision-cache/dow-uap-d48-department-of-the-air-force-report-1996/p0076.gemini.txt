@@ -1,0 +1,3 @@
+[Diagram of Titan Simulation Results with Best-Fit Shaping Constants — Titan IV Random-Attitude Failures through 300 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, curves for various A and B values]
+
+Figure 28. Titan Simulation Results with Best-Fit Shaping Constants

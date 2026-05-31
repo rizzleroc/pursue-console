@@ -1,0 +1,3 @@
+[Diagram of Atlas IIAS Simulation Results with B = 100,000 — log-scale plot of Percent in 5-deg sector vs Angle From Flight Path with multiple breakup q-alpha curves]
+
+Figure 11. Atlas IIAS Simulation Results with B = 100,000

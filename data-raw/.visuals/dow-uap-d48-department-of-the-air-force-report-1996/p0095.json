@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of f-Ratios for Ranges from 1 to 25 Miles — f-Ratio vs Angular Deviation From Do",
+  "description": "Diagram of f-Ratios for Ranges from 1 to 25 Miles — f-Ratio vs Angular Deviation From Downrange (deg), curves for R = 1 / 5 / 10 / 25 nm, A = 3.0 and B = 1,000, showing strongly peaked f-ratio for short ranges decaying toward 1 for long ranges",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.629Z"
+}

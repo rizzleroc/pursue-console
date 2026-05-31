@@ -1,0 +1,3 @@
+[Diagram of Delta-GEM Simulation Results with Best-Fit Shaping Constants — Delta-GEM Random-Attitude Failures through 270 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, multiple curves for varying A and B values]
+
+Figure 25. Delta-GEM Simulation Results with Best-Fit Shaping Constants

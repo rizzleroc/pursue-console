@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Atlas IIAS Breakup Percentages for Random-Attitude Turns — Breakup Percent vs",
+  "description": "Diagram of Atlas IIAS Breakup Percentages for Random-Attitude Turns — Breakup Percent vs Failure Time in seconds, multiple curves plotted for q-alpha = 5,000 / 10,000 / 20,000 deg-lb/ft², showing breakup rising steeply between 30-100 sec to plateau near 95%",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.600Z"
+}

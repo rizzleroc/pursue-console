@@ -1,0 +1,3 @@
+[Diagram of Atlas IIAS Impact-Range Distributions — Percent Impacts in 10-nm interval vs Impact Range (nm), curves for Theoretical / Breakup q-alpha = 5,000 deg-lb/ft² / Breakup q-alpha = 20,000 deg-lb/ft² / No Breakup]
+
+Figure 22. Impact-Range Distributions

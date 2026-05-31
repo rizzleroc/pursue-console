@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Atlas Launch Summary — bar chart of Number of Atlas Missions vs Launch Year (",
+  "description": "Diagram of Atlas Launch Summary — bar chart of Number of Atlas Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing peak launch activity ~1960-1965 of 30-50 missions/year tapering to ~5 by 1990s",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.635Z"
+}

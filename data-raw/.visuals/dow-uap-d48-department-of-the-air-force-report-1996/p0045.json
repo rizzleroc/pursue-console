@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of percent in 5-deg sector vs angle from flight path — log-scale Y axis (0.1 to",
+  "description": "Diagram of percent in 5-deg sector vs angle from flight path — log-scale Y axis (0.1 to 100), X axis 0 to 180 degrees, three plotted curves for Random-attitude turns, Slow turns, and Combined turns (0.75 random + 0.25 slow), Atlas IIAS failures through 280 sec, Breakup q-alpha = 20,000 deg-lb/ft²",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.600Z"
+}

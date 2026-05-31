@@ -1,0 +1,3 @@
+[Diagram of Atlas Launch Summary — bar chart of Number of Atlas Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing peak launch activity ~1960-1965 of 30-50 missions/year tapering to ~5 by 1990s]
+
+Figure 37. Atlas Launch Summary

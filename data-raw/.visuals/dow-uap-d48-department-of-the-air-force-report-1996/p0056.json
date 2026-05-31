@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Atlas IIAS Simulation Results — Atlas IIAS Random-Attitude Failures through 2",
+  "description": "Diagram of Atlas IIAS Simulation Results — Atlas IIAS Random-Attitude Failures through 280 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, multiple curves for varying A values",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.609Z"
+}

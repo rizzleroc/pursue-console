@@ -1,0 +1,7 @@
+A good illustration of a Mode-5 failure response occurred during launch of Prospector (Joust) on the Eastern Range in June 1991. The Joust consists of a single-stage Castor IV-A solid-propellant rocket motor and a payload module. The "vehicle made a radical pitch-up maneuver due to alt-skirt structural failure at approximately T+14 Seconds." The vacuum instantaneous impact trace from the RSO console is shown in Figure 1. If the safety officer had taken destruct action during the time interval from 18 to 25 seconds, impact would have been well away from the flight line.
+
+[Diagram of Joust missile vacuum instantaneous impact trace showing Mode-5 failure response — flight path plotted with time markers (10, 20, 30, 40 SEC) over coordinate grid, labels UNCLASSIFIED / JOUST1761-A / CYBER N / DH MAY 1 / CENTERLINE / FLIGHT LINE]
+
+As still another example of a Mode-5 failure response, a guided Red Tigress sounding rocket was launched from Pad 20 at Cape Canaveral on 20 Aug 91. Within a second or two after clearing the launcher, the rocket made a near 90° right turn, and flew stably in this direction until destroyed by the safety officer at 23.5 seconds. Pieces impacted some two or three miles from the launch pad. This failure might have been classified as a Mode-2 response if destruct action had been taken shortly after launch.
+
+Figure 1. Joust Impact Trace Showing a Mode-5 Failure Response

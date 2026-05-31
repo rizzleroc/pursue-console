@@ -1,0 +1,3 @@
+[Diagram of Recursive Filter Factor for Last Data Point — log-scale plot of Recursive Filter Factor vs Number of Data Points in Sample (0-300), seven curves for F = 0.85 / 0.90 / 0.95 / 0.98 / 0.99 / Equal weighting, showing recursive factor asymptote behavior]
+
+Figure 36. Recursive Filter Factor for Last Data Point

@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Titan Launch Summary — bar chart of Number of Titan Missions vs Launch Year (",
+  "description": "Diagram of Titan Launch Summary — bar chart of Number of Titan Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing peak Titan launch activity ~1965-1975 of 25 missions/year tapering through 1990s",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.638Z"
+}
