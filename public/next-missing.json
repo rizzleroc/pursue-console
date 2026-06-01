@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T16:39:47.840Z",
+  "generatedAt": "2026-06-01T19:21:30.530Z",
   "queue": [
     {
       "eid": "indopacom-2024",
@@ -11,6 +11,14 @@
     },
     {
       "eid": "pursue-release-01",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "anchor",
+      "reason": "no-data",
+      "priority": 4
+    },
+    {
+      "eid": "pursue-release-02",
       "page": 1,
       "agency": "Department of War",
       "flag": "anchor",
