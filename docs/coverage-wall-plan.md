@@ -41,13 +41,26 @@ Critical path ⇒ 1 · 2 · 3(en-only) · 4 · 6 · 11 — six PRs, ~755 LOC.
 Pure additions. No changes to live code. Safe to merge anytime.
 
 - `docs/coverage-wall-plan.md` — this document.
-- `docs/coverage-wall-design-lab.html` — self-contained visual demo
-  (Tailwind via CDN, Google Fonts, no build step). Open in browser.
+- `docs/coverage-wall-design-lab.html` — early visual exploration (Tailwind CDN, no build).
+- **`docs/coverage-wall-mission-control.html` — the canonical visual target.**
+  Self-contained, no build step, Space Grotesk + JetBrains Mono + Inter
+  via Google Fonts CDN. Open in any browser at 1600px width to see the
+  full motion design (radar sweep, coverage matrix wave-in, count-ups,
+  scanlines, breathing CTA, classification banners). The 12-PR React
+  sequence implements toward this file.
+- `docs/coverage-wall-mission-control-hero.png` — 1× hero still
+- `docs/coverage-wall-mission-control-bottom.png` — 1× bottom fold
+- `docs/coverage-wall-mission-control-motion.mp4` — 6.6s motion clip
+- `docs/coverage-wall-data-bindings.md` — every visible value mapped
+  to its JSON source + script, the contract that nothing is hard-coded.
 - `src/components/CoverageGrid.jsx` — drafted component, exported but
   **not yet imported anywhere**. Ready for PR 4 to wire in.
-- `scripts/build-next-missing.mjs` — drafted build script, **not yet
-  invoked** by `npm run build`. Ready for PR 6 to wire in via the
-  CoverageView CTA.
+- `src/hooks/useCoverage.js`, `useNextMissing.js`, `usePatterns.js` —
+  three data hooks following the existing `useCorpusStats` pattern
+  (module-cached, 60s revalidate, 800ms backoff retry).
+- `scripts/build-next-missing.mjs` — wired into `npm run build` chain.
+- `package.json` — build chain expanded from 19 → 21 scripts:
+  `diagnose-coverage` and `build-next-missing` now run on every build.
 
 ## Key findings from the agent sweep
 
