@@ -112,13 +112,13 @@
       <h1>The archive of what the Department of War released — <em>and what's still dark.</em></h1>
       <p>Community-run. Every page transcribed in the open, catalogued event by event. Pages stream in as machine + volunteer transcriptions land — the gap is the mission.</p>
       <div class="ms">
-        <div class="cell"><div class="k">Catalogued</div><div class="v"><span data-count="121">0</span><span class="small">/ 162</span></div><div class="sub">R01 inventory</div></div>
-        <div class="cell"><div class="k">Complete</div><div class="v amber" data-count="1">0</div><div class="sub">of 121 events</div></div>
-        <div class="cell"><div class="k">Awaiting</div><div class="v rose"><span data-count="46">0</span>%</div><div class="sub">no body text</div></div>
-        <div class="cell"><div class="k">R02 Intake</div><div class="v cyan"><span data-count="7">0</span><span class="small">/ 64</span></div><div class="sub">partial-mirror</div></div>
+        <div class="cell"><div class="k">Catalogued</div><div class="v"><span data-count="121" data-mc-count="r1Catalogued">0</span><span class="small">/ <span data-mc="r1Inventory">162</span></span></div><div class="sub">R01 inventory</div></div>
+        <div class="cell"><div class="k">Complete</div><div class="v amber" data-count="1" data-mc-count="coverageComplete">0</div><div class="sub">of 121 events</div></div>
+        <div class="cell"><div class="k">Awaiting</div><div class="v rose"><span data-count="46" data-mc-count="coverageAwaitingPct">0</span>%</div><div class="sub">no body text</div></div>
+        <div class="cell"><div class="k">R02 Intake</div><div class="v cyan"><span data-count="7" data-mc-count="r2Catalogued">0</span><span class="small">/ <span data-mc="r2Inventory">64</span></span></div><div class="sub">partial-mirror</div></div>
       </div>
       <div class="cta-row">
-        <a class="primary-cta" href="review.html">Open the next missing page <span>→</span></a>
+        <a class="primary-cta" href="review.html" id="next-cta">Open the next missing page <span>→</span></a>
         <div class="cta-meta">
           <div><span class="ping"></span>No account needed</div>
           <div><span class="v">8</span> transcribers online · queue from <span style="color:var(--amber)">next-missing.json</span></div>
@@ -160,20 +160,20 @@
           <text x="146" y="270" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">S</text>
           <text x="12" y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">W</text>
         </svg>
-        <div class="rd-stack">
-          <div class="rd-row"><span class="k">complete</span><span class="v emerald">1</span><span class="pct">0.8%</span></div>
-          <div class="rd-row"><span class="k">partial</span><span class="v amber">63</span><span class="pct">52%</span></div>
-          <div class="rd-row"><span class="k">no-data</span><span class="v rose">57</span><span class="pct">47%</span></div>
-          <div class="rd-row"><span class="k">events</span><span class="v">121</span><span class="pct">·</span></div>
-          <div class="rd-row"><span class="k">queue</span><span class="v cyan">57</span><span class="pct">cand</span></div>
+        <div class="rd-stack" id="rd-stack">
+          <div class="rd-row"><span class="k">complete</span><span class="v emerald" data-mc="coverageComplete">1</span><span class="pct" data-pct="coverageComplete">0.8%</span></div>
+          <div class="rd-row"><span class="k">partial</span><span class="v amber" data-mc="coveragePartial">63</span><span class="pct" data-pct="coveragePartial">52%</span></div>
+          <div class="rd-row"><span class="k">no-data</span><span class="v rose" data-mc="coverageNoData">57</span><span class="pct" data-pct="coverageNoData">47%</span></div>
+          <div class="rd-row"><span class="k">events</span><span class="v" data-mc="coverageTotal">121</span><span class="pct">·</span></div>
+          <div class="rd-row"><span class="k">queue</span><span class="v cyan" id="rd-queue">57</span><span class="pct">cand</span></div>
         </div>
       </div>
       <div class="cw-titlerow"><span class="left"><span class="accent">▣</span>&nbsp;&nbsp;COVERAGE MATRIX · per-event status</span><span class="right">click cell → dossier</span></div>
       <div class="cw-grid" id="cw"></div>
       <div class="cw-legend">
-        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v">1</span></span>
-        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v">63</span></span>
-        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v">57</span></span>
+        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v" data-mc="coverageComplete">1</span></span>
+        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v" data-mc="coveragePartial">63</span></span>
+        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v" data-mc="coverageNoData">57</span></span>
       </div>
     </aside>
   </section>
@@ -209,11 +209,12 @@
     <div class="panel">
       <div class="panel-head"><span><span class="icon-sq"></span>Arriving signals</span><span class="right">vision × ocr · utc · most recent</span></div>
       <div class="signals-filter">
-        <span class="pill active">All <span class="count">200</span></span>
-        <span class="pill">Vision <span class="count">3,402</span></span>
-        <span class="pill">Tesseract <span class="count">128</span></span>
+        <span class="pill active">All <span class="count" data-mc="feedCount">200</span></span>
+        <span class="pill">Vision <span class="count" data-mc="feedVision">3,402</span></span>
+        <span class="pill">Tesseract <span class="count" data-mc="feedOcr">128</span></span>
         <span class="refresh">↻ refresh</span>
       </div>
+      <div id="signals">
       <div class="signal">
         <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">usper-2025</span><span>FBI · p1</span></div>
         <p class="signal-quote">"<em>SECRET//NOFORN.</em> On <span class="redacted">_____</span> 2025, at approximately 1700 hours, [<em>witness 1 — a senior US intelligence official</em>] accompanied by two pilots from [<em>state partner organization</em>]…"</p>
@@ -230,18 +231,22 @@
         <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">netherlands-1948</span><span>DEPT/War · p3</span></div>
         <p class="signal-quote">"[stamp: <em>SECRET</em>] USAFE 2 TT 1524 · 4 Nov 48 · To Gen Cabell: we now have one complete set of all reports prepared by special intelligence organization of the European Command…"</p>
       </div>
+      </div>
     </div>
 
     <div class="stack">
       <div class="panel">
-        <div class="panel-head"><span><span class="icon-sq"></span>Field assignments</span><span class="right">119 open</span></div>
+        <div class="panel-head"><span><span class="icon-sq"></span>Field assignments</span><span class="right"><span id="fa-open">119</span> open</span></div>
+        <div id="assignments">
         <div class="help-row"><span><span class="eid">indopacom-2024</span><span class="pp">· ANCHOR · 24pp</span></span><button class="claim">CLAIM</button></div>
         <div class="help-row"><span><span class="eid">army-2026</span><span class="pp">· HIGH · 14pp</span></span><button class="claim">CLAIM</button></div>
         <div class="help-row"><span><span class="eid">dow-uap-d62</span><span class="pp">· MED · 9pp</span></span><button class="claim">CLAIM</button></div>
         <div class="help-row"><span><span class="eid">dow-uap-d65</span><span class="pp">· MED · 8pp</span></span><button class="claim">CLAIM</button></div>
+        </div>
       </div>
       <div class="panel">
-        <div class="panel-head"><span><span class="icon-sq"></span>Mined index</span><span class="right">199 ents · 67 dates</span></div>
+        <div class="panel-head"><span><span class="icon-sq"></span>Mined index</span><span class="right"><span data-mc="entityCount">199</span> ents · <span data-mc="dateCount">67</span> dates</span></div>
+        <div id="entities">
         <div class="entity-row"><span class="name">USCENTCOM</span><span class="meter"><span style="width:90%"></span></span><span class="count">202</span></div>
         <div class="entity-row"><span class="name">Air Force</span><span class="meter"><span style="width:100%"></span></span><span class="count">338</span></div>
         <div class="entity-row"><span class="name">FBI</span><span class="meter"><span style="width:45%"></span></span><span class="count">88</span></div>
@@ -249,22 +254,125 @@
         <div class="entity-row"><span class="name">USAFE</span><span class="meter"><span style="width:16%"></span></span><span class="count">29</span></div>
         <div class="entity-row"><span class="name">NORTHCOM</span><span class="meter"><span style="width:13%"></span></span><span class="count">24</span></div>
         <div class="entity-row"><span class="name">Handwritten</span><span class="meter"><span style="width:100%"></span></span><span class="count">1,649</span></div>
+        </div>
       </div>
     </div>
   </section>
 </main>
 
+<script src="data.js"></script>
+
 <script src="chrome.js" defer></script>
 <script>
-  const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
-  let s = 41; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
-  for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
-  const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(35,0,'complete');
-  const grid = document.getElementById('cw');
-  cls.forEach((c,i) => { const d=document.createElement('div'); d.className='cw-cell'+(c?' '+c:''); d.style.animationDelay=(300+i*6)+'ms'; grid.appendChild(d); });
+  // ── Ingest histogram (static, not data-layer driven) ──
   const h = document.getElementById('histo');
   const bars = [2,1,0,0,1,3,5,8,12,9,7,11,6,4,9,14,10,6,3,8,5,2,1,0]; const mx = Math.max(...bars);
   bars.forEach((b,i) => { const d=document.createElement('div'); d.style.height='0%'; h.appendChild(d); setTimeout(() => { d.style.transition='height .9s cubic-bezier(.2,.7,.2,1)'; d.style.height=((b/mx)*100)+'%'; }, 1400+i*28); });
+
+  // ── Coverage grid: deterministic random fallback (used if MC fails) ──
+  function renderCoverageFallback() {
+    const grid = document.getElementById('cw');
+    if (!grid || grid.childElementCount) return;
+    const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
+    let s = 41; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+    for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
+    const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(35,0,'complete');
+    cls.forEach((c,i) => { const d=document.createElement('div'); d.className='cw-cell'+(c?' '+c:''); d.style.animationDelay=(300+i*6)+'ms'; grid.appendChild(d); });
+  }
+
+  // ── Live data-layer wiring ──
+  function esc(v){ const d=document.createElement('div'); d.textContent=(v==null?'':String(v)); return d.innerHTML; }
+
+  function renderLive(MC){
+    const D = MC && MC.derive; if (!D) return;
+
+    // Coverage grid from coverageCells (state strings → cw-cell classes)
+    const grid = document.getElementById('cw');
+    if (grid && Array.isArray(D.coverageCells) && D.coverageCells.length) {
+      grid.innerHTML = '';
+      D.coverageCells.forEach((state,i) => {
+        const extra = state === 'complete' ? ' complete' : state === 'partial' ? ' partial' : '';
+        const d = document.createElement('div');
+        d.className = 'cw-cell' + extra;
+        d.style.animationDelay = (300 + i*6) + 'ms';
+        grid.appendChild(d);
+      });
+    } else {
+      // coverage.json missing/empty even though MC resolved → keep static grid.
+      renderCoverageFallback();
+    }
+
+    // Radar rail percentages (values bound via data-mc; recompute % live)
+    const total = D.coverageTotal;
+    if (typeof total === 'number' && total > 0) {
+      document.querySelectorAll('#rd-stack .pct[data-pct]').forEach(el => {
+        const v = D[el.getAttribute('data-pct')];
+        if (typeof v === 'number') {
+          const p = (v/total)*100;
+          el.textContent = (p < 10 ? p.toFixed(1) : Math.round(p)) + '%';
+        }
+      });
+    }
+    const rdq = document.getElementById('rd-queue');
+    if (rdq && Array.isArray(D.queue)) rdq.textContent = D.queue.length;
+
+    // Field assignments "N open"
+    const faOpen = document.getElementById('fa-open');
+    if (faOpen && Array.isArray(D.queue)) faOpen.textContent = D.queue.length;
+
+    // CTA title hint
+    const cta = document.getElementById('next-cta');
+    if (cta && D.queueTop && D.queueTop.eid) cta.title = 'Next: ' + D.queueTop.eid;
+
+    // Arriving signals from feedEntries
+    const sig = document.getElementById('signals');
+    if (sig && Array.isArray(D.feedEntries) && D.feedEntries.length) {
+      sig.innerHTML = D.feedEntries.slice(0,5).map(e => {
+        const src = (e.source || '').toString().toUpperCase() || 'VISION';
+        const meta = [e.agency, (e.page != null ? 'p'+e.page : '')].filter(Boolean).join(' · ');
+        return '<div class="signal">'
+          + '<div class="signal-meta"><span class="tag">'+esc(src)+'</span>'
+          + '<span class="eid">'+esc(e.eventId||e.title||'')+'</span>'
+          + (meta ? '<span>'+esc(meta)+'</span>' : '')
+          + '</div>'
+          + '<p class="signal-quote">'+esc(e.snippet||'')+'</p>'
+          + '</div>';
+      }).join('');
+    }
+
+    // Field assignments from queue
+    const asg = document.getElementById('assignments');
+    if (asg && Array.isArray(D.queue) && D.queue.length) {
+      asg.innerHTML = D.queue.slice(0,4).map(q => {
+        const bits = [q.flag, q.reason].filter(Boolean).map(x => String(x).toUpperCase()).join(' · ');
+        return '<div class="help-row"><span><span class="eid">'+esc(q.eid||'')+'</span>'
+          + (bits ? '<span class="pp">· '+esc(bits)+'</span>' : '')
+          + '</span><button class="claim">CLAIM</button></div>';
+      }).join('');
+    }
+
+    // Mined index from topEntities
+    const ents = document.getElementById('entities');
+    if (ents && Array.isArray(D.topEntities) && D.topEntities.length) {
+      const top = D.topEntities.slice(0,7);
+      const maxM = Math.max(...top.map(e => e.mentions||0), 1);
+      ents.innerHTML = top.map(e => {
+        const w = Math.max(6, Math.round(((e.mentions||0)/maxM)*100));
+        return '<div class="entity-row"><span class="name">'+esc(e.term||'')+'</span>'
+          + '<span class="meter"><span style="width:'+w+'%"></span></span>'
+          + '<span class="count">'+esc((e.mentions||0).toLocaleString())+'</span></div>';
+      }).join('');
+    }
+  }
+
+  if (window.MC && typeof window.MC.ready === 'function') {
+    window.MC.ready().then(() => renderLive(window.MC)).catch(renderCoverageFallback);
+    window.MC.onUpdate(() => renderLive(window.MC));
+    // If MC never loads, fall back to the random grid.
+    setTimeout(() => { if (!window.MC._loaded) renderCoverageFallback(); }, 1500);
+  } else {
+    renderCoverageFallback();
+  }
 </script>
 </body>
 </html>

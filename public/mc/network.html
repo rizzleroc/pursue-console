@@ -60,7 +60,7 @@
         <div class="row"><span class="label">MIN COSINE</span><span class="slider"><span class="knob" style="left:20%"></span></span><span class="v">0.55</span></div>
         <div class="row"><span class="label">REPULSION</span><span class="slider"><span class="knob" style="left:50%"></span></span><span class="v">3.2</span></div>
         <div class="row"><span class="label">ITERATIONS</span><span class="slider"><span class="knob" style="left:65%"></span></span><span class="v">320</span></div>
-        <div class="row"><span class="label">NODES</span><span class="v">75 / 220</span></div>
+        <div class="row"><span class="label">NODES</span><span class="v" id="nw-nodes">75 / 220</span></div>
         <div class="row"><span class="label">EDGES</span><span class="v">142</span></div>
         <div class="row"><span class="label">CLUSTERS</span><span class="v">2 dominant</span></div>
       </div>
@@ -78,14 +78,14 @@
 
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-3);letter-spacing:0.06em">
         <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 1 — FBI 62HQ.</strong> 11 internal-section neighbors at cos 0.94-0.98. Tight intra-document.<br><br>
-        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 2 — CENTCOM/ME.</strong> 18 events anchored on USCENTCOM (202 mentions / 18 docs).
+        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 2 — CENTCOM/ME.</strong> 18 events anchored on USCENTCOM (<span data-entity="USCENTCOM"><span data-entity-mentions>202</span> mentions / <span data-entity-docs>18</span> docs</span>).
       </div>
     </div>
 
     <div class="nw-card">
       <div class="nw-h">
         <div class="t">▣ &nbsp; SEMANTIC GRAPH</div>
-        <div class="meta">220 events · 199 entities · cosine ≥ 0.55</div>
+        <div class="meta"><span id="nw-eventcount">220</span> events · <span id="nw-entitycount">199</span> entities · cosine ≥ 0.55</div>
       </div>
 
       <svg class="nw-svg" viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg">
@@ -194,6 +194,56 @@
     </div>
   </section>
 </main>
+
+<script src="data.js"></script>
+
+<script>
+  (function () {
+    function setText(id, val) {
+      var el = document.getElementById(id);
+      if (el && val != null) el.textContent = val;
+    }
+
+    // Update an entity reference (mentions / docs) from topEntities,
+    // matched by the term in data-entity. If no match, leave as-is.
+    function renderEntities(topEntities) {
+      if (!topEntities || !topEntities.length) return;
+      var byTerm = {};
+      topEntities.forEach(function (e) { byTerm[e.term] = e; });
+      var hosts = document.querySelectorAll('[data-entity]');
+      for (var i = 0; i < hosts.length; i++) {
+        var host = hosts[i];
+        var ent = byTerm[host.getAttribute('data-entity')];
+        if (!ent) continue; // no matching term → leave hardcoded fallback
+        var m = host.querySelector('[data-entity-mentions]');
+        var dc = host.querySelector('[data-entity-docs]');
+        if (m && ent.mentions != null) m.textContent = ent.mentions;
+        if (dc && ent.docs != null) dc.textContent = ent.docs;
+      }
+    }
+
+    function renderFromMC() {
+      var D = window.MC && window.MC.derive;
+      if (!D) return false;
+      // NODES "75 / 220" — similarity node count / total events.
+      var nodes = D.similarity ? Object.keys(D.similarity).length : null;
+      if (nodes != null && D.eventCount != null) {
+        setText('nw-nodes', nodes + ' / ' + D.eventCount);
+      }
+      // EDGES / iterations stay static (graph-layout params).
+      setText('nw-eventcount', D.eventCount);
+      setText('nw-entitycount', D.entityCount);
+      renderEntities(D.topEntities);
+      return true;
+    }
+
+    if (window.MC && typeof window.MC.ready === 'function') {
+      window.MC.ready().then(renderFromMC);
+      window.MC.onUpdate(renderFromMC);
+    }
+    // If MC never loads, the baked-in markup remains as the fallback.
+  })();
+</script>
 
 <script src="chrome.js" defer></script>
 </body>

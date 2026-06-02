@@ -49,13 +49,14 @@
 <main>
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 05 — disputed-page review</div>
-    <h1>3 pages where the engines disagree. <em>Pick the truth.</em></h1>
+    <h1 id="rv-title">3 pages where the engines disagree. <em>Pick the truth.</em></h1>
     <p class="sub">Each row in the queue is a page where machine OCR sources (Gemini-vision, GPT-vision, Tesseract, PDF.js) produced conflicting transcripts. The reviewer's job is to merge to a canonical version; one click opens a pre-filled GitHub PR.</p>
   </section>
 
   <section class="rv-shell">
     <div class="rv-queue">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between"><span>QUEUE · WORST AGREEMENT</span><span style="color:var(--amber)">3</span></div>
+      <div id="rv-queue-head" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between"><span id="rv-queue-label">QUEUE · WORST AGREEMENT</span><span id="rv-queue-count" style="color:var(--amber)">3</span></div>
+      <div id="rv-queue-list">
       <div class="rv-row active">
         <div class="top"><span>FBI</span><span>·</span><span>2025-10</span><span class="agree">0.21</span></div>
         <div class="eid">usper-2025 · p 03</div>
@@ -71,6 +72,7 @@
         <div class="eid">dow-uap-d038 · p 12</div>
         <div class="meta">vision · ocr · minor</div>
       </div>
+      </div>
 
       <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
         <div style="margin-bottom:8px">FILTER · all agencies</div>
@@ -82,7 +84,7 @@
     <div class="rv-pane">
       <div class="rv-head">
         <div>
-          <h2>usper-2025 · page 03</h2>
+          <h2 id="rv-pane-title">usper-2025 · page 03</h2>
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES · LAST UPDATED 14h ago</div>
         </div>
         <div class="meta">AGREEMENT <span class="score">0.21</span></div>
@@ -113,12 +115,86 @@
   </section>
 </main>
 
+<script src="data.js"></script>
+
 <script src="chrome.js" defer></script>
 <script>
-  document.querySelectorAll('.rv-row').forEach(r => r.addEventListener('click', () => {
-    document.querySelectorAll('.rv-row').forEach(x => x.classList.remove('active'));
-    r.classList.add('active');
-  }));
+  // Active-state toggle via delegation so it survives live re-render.
+  const rvList = document.getElementById('rv-queue-list');
+  if (rvList) rvList.addEventListener('click', (e) => {
+    const row = e.target.closest('.rv-row');
+    if (!row || !rvList.contains(row)) return;
+    rvList.querySelectorAll('.rv-row').forEach(x => x.classList.remove('active'));
+    row.classList.add('active');
+  });
+
+  // ── Live data layer ──
+  // The real review queue (pages where engines disagree) may be empty —
+  // MC.derive.reviewCount can be 0. The actionable list is the transcription
+  // queue (MC.derive.queue: next-missing pages). Drive the UI off that, and
+  // reword the header so it stays grammatical. Static rows remain the fallback.
+  function esc(v){ const d=document.createElement('div'); d.textContent=(v==null?'':String(v)); return d.innerHTML; }
+
+  function renderReview(MC){
+    const D = MC && MC.derive; if (!D) return;
+    const q = Array.isArray(D.queue) ? D.queue : [];
+    if (!q.length) return; // keep hardcoded fallback
+
+    const n = q.length;
+    const plural = n === 1 ? 'page' : 'pages';
+
+    // Header h1 — disputed-page wording only if there are disputes; otherwise
+    // drive off the transcription queue length.
+    const title = document.getElementById('rv-title');
+    if (title) {
+      if (typeof D.reviewCount === 'number' && D.reviewCount > 0) {
+        const rc = D.reviewCount;
+        title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
+          + ' where the engines disagree. <em>Pick the truth.</em>';
+      } else {
+        title.innerHTML = n + ' ' + plural
+          + ' awaiting transcription. <em>Pick the truth.</em>';
+      }
+    }
+
+    // Queue header label + count
+    const label = document.getElementById('rv-queue-label');
+    if (label) label.textContent = (typeof D.reviewCount === 'number' && D.reviewCount > 0)
+      ? 'QUEUE · WORST AGREEMENT' : 'QUEUE · NEXT MISSING';
+    const count = document.getElementById('rv-queue-count');
+    if (count) count.textContent = n;
+
+    // Queue list — top 12 from the transcription queue
+    const list = document.getElementById('rv-queue-list');
+    if (list) {
+      list.innerHTML = q.slice(0, 12).map((item, i) => {
+        const eid = item.eid || '';
+        const pg = item.page != null ? 'p ' + item.page : '';
+        const agency = item.agency || '';
+        const flag = (item.flag || '').toString().toUpperCase();
+        const reason = (item.reason || '').toString();
+        const meta = [reason, 'priority ' + (item.priority ?? '—')]
+          .filter(Boolean).join(' · ');
+        return '<div class="rv-row' + (i === 0 ? ' active' : '') + '">'
+          + '<div class="top"><span>' + esc(agency) + '</span><span>·</span>'
+          + '<span class="agree high">' + esc(flag || '—') + '</span></div>'
+          + '<div class="eid">' + esc(eid) + (pg ? ' · ' + esc(pg) : '') + '</div>'
+          + '<div class="meta">' + esc(meta) + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    // Detail-pane title → first queued eid (demo diff stays as-is)
+    const pane = document.getElementById('rv-pane-title');
+    if (pane && q[0] && q[0].eid) {
+      pane.textContent = q[0].eid + (q[0].page != null ? ' · page ' + q[0].page : '');
+    }
+  }
+
+  if (window.MC && typeof window.MC.ready === 'function') {
+    window.MC.ready().then(() => renderReview(window.MC));
+    window.MC.onUpdate(() => renderReview(window.MC));
+  }
 </script>
 </body>
 </html>

@@ -60,7 +60,7 @@
         <span style="margin-left:auto">220 EVENTS · 8 AGENCIES · 8 ERAS</span>
       </div>
 
-      <div class="at-grid">
+      <div class="at-grid" id="at-grid">
         <div class="corner-cell"></div>
         <div class="col-h">1940s</div>
         <div class="col-h">1950s</div>
@@ -152,7 +152,7 @@
         <div class="cell h2"><span class="v">12</span><span class="pct">100%</span></div>
       </div>
 
-      <div class="at-summary">
+      <div class="at-summary" id="at-summary">
         <div class="s"><div class="k">Dominant cohort</div><div class="v amber">DoW · 2020s</div><div class="sub">144 events · 65% of corpus</div></div>
         <div class="s"><div class="k">Secondary cluster</div><div class="v">FBI · 1940s</div><div class="sub">11 events · 5% of corpus</div></div>
         <div class="s"><div class="k">Cold cells</div><div class="v">42</div><div class="sub">of 64 grid positions empty</div></div>
@@ -161,6 +161,177 @@
     </div>
   </section>
 </main>
+
+<script src="data.js"></script>
+
+<script>
+/* Atlas heatmap — data-driven from MC.derive.events.
+   Rebuilds the agency × era grid and the summary row from live data.
+   If MC is unavailable or errors, the hardcoded markup above stays as fallback. */
+(function () {
+  if (!window.MC || typeof MC.ready !== "function") return;
+
+  // Row order (full agency names) + short labels matching the static row headers.
+  var AGENCIES = [
+    ["Department of War", "DEPT/WAR"],
+    ["FBI", "FBI"],
+    ["NASA", "NASA"],
+    ["Department of State", "STATE"],
+    ["Department of Energy", "ENERGY"],
+    ["Central Intelligence Agency", "CIA"],
+    ["Office of the Director of National Intelligence", "ODNI"],
+    ["Unknown", "UNKNOWN"]
+  ];
+  // 8 era columns. col[0] = era key(s) folded into it, col[1] = column label.
+  var ERAS = [
+    ["40s", "1940s"],
+    ["50s", "1950s"],
+    ["60s", "1960s"],
+    ["70s", "1970s"],
+    ["80s", "1980s"],
+    ["90s", "1990s"],
+    ["00s", "2000s"],
+    ["20s", "2020s"]
+  ];
+  var ERA_KEYS = ERAS.map(function (e) { return e[0]; });
+
+  // Map a raw era key to its display column. 'modern' folds into 20s; '10s'
+  // folds into 00s (no 2010s column); any unknown/'?' folds into 20s so no
+  // event is dropped and counts reconcile to the corpus total.
+  function eraCol(raw) {
+    var k = raw || "?";
+    if (k === "modern") return "20s";
+    if (k === "10s") return "00s";
+    if (ERA_KEYS.indexOf(k) === -1) return "20s";
+    return k;
+  }
+
+  // count -> density class
+  function densityClass(n) {
+    if (n === 0) return "h0";
+    if (n <= 2) return "h1";
+    if (n <= 8) return "h2";
+    if (n <= 20) return "h3";
+    if (n <= 50) return "h4";
+    return "h5";
+  }
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  function render(mc) {
+    var events = (mc.derive && mc.derive.events) || [];
+    if (!events.length) return; // nothing live → keep fallback markup
+
+    var grid = document.getElementById("at-grid");
+    var summary = document.getElementById("at-summary");
+    if (!grid) return;
+
+    // Build matrix M[agency][eraKey] = count.
+    var M = {};
+    AGENCIES.forEach(function (a) {
+      M[a[0]] = {};
+      ERA_KEYS.forEach(function (c) { M[a[0]][c] = 0; });
+    });
+    events.forEach(function (e) {
+      var ag = (M[e.agency] != null) ? e.agency : "Unknown";
+      var col = eraCol(e.era);
+      if (M[ag] && col in M[ag]) M[ag][col]++;
+    });
+
+    // Row totals + corpus total + summary aggregates.
+    var rowTotals = {}, corpus = 0, cold = 0;
+    var maxA = null, maxC = null, maxN = -1;
+    var secA = null, secC = null, secN = -1;
+    var crossEra = [];
+
+    AGENCIES.forEach(function (a) {
+      var name = a[0], rt = 0, erasPresent = 0;
+      ERA_KEYS.forEach(function (c) {
+        var n = M[name][c];
+        rt += n; corpus += n;
+        if (n === 0) cold++;
+        if (n > 0) erasPresent++;
+        if (n > maxN) { secN = maxN; secA = maxA; secC = maxC; maxN = n; maxA = name; maxC = c; }
+        else if (n > secN) { secN = n; secA = name; secC = c; }
+      });
+      rowTotals[name] = rt;
+      if (erasPresent >= 3) crossEra.push(a[1]);
+    });
+
+    // ── Render grid ────────────────────────────────────────────────────────
+    grid.textContent = "";
+    grid.appendChild(el("div", "corner-cell"));
+    ERAS.forEach(function (c) { grid.appendChild(el("div", "col-h", c[1])); });
+
+    AGENCIES.forEach(function (a) {
+      grid.appendChild(el("div", "row-h", a[1]));
+      var rt = rowTotals[a[0]];
+      ERA_KEYS.forEach(function (c) {
+        var n = M[a[0]][c];
+        var cell = el("div", "cell " + densityClass(n));
+        if (n === 0) {
+          cell.appendChild(el("span", "v zero", "&middot;"));
+        } else {
+          cell.appendChild(el("span", "v", String(n)));
+          var pct = rt ? Math.round((n / rt) * 100) : 0;
+          cell.appendChild(el("span", "pct", pct + "%"));
+        }
+        grid.appendChild(cell);
+      });
+    });
+
+    // ── Render summary ─────────────────────────────────────────────────────
+    if (summary) {
+      function shortName(full) {
+        for (var i = 0; i < AGENCIES.length; i++) {
+          if (AGENCIES[i][0] === full) {
+            // friendlier dominant/secondary labels
+            if (full === "Department of War") return "DoW";
+            if (full === "Department of State") return "State";
+            if (full === "Department of Energy") return "Energy";
+            return AGENCIES[i][1];
+          }
+        }
+        return full;
+      }
+      function eraLabel(key) {
+        for (var i = 0; i < ERAS.length; i++) if (ERAS[i][0] === key) return ERAS[i][1];
+        return key;
+      }
+      function pctCorpus(n) { return corpus ? Math.round((n / corpus) * 100) : 0; }
+
+      var cells = summary.querySelectorAll(".s");
+      if (cells.length >= 4) {
+        // Dominant cohort
+        cells[0].querySelector(".v").textContent = shortName(maxA) + " · " + eraLabel(maxC);
+        cells[0].querySelector(".sub").textContent = maxN + " events · " + pctCorpus(maxN) + "% of corpus";
+        // Secondary cluster
+        cells[1].querySelector(".v").textContent = shortName(secA) + " · " + eraLabel(secC);
+        cells[1].querySelector(".sub").textContent = secN + " events · " + pctCorpus(secN) + "% of corpus";
+        // Cold cells
+        var totalCells = AGENCIES.length * ERAS.length;
+        cells[2].querySelector(".v").textContent = String(cold);
+        cells[2].querySelector(".sub").textContent = "of " + totalCells + " grid positions empty";
+        // Cross-era agencies (present in >= 3 eras)
+        cells[3].querySelector(".v").textContent = String(crossEra.length);
+        cells[3].querySelector(".sub").textContent = crossEra.join(" · ");
+      }
+    }
+  }
+
+  MC.ready().then(function (mc) {
+    try { render(mc); } catch (e) { console.warn("atlas render failed, keeping static fallback", e); }
+  });
+  MC.onUpdate(function (mc) {
+    try { render(mc); } catch (e) { console.warn("atlas re-render failed", e); }
+  });
+})();
+</script>
 
 <script src="chrome.js" defer></script>
 </body>
