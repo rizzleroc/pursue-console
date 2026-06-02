@@ -32,7 +32,7 @@
     return e;
   }
 
-  const view = document.body.dataset.view || 'live';
+  const view = document.body.dataset.view || '';
   function stamp() {
     const d = new Date();
     const pad = n => String(n).padStart(2, '0');
@@ -78,6 +78,7 @@
     ]),
     el('div', { class: 'topbar-actions' }, [
       el('a', { class: 'ghost', href: 'index.html' }, ['LAUNCH ▾']),
+      el('a', { class: 'ghost', href: '../', title: 'Jump to the live React app at the deployed site root' }, ['OPEN LIVE APP →']),
       el('a', { class: 'ops-btn', href: 'review.html' }, ['＋ ENLIST']),
     ]),
   ]);
