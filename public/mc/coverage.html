@@ -47,7 +47,7 @@
 <main>
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 02 — corpus coverage</div>
-    <h1>121 events. <em>One complete.</em> The rest is the work.</h1>
+    <h1><span data-mc="coverageTotal">121</span> events. <em><span data-mc="coverageComplete">1</span> complete.</em> The rest is the work.</h1>
     <p class="sub">Each cell is one catalogued event coloured by <span class="mono" style="color:var(--amber)">coverage.json</span> status. Hover for the eid; click to open the dossier. Priority queue on the right ranks the highest-impact pages awaiting a transcriber.</p>
   </section>
 
@@ -58,22 +58,23 @@
         <span class="mono" style="font-size:10px;color:var(--text-4);letter-spacing:0.2em">SORTED BY STATUS</span>
       </div>
       <div class="legend-rail" style="margin-bottom:10px">
-        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v">1</span></span>
-        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v">63</span></span>
-        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v">57</span></span>
+        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v" data-mc="coverageComplete">1</span></span>
+        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v" data-mc="coveragePartial">63</span></span>
+        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v" data-mc="coverageNoData">57</span></span>
       </div>
       <div class="cov-grid" id="cg"></div>
       <div class="cov-summary">
-        <div class="s"><div class="k">Total catalogued</div><div class="v">121</div><div class="sub">of 162 R01 inventory</div></div>
-        <div class="s"><div class="k">Complete</div><div class="v emerald" data-count="1">0</div><div class="sub">all pages OCR'd · 0.8%</div></div>
-        <div class="s"><div class="k">Partial</div><div class="v amber" data-count="63">0</div><div class="sub">gap pages remain · 52%</div></div>
-        <div class="s"><div class="k">No data</div><div class="v rose" data-count="57">0</div><div class="sub">no body text · 47%</div></div>
+        <div class="s"><div class="k">Total catalogued</div><div class="v" data-count="121" data-mc-count="coverageTotal">0</div><div class="sub">of 162 R01 inventory</div></div>
+        <div class="s"><div class="k">Complete</div><div class="v emerald" data-count="1" data-mc-count="coverageComplete">0</div><div class="sub">all pages OCR'd · 2.3%</div></div>
+        <div class="s"><div class="k">Partial</div><div class="v amber" data-count="63" data-mc-count="coveragePartial">0</div><div class="sub">gap pages remain · 53%</div></div>
+        <div class="s"><div class="k">No data</div><div class="v rose" data-count="57" data-mc-count="coverageNoData">0</div><div class="sub">no body text · 45%</div></div>
       </div>
     </div>
 
     <div class="panel">
       <div class="panel-head"><span><span class="icon-sq"></span>Priority queue</span><span class="right">next-missing.json</span></div>
       <p style="font-size:11px;color:var(--text-3);line-height:1.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em;margin:0 0 16px">Scored: flag-weight × (1 + gapPages/10) × (1 + chars/10000). Top of this list is the deep-link target for the LIVE-view CTA "Open the next missing page →".</p>
+      <div id="queue-list">
       <div class="queue-row"><div class="left"><span class="eid">indopacom-2024</span><span class="meta"><span class="anchor">ANCHOR</span> · 24pp · 0%</span></div><span class="pri amber">4.00</span></div>
       <div class="queue-row"><div class="left"><span class="eid">pursue-release-01</span><span class="meta"><span class="anchor">ANCHOR</span> · 12pp · 0%</span></div><span class="pri amber">4.00</span></div>
       <div class="queue-row"><div class="left"><span class="eid">pursue-release-02</span><span class="meta"><span class="anchor">ANCHOR</span> · 8pp · 0%</span></div><span class="pri amber">4.00</span></div>
@@ -82,19 +83,97 @@
       <div class="queue-row"><div class="left"><span class="eid">dow-uap-d65</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
       <div class="queue-row"><div class="left"><span class="eid">dow-uap-d63</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
       <div class="queue-row"><div class="left"><span class="eid">dow-uap-d54</span><span class="meta"><span class="med">MED</span> · 7pp · 23%</span></div><span class="pri">2.14</span></div>
+      </div>
       <a class="primary-cta" href="review.html" style="margin-top:24px;width:100%;justify-content:center">Open queue head <span>→</span></a>
     </div>
   </section>
 </main>
 
+<script src="data.js"></script>
+
 <script src="chrome.js" defer></script>
 <script>
-  const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
-  let s = 17; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
-  for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
-  const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(28,0,'complete');
-  const grid = document.getElementById('cg');
-  cls.forEach((c,i) => { const d=document.createElement('div'); d.className='cov-cell'+(c?' '+c:''); d.style.animationDelay=(300+i*5)+'ms'; grid.appendChild(d); });
+  (function () {
+    const grid = document.getElementById('cg');
+
+    // Render the coverage matrix from an array of status strings.
+    // 'complete' | 'partial' | (anything else → empty/dark cell, bare .cov-cell).
+    function renderGrid(cells) {
+      grid.innerHTML = '';
+      cells.forEach((c, i) => {
+        const d = document.createElement('div');
+        const cls = c === 'complete' ? ' complete' : c === 'partial' ? ' partial' : '';
+        d.className = 'cov-cell' + cls;
+        d.style.animationDelay = (300 + i * 5) + 'ms';
+        grid.appendChild(d);
+      });
+    }
+
+    // Baked-in fallback: deterministic shuffle of the static 1/63/57 split.
+    function randomFill() {
+      const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
+      let s = 17; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+      for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
+      const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(28,0,'complete');
+      renderGrid(cls);
+    }
+
+    // Priority queue → render from MC.derive.queueTop8.
+    const FLAG_CLASS = { anchor: 'anchor', high: 'high', med: 'med', medium: 'med', low: 'med' };
+    function renderQueue(rows) {
+      const list = document.getElementById('queue-list');
+      if (!list || !Array.isArray(rows) || !rows.length) return;
+      list.innerHTML = '';
+      rows.forEach((q) => {
+        const flag = String(q.flag || '').toLowerCase();
+        const flagCls = FLAG_CLASS[flag] || 'med';
+        const pri = (typeof q.priority === 'number' ? q.priority : parseFloat(q.priority) || 0);
+
+        const row = document.createElement('div');
+        row.className = 'queue-row';
+
+        const left = document.createElement('div');
+        left.className = 'left';
+        const eid = document.createElement('span');
+        eid.className = 'eid';
+        eid.textContent = q.eid || '—';
+        const meta = document.createElement('span');
+        meta.className = 'meta';
+        const fl = document.createElement('span');
+        fl.className = flagCls;
+        fl.textContent = (q.flag || '').toUpperCase();
+        meta.appendChild(fl);
+        meta.appendChild(document.createTextNode(' · ' + (q.page != null ? q.page : 1) + 'pp · ' + (q.reason || '')));
+        left.appendChild(eid);
+        left.appendChild(meta);
+
+        const priEl = document.createElement('span');
+        priEl.className = 'pri' + (flag === 'anchor' ? ' amber' : '');
+        priEl.textContent = pri.toFixed(2);
+
+        row.appendChild(left);
+        row.appendChild(priEl);
+        list.appendChild(row);
+      });
+    }
+
+    function renderFromMC() {
+      const D = window.MC && window.MC.derive;
+      if (!D) return false;
+      if (Array.isArray(D.coverageCells) && D.coverageCells.length) renderGrid(D.coverageCells);
+      renderQueue(D.queueTop8);
+      return true;
+    }
+
+    if (window.MC && typeof window.MC.ready === 'function') {
+      window.MC.ready().then(() => { if (!renderFromMC()) randomFill(); });
+      window.MC.onUpdate(() => { renderFromMC(); });
+      // If MC never resolves, fall back to the baked-in fill.
+      setTimeout(() => { if (!window.MC._loaded && !grid.children.length) randomFill(); }, 1200);
+    } else {
+      randomFill();
+    }
+  })();
 </script>
 </body>
 </html>

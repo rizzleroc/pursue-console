@@ -70,7 +70,7 @@
 
       <div class="search-input">
         <span class="glyph">⌕</span>
-        <input value="orb hover elevation" placeholder="QUERY · 220 events · 3,530 pages…"/>
+        <input id="search-q" value="orb hover elevation" placeholder="QUERY · 220 events · 3,530 pages…"/>
         <span class="clear">⨯ CLEAR</span>
       </div>
 
@@ -135,6 +135,8 @@
   </section>
 </main>
 
+<script src="data.js"></script>
+
 <script src="chrome.js" defer></script>
 <script>
   // Toggle modes on click (visual demo)
@@ -144,6 +146,23 @@
       m.classList.add('active');
     });
   });
+
+  // ── Live data layer: corpus-scale numbers in the input placeholder ──
+  // (eventCount + pagesIndexed). Index sizes 276 docs / 5,665 chunks stay static.
+  function syncSearchScale(MC){
+    const D = MC && MC.derive; if (!D) return;
+    const q = document.getElementById('search-q');
+    if (!q) return;
+    const ev = (typeof D.eventCount === 'number' && D.eventCount > 0)
+      ? D.eventCount : 220;
+    const pg = (typeof D.pagesIndexed === 'number' && D.pagesIndexed > 0)
+      ? D.pagesIndexed.toLocaleString() : '3,530';
+    q.placeholder = 'QUERY · ' + ev + ' events · ' + pg + ' pages…';
+  }
+  if (window.MC && typeof window.MC.ready === 'function') {
+    window.MC.ready().then(() => syncSearchScale(window.MC));
+    window.MC.onUpdate(() => syncSearchScale(window.MC));
+  }
 </script>
 </body>
 </html>

@@ -52,19 +52,21 @@
 
   <section class="md-shell">
     <div class="md-filterbar">
-      <span class="md-pill active"><span class="ic"></span>ALL <span class="n">362</span></span>
-      <span class="md-pill video"><span class="ic"></span>VIDEO <span class="n">106</span></span>
-      <span class="md-pill photo"><span class="ic"></span>PHOTO <span class="n">113</span></span>
-      <span class="md-pill"><span class="ic" style="background:#FFD93D"></span>HAND-DRAWING <span class="n">44</span></span>
-      <span class="md-pill diagram"><span class="ic"></span>DIAGRAM <span class="n">49</span></span>
-      <span class="md-pill map"><span class="ic"></span>MAP <span class="n">11</span></span>
-      <span class="md-pill"><span class="ic" style="background:#94A3B8"></span>NEGATIVE <span class="n">6</span></span>
-      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">SORT · DVIDS VIEWS DESC · 135 EVENTS · media.json</span>
+      <span class="md-pill active"><span class="ic"></span>ALL <span class="n" data-mc="mediaTotal">324</span></span>
+      <span class="md-pill video"><span class="ic"></span>VIDEO <span class="n" data-mc="media.byKind.video">106</span></span>
+      <span class="md-pill photo"><span class="ic"></span>PHOTO <span class="n" data-mc="media.byKind.photograph">113</span></span>
+      <span class="md-pill"><span class="ic" style="background:#FFD93D"></span>HAND-DRAWING <span class="n" data-mc="media.byKind.hand-drawing">42</span></span>
+      <span class="md-pill diagram"><span class="ic"></span>DIAGRAM <span class="n" data-mc="media.byKind.diagram">16</span></span>
+      <span class="md-pill map"><span class="ic"></span>MAP <span class="n" data-mc="media.byKind.map">8</span></span>
+      <span class="md-pill"><span class="ic" style="background:#94A3B8"></span>NEGATIVE <span class="n" data-mc="media.byKind.photocopied-negative">6</span></span>
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">SORT · DVIDS VIEWS DESC · <span data-mc="mediaEvents">133</span> EVENTS · media.json</span>
     </div>
 
     <div class="md-grid" id="grid"></div>
   </section>
 </main>
+
+<script src="data.js"></script>
 
 <script src="chrome.js" defer></script>
 <script>
@@ -90,27 +92,92 @@
     {k:'map', t:'Atlas IIAS risk contours, A=3.5', e:'dow-uap-d48 · p21', v:''},
     {k:'photo', t:'30th Space Wing patch — Vandenberg', e:'dow-uap-d49 · p1', v:''},
   ];
-  const ICONS = { video: '▶', photo: '◫', diagram: '◬', map: '◐', sketch: '✎' };
+  const ICONS = { video: '▶', photo: '◫', photograph: '◫', diagram: '◬', map: '◐', sketch: '✎', 'hand-drawing': '✎', 'newspaper-clipping': '▤', 'photocopied-negative': '▦' };
   const KIND_NAMES = { video: 'VIDEO', photo: 'PHOTOGRAPH', diagram: 'DIAGRAM', map: 'MAP' };
   const grid = document.getElementById('grid');
-  data.forEach((d, i) => {
-    const t = document.createElement('div');
-    t.className = 'tile ' + d.k;
-    t.innerHTML = `
-      <div class="thumb">
-        <span class="ribbon">${KIND_NAMES[d.k] || d.k.toUpperCase()}</span>
-        ${d.v ? `<span class="views">${d.v}</span>` : ''}
-        <span class="icon">${ICONS[d.k] || '?'}</span>
-      </div>
-      <div class="footer">
-        <div class="kind">${KIND_NAMES[d.k] || d.k}</div>
-        <div class="title">${d.t}</div>
-        <div class="ev">${d.e}</div>
-      </div>`;
-    t.style.opacity = '0';
-    t.style.animation = `rise 0.5s ${300 + i * 35}ms cubic-bezier(.2,.7,.2,1) forwards`;
-    grid.appendChild(t);
-  });
+  const MAX_TILES = 30;
+
+  // map a real media kind → the CSS modifier class the tile styling expects.
+  function kindClass(kind) {
+    if (kind === 'video') return 'video';
+    if (kind === 'photograph') return 'photo';
+    if (kind === 'diagram') return 'diagram';
+    if (kind === 'map') return 'map';
+    return ''; // hand-drawing, newspaper-clipping, photocopied-negative → generic
+  }
+  const esc = (s) => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+  // ── Static fallback render (kept so something shows before MC loads / if it fails) ──
+  function renderFallback() {
+    grid.innerHTML = '';
+    data.forEach((d, i) => {
+      const t = document.createElement('div');
+      t.className = 'tile ' + d.k;
+      t.innerHTML = `
+        <div class="thumb">
+          <span class="ribbon">${KIND_NAMES[d.k] || d.k.toUpperCase()}</span>
+          ${d.v ? `<span class="views">${d.v}</span>` : ''}
+          <span class="icon">${ICONS[d.k] || '?'}</span>
+        </div>
+        <div class="footer">
+          <div class="kind">${KIND_NAMES[d.k] || d.k}</div>
+          <div class="title">${d.t}</div>
+          <div class="ev">${d.e}</div>
+        </div>`;
+      t.style.opacity = '0';
+      t.style.animation = `rise 0.5s ${300 + i * 35}ms cubic-bezier(.2,.7,.2,1) forwards`;
+      grid.appendChild(t);
+    });
+  }
+  renderFallback();
+
+  // ── Live render from the shared data layer ──
+  function renderLive(MC) {
+    const items = (MC.derive && MC.derive.mediaItems) || [];
+    if (!items.length) return; // keep the static fallback on-screen
+    const slice = items.slice(0, MAX_TILES);
+    grid.innerHTML = '';
+    slice.forEach((m, i) => {
+      const cls = kindClass(m.kind);
+      const label = (m.kind || '').toUpperCase();
+      const hasViews = m.views != null && m.views !== '';
+      const t = document.createElement('div');
+      t.className = 'tile' + (cls ? ' ' + cls : '');
+
+      let thumbInner;
+      if (m.imagePath) {
+        // imagePath is relative to the site root; /mc/ pages need a "../" prefix.
+        thumbInner = `<img src="../${esc(m.imagePath)}" alt="${esc(m.title)}" loading="lazy"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1">`;
+      } else {
+        thumbInner = `<span class="icon">${ICONS[m.kind] || '?'}</span>`;
+      }
+      const viewsBadge = hasViews ? `<span class="views">${esc(m.views)}</span>` : '';
+      const evLine = esc(m.eventTitle || m.eventId || '');
+
+      t.innerHTML = `
+        <div class="thumb">
+          <span class="ribbon">${esc(label)}</span>
+          ${viewsBadge}
+          ${thumbInner}
+        </div>
+        <div class="footer">
+          <div class="kind">${esc(label)}</div>
+          <div class="title">${esc(m.title)}</div>
+          <div class="ev">${evLine}</div>
+        </div>`;
+      t.style.opacity = '0';
+      t.style.animation = `rise 0.5s ${300 + i * 35}ms cubic-bezier(.2,.7,.2,1) forwards`;
+      grid.appendChild(t);
+    });
+  }
+
+  if (window.MC) {
+    MC.ready().then(renderLive);
+    MC.onUpdate(renderLive);
+  }
 </script>
 </body>
 </html>

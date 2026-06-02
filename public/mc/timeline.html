@@ -47,15 +47,16 @@
 
   <section class="tl-shell">
     <div class="legend-row">
-      <span class="a"><span class="d" style="background:var(--amber)"></span>DEPT OF WAR · 158</span>
-      <span class="a"><span class="d" style="background:var(--cyan)"></span>FBI · 26</span>
-      <span class="a"><span class="d" style="background:var(--emerald)"></span>NASA · 22</span>
-      <span class="a"><span class="d" style="background:var(--rose)"></span>STATE · 7</span>
-      <span class="a"><span class="d" style="background:#F472B6"></span>ENERGY · 3</span>
-      <span class="a"><span class="d" style="background:#B280FF"></span>CIA · 1</span>
-      <span class="a"><span class="d" style="background:#FFD93D"></span>ODNI · 1</span>
+      <span class="a"><span class="d" style="background:var(--amber)"></span>DEPT OF WAR · <span class="lg-ct" data-ag="Department of War">158</span></span>
+      <span class="a"><span class="d" style="background:var(--cyan)"></span>FBI · <span class="lg-ct" data-ag="FBI">26</span></span>
+      <span class="a"><span class="d" style="background:var(--emerald)"></span>NASA · <span class="lg-ct" data-ag="NASA">22</span></span>
+      <span class="a"><span class="d" style="background:var(--rose)"></span>STATE · <span class="lg-ct" data-ag="Department of State">7</span></span>
+      <span class="a"><span class="d" style="background:#F472B6"></span>ENERGY · <span class="lg-ct" data-ag="Department of Energy">3</span></span>
+      <span class="a"><span class="d" style="background:#B280FF"></span>CIA · <span class="lg-ct" data-ag="Central Intelligence Agency">1</span></span>
+      <span class="a"><span class="d" style="background:#FFD93D"></span>ODNI · <span class="lg-ct" data-ag="Office of the Director of National Intelligence">1</span></span>
     </div>
 
+    <div id="tl-bands">
     <div class="tl-band">
       <h2><span class="era">2020s</span>Modern military encounters<span class="ct"><span class="v">86</span> events</span></h2>
       <div class="tl-density"><div class="fill" style="width:100%"></div></div>
@@ -115,8 +116,125 @@
         <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1949</span></div><div class="ttl">Project Sign · "1949 discs"</div><div class="agn">DoW · radar scope</div></div>
       </div>
     </div>
+    </div>
   </section>
 </main>
+
+<script src="data.js"></script>
+
+<script>
+(function () {
+  if (!window.MC || !MC.ready) return;
+
+  // agency full-name → existing .dot class
+  var AGENCY_DOT = {
+    "Department of War": "dow",
+    "FBI": "fbi",
+    "NASA": "nasa",
+    "Department of State": "state",
+    "Central Intelligence Agency": "cia",
+    "Office of the Director of National Intelligence": "odni",
+    "Department of Energy": "energy"
+  };
+  // short agency tag for the .agn line
+  var AGENCY_SHORT = {
+    "Department of War": "DoW",
+    "FBI": "FBI",
+    "NASA": "NASA",
+    "Department of State": "STATE",
+    "Central Intelligence Agency": "CIA",
+    "Office of the Director of National Intelligence": "ODNI",
+    "Department of Energy": "ENERGY"
+  };
+  // era key → human decade label + descriptor; newest → oldest, Unknown last.
+  var ERA_ORDER = ["20s", "modern", "10s", "00s", "90s", "80s", "70s", "60s", "50s", "40s", "Unknown"];
+  var ERA_LABEL = {
+    "20s": ["2020s", "Modern military encounters"],
+    "modern": ["MODERN", "Recent undated encounters"],
+    "10s": ["2010s", "Fleet & sensor reports"],
+    "00s": ["2000s", "Vandenberg, Apollo follow-up"],
+    "90s": ["1990s", "Air Force technical analysis"],
+    "80s": ["1980s", "Cold War case files"],
+    "70s": ["1970s", "Apollo crew debriefings"],
+    "60s": ["1960s", "Gemini · Apollo · Project Blue Book"],
+    "50s": ["1950s", "Early atomic-era sightings"],
+    "40s": ["1940s", "Foundational case files"],
+    "Unknown": ["UNDATED", "Unclassified by era"]
+  };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function dotClass(agency) { return AGENCY_DOT[agency] || ""; }
+
+  function agnLine(ev) {
+    var tag = AGENCY_SHORT[ev.agency] || ev.agency || "—";
+    var extra = ev.flag || ev.type;
+    return extra ? esc(tag) + " · " + esc(extra) : esc(tag);
+  }
+
+  function cardHTML(ev) {
+    return '<div class="evt"><div class="top">' +
+      '<span class="dot ' + dotClass(ev.agency) + '"></span>' +
+      '<span class="date">' + esc(ev.date || "—") + '</span></div>' +
+      '<div class="ttl">' + esc(ev.title || "Untitled") + '</div>' +
+      '<div class="agn">' + agnLine(ev) + '</div></div>';
+  }
+
+  function bandHTML(eraKey, events, maxCount) {
+    var label = ERA_LABEL[eraKey] || [eraKey, ""];
+    var count = events.length;
+    var width = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+    var cards = events.slice(0, 8).map(cardHTML).join("");
+    return '<div class="tl-band">' +
+      '<h2><span class="era">' + esc(label[0]) + '</span>' + esc(label[1]) +
+      '<span class="ct"><span class="v">' + count + '</span> events</span></h2>' +
+      '<div class="tl-density"><div class="fill" style="width:' + width + '%"></div></div>' +
+      '<div class="tl-events">' + cards + '</div></div>';
+  }
+
+  function renderBands() {
+    var host = document.getElementById("tl-bands");
+    if (!host) return;
+    var events = (MC.derive && MC.derive.events) || [];
+    if (!events.length) return; // keep static fallback
+
+    var groups = {};
+    events.forEach(function (ev) {
+      var k = ev.era || "Unknown";
+      (groups[k] || (groups[k] = [])).push(ev);
+    });
+
+    var maxCount = 0;
+    ERA_ORDER.forEach(function (k) {
+      if (k !== "Unknown" && groups[k]) maxCount = Math.max(maxCount, groups[k].length);
+    });
+    if (maxCount === 0) maxCount = 1;
+
+    var html = "";
+    ERA_ORDER.forEach(function (k) {
+      if (groups[k] && groups[k].length) html += bandHTML(k, groups[k], maxCount);
+    });
+    if (html) host.innerHTML = html;
+  }
+
+  function renderLegend() {
+    var by = (MC.derive && MC.derive.byAgency) || {};
+    document.querySelectorAll(".lg-ct[data-ag]").forEach(function (el) {
+      var v = by[el.getAttribute("data-ag")];
+      if (typeof v === "number") el.textContent = v;
+    });
+  }
+
+  function paint() { renderLegend(); renderBands(); }
+
+  MC.ready().then(paint);
+  MC.onUpdate(paint);
+})();
+</script>
 
 <script src="chrome.js" defer></script>
 </body>

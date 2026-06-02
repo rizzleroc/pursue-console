@@ -41,7 +41,7 @@
 <main>
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 10 — orbital projection</div>
-    <h1>220 events plotted by lat/lon. <em>The blank zones tell their own story.</em></h1>
+    <h1><span id="gl-eventcount">220</span> events plotted by lat/lon. <em>The blank zones tell their own story.</em></h1>
     <p class="sub">Pins encode region density: hot amber where multiple events cluster, cool cyan for single sightings. Africa and Oceania are nearly empty — archive gap, not data gap. Drag to spin · scroll to zoom · tap any pin to open its dossier.</p>
   </section>
 
@@ -99,34 +99,34 @@
 
         <!-- Event pins -->
         <!-- North America cluster — 80 events -->
-        <g class="pin"><circle cx="200" cy="220" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="200" cy="220" r="7" fill="rgba(242,166,35,0.85)" /><text x="218" y="218" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600">NA · 80</text></g>
+        <g class="pin"><circle cx="200" cy="220" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="200" cy="220" r="7" fill="rgba(242,166,35,0.85)" /><text x="218" y="218" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600" data-region="North America" data-prefix="NA · ">NA · 80</text></g>
         <g class="pin"><circle cx="240" cy="260" r="5" fill="#F2A623"/></g>
         <g class="pin"><circle cx="180" cy="180" r="4" fill="#F2A623"/></g>
         <g class="pin"><circle cx="260" cy="240" r="4" fill="#F2A623"/></g>
 
         <!-- Middle East cluster — 77 events -->
-        <g class="pin"><circle cx="595" cy="245" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="595" cy="245" r="7" fill="rgba(242,166,35,0.85)"/><text x="610" y="243" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600">ME · 77</text></g>
+        <g class="pin"><circle cx="595" cy="245" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="595" cy="245" r="7" fill="rgba(242,166,35,0.85)"/><text x="610" y="243" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600" data-region="Middle East" data-prefix="ME · ">ME · 77</text></g>
         <g class="pin"><circle cx="610" cy="265" r="4" fill="#F2A623"/></g>
         <g class="pin"><circle cx="580" cy="225" r="4" fill="#F2A623"/></g>
 
         <!-- Europe — 14 events -->
-        <g class="pin"><circle cx="510" cy="200" r="6" fill="rgba(97,215,240,0.85)"/><text x="525" y="200" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10">EU · 14</text></g>
+        <g class="pin"><circle cx="510" cy="200" r="6" fill="rgba(97,215,240,0.85)"/><text x="525" y="200" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10" data-region="Europe" data-prefix="EU · ">EU · 14</text></g>
 
         <!-- Asia Pacific — 10 events -->
-        <g class="pin"><circle cx="740" cy="230" r="5" fill="rgba(97,215,240,0.85)"/><text x="755" y="230" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10">AP · 10</text></g>
+        <g class="pin"><circle cx="740" cy="230" r="5" fill="rgba(97,215,240,0.85)"/><text x="755" y="230" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10" data-region="Asia-Pacific" data-prefix="AP · ">AP · 10</text></g>
 
         <!-- Asia — 4 events -->
         <g class="pin"><circle cx="680" cy="215" r="4" fill="rgba(97,215,240,0.7)"/></g>
 
         <!-- Africa — 4 events (sparse) -->
-        <g class="pin"><circle cx="520" cy="350" r="3.5" fill="rgba(224,73,104,0.85)"/><text x="535" y="352" fill="rgba(224,73,104,0.85)" font-family="JetBrains Mono" font-size="9">AF · 4</text></g>
+        <g class="pin"><circle cx="520" cy="350" r="3.5" fill="rgba(224,73,104,0.85)"/><text x="535" y="352" fill="rgba(224,73,104,0.85)" font-family="JetBrains Mono" font-size="9" data-region="Africa" data-prefix="AF · ">AF · 4</text></g>
 
         <!-- Oceania — 1 event (sparse) -->
-        <g class="pin"><circle cx="840" cy="400" r="3" fill="rgba(224,73,104,0.8)"/><text x="853" y="402" fill="rgba(224,73,104,0.7)" font-family="JetBrains Mono" font-size="9">OC · 1</text></g>
+        <g class="pin"><circle cx="840" cy="400" r="3" fill="rgba(224,73,104,0.8)"/><text x="853" y="402" fill="rgba(224,73,104,0.7)" font-family="JetBrains Mono" font-size="9" data-region="Oceania" data-prefix="OC · ">OC · 1</text></g>
 
         <!-- Space band -->
         <g>
-          <text x="475" y="55" fill="rgba(74,222,128,0.6)" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="0.18em">LEO + ORBIT · 18 EVENTS</text>
+          <text x="475" y="55" fill="rgba(74,222,128,0.6)" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="0.18em" data-region="Space" data-prefix="LEO + ORBIT · " data-suffix=" EVENTS">LEO + ORBIT · 18 EVENTS</text>
           <g class="pin"><circle cx="475" cy="70" r="4" fill="rgba(74,222,128,0.85)"/></g>
           <g class="pin"><circle cx="540" cy="74" r="3" fill="rgba(74,222,128,0.7)"/></g>
           <g class="pin"><circle cx="410" cy="68" r="3" fill="rgba(74,222,128,0.7)"/></g>
@@ -147,6 +147,7 @@
 
     <div class="panel">
       <div class="panel-head"><span><span class="icon-sq"></span>Region totals</span><span class="right">EVENTS.json</span></div>
+      <div id="gl-regions">
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>North America</span><span class="ct">80</span></div>
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>Middle East</span><span class="ct">77</span></div>
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)"></span>Space / orbit</span><span class="ct">18</span></div>
@@ -156,10 +157,83 @@
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--cyan)"></span>Asia</span><span class="ct">4</span></div>
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--rose)"></span>Africa</span><span class="ct cold">4</span></div>
       <div class="reg-row"><span class="l"><span class="d" style="background:var(--rose)"></span>Oceania</span><span class="ct cold">1</span></div>
+      </div>
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-3);letter-spacing:0.06em">Africa and Oceania are <span style="color:var(--rose)">near-empty</span> — likely an archive gap, not a data gap.</div>
     </div>
   </section>
 </main>
+
+<script src="data.js"></script>
+
+<script>
+  (function () {
+    // Dot color classes (inline styles) reused from the baked-in markup,
+    // keyed by region. Anything unmapped falls back to the neutral text-3 dot.
+    var DOT = {
+      'North America': 'background:var(--amber);box-shadow:0 0 6px var(--amber-glow)',
+      'Middle East':   'background:var(--amber);box-shadow:0 0 6px var(--amber-glow)',
+      'Space':         'background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)',
+      'Europe':        'background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)',
+      'Asia-Pacific':  'background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)',
+      'Asia':          'background:var(--cyan)',
+      'Africa':        'background:var(--rose)',
+      'Oceania':       'background:var(--rose)',
+      'Unknown':       'background:var(--text-3)'
+    };
+    // Display label overrides for the region totals panel.
+    var LABEL = { 'Space': 'Space / orbit' };
+
+    function renderRegions(byRegion) {
+      var host = document.getElementById('gl-regions');
+      if (!host) return;
+      var rows = Object.keys(byRegion)
+        .map(function (k) { return { region: k, count: byRegion[k] }; })
+        .sort(function (a, b) { return b.count - a.count; });
+      if (!rows.length) return;
+      // Mark the two smallest regions (e.g. Africa / Oceania) as "cold".
+      var coldThreshold = rows.length >= 2 ? rows[rows.length - 2].count : -Infinity;
+      host.innerHTML = rows.map(function (r, i) {
+        var dot = DOT[r.region] || 'background:var(--text-3)';
+        var label = LABEL[r.region] || r.region;
+        var cold = i >= rows.length - 2 && r.count <= coldThreshold ? ' cold' : '';
+        return '<div class="reg-row"><span class="l"><span class="d" style="' + dot +
+          '"></span>' + label + '</span><span class="ct' + cold + '">' + r.count + '</span></div>';
+      }).join('');
+    }
+
+    function renderPins(byRegion) {
+      var labels = document.querySelectorAll('[data-region]');
+      for (var i = 0; i < labels.length; i++) {
+        var el = labels[i];
+        var key = el.getAttribute('data-region');
+        if (!(key in byRegion)) continue;
+        var prefix = el.getAttribute('data-prefix') || '';
+        var suffix = el.getAttribute('data-suffix') || '';
+        el.textContent = prefix + byRegion[key] + suffix;
+      }
+    }
+
+    function renderFromMC() {
+      var D = window.MC && window.MC.derive;
+      if (!D) return false;
+      if (D.byRegion && Object.keys(D.byRegion).length) {
+        renderRegions(D.byRegion);
+        renderPins(D.byRegion);
+      }
+      if (D.eventCount != null) {
+        var ec = document.getElementById('gl-eventcount');
+        if (ec) ec.textContent = D.eventCount;
+      }
+      return true;
+    }
+
+    if (window.MC && typeof window.MC.ready === 'function') {
+      window.MC.ready().then(renderFromMC);
+      window.MC.onUpdate(renderFromMC);
+    }
+    // If MC never loads, the baked-in markup remains as the fallback.
+  })();
+</script>
 
 <script src="chrome.js" defer></script>
 </body>

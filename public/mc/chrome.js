@@ -93,7 +93,13 @@
       class: 'nav-tab' + (view === v.id ? ' active' : ''),
       href: `${v.id}.html`,
     }, [v.label]);
-    if (v.badge) tab.appendChild(el('span', { class: 'nav-badge' }, [String(v.badge)]));
+    if (v.id === 'review') {
+      // live review badge — hidden until we know the count is > 0
+      const b = el('span', { class: 'nav-badge', id: 'review-badge', style: 'display:none' }, ['0']);
+      tab.appendChild(b);
+    } else if (v.badge) {
+      tab.appendChild(el('span', { class: 'nav-badge' }, [String(v.badge)]));
+    }
     nav.appendChild(tab);
   }
   main.parentNode.insertBefore(classifiedTop, main);
@@ -120,19 +126,44 @@
     if (t) t.textContent = stamp();
   }, 1000);
 
-  // Count-up helper
+  // Count-up helper. Targets come from the static data-count attribute by
+  // default; if the element also carries data-mc-count="<deriveKey>", the
+  // LIVE value from the data layer overrides it once MC is ready.
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-  document.querySelectorAll('[data-count]').forEach(elx => {
-    const target = parseFloat(elx.dataset.count);
-    const start = performance.now();
-    setTimeout(() => {
+  function runCountUp() {
+    document.querySelectorAll('[data-count]').forEach(elx => {
+      let target = parseFloat(elx.dataset.count);
+      const liveKey = elx.dataset.mcCount;
+      if (liveKey && window.MC && window.MC.derive && window.MC.derive[liveKey] != null) {
+        const lv = window.MC.derive[liveKey];
+        if (typeof lv === 'number' && isFinite(lv)) target = lv;
+      }
+      const start = performance.now();
       function frame(now) {
-        const t = Math.min(1, (now - start - 600) / 1500);
-        if (t < 0) { requestAnimationFrame(frame); return; }
+        const t = Math.min(1, (now - start) / 1500);
         elx.textContent = Math.round(target * easeOut(t)).toLocaleString();
         if (t < 1) requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
-    }, 600);
-  });
+    });
+  }
+
+  // Live review badge from the data layer
+  function updateReviewBadge() {
+    const b = document.getElementById('review-badge');
+    if (!b || !window.MC || !window.MC.derive) return;
+    const n = window.MC.derive.reviewCount;
+    if (typeof n === 'number' && n > 0) { b.textContent = String(n); b.style.display = ''; }
+    else { b.style.display = 'none'; }
+  }
+
+  if (window.MC && typeof window.MC.ready === 'function') {
+    // Live data present — run count-up against real targets once loaded.
+    window.MC.ready().then(() => { runCountUp(); updateReviewBadge(); });
+    window.MC.onUpdate(() => { updateReviewBadge(); });
+    // If MC is slow, still animate the static fallbacks after 1.2s.
+    setTimeout(() => { if (!window.MC._loaded) runCountUp(); }, 1200);
+  } else {
+    setTimeout(runCountUp, 600);
+  }
 })();

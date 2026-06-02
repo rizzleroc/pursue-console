@@ -204,6 +204,170 @@
   </section>
 </main>
 
+<script src="data.js"></script>
+
+<script>
+// ── Dossier live-data wiring ──────────────────────────────────────────────
+// Binds the page to window.MC (data.js). Every hardcoded value in the markup
+// above stays as the fallback: we only overwrite a node once real data for it
+// exists, so a fetch failure degrades to the static mockup.
+(function () {
+  if (!window.MC || !MC.ready) return;
+
+  // Candidate subjects, best first. fbi-62hq83894 is the strongest real anchor
+  // (234 chunks + 10 neighbors + rich entity/shape/behavior/sensor coverage);
+  // usper-2025 is the legacy hardcoded subject and resolves too.
+  var PREFERRED = ["fbi-62hq83894", "usper-2025"];
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  function pickSubject() {
+    var events = (MC.derive && MC.derive.events) || [];
+    var sim = (MC.derive && MC.derive.similarity) || {};
+    var hasN = function (id) { return MC.neighbors(id, 1).length > 0; };
+    var inEvents = function (id) { return events.some(function (e) { return e.id === id; }); };
+    // 1) preferred ids present in events + similarity graph
+    for (var i = 0; i < PREFERRED.length; i++) {
+      var id = PREFERRED[i];
+      if (inEvents(id) && hasN(id)) return id;
+    }
+    // 2) any event that has neighbors
+    for (var j = 0; j < events.length; j++) {
+      if (hasN(events[j].id)) return events[j].id;
+    }
+    // 3) any event at all, else the legacy default
+    return events.length ? events[0].id : "usper-2025";
+  }
+
+  // Per-event terms for a pattern kind, sorted by per-event count; falls back
+  // to the global top terms (by total) when the event mentions none.
+  function kindForEvent(kind, eid) {
+    var items = MC.get("patterns.byKind." + kind, []) || [];
+    var hits = items.map(function (e) {
+      var hit = (e.events || []).find(function (x) { return x.eid === eid; });
+      return hit ? { term: e.term, n: hit.count } : null;
+    }).filter(Boolean).sort(function (a, b) { return b.n - a.n; });
+    if (hits.length) return hits;
+    return items.slice()
+      .sort(function (a, b) { return (b.total || 0) - (a.total || 0); })
+      .map(function (e) { return { term: e.term, n: e.total }; });
+  }
+
+  function renderChips(containerLabel, kind, eid) {
+    // find the .sig-chips that follows the matching .label
+    var labels = document.querySelectorAll(".sig-grid .label");
+    var target = null;
+    for (var i = 0; i < labels.length; i++) {
+      if (labels[i].textContent.trim().toUpperCase() === containerLabel) {
+        target = labels[i].nextElementSibling; break;
+      }
+    }
+    if (!target || !target.classList.contains("sig-chips")) return;
+    var rows = kindForEvent(kind, eid);
+    if (!rows.length) return; // keep fallback chips
+    target.innerHTML = rows.slice(0, 5).map(function (r) {
+      return '<span class="sig-chip ' + kind + '">' + esc(r.term) +
+        ' <span class="v">' + esc(r.n) + '</span></span>';
+    }).join("");
+  }
+
+  function dotClass(cos) {
+    if (cos >= 0.85) return "r";   // rose — very strong
+    if (cos >= 0.70) return "a";   // amber — strong
+    if (cos >= 0.55) return "c";   // cyan — moderate
+    return "z";                    // grey — weak
+  }
+
+  function render() {
+    var events = (MC.derive && MC.derive.events) || [];
+    if (!events.length) return; // no data yet → keep full static fallback
+    var eid = pickSubject();
+    var rec = events.find(function (e) { return e.id === eid; });
+
+    // 1) Header ------------------------------------------------------------
+    if (rec) {
+      var metaRow = document.querySelector(".ds-header .meta-row");
+      if (metaRow) {
+        var anchorPill = metaRow.querySelector(".anchor");
+        if (anchorPill) anchorPill.style.display = (rec.flag === "anchor") ? "" : "none";
+        var idEl = metaRow.querySelector(".id");
+        if (idEl) idEl.textContent = rec.id;
+        // agency is the first plain <span> after the id (markup: id · agency · stamp · date · title)
+        var spans = metaRow.querySelectorAll("span");
+        // spans: [anchor?, id, "·", agency, "·", stamp, "·", date, "·", title]
+        var agencyEl = idEl ? idEl.nextElementSibling && idEl.nextElementSibling.nextElementSibling : null;
+        if (agencyEl && !agencyEl.classList.contains("stamp")) agencyEl.textContent = rec.agency || agencyEl.textContent;
+        var dateEl = metaRow.querySelector(".stamp");
+        // date is the span two after .stamp (stamp · date)
+        if (dateEl) {
+          var afterStamp = dateEl.nextElementSibling && dateEl.nextElementSibling.nextElementSibling;
+          if (afterStamp) afterStamp.textContent = rec.date || afterStamp.textContent;
+          // last span = short descriptor → use the title text
+          var lastSpan = spans[spans.length - 1];
+          if (lastSpan && lastSpan !== afterStamp) lastSpan.textContent = rec.title || lastSpan.textContent;
+        }
+      }
+      var h1 = document.querySelector(".ds-header h1");
+      if (h1 && rec.title) h1.textContent = rec.title;
+    }
+
+    // 2) Signatures --------------------------------------------------------
+    renderChips("SHAPE", "shape", eid);
+    renderChips("BEHAVIOR", "behavior", eid);
+    renderChips("SENSOR", "sensor", eid);
+
+    // 3) Entities & dates --------------------------------------------------
+    var ents = MC.entitiesForEvent(eid, 8);
+    var entCol = document.querySelector(".ed-grid > div:first-child");
+    if (entCol && ents.length) {
+      var heading = entCol.querySelector("div");
+      var head = heading ? heading.outerHTML : "";
+      // update "(N in event)" label
+      head = head.replace(/\(\s*\d+\s+in event\s*\)/i, "(" + ents.length + " in event)");
+      entCol.innerHTML = head + ents.map(function (e) {
+        return '<div class="ent-row"><span class="name">' + esc(e.term) +
+          '</span><span class="docs">&rarr; ' + esc(e.docs) + ' docs</span>' +
+          '<span class="ct">' + esc(e.count) + '</span></div>';
+      }).join("");
+    }
+    // header counts: "199 ents · 67 dates"
+    var entHdr = document.querySelectorAll(".ds-section .ds-h .r");
+    entHdr.forEach(function (el) {
+      if (/ents\b/.test(el.textContent) && /dates\b/.test(el.textContent)) {
+        var ec = MC.derive.entityCount, dc = MC.derive.dateCount;
+        if (ec != null && dc != null) el.textContent = "patterns.json · " + ec + " ents · " + dc + " dates";
+      }
+    });
+
+    // 4) Semantic neighbors ------------------------------------------------
+    var neigh = MC.neighbors(eid, 10);
+    var nbSection = null;
+    document.querySelectorAll(".ds-section").forEach(function (sec) {
+      var t = sec.querySelector(".ds-h .t");
+      if (t && /SEMANTIC NEIGHBORS/i.test(t.textContent)) nbSection = sec;
+    });
+    if (nbSection && neigh.length) {
+      // remove existing static rows, keep the .ds-h header
+      nbSection.querySelectorAll(".nb-row").forEach(function (n) { n.remove(); });
+      var frag = neigh.map(function (nb) {
+        return '<div class="nb-row"><div class="left"><span class="dot ' + dotClass(nb.cos) +
+          '"></span><span class="t">' + esc(nb.eid) + '</span></div>' +
+          '<span class="cos">' + nb.cos.toFixed(2) + '</span></div>';
+      }).join("");
+      nbSection.insertAdjacentHTML("beforeend", frag);
+      var rHdr = nbSection.querySelector(".ds-h .r");
+      if (rHdr) rHdr.textContent = neigh.length + " · event-similarity.json";
+    }
+  }
+
+  MC.ready().then(render);
+  MC.onUpdate(render);
+})();
+</script>
+
 <script src="chrome.js" defer></script>
 </body>
 </html>
