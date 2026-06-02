@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .rv-shell { padding: 0 56px 64px; display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 22px; position: relative; z-index: 3; }
+    .rv-queue { background: var(--surface); border: 1px solid var(--border); padding: 22px; backdrop-filter: blur(10px); max-height: 1200px; overflow-y: auto; }
+    .rv-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: padding-left .2s; }
+    .rv-row:hover { padding-left: 6px; }
+    .rv-row.active { padding-left: 8px; border-left: 2px solid var(--amber); background: rgba(242,166,35,0.05); margin: 0 -22px; padding: 14px 22px 14px 26px; }
+    .rv-row .top { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
+    .rv-row .top .agree { margin-left: auto; color: var(--rose); font-weight: 700; }
+    .rv-row .top .agree.high { color: var(--amber); }
+    .rv-row .eid { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; }
+    .rv-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.08em; }
+    .rv-pane { background: var(--surface); border: 1px solid var(--border); padding: 24px 28px; backdrop-filter: blur(10px); }
+    .rv-head { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--hairline); }
+    .rv-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; margin: 0; letter-spacing: -0.015em; color: var(--text); }
+    .rv-head .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
+    .rv-head .meta .score { color: var(--rose); font-weight: 700; font-size: 14px; padding: 4px 10px; border: 1px solid rgba(224,73,104,0.4); background: rgba(224,73,104,0.10); margin-left: 8px; }
+    .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+    .diff-col { background: var(--surface-3); border: 1px solid var(--hairline); padding: 16px 18px; }
+    .diff-col h4 { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--text-3); text-transform: uppercase; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+    .diff-col h4 .src-tag { font-size: 9px; padding: 1px 6px; border: 1px solid; }
+    .diff-col h4 .src-tag.g { color: var(--cyan); border-color: rgba(97,215,240,0.4); background: rgba(97,215,240,0.08); }
+    .diff-col h4 .src-tag.o { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
+    .diff-col .conf { margin-left: auto; color: var(--text); font-weight: 600; }
+    .diff-col p { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.65; color: var(--text-2); margin: 0; }
+    .diff-col p .add { background: rgba(74,222,128,0.16); color: var(--emerald); padding: 0 3px; }
+    .diff-col p .del { background: rgba(224,73,104,0.16); color: var(--rose); padding: 0 3px; text-decoration: line-through; }
+    .merge-pane { border: 1px solid var(--border-strong); background: rgba(242,166,35,0.04); padding: 18px 22px; }
+    .merge-pane h4 { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--amber); text-transform: uppercase; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+    .merge-pane textarea { width: 100%; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; resize: vertical; min-height: 120px; }
+    .actions-bar { display: flex; align-items: center; gap: 12px; margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--hairline); }
+    .actions-bar .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; margin-right: auto; }
+    .ab-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; padding: 11px 18px; cursor: pointer; }
+    .ab-btn.primary { color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); box-shadow: 0 12px 28px -10px rgba(242,166,35,0.55); }
+    .ab-btn.ghost { color: var(--text-2); background: var(--surface); border: 1px solid var(--border); }
+    .ab-btn.ghost:hover { color: var(--text); border-color: var(--border-strong); }
+  </style>
+</head>
+<body data-view="review">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 05 — disputed-page review</div>
+    <h1>3 pages where the engines disagree. <em>Pick the truth.</em></h1>
+    <p class="sub">Each row in the queue is a page where machine OCR sources (Gemini-vision, GPT-vision, Tesseract, PDF.js) produced conflicting transcripts. The reviewer's job is to merge to a canonical version; one click opens a pre-filled GitHub PR.</p>
+  </section>
+
+  <section class="rv-shell">
+    <div class="rv-queue">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between"><span>QUEUE · WORST AGREEMENT</span><span style="color:var(--amber)">3</span></div>
+      <div class="rv-row active">
+        <div class="top"><span>FBI</span><span>·</span><span>2025-10</span><span class="agree">0.21</span></div>
+        <div class="eid">usper-2025 · p 03</div>
+        <div class="meta">vision · ocr · gemini · 4 sources disagree</div>
+      </div>
+      <div class="rv-row">
+        <div class="top"><span>DEPT/War</span><span>·</span><span>1996</span><span class="agree">0.34</span></div>
+        <div class="eid">dow-uap-d48 · p 087</div>
+        <div class="meta">vision · pdfjs · 2 sources disagree</div>
+      </div>
+      <div class="rv-row">
+        <div class="top"><span>DEPT/War</span><span>·</span><span>2020-05</span><span class="agree high">0.48</span></div>
+        <div class="eid">dow-uap-d038 · p 12</div>
+        <div class="meta">vision · ocr · minor</div>
+      </div>
+
+      <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
+        <div style="margin-bottom:8px">FILTER · all agencies</div>
+        <div style="margin-bottom:8px">SORT · worst agreement first</div>
+        <div style="color:var(--text-3);margin-top:14px">Pages graded ≥0.85 are auto-accepted as canonical and never enter this queue. Threshold tunable in <span style="color:var(--amber)">corpus-stats.json</span>.</div>
+      </div>
+    </div>
+
+    <div class="rv-pane">
+      <div class="rv-head">
+        <div>
+          <h2>usper-2025 · page 03</h2>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES · LAST UPDATED 14h ago</div>
+        </div>
+        <div class="meta">AGREEMENT <span class="score">0.21</span></div>
+      </div>
+
+      <div class="diff-grid">
+        <div class="diff-col">
+          <h4><span class="src-tag g">VISION</span><span>GEMINI · 2.0 Flash</span><span class="conf">0.94 conf</span></h4>
+          <p>"On <span class="del">[redacted]</span> 2025, at approximately 1700 hours [redacted] (a senior US intelligence official), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanied by [WITNESS 2 (a senior US intelligence official)], and two pilots from [STATE PARTNER ORGANIZATION] departed [<span class="add">SITE CODE NAME</span>] to conduct a search…"</p>
+        </div>
+        <div class="diff-col">
+          <h4><span class="src-tag o">OCR</span><span>Tesseract 5.4</span><span class="conf">0.62 conf</span></h4>
+          <p>"On <span class="add">[reducted]</span> 2025, at approxlmately 1700 hours [reducted] (a senior US lntelligence offlcial), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanled by [WITNESS 2 (a sentior US Intelligence offlclal)], and two pllots from [STATE PARTNER ORGANIZATION] departed [<span class="del">unknown</span>] to conduct a search…"</p>
+        </div>
+      </div>
+
+      <div class="merge-pane">
+        <h4><span>▣ MERGED TEXT — REVIEWER PROPOSAL</span><span style="margin-left:auto;color:var(--text-3);font-weight:400">edit freely · saves on submit</span></h4>
+        <textarea>On [redacted] 2025, at approximately 1700 hours [redacted] (a senior US intelligence official), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanied by [WITNESS 2 (a senior US intelligence official)], and two pilots from [STATE PARTNER ORGANIZATION] departed [SITE CODE NAME] to conduct a search…</textarea>
+      </div>
+
+      <div class="actions-bar">
+        <span class="meta">SUBMISSION · opens pre-filled PR · reviewer credit: anonymous OK</span>
+        <button class="ab-btn ghost">SKIP — next page</button>
+        <button class="ab-btn primary">▣ SUBMIT MERGED TEXT →</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+<script>
+  document.querySelectorAll('.rv-row').forEach(r => r.addEventListener('click', () => {
+    document.querySelectorAll('.rv-row').forEach(x => x.classList.remove('active'));
+    r.classList.add('active');
+  }));
+</script>
+</body>
+</html>

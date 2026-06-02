@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · launch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .launch-hero { padding: 80px 56px 28px; position: relative; z-index: 4; }
+    .launch-hero .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--amber); letter-spacing: 0.32em; text-transform: uppercase; }
+    .launch-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 96px; font-weight: 700; line-height: 1.0;
+      color: var(--text); letter-spacing: -0.035em;
+      margin: 28px 0 22px; max-width: 1100px;
+    }
+    .launch-hero h1 em { font-style: normal; background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(242, 166, 35, 0.3); }
+    .launch-hero p { font-size: 18px; line-height: 1.6; color: var(--text-2); max-width: 680px; }
+    .launch-grid {
+      padding: 32px 56px 64px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      position: relative; z-index: 3;
+    }
+    .lc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 26px 22px;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      color: inherit;
+      transition: all .25s;
+      position: relative;
+      display: flex; flex-direction: column;
+      min-height: 200px;
+      overflow: hidden;
+    }
+    .lc:hover { border-color: var(--border-strong); transform: translateY(-3px); box-shadow: 0 20px 40px -16px rgba(0,0,0,0.6); }
+    .lc::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--amber); opacity: 0; transition: opacity .25s;
+    }
+    .lc:hover::before { opacity: 1; box-shadow: 0 0 10px var(--amber-glow); }
+    .lc .code { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: var(--text-3); }
+    .lc h3 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; margin: 8px 0 10px; letter-spacing: -0.02em; }
+    .lc p { font-size: 13px; line-height: 1.5; color: var(--text-2); margin: 0; flex: 1; }
+    .lc .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.14em; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hairline); display: flex; justify-content: space-between; }
+    .lc .meta .v { color: var(--amber); font-weight: 600; }
+    .lc.feat { grid-column: span 2; background: linear-gradient(135deg, rgba(242,166,35,0.10), rgba(12,19,28,0.55) 60%); border-color: var(--border-strong); }
+    .lc.feat h3 { font-size: 36px; }
+  </style>
+</head>
+<body data-view="">
+
+<main>
+  <section class="launch-hero">
+    <div class="eyebrow">▣ &nbsp; PURSUE Console · Mission Control · Release 3.0</div>
+    <h1>Investigate the record <em>the Department of War released.</em></h1>
+    <p>Eleven mission surfaces. Same corpus, ten access modes plus the launch grid. Every value bound to live JSON regenerated on every build. Every page implements the Mission Control tactical aesthetic.</p>
+  </section>
+
+  <section class="launch-grid">
+
+    <a class="lc feat" href="live.html">
+      <span class="code">SURFACE · 01</span>
+      <h3>Live</h3>
+      <p>Tactical overview with the corpus-coverage matrix, mission status readout, the arriving signals stream, telemetry rails, field assignments, and the mined-entity index. The home of the console.</p>
+      <span class="meta"><span>11×11 grid · radar dome · signals · help wanted</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="coverage.html">
+      <span class="code">SURFACE · 02</span>
+      <h3>Coverage</h3>
+      <p>Full-page coverage matrix. Every event ranked by completeness, with the priority queue and gap-status breakdown.</p>
+      <span class="meta"><span>121 events · 4 statuses</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="search.html">
+      <span class="code">SURFACE · 03</span>
+      <h3>Search</h3>
+      <p>Unified search with an EXACT/MEANING toggle. Lexical MiniSearch over 276 docs by default; flip to semantic for 5,665-chunk FAISS retrieval.</p>
+      <span class="meta"><span>2 modes · result cards</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="ask.html">
+      <span class="code">SURFACE · 04</span>
+      <h3>Ask</h3>
+      <p>Natural-language Q&A grounded in the corpus. Cite-by-page answers, pattern-classifier fallback when the LLM backend is offline.</p>
+      <span class="meta"><span>RAG · pattern · cited</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="review.html">
+      <span class="code">SURFACE · 05</span>
+      <h3>Review</h3>
+      <p>Disputed-page queue. Side-by-side source diffs, merged-text proposal, one-click GitHub PR.</p>
+      <span class="meta"><span>3 pending · diff viewer</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="media.html">
+      <span class="code">SURFACE · 06</span>
+      <h3>Media</h3>
+      <p>Photo · video · diagram · map · sketch gallery. 362 visual tiles across 135 events with kind + agency filters.</p>
+      <span class="meta"><span>362 tiles · DVIDS embedded</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="dossier.html">
+      <span class="code">SURFACE · 07</span>
+      <h3>Dossier</h3>
+      <p>Per-event reading view: summary, signatures, mined entities, semantic neighbors, page-by-page excerpts, visuals gallery.</p>
+      <span class="meta"><span>220 events</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="timeline.html">
+      <span class="code">SURFACE · 08</span>
+      <h3>Timeline</h3>
+      <p>Events plotted by decade — 1940s through 2020s — with agency color-coding and density bands.</p>
+      <span class="meta"><span>chronological strip</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="atlas.html">
+      <span class="code">SURFACE · 09</span>
+      <h3>Atlas</h3>
+      <p>Agency × era heatmap. Click any cell to drill into the events that anchor that cohort.</p>
+      <span class="meta"><span>8 agencies × 8 eras</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="globe.html">
+      <span class="code">SURFACE · 10</span>
+      <h3>Globe</h3>
+      <p>3D globe with event pins by lat/lon. Spin, zoom, tap a pin to jump into the dossier.</p>
+      <span class="meta"><span>orbital projection</span><span class="v">→</span></span>
+    </a>
+
+    <a class="lc" href="network.html">
+      <span class="code">SURFACE · 11</span>
+      <h3>Network</h3>
+      <p>Force-directed entity graph. Patterns × events × agencies, similarity-edge tunable.</p>
+      <span class="meta"><span>199 entities · 121 events</span><span class="v">→</span></span>
+    </a>
+
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

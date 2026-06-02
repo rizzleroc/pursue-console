@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Globe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .gl-shell { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 24px; position: relative; z-index: 3; align-items: start; }
+    .gl-card { background: var(--surface); border: 1px solid var(--border); padding: 28px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+    .gl-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--amber), transparent); animation: glscan 8s linear infinite; box-shadow: 0 0 18px var(--amber-glow); }
+    @keyframes glscan { 0%{transform:translateY(0);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateY(700px);opacity:0} }
+    .gl-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--hairline); }
+    .gl-h .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.30em; color: var(--text-2); text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+    .gl-h .t .icon { width: 14px; height: 14px; border: 1px solid var(--amber); transform: rotate(45deg); position: relative; }
+    .gl-h .t .icon::before { content: ''; position: absolute; inset: 3px; background: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
+    .gl-h .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
+    .globe-svg { width: 100%; height: 600px; display: block; margin: 0 auto; }
+    .longitude, .latitude { fill: none; stroke: rgba(242,166,35,0.10); stroke-width: 0.5; }
+    .equator, .prime { stroke: rgba(242,166,35,0.20); stroke-width: 0.8; }
+    .land { fill: rgba(110, 138, 124, 0.10); stroke: rgba(110, 138, 124, 0.35); stroke-width: 0.6; }
+    .pin { animation: pin-pulse 2.6s ease-in-out infinite; transform-origin: center; }
+    .pin:nth-child(3n){animation-delay:0.4s}.pin:nth-child(3n+1){animation-delay:1.4s}
+    @keyframes pin-pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+    .gl-ctl { display: flex; align-items: center; gap: 10px; padding: 14px 0 0; margin-top: 16px; border-top: 1px solid var(--hairline); }
+    .gl-ctl .btn { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--text-3); background: var(--surface-2); border: 1px solid var(--border); padding: 8px 14px; cursor: pointer; text-transform: uppercase; }
+    .gl-ctl .btn.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
+    .gl-ctl .meta { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; }
+    .reg-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .reg-row:last-child { border-bottom: none; }
+    .reg-row .l { display: flex; align-items: center; gap: 10px; color: var(--text-2); letter-spacing: 0.06em; }
+    .reg-row .l .d { width: 9px; height: 9px; }
+    .reg-row .ct { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; color: var(--text); }
+    .reg-row .ct.cold { color: var(--rose); }
+  </style>
+</head>
+<body data-view="globe">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 10 — orbital projection</div>
+    <h1>220 events plotted by lat/lon. <em>The blank zones tell their own story.</em></h1>
+    <p class="sub">Pins encode region density: hot amber where multiple events cluster, cool cyan for single sightings. Africa and Oceania are nearly empty — archive gap, not data gap. Drag to spin · scroll to zoom · tap any pin to open its dossier.</p>
+  </section>
+
+  <section class="gl-shell">
+    <div class="gl-card">
+      <div class="gl-h">
+        <div class="t"><div class="icon"></div>WORLD VIEW · ORTHOGRAPHIC</div>
+        <div class="meta">LAT/LON · 220 EVENTS · projection equirectangular</div>
+      </div>
+
+      <svg class="globe-svg" viewBox="0 0 1100 580" xmlns="http://www.w3.org/2000/svg">
+        <!-- Latitude/longitude grid -->
+        <g>
+          <line class="longitude" x1="100"  y1="40" x2="100"  y2="540"/>
+          <line class="longitude" x1="225"  y1="40" x2="225"  y2="540"/>
+          <line class="longitude" x1="350"  y1="40" x2="350"  y2="540"/>
+          <line class="longitude prime" x1="475"  y1="40" x2="475"  y2="540"/>
+          <line class="longitude" x1="600"  y1="40" x2="600"  y2="540"/>
+          <line class="longitude" x1="725"  y1="40" x2="725"  y2="540"/>
+          <line class="longitude" x1="850"  y1="40" x2="850"  y2="540"/>
+          <line class="longitude" x1="975"  y1="40" x2="975"  y2="540"/>
+
+          <line class="latitude" x1="80" y1="100" x2="1020" y2="100"/>
+          <line class="latitude" x1="80" y1="180" x2="1020" y2="180"/>
+          <line class="latitude equator" x1="80" y1="290" x2="1020" y2="290"/>
+          <line class="latitude" x1="80" y1="400" x2="1020" y2="400"/>
+          <line class="latitude" x1="80" y1="480" x2="1020" y2="480"/>
+
+          <!-- coord labels -->
+          <text x="80" y="35" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em">180°W</text>
+          <text x="475" y="35" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em" text-anchor="middle">0°</text>
+          <text x="1020" y="35" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em" text-anchor="end">180°E</text>
+          <text x="70" y="293" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em" text-anchor="end">0° EQ</text>
+          <text x="70" y="103" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em" text-anchor="end">60°N</text>
+          <text x="70" y="483" fill="rgba(184,168,135,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.14em" text-anchor="end">60°S</text>
+        </g>
+
+        <!-- Very abstract continent silhouettes (stylized blobs) -->
+        <g>
+          <!-- North America -->
+          <path class="land" d="M 130 150 Q 170 130 230 145 Q 280 160 290 200 Q 310 240 280 290 Q 250 310 210 305 Q 175 295 155 270 Q 135 240 130 200 Z"/>
+          <!-- South America -->
+          <path class="land" d="M 270 340 Q 290 330 305 350 Q 315 390 310 440 Q 300 480 285 480 Q 268 470 265 430 Q 263 380 270 340 Z"/>
+          <!-- Europe -->
+          <path class="land" d="M 470 165 Q 510 155 540 175 Q 555 195 545 215 Q 525 225 495 220 Q 470 210 465 190 Z"/>
+          <!-- Africa -->
+          <path class="land" d="M 490 240 Q 530 230 555 250 Q 575 290 570 340 Q 560 390 535 415 Q 510 425 490 405 Q 475 360 480 310 Q 485 270 490 240 Z"/>
+          <!-- Asia -->
+          <path class="land" d="M 580 145 Q 660 130 750 145 Q 820 160 850 200 Q 855 250 820 270 Q 750 285 680 280 Q 620 270 590 240 Q 575 200 580 145 Z"/>
+          <!-- Australia -->
+          <path class="land" d="M 800 370 Q 850 360 880 385 Q 885 415 860 425 Q 820 425 800 410 Q 790 390 800 370 Z"/>
+          <!-- Antarctica band -->
+          <path class="land" d="M 80 525 Q 300 510 500 525 Q 700 535 1020 520 L 1020 545 L 80 545 Z" opacity="0.5"/>
+        </g>
+
+        <!-- Event pins -->
+        <!-- North America cluster — 80 events -->
+        <g class="pin"><circle cx="200" cy="220" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="200" cy="220" r="7" fill="rgba(242,166,35,0.85)" /><text x="218" y="218" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600">NA · 80</text></g>
+        <g class="pin"><circle cx="240" cy="260" r="5" fill="#F2A623"/></g>
+        <g class="pin"><circle cx="180" cy="180" r="4" fill="#F2A623"/></g>
+        <g class="pin"><circle cx="260" cy="240" r="4" fill="#F2A623"/></g>
+
+        <!-- Middle East cluster — 77 events -->
+        <g class="pin"><circle cx="595" cy="245" r="11" fill="none" stroke="rgba(242,166,35,0.55)" stroke-width="0.6"/><circle cx="595" cy="245" r="7" fill="rgba(242,166,35,0.85)"/><text x="610" y="243" fill="rgba(242,166,35,0.85)" font-family="JetBrains Mono" font-size="10" font-weight="600">ME · 77</text></g>
+        <g class="pin"><circle cx="610" cy="265" r="4" fill="#F2A623"/></g>
+        <g class="pin"><circle cx="580" cy="225" r="4" fill="#F2A623"/></g>
+
+        <!-- Europe — 14 events -->
+        <g class="pin"><circle cx="510" cy="200" r="6" fill="rgba(97,215,240,0.85)"/><text x="525" y="200" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10">EU · 14</text></g>
+
+        <!-- Asia Pacific — 10 events -->
+        <g class="pin"><circle cx="740" cy="230" r="5" fill="rgba(97,215,240,0.85)"/><text x="755" y="230" fill="rgba(97,215,240,0.85)" font-family="JetBrains Mono" font-size="10">AP · 10</text></g>
+
+        <!-- Asia — 4 events -->
+        <g class="pin"><circle cx="680" cy="215" r="4" fill="rgba(97,215,240,0.7)"/></g>
+
+        <!-- Africa — 4 events (sparse) -->
+        <g class="pin"><circle cx="520" cy="350" r="3.5" fill="rgba(224,73,104,0.85)"/><text x="535" y="352" fill="rgba(224,73,104,0.85)" font-family="JetBrains Mono" font-size="9">AF · 4</text></g>
+
+        <!-- Oceania — 1 event (sparse) -->
+        <g class="pin"><circle cx="840" cy="400" r="3" fill="rgba(224,73,104,0.8)"/><text x="853" y="402" fill="rgba(224,73,104,0.7)" font-family="JetBrains Mono" font-size="9">OC · 1</text></g>
+
+        <!-- Space band -->
+        <g>
+          <text x="475" y="55" fill="rgba(74,222,128,0.6)" font-family="JetBrains Mono" font-size="9" text-anchor="middle" letter-spacing="0.18em">LEO + ORBIT · 18 EVENTS</text>
+          <g class="pin"><circle cx="475" cy="70" r="4" fill="rgba(74,222,128,0.85)"/></g>
+          <g class="pin"><circle cx="540" cy="74" r="3" fill="rgba(74,222,128,0.7)"/></g>
+          <g class="pin"><circle cx="410" cy="68" r="3" fill="rgba(74,222,128,0.7)"/></g>
+        </g>
+
+        <!-- Center crosshair -->
+        <line x1="475" y1="285" x2="475" y2="295" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
+        <line x1="470" y1="290" x2="480" y2="290" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
+      </svg>
+
+      <div class="gl-ctl">
+        <span class="btn active">EQUIRECTANGULAR</span>
+        <span class="btn">ORTHOGRAPHIC</span>
+        <span class="btn">MERCATOR</span>
+        <span class="meta">ROTATE · ZOOM · TAP A PIN</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Region totals</span><span class="right">EVENTS.json</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>North America</span><span class="ct">80</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>Middle East</span><span class="ct">77</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)"></span>Space / orbit</span><span class="ct">18</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)"></span>Europe</span><span class="ct">14</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--text-3)"></span>Unknown</span><span class="ct">12</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)"></span>Asia-Pacific</span><span class="ct">10</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--cyan)"></span>Asia</span><span class="ct">4</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--rose)"></span>Africa</span><span class="ct cold">4</span></div>
+      <div class="reg-row"><span class="l"><span class="d" style="background:var(--rose)"></span>Oceania</span><span class="ct cold">1</span></div>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-3);letter-spacing:0.06em">Africa and Oceania are <span style="color:var(--rose)">near-empty</span> — likely an archive gap, not a data gap.</div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>
