@@ -210,14 +210,16 @@
 // ── Dossier live-data wiring ──────────────────────────────────────────────
 // Binds the page to window.MC (data.js). Every hardcoded value in the markup
 // above stays as the fallback: we only overwrite a node once real data for it
-// exists, so a fetch failure degrades to the static mockup.
+// exists, so a fetch failure degrades to the static mockup. The subject event
+// is determined by the ?eid=... URL param; if that resolves we render it,
+// otherwise we fall back to a preferred chain (fbi anchor → usper → first w/ neighbors).
 (function () {
   if (!window.MC || !MC.ready) return;
 
-  // Candidate subjects, best first. fbi-62hq83894 is the strongest real anchor
-  // (234 chunks + 10 neighbors + rich entity/shape/behavior/sensor coverage);
-  // usper-2025 is the legacy hardcoded subject and resolves too.
+  // Candidate subjects in priority order after the URL param.
   var PREFERRED = ["fbi-62hq83894", "usper-2025"];
+  var lastRenderedEid = null; // guard against onUpdate flicker
+
   var esc = function (s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -226,37 +228,35 @@
 
   function pickSubject() {
     var events = (MC.derive && MC.derive.events) || [];
-    var sim = (MC.derive && MC.derive.similarity) || {};
     var hasN = function (id) { return MC.neighbors(id, 1).length > 0; };
-    var inEvents = function (id) { return events.some(function (e) { return e.id === id; }); };
-    // 1) preferred ids present in events + similarity graph
+    // 1) URL ?eid=... if it resolves to a real event
+    var qEid = MC.query && MC.query.eid;
+    if (qEid && MC.byEid(qEid)) return qEid;
+    // 2) preferred ids that exist
     for (var i = 0; i < PREFERRED.length; i++) {
-      var id = PREFERRED[i];
-      if (inEvents(id) && hasN(id)) return id;
+      if (MC.byEid(PREFERRED[i])) return PREFERRED[i];
     }
-    // 2) any event that has neighbors
+    // 3) first event with a similarity entry
     for (var j = 0; j < events.length; j++) {
       if (hasN(events[j].id)) return events[j].id;
     }
-    // 3) any event at all, else the legacy default
+    // 4) any event at all, else the legacy default
     return events.length ? events[0].id : "usper-2025";
   }
 
-  // Per-event terms for a pattern kind, sorted by per-event count; falls back
-  // to the global top terms (by total) when the event mentions none.
-  function kindForEvent(kind, eid) {
-    var items = MC.get("patterns.byKind." + kind, []) || [];
-    var hits = items.map(function (e) {
-      var hit = (e.events || []).find(function (x) { return x.eid === eid; });
-      return hit ? { term: e.term, n: hit.count } : null;
-    }).filter(Boolean).sort(function (a, b) { return b.n - a.n; });
-    if (hits.length) return hits;
-    return items.slice()
-      .sort(function (a, b) { return (b.total || 0) - (a.total || 0); })
-      .map(function (e) { return { term: e.term, n: e.total }; });
+  // Map agency → existing .dot class. NASA gets an inline emerald color because
+  // there isn't a dedicated .dot.e class. anchor flag overrides → rose.
+  function agencyDot(rec) {
+    if (!rec) return { cls: "z", style: "" };
+    if (rec.flag === "anchor") return { cls: "r", style: "" };
+    var a = (rec.agency || "").toLowerCase();
+    if (a.indexOf("department of war") >= 0 || a === "dow") return { cls: "a", style: "" };
+    if (a === "fbi") return { cls: "c", style: "" };
+    if (a === "nasa") return { cls: "", style: "background:var(--emerald)" };
+    return { cls: "z", style: "" };
   }
 
-  function renderChips(containerLabel, kind, eid) {
+  function renderChips(containerLabel, kind, rows) {
     // find the .sig-chips that follows the matching .label
     var labels = document.querySelectorAll(".sig-grid .label");
     var target = null;
@@ -266,58 +266,52 @@
       }
     }
     if (!target || !target.classList.contains("sig-chips")) return;
-    var rows = kindForEvent(kind, eid);
-    if (!rows.length) return; // keep fallback chips
+    if (!rows || !rows.length) {
+      target.innerHTML = '<span style="color:var(--text-4);font-size:11px">—</span>';
+      return;
+    }
     target.innerHTML = rows.slice(0, 5).map(function (r) {
       return '<span class="sig-chip ' + kind + '">' + esc(r.term) +
-        ' <span class="v">' + esc(r.n) + '</span></span>';
+        ' <span class="v">' + esc(r.count) + '</span></span>';
     }).join("");
-  }
-
-  function dotClass(cos) {
-    if (cos >= 0.85) return "r";   // rose — very strong
-    if (cos >= 0.70) return "a";   // amber — strong
-    if (cos >= 0.55) return "c";   // cyan — moderate
-    return "z";                    // grey — weak
   }
 
   function render() {
     var events = (MC.derive && MC.derive.events) || [];
     if (!events.length) return; // no data yet → keep full static fallback
     var eid = pickSubject();
-    var rec = events.find(function (e) { return e.id === eid; });
+    var rec = MC.byEid(eid);
+    if (!rec) return; // keep the static fallback content and bail
+    if (eid === lastRenderedEid) return; // no-op on re-fire with same subject
+    lastRenderedEid = eid;
 
     // 1) Header ------------------------------------------------------------
-    if (rec) {
-      var metaRow = document.querySelector(".ds-header .meta-row");
-      if (metaRow) {
-        var anchorPill = metaRow.querySelector(".anchor");
-        if (anchorPill) anchorPill.style.display = (rec.flag === "anchor") ? "" : "none";
-        var idEl = metaRow.querySelector(".id");
-        if (idEl) idEl.textContent = rec.id;
-        // agency is the first plain <span> after the id (markup: id · agency · stamp · date · title)
-        var spans = metaRow.querySelectorAll("span");
-        // spans: [anchor?, id, "·", agency, "·", stamp, "·", date, "·", title]
-        var agencyEl = idEl ? idEl.nextElementSibling && idEl.nextElementSibling.nextElementSibling : null;
-        if (agencyEl && !agencyEl.classList.contains("stamp")) agencyEl.textContent = rec.agency || agencyEl.textContent;
-        var dateEl = metaRow.querySelector(".stamp");
-        // date is the span two after .stamp (stamp · date)
-        if (dateEl) {
-          var afterStamp = dateEl.nextElementSibling && dateEl.nextElementSibling.nextElementSibling;
-          if (afterStamp) afterStamp.textContent = rec.date || afterStamp.textContent;
-          // last span = short descriptor → use the title text
-          var lastSpan = spans[spans.length - 1];
-          if (lastSpan && lastSpan !== afterStamp) lastSpan.textContent = rec.title || lastSpan.textContent;
-        }
+    var metaRow = document.querySelector(".ds-header .meta-row");
+    if (metaRow) {
+      var anchorPill = metaRow.querySelector(".anchor");
+      if (anchorPill) anchorPill.style.display = (rec.flag === "anchor") ? "" : "none";
+      var idEl = metaRow.querySelector(".id");
+      if (idEl) idEl.textContent = String(rec.id || "").toUpperCase();
+      // markup: [anchor?] · id · "·" · agency · "·" · stamp · "·" · date · "·" · descriptor
+      var spans = metaRow.querySelectorAll("span");
+      var agencyEl = idEl ? idEl.nextElementSibling && idEl.nextElementSibling.nextElementSibling : null;
+      if (agencyEl && !agencyEl.classList.contains("stamp")) agencyEl.textContent = rec.agency || agencyEl.textContent;
+      var stampEl = metaRow.querySelector(".stamp");
+      if (stampEl) {
+        var afterStamp = stampEl.nextElementSibling && stampEl.nextElementSibling.nextElementSibling;
+        if (afterStamp) afterStamp.textContent = rec.date || afterStamp.textContent;
+        var lastSpan = spans[spans.length - 1];
+        if (lastSpan && lastSpan !== afterStamp) lastSpan.textContent = rec.title || lastSpan.textContent;
       }
-      var h1 = document.querySelector(".ds-header h1");
-      if (h1 && rec.title) h1.textContent = rec.title;
     }
+    var h1 = document.querySelector(".ds-header h1");
+    if (h1 && rec.title) h1.textContent = rec.title;
 
     // 2) Signatures --------------------------------------------------------
-    renderChips("SHAPE", "shape", eid);
-    renderChips("BEHAVIOR", "behavior", eid);
-    renderChips("SENSOR", "sensor", eid);
+    var sigs = (MC.signaturesForEvent && MC.signaturesForEvent(eid)) || { shape: [], behavior: [], sensor: [] };
+    renderChips("SHAPE", "shape", sigs.shape);
+    renderChips("BEHAVIOR", "behavior", sigs.behavior);
+    renderChips("SENSOR", "sensor", sigs.sensor);
 
     // 3) Entities & dates --------------------------------------------------
     var ents = MC.entitiesForEvent(eid, 8);
@@ -325,7 +319,6 @@
     if (entCol && ents.length) {
       var heading = entCol.querySelector("div");
       var head = heading ? heading.outerHTML : "";
-      // update "(N in event)" label
       head = head.replace(/\(\s*\d+\s+in event\s*\)/i, "(" + ents.length + " in event)");
       entCol.innerHTML = head + ents.map(function (e) {
         return '<div class="ent-row"><span class="name">' + esc(e.term) +
@@ -333,7 +326,8 @@
           '<span class="ct">' + esc(e.count) + '</span></div>';
       }).join("");
     }
-    // header counts: "199 ents · 67 dates"
+    // header counts: "patterns.json · N ents · M dates" (data-mc already covers
+    // entityCount/dateCount where bound, but the dossier header uses literal text)
     var entHdr = document.querySelectorAll(".ds-section .ds-h .r");
     entHdr.forEach(function (el) {
       if (/ents\b/.test(el.textContent) && /dates\b/.test(el.textContent)) {
@@ -349,17 +343,30 @@
       var t = sec.querySelector(".ds-h .t");
       if (t && /SEMANTIC NEIGHBORS/i.test(t.textContent)) nbSection = sec;
     });
-    if (nbSection && neigh.length) {
-      // remove existing static rows, keep the .ds-h header
-      nbSection.querySelectorAll(".nb-row").forEach(function (n) { n.remove(); });
-      var frag = neigh.map(function (nb) {
-        return '<div class="nb-row"><div class="left"><span class="dot ' + dotClass(nb.cos) +
-          '"></span><span class="t">' + esc(nb.eid) + '</span></div>' +
-          '<span class="cos">' + nb.cos.toFixed(2) + '</span></div>';
-      }).join("");
-      nbSection.insertAdjacentHTML("beforeend", frag);
+    if (nbSection) {
+      // strip both existing rows and any prior empty-notice
+      nbSection.querySelectorAll(".nb-row, .nb-empty").forEach(function (n) { n.remove(); });
       var rHdr = nbSection.querySelector(".ds-h .r");
-      if (rHdr) rHdr.textContent = neigh.length + " · event-similarity.json";
+      if (!neigh.length) {
+        nbSection.insertAdjacentHTML(
+          "beforeend",
+          '<div class="nb-empty" style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-4);padding:14px 0;line-height:1.5">no semantic neighbors — outside the 75-event embedding cohort</div>'
+        );
+        if (rHdr) rHdr.textContent = "0 · event-similarity.json";
+      } else {
+        var frag = neigh.map(function (nb) {
+          var nbRec = MC.byEid(nb.eid);
+          var dot = agencyDot(nbRec);
+          var label = (nbRec && nbRec.title) || nb.eid;
+          var href = "dossier.html?eid=" + encodeURIComponent(nb.eid);
+          return '<a class="nb-row" href="' + href + '" style="text-decoration:none;color:inherit"><div class="left">' +
+            '<span class="dot ' + dot.cls + '"' + (dot.style ? ' style="' + dot.style + '"' : '') + '></span>' +
+            '<span class="t">' + esc(label) + '</span></div>' +
+            '<span class="cos">' + nb.cos.toFixed(2) + '</span></a>';
+        }).join("");
+        nbSection.insertAdjacentHTML("beforeend", frag);
+        if (rHdr) rHdr.textContent = neigh.length + " · event-similarity.json";
+      }
     }
   }
 

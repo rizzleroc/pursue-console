@@ -41,15 +41,15 @@
 <main>
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 10 — orbital projection</div>
-    <h1><span id="gl-eventcount">220</span> events plotted by lat/lon. <em>The blank zones tell their own story.</em></h1>
-    <p class="sub">Pins encode region density: hot amber where multiple events cluster, cool cyan for single sightings. Africa and Oceania are nearly empty — archive gap, not data gap. Drag to spin · scroll to zoom · tap any pin to open its dossier.</p>
+    <h1><span id="gl-eventcount">100</span> events plotted by lat/lon. <em>The blank zones tell their own story.</em></h1>
+    <p class="sub"><span id="gl-plotted">100</span> events plotted · <span id="gl-pending">120</span> pending coordinates. Pins encode region density: hot amber where multiple events cluster, cool cyan for single sightings. Africa and Oceania are nearly empty — archive gap, not data gap. Tap any pin to open its dossier.</p>
   </section>
 
   <section class="gl-shell">
     <div class="gl-card">
       <div class="gl-h">
         <div class="t"><div class="icon"></div>WORLD VIEW · ORTHOGRAPHIC</div>
-        <div class="meta">LAT/LON · 220 EVENTS · projection equirectangular</div>
+        <div class="meta">LAT/LON · <span id="gl-meta-count">220</span> EVENTS · projection equirectangular</div>
       </div>
 
       <svg class="globe-svg" viewBox="0 0 1100 580" xmlns="http://www.w3.org/2000/svg">
@@ -132,6 +132,9 @@
           <g class="pin"><circle cx="410" cy="68" r="3" fill="rgba(74,222,128,0.7)"/></g>
         </g>
 
+        <!-- Per-event pins (populated by JS from MC.derive.events) -->
+        <g id="event-pins"></g>
+
         <!-- Center crosshair -->
         <line x1="475" y1="285" x2="475" y2="295" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
         <line x1="470" y1="290" x2="480" y2="290" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
@@ -213,6 +216,84 @@
       }
     }
 
+    // Per-event pin colour by region.
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var XLINK_NS = 'http://www.w3.org/1999/xlink';
+    var REGION_FILL = {
+      'North America': 'rgba(242,166,35,0.85)',
+      'Middle East':   'rgba(242,166,35,0.85)',
+      'Europe':        'rgba(97,215,240,0.85)',
+      'Asia-Pacific':  'rgba(97,215,240,0.85)',
+      'Asia':          'rgba(97,215,240,0.85)',
+      'Space':         'rgba(74,222,128,0.85)',
+      'Africa':        'rgba(224,73,104,0.85)',
+      'Oceania':       'rgba(224,73,104,0.85)',
+      'Unknown':       'rgba(184,168,135,0.55)'
+    };
+
+    function project(lat, lng) {
+      var x = 80 + ((lng + 180) / 360) * 940;
+      var y = 290 - (lat / 90) * 250;
+      if (x < 80)   x = 80;
+      if (x > 1020) x = 1020;
+      if (y < 40)   y = 40;
+      if (y > 540)  y = 540;
+      return [x, y];
+    }
+
+    function renderEventPins(events) {
+      var host = document.getElementById('event-pins');
+      if (!host || !events) return 0;
+      // Clear any previously-rendered pins (idempotent under MC.onUpdate).
+      while (host.firstChild) host.removeChild(host.firstChild);
+      var plotted = 0;
+      var dossier = (window.MC && window.MC.url && window.MC.url.dossier) || function (id) { return 'dossier.html?eid=' + encodeURIComponent(id); };
+      for (var i = 0; i < events.length; i++) {
+        var ev = events[i];
+        var c = ev.coords || [0, 0];
+        if (c[0] === 0 && c[1] === 0) continue;
+        var xy = project(c[0], c[1]);
+        var region = ev.region || 'Unknown';
+        var fill = REGION_FILL[region] || REGION_FILL['Unknown'];
+        var isAnchor = ev.flag === 'anchor';
+
+        var a = document.createElementNS(SVG_NS, 'a');
+        a.setAttributeNS(XLINK_NS, 'href', dossier(ev.id));
+        a.setAttribute('href', dossier(ev.id));
+
+        if (isAnchor) {
+          var ring = document.createElementNS(SVG_NS, 'circle');
+          ring.setAttribute('cx', xy[0]);
+          ring.setAttribute('cy', xy[1]);
+          ring.setAttribute('r', 9);
+          ring.setAttribute('fill', 'none');
+          ring.setAttribute('stroke', fill);
+          ring.setAttribute('stroke-width', 0.6);
+          ring.setAttribute('opacity', 0.55);
+          a.appendChild(ring);
+        }
+
+        var dot = document.createElementNS(SVG_NS, 'circle');
+        dot.setAttribute('cx', xy[0]);
+        dot.setAttribute('cy', xy[1]);
+        dot.setAttribute('r', isAnchor ? 5 : 3);
+        dot.setAttribute('fill', fill);
+
+        var title = document.createElementNS(SVG_NS, 'title');
+        title.textContent = (ev.title || ev.id) + ' · ' + region;
+        a.appendChild(title);
+        a.appendChild(dot);
+        host.appendChild(a);
+        plotted++;
+      }
+      return plotted;
+    }
+
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
     function renderFromMC() {
       var D = window.MC && window.MC.derive;
       if (!D) return false;
@@ -220,10 +301,16 @@
         renderRegions(D.byRegion);
         renderPins(D.byRegion);
       }
-      if (D.eventCount != null) {
-        var ec = document.getElementById('gl-eventcount');
-        if (ec) ec.textContent = D.eventCount;
+      var total = (D.eventCount != null) ? D.eventCount : (D.events ? D.events.length : 0);
+      if (D.events && D.events.length) {
+        var plotted = renderEventPins(D.events);
+        setText('gl-eventcount', plotted);
+        setText('gl-plotted', plotted);
+        setText('gl-pending', Math.max(0, total - plotted));
+      } else if (D.eventCount != null) {
+        setText('gl-eventcount', D.eventCount);
       }
+      if (total) setText('gl-meta-count', total);
       return true;
     }
 
