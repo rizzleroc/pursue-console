@@ -129,23 +129,37 @@
   // Count-up helper. Targets come from the static data-count attribute by
   // default; if the element also carries data-mc-count="<deriveKey>", the
   // LIVE value from the data layer overrides it once MC is ready.
+  // Uses setTimeout rather than requestAnimationFrame: rAF is throttled to
+  // ~0 fps in headless / non-visible / accessibility contexts, leaving the
+  // cells stuck on their fallback. setTimeout fires reliably everywhere.
   function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  const FRAME_MS = 33; // ~30fps; perceptually identical to rAF for short animations
+  const DUR_MS = 1500;
+  function animateOne(elx) {
+    let target = parseFloat(elx.dataset.count);
+    const liveKey = elx.dataset.mcCount;
+    if (liveKey && window.MC && window.MC.derive && window.MC.derive[liveKey] != null) {
+      const lv = window.MC.derive[liveKey];
+      if (typeof lv === 'number' && isFinite(lv)) target = lv;
+    }
+    if (!isFinite(target)) return;
+    // Mark so we don't re-animate from 0 every time MC revalidates — write
+    // the target value directly on subsequent passes.
+    if (elx._mcAnimated) {
+      elx.textContent = Math.round(target).toLocaleString();
+      return;
+    }
+    elx._mcAnimated = true;
+    const start = Date.now();
+    (function step() {
+      const elapsed = Date.now() - start;
+      const t = Math.min(1, elapsed / DUR_MS);
+      elx.textContent = Math.round(target * easeOut(t)).toLocaleString();
+      if (t < 1) setTimeout(step, FRAME_MS);
+    })();
+  }
   function runCountUp() {
-    document.querySelectorAll('[data-count]').forEach(elx => {
-      let target = parseFloat(elx.dataset.count);
-      const liveKey = elx.dataset.mcCount;
-      if (liveKey && window.MC && window.MC.derive && window.MC.derive[liveKey] != null) {
-        const lv = window.MC.derive[liveKey];
-        if (typeof lv === 'number' && isFinite(lv)) target = lv;
-      }
-      const start = performance.now();
-      function frame(now) {
-        const t = Math.min(1, (now - start) / 1500);
-        elx.textContent = Math.round(target * easeOut(t)).toLocaleString();
-        if (t < 1) requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
-    });
+    document.querySelectorAll('[data-count]').forEach(animateOne);
   }
 
   // Live review badge from the data layer
@@ -158,11 +172,12 @@
   }
 
   if (window.MC && typeof window.MC.ready === 'function') {
-    // Live data present — run count-up against real targets once loaded.
+    // Live data present — animate count-up to LIVE targets once MC is ready,
+    // and re-sync (without re-animating) on every revalidation.
     window.MC.ready().then(() => { runCountUp(); updateReviewBadge(); });
-    window.MC.onUpdate(() => { updateReviewBadge(); });
-    // If MC is slow, still animate the static fallbacks after 1.2s.
-    setTimeout(() => { if (!window.MC._loaded) runCountUp(); }, 1200);
+    window.MC.onUpdate(() => { runCountUp(); updateReviewBadge(); });
+    // Fallback if MC stays slow: still animate the static data-count targets.
+    setTimeout(() => { if (!window.MC._loaded) runCountUp(); }, 1500);
   } else {
     setTimeout(runCountUp, 600);
   }
