@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Ask</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .ask-shell { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 24px; position: relative; z-index: 3; }
+    .ask-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .mode-pill-row { display: flex; gap: 10px; margin-bottom: 22px; }
+    .mp { padding: 10px 16px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; }
+    .mp.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
+    .mp .badge { background: rgba(74,222,128,0.10); border: 1px solid rgba(74,222,128,0.4); color: var(--emerald); padding: 1px 6px; margin-left: 8px; font-size: 9px; }
+    .ask-input { display: flex; flex-direction: column; gap: 12px; background: var(--surface-3); border: 1px solid var(--border-strong); padding: 22px; }
+    .ask-input textarea { background: transparent; border: none; outline: none; color: var(--text); font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; resize: vertical; min-height: 88px; }
+    .ask-input textarea::placeholder { color: var(--text-4); }
+    .ask-input-row { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+    .ask-input-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; flex: 1; }
+    .ask-input-row .meta .v { color: var(--amber); }
+    .ask-input-row .send { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); padding: 10px 22px; cursor: pointer; }
+    .qa { margin-top: 32px; }
+    .q { display: flex; align-items: flex-start; gap: 14px; padding: 22px 0 16px; border-bottom: 1px solid var(--hairline); }
+    .q .avatar { width: 32px; height: 32px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-2); flex-shrink: 0; }
+    .q .avatar.user { background: rgba(97,215,240,0.10); border-color: rgba(97,215,240,0.4); color: var(--cyan); }
+    .q .avatar.ai { background: rgba(242,166,35,0.10); border-color: var(--border-strong); color: var(--amber); }
+    .q .body { flex: 1; }
+    .q .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.14em; margin-bottom: 8px; }
+    .q .body p { font-size: 15px; line-height: 1.65; color: var(--text-2); margin: 0 0 12px; }
+    .q .body p strong { color: var(--text); font-weight: 600; }
+    .q .body p em { color: var(--text); font-style: normal; font-weight: 500; background: rgba(242,166,35,0.06); padding: 0 4px; }
+    .cite { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--cyan); background: rgba(97,215,240,0.10); border: 1px solid rgba(97,215,240,0.30); padding: 1px 6px; margin: 0 3px; vertical-align: super; }
+    .src-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+    .src { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); }
+    .src .n { color: var(--cyan); font-weight: 600; }
+    .src .title { color: var(--text-2); }
+    .src .pg { color: var(--text-4); }
+    .suggest { padding: 0; }
+    .suggest h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; margin: 0 0 14px; }
+    .suggest .sg { display: block; padding: 12px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: color .15s; color: var(--text-2); text-decoration: none; }
+    .suggest .sg:hover { color: var(--text); }
+    .suggest .sg:last-child { border-bottom: none; }
+    .suggest .sg .q-text { font-size: 13px; line-height: 1.45; }
+    .suggest .sg .q-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; margin-top: 4px; }
+  </style>
+</head>
+<body data-view="ask">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 04 — natural-language Q&A</div>
+    <h1>Ask the corpus a question, <em>get a cited answer.</em></h1>
+    <p class="sub">SMART mode runs a RAG pipeline against the 5,665-chunk semantic index and a frontier LLM. PATTERN mode falls back to a local classifier when the LLM backend is offline.</p>
+  </section>
+
+  <section class="ask-shell">
+    <div class="ask-card">
+
+      <div class="mode-pill-row">
+        <span class="mp active">∿ SMART <span class="badge">RAG + LLM</span></span>
+        <span class="mp">▣ PATTERN <span style="background:rgba(184,168,135,0.10);border:1px solid var(--border);color:var(--text-3);padding:1px 6px;margin-left:8px;font-size:9px">LOCAL</span></span>
+      </div>
+
+      <div class="ask-input">
+        <textarea placeholder="Ask anything about the corpus — events, entities, sources, dates, patterns…">What does the corpus suggest about helicopter encounters with orbs at low altitude?</textarea>
+        <div class="ask-input-row">
+          <span class="meta">SOURCE · <span class="v">3,530 pages · 5,665 chunks · 220 events</span></span>
+          <button class="send">▶ INVESTIGATE</button>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="q">
+          <div class="avatar user">YOU</div>
+          <div class="body">
+            <div class="meta">02·06 · 17:21 UTC · SMART · WEB</div>
+            <p>What does the corpus suggest about helicopter encounters with orbs at low altitude?</p>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="avatar ai">▣</div>
+          <div class="body">
+            <div class="meta">02·06 · 17:21:14 UTC · SMART · CLAUDE-3.7 · 4 SOURCES</div>
+            <p>The corpus contains one anchor event matching this profile: a late-2025 FBI 302 statement from a senior US intelligence official aboard a search helicopter at a US military facility <span class="cite">[1]</span>. The narrative describes an <em>LP/OP-tracked orb</em> that "gained elevation, came within ten feet of [the helicopter]" before separating into a swarm of orbs in triangle formation that "moved in all directions" <span class="cite">[2]</span>.</p>
+            <p>Adjacent DoW mission reports show similar low-altitude small-object encounters but in fixed-wing contexts: <strong>UAE June 2024</strong> records an object flying straight at 140 knots over water at the same general altitude band as a returning aircraft <span class="cite">[3]</span>. The <strong>Western US 2023</strong> dossier provides a complementary ground-witness account of a "Large, Fiery Orb" at ~500–600m observed by federal law-enforcement agents <span class="cite">[4]</span>.</p>
+            <p>The corpus does not contain a second helicopter-vs-orb event matching the USPER profile. <span style="color:var(--text-3)">Confidence: 0.86 · Caveat: 46% of catalogued events lack body text.</span></p>
+
+            <div class="src-list">
+              <div class="src"><span class="n">[1]</span><span class="title">USPER Statement · Senior USIC Official · helicopter encounter, US military facility</span><span class="pg">FBI · p1</span></div>
+              <div class="src"><span class="n">[2]</span><span class="title">USPER Statement · "swarm of lights in triangle formation"</span><span class="pg">FBI · p3</span></div>
+              <div class="src"><span class="n">[3]</span><span class="title">UAE June 2024 mission report · 140kt at low altitude over water</span><span class="pg">DoW · p6</span></div>
+              <div class="src"><span class="n">[4]</span><span class="title">Western US 2023 · "Large, Fiery Orb" at 500–600m, dusk</span><span class="pg">DoW · p2</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Suggested queries</span><span class="right">community curated</span></div>
+      <div class="suggest">
+        <a class="sg"><div class="q-text">Which events involve multiple USIC witnesses?</div><div class="q-meta">3 hits in corpus</div></a>
+        <a class="sg"><div class="q-text">Sightings classified as "orb" near military facilities, 2020–2025?</div><div class="q-meta">7 hits</div></a>
+        <a class="sg"><div class="q-text">List USCENTCOM events with FLIR sensor readouts</div><div class="q-meta">12 hits</div></a>
+        <a class="sg"><div class="q-text">Which 1947 documents mention "Roswell"?</div><div class="q-meta">FBI 62HQ section 2 + 5</div></a>
+        <a class="sg"><div class="q-text">Compare Gemini VII bogey vs Apollo 17 debrief language</div><div class="q-meta">cross-event analysis</div></a>
+        <a class="sg"><div class="q-text">What patterns dominate the 2020s cohort?</div><div class="q-meta">light / hover / vertical</div></a>
+        <a class="sg"><div class="q-text">List events that have signature "split" or "swarm"</div><div class="q-meta">3 hits</div></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+<script>
+  document.querySelectorAll('.mp').forEach(m => m.addEventListener('click', () => {
+    document.querySelectorAll('.mp').forEach(x => x.classList.remove('active'));
+    m.classList.add('active');
+  }));
+</script>
+</body>
+</html>

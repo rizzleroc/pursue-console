@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Timeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .tl-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .tl-band { background: var(--surface); border: 1px solid var(--border); padding: 22px 26px; backdrop-filter: blur(10px); margin-bottom: 26px; }
+    .tl-band h2 { display: flex; align-items: baseline; gap: 18px; margin: 0 0 6px; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+    .tl-band h2 .era { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 0.24em; padding: 4px 10px; border: 1px solid var(--border-strong); background: rgba(242,166,35,0.08); font-weight: 600; }
+    .tl-band h2 .ct { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); letter-spacing: 0.16em; font-weight: 400; }
+    .tl-band .ct .v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; }
+    .tl-density { height: 4px; background: var(--hairline); margin: 16px 0 20px; }
+    .tl-density .fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 8px var(--amber-glow); }
+    .tl-events { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .evt { background: var(--surface-2); border: 1px solid var(--hairline); padding: 12px 14px; transition: all .15s; cursor: pointer; }
+    .evt:hover { border-color: var(--amber); transform: translateY(-2px); }
+    .evt .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.12em; text-transform: uppercase; }
+    .evt .dot { width: 7px; height: 7px; }
+    .evt .dot.dow { background: var(--amber); }
+    .evt .dot.fbi { background: var(--cyan); }
+    .evt .dot.nasa { background: var(--emerald); }
+    .evt .dot.state { background: var(--rose); }
+    .evt .dot.cia { background: #B280FF; }
+    .evt .dot.odni { background: #FFD93D; }
+    .evt .dot.energy { background: #F472B6; }
+    .evt .date { color: var(--amber); }
+    .evt .ttl { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); line-height: 1.35; }
+    .evt .agn { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-3); margin-top: 4px; letter-spacing: 0.08em; }
+    .legend-row { display: flex; flex-wrap: wrap; gap: 14px; padding: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; }
+    .legend-row .a { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-row .a .d { width: 8px; height: 8px; display: inline-block; }
+  </style>
+</head>
+<body data-view="timeline">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 08 — chronological strip</div>
+    <h1>220 events by decade, <em>1940s through 2020s.</em></h1>
+    <p class="sub">Each band is one decade. Event density per band shown as the gold fill. Color of the dot encodes the originating agency.</p>
+  </section>
+
+  <section class="tl-shell">
+    <div class="legend-row">
+      <span class="a"><span class="d" style="background:var(--amber)"></span>DEPT OF WAR · 158</span>
+      <span class="a"><span class="d" style="background:var(--cyan)"></span>FBI · 26</span>
+      <span class="a"><span class="d" style="background:var(--emerald)"></span>NASA · 22</span>
+      <span class="a"><span class="d" style="background:var(--rose)"></span>STATE · 7</span>
+      <span class="a"><span class="d" style="background:#F472B6"></span>ENERGY · 3</span>
+      <span class="a"><span class="d" style="background:#B280FF"></span>CIA · 1</span>
+      <span class="a"><span class="d" style="background:#FFD93D"></span>ODNI · 1</span>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">2020s</span>Modern military encounters<span class="ct"><span class="v">86</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:100%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">2025-10</span></div><div class="ttl">USPER Statement · helicopter encounter</div><div class="agn">FBI · SECRET//NOFORN</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2024-06</span></div><div class="ttl">UAE June 2024 mission report</div><div class="agn">DoW · USCENTCOM · MISREP</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2023-10</span></div><div class="ttl">Greece mission report</div><div class="agn">DoW · 56 SOIS</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2023</span></div><div class="ttl">Western US — orange orb · USPER witnesses</div><div class="agn">DoW · 3 USPERs</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2022-05</span></div><div class="ttl">Iraq mission report (D12)</div><div class="agn">DoW · 27 SOW</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-05</span></div><div class="ttl">Middle East erratic white object</div><div class="agn">DoW · Range Fouler (PR-36)</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-03</span></div><div class="ttl">Southern US Air Force sighting (PR-45)</div><div class="agn">DoW · targeting pod</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-07</span></div><div class="ttl">Persian Gulf July 2020 (D65)</div><div class="agn">DoW · MISREP</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">2000s</span>Vandenberg, Apollo follow-up<span class="ct"><span class="v">8</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:18%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2000-02</span></div><div class="ttl">Vandenberg Launch Summary 1958–2000</div><div class="agn">DoW · D49 · 113pp</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2004-11</span></div><div class="ttl">Tic-Tac · Nimitz fleet</div><div class="agn">DoW · F/A-18 IR</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1990s</span>Air Force technical analysis<span class="ct"><span class="v">2</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:6%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1996-09</span></div><div class="ttl">Air Force Report · Modeling Booster Failures</div><div class="agn">DoW · D48 · RTI · 181pp</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1970s</span>Apollo crew debriefings<span class="ct"><span class="v">8</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:14%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1973-12</span></div><div class="ttl">Apollo 17 crew debriefing for science</div><div class="agn">NASA · 5pp</div></div>
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1973-12</span></div><div class="ttl">Apollo 17 technical crew debriefing</div><div class="agn">NASA · 2pp</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1960s</span>Gemini · Apollo · Project Blue Book<span class="ct"><span class="v">15</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:24%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1965-12-05</span></div><div class="ttl">Gemini VII · Borman &amp; Lovell "Bogey"</div><div class="agn">NASA · debris field of trillions</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1940s</span>Foundational case files<span class="ct"><span class="v">7</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:12%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">1947</span></div><div class="ttl">FBI Flying Discs Case File · 62HQ-83894 · §2</div><div class="agn">FBI · Roswell-era reports</div></div>
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">1947</span></div><div class="ttl">FBI Flying Discs Case File · §5</div><div class="agn">FBI · regional sightings</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1948-11</span></div><div class="ttl">Netherlands USAFE TT-1524 dispatch</div><div class="agn">DoW · USAFE · To Gen Cabell</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1949</span></div><div class="ttl">Project Sign · "1949 discs"</div><div class="agn">DoW · radar scope</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

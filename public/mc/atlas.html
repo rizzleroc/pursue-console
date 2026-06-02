@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .at-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .at-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .at-grid { display: grid; grid-template-columns: 160px repeat(8, 1fr); gap: 4px; }
+    .at-grid .corner-cell, .at-grid .col-h, .at-grid .row-h, .at-grid .cell { padding: 14px 10px; }
+    .at-grid .col-h { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; text-align: center; padding-bottom: 8px; }
+    .at-grid .row-h { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); letter-spacing: 0.14em; text-transform: uppercase; padding-right: 14px; text-align: right; align-self: center; }
+    .at-grid .cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all .15s; cursor: pointer; position: relative; border: 1px solid #1A2638; }
+    .at-grid .cell:hover { transform: scale(1.05); z-index: 2; border-color: var(--amber); }
+    .at-grid .cell .v { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); line-height: 1; }
+    .at-grid .cell .pct { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-4); letter-spacing: 0.08em; }
+    .at-grid .cell.h0 { background: #0A1018; }
+    .at-grid .cell.h1 { background: rgba(242,166,35,0.08); border-color: rgba(242,166,35,0.18); }
+    .at-grid .cell.h2 { background: rgba(242,166,35,0.18); border-color: rgba(242,166,35,0.30); }
+    .at-grid .cell.h3 { background: rgba(242,166,35,0.35); border-color: rgba(242,166,35,0.55); }
+    .at-grid .cell.h4 { background: rgba(242,166,35,0.55); border-color: var(--amber); box-shadow: 0 0 16px rgba(242,166,35,0.4); }
+    .at-grid .cell.h5 { background: rgba(242,166,35,0.75); border-color: var(--amber-bright); box-shadow: 0 0 22px rgba(242,166,35,0.55); }
+    .at-grid .cell.h5 .v { color: var(--void); }
+    .at-grid .cell.h4 .v { color: var(--void); }
+    .at-grid .cell .v.zero { color: var(--text-4); }
+    .at-summary { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--hairline); display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .at-summary .s { padding-left: 18px; border-left: 1px solid var(--hairline); }
+    .at-summary .s:first-child { padding-left: 0; border-left: none; }
+    .at-summary .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; }
+    .at-summary .v { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--text); margin: 6px 0 2px; letter-spacing: -0.025em; }
+    .at-summary .v.amber { color: var(--amber); text-shadow: 0 0 16px var(--amber-glow); }
+    .at-summary .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; }
+    .at-legend { display: flex; align-items: center; gap: 12px; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.14em; text-transform: uppercase; }
+    .at-legend .swatch { width: 22px; height: 12px; display: inline-block; }
+  </style>
+</head>
+<body data-view="atlas">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 09 — agency × era heatmap</div>
+    <h1>Where the corpus lives. <em>And where it doesn't.</em></h1>
+    <p class="sub">Eight agencies, eight eras. The hot cells dominate the corpus story; the cold cells are where contributors are most needed. Click any cell to drill into the events that anchor that cohort.</p>
+  </section>
+
+  <section class="at-shell">
+    <div class="at-card">
+      <div class="at-legend">
+        <span>DENSITY</span>
+        <span class="swatch" style="background:#0A1018;border:1px solid #1A2638"></span><span>0</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.08);border:1px solid rgba(242,166,35,0.18)"></span><span>1–2</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.18)"></span><span>3–8</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.35)"></span><span>9–20</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.55)"></span><span>21–50</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.75)"></span><span>51+</span>
+        <span style="margin-left:auto">220 EVENTS · 8 AGENCIES · 8 ERAS</span>
+      </div>
+
+      <div class="at-grid">
+        <div class="corner-cell"></div>
+        <div class="col-h">1940s</div>
+        <div class="col-h">1950s</div>
+        <div class="col-h">1960s</div>
+        <div class="col-h">1970s</div>
+        <div class="col-h">1980s</div>
+        <div class="col-h">1990s</div>
+        <div class="col-h">2000s</div>
+        <div class="col-h">2020s</div>
+
+        <div class="row-h">DEPT/WAR</div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">14%</span></div>
+        <div class="cell h2"><span class="v">2</span><span class="pct">9%</span></div>
+        <div class="cell h2"><span class="v">4</span><span class="pct">18%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">2</span><span class="pct">9%</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">14%</span></div>
+        <div class="cell h5"><span class="v">144</span><span class="pct">91%</span></div>
+
+        <div class="row-h">FBI</div>
+        <div class="cell h3"><span class="v">11</span><span class="pct">42%</span></div>
+        <div class="cell h2"><span class="v">5</span><span class="pct">19%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">8%</span></div>
+        <div class="cell h2"><span class="v">8</span><span class="pct">31%</span></div>
+
+        <div class="row-h">NASA</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h3"><span class="v">12</span><span class="pct">55%</span></div>
+        <div class="cell h2"><span class="v">8</span><span class="pct">36%</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">5%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">5%</span></div>
+
+        <div class="row-h">STATE</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">29%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">29%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">43%</span></div>
+
+        <div class="row-h">ENERGY</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">100%</span></div>
+
+        <div class="row-h">CIA</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">100%</span></div>
+
+        <div class="row-h">ODNI</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">100%</span></div>
+
+        <div class="row-h">UNKNOWN</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">12</span><span class="pct">100%</span></div>
+      </div>
+
+      <div class="at-summary">
+        <div class="s"><div class="k">Dominant cohort</div><div class="v amber">DoW · 2020s</div><div class="sub">144 events · 65% of corpus</div></div>
+        <div class="s"><div class="k">Secondary cluster</div><div class="v">FBI · 1940s</div><div class="sub">11 events · 5% of corpus</div></div>
+        <div class="s"><div class="k">Cold cells</div><div class="v">42</div><div class="sub">of 64 grid positions empty</div></div>
+        <div class="s"><div class="k">Cross-era agencies</div><div class="v">3</div><div class="sub">DoW · NASA · FBI</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

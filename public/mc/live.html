@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .hero { padding: 64px 56px 48px; display: grid; grid-template-columns: minmax(0,1fr) 720px; gap: 56px; align-items: start; position: relative; z-index: 4; }
+    .hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 64px; font-weight: 700; line-height: 1.04; color: var(--text); letter-spacing: -0.028em; margin: 24px 0; max-width: 700px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 17px; line-height: 1.6; color: var(--text-2); max-width: 580px; }
+    .eyebrow { display: flex; align-items: center; gap: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--amber); letter-spacing: 0.32em; text-transform: uppercase; }
+    .eyebrow .div { width: 32px; height: 1px; background: var(--amber); opacity: 0.6; }
+
+    .ms { margin-top: 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); background: var(--surface); max-width: 720px; }
+    .ms .cell { padding: 20px 22px; border-right: 1px solid var(--hairline); }
+    .ms .cell:last-child { border-right: none; }
+    .ms .k { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.28em; color: var(--text-3); text-transform: uppercase; margin-bottom: 8px; }
+    .ms .v { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 600; color: var(--text); line-height: 1; }
+    .ms .v.amber { color: var(--amber); text-shadow: 0 0 18px var(--amber-glow); }
+    .ms .v.rose { color: var(--rose); }
+    .ms .v.cyan { color: var(--cyan); }
+    .ms .v .small { font-size: 16px; color: var(--text-3); margin-left: 3px; }
+    .ms .sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.18em; margin-top: 4px; }
+
+    .cta-row { margin-top: 36px; display: flex; align-items: center; gap: 28px; }
+    .cta-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); border-left: 1px solid var(--border); padding-left: 22px; line-height: 1.7; }
+    .cta-meta .ping { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); margin-right: 7px; box-shadow: 0 0 8px var(--amber-glow); animation: pulse-soft 2.4s ease-in-out infinite; vertical-align: middle; transform: translateY(-1px); }
+    .cta-meta .v { color: var(--text); font-weight: 600; }
+
+    .ops-panel { position: relative; background: var(--surface); border: 1px solid var(--border); padding: 26px 28px; backdrop-filter: blur(14px); overflow: hidden; }
+    .ops-panel::before { content:''; position:absolute; left:0; right:0; top:0; height:2px; background: linear-gradient(90deg, transparent, var(--amber), transparent); box-shadow: 0 0 18px var(--amber-glow); animation: opscan 6s linear infinite; }
+    @keyframes opscan { 0%{transform:translateY(0);opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{transform:translateY(700px);opacity:0} }
+    .ops-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--hairline); }
+    .ops-head .title { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.3em; color: var(--text); text-transform: uppercase; }
+    .ops-head .icon { width: 16px; height: 16px; border: 1px solid var(--amber); transform: rotate(45deg); position: relative; }
+    .ops-head .icon::before { content:''; position: absolute; inset: 4px; background: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
+    .ops-head .left { display: flex; align-items: center; gap: 12px; }
+    .ops-head .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-3); }
+    .ops-head .sub .v { color: var(--amber); }
+
+    .rd-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 26px; margin-bottom: 24px; align-items: start; }
+    .rd-stack { display: flex; flex-direction: column; gap: 12px; }
+    .rd-row { display: flex; align-items: baseline; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; }
+    .rd-row:last-child { border-bottom: none; }
+    .rd-row .k { font-size: 9px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; flex: 1; }
+    .rd-row .v { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; color: var(--text); }
+    .rd-row .v.amber { color: var(--amber); }
+    .rd-row .v.rose { color: var(--rose); }
+    .rd-row .v.emerald { color: var(--emerald); }
+    .rd-row .v.cyan { color: var(--cyan); }
+    .rd-row .pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); width: 46px; text-align: right; }
+
+    .sweep-g { transform-origin: 140px 140px; animation: sweep 5s linear infinite; }
+    @keyframes sweep { to { transform: rotate(360deg); } }
+    .ping-pulse { animation: ping-pulse 2.4s ease-in-out infinite; }
+    @keyframes ping-pulse { 0%,100%{opacity:0.55} 50%{opacity:1} }
+
+    .cw-titlerow { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+    .cw-titlerow .left { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.26em; color: var(--text-2); text-transform: uppercase; }
+    .cw-titlerow .left .accent { color: var(--amber); }
+    .cw-titlerow .right { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--text-4); }
+    .cw-legend { margin-top: 14px; display: flex; gap: 22px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; }
+    .cw-legend .sw { width: 9px; height: 9px; display: inline-block; margin-right: 7px; vertical-align: middle; transform: translateY(-1px); }
+    .cw-legend .lbl { color: var(--text-3); }
+    .cw-legend .v { color: var(--text); margin-left: 5px; font-weight: 700; }
+
+    .body3 { padding: 0 56px 64px; display: grid; grid-template-columns: 340px minmax(0,1fr) 360px; gap: 22px; position: relative; z-index: 3; }
+    .stack { display: flex; flex-direction: column; gap: 22px; }
+    .histo { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+    .histo div { flex: 1; background: linear-gradient(180deg, var(--amber-bright), rgba(242, 166, 35, 0.20)); box-shadow: 0 0 6px rgba(242,166,35,0.30); }
+    .histo-axis { margin-top: 12px; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.18em; }
+    .ch-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .ch-row:last-child { border-bottom: none; }
+    .ch-row .name { color: var(--text-2); letter-spacing: 0.10em; }
+    .ch-row .rate { color: var(--text-3); }
+    .ch-row .rate.v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; }
+
+    .signals-filter { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1px solid var(--hairline); }
+    .refresh { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.18em; cursor: pointer; }
+    .signal { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+    .signal:last-child { border-bottom: none; }
+    .signal-meta { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); margin-bottom: 10px; letter-spacing: 0.10em; }
+    .signal-meta .tag { background: rgba(242, 166, 35, 0.08); border: 1px solid var(--border-strong); color: var(--amber); padding: 2px 8px; font-size: 9px; letter-spacing: 0.16em; font-weight: 600; }
+    .signal-meta .eid { color: var(--text); font-weight: 600; }
+    .signal-quote { font-size: 14px; line-height: 1.65; color: var(--text-2); max-width: 760px; }
+    .signal-quote em { color: var(--text); font-style: normal; font-weight: 500; background: rgba(242, 166, 35, 0.08); padding: 0 4px; }
+    .signal-quote .redacted { background: var(--text-4); color: var(--text-4); padding: 0 6px; border-radius: 1px; }
+
+    .help-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid var(--hairline); }
+    .help-row:last-child { border-bottom: none; }
+    .help-row .eid { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); font-weight: 500; }
+    .help-row .pp { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); margin-left: 10px; }
+    .claim { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.20em; font-weight: 700; color: var(--amber); background: rgba(242, 166, 35, 0.10); border: 1px solid var(--border-strong); padding: 6px 14px; cursor: pointer; }
+
+    .entity-row { display: grid; grid-template-columns: 1fr auto auto; align-items: baseline; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding-bottom: 11px; }
+    .entity-row .name { color: var(--text-2); letter-spacing: 0.06em; }
+    .entity-row .meter { width: 70px; height: 3px; background: rgba(242, 166, 35, 0.10); }
+    .entity-row .meter span { display: block; height: 100%; background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
+    .entity-row .count { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; min-width: 50px; text-align: right; }
+  </style>
+</head>
+<body data-view="live">
+
+<main>
+  <section class="hero">
+    <div class="hero-left">
+      <div class="eyebrow"><span class="div"></span>Dept. of War · Declassified UAP · Release 01–02<span class="code" style="color:var(--text-3)">// 2026·05·08 → 2026·06·22</span></div>
+      <h1>The archive of what the Department of War released — <em>and what's still dark.</em></h1>
+      <p>Community-run. Every page transcribed in the open, catalogued event by event. Pages stream in as machine + volunteer transcriptions land — the gap is the mission.</p>
+      <div class="ms">
+        <div class="cell"><div class="k">Catalogued</div><div class="v"><span data-count="121">0</span><span class="small">/ 162</span></div><div class="sub">R01 inventory</div></div>
+        <div class="cell"><div class="k">Complete</div><div class="v amber" data-count="1">0</div><div class="sub">of 121 events</div></div>
+        <div class="cell"><div class="k">Awaiting</div><div class="v rose"><span data-count="46">0</span>%</div><div class="sub">no body text</div></div>
+        <div class="cell"><div class="k">R02 Intake</div><div class="v cyan"><span data-count="7">0</span><span class="small">/ 64</span></div><div class="sub">partial-mirror</div></div>
+      </div>
+      <div class="cta-row">
+        <a class="primary-cta" href="review.html">Open the next missing page <span>→</span></a>
+        <div class="cta-meta">
+          <div><span class="ping"></span>No account needed</div>
+          <div><span class="v">8</span> transcribers online · queue from <span style="color:var(--amber)">next-missing.json</span></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="ops-panel">
+      <div class="ops-head">
+        <div class="left">
+          <div class="icon"></div>
+          <div>
+            <div class="title">TACTICAL OVERVIEW</div>
+            <div class="sub">coverage.json · <span class="v">live</span></div>
+          </div>
+        </div>
+        <div class="sub">121 events</div>
+      </div>
+
+      <div class="rd-wrap">
+        <svg viewBox="0 0 280 280" width="280" height="280">
+          <defs>
+            <radialGradient id="sg"><stop offset="0%" stop-color="rgba(242,166,35,0.45)"/><stop offset="100%" stop-color="rgba(242,166,35,0)"/></radialGradient>
+          </defs>
+          <circle cx="140" cy="140" r="130" fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="95"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="58"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="22"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <line x1="140" y1="8"  x2="140" y2="272" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
+          <line x1="8"  y1="140" x2="272" y2="140" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
+          <g class="sweep-g"><path d="M140 140 L270 140 A130 130 0 0 1 200 240 Z" fill="url(#sg)" stroke="rgba(242,166,35,0.55)" stroke-width="0.7"/></g>
+          <g class="ping-pulse"><circle cx="200" cy="84" r="3.6" fill="#F2A623"/><circle cx="200" cy="84" r="8" fill="none" stroke="rgba(242,166,35,0.45)" stroke-width="0.6"/></g>
+          <g class="ping-pulse" style="animation-delay:0.6s"><circle cx="86" cy="68" r="3" fill="#61D7F0"/><circle cx="86" cy="68" r="7" fill="none" stroke="rgba(97,215,240,0.4)" stroke-width="0.5"/></g>
+          <g class="ping-pulse" style="animation-delay:1.4s"><circle cx="58" cy="196" r="3.4" fill="#F2A623"/></g>
+          <g class="ping-pulse" style="animation-delay:0.4s"><circle cx="198" cy="190" r="3.2" fill="#4ADE80"/><circle cx="198" cy="190" r="9" fill="none" stroke="rgba(74,222,128,0.5)" stroke-width="0.6"/></g>
+          <circle cx="140" cy="140" r="3" fill="var(--text)"/>
+          <text x="146" y="22" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">N</text>
+          <text x="262" y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">E</text>
+          <text x="146" y="270" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">S</text>
+          <text x="12" y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">W</text>
+        </svg>
+        <div class="rd-stack">
+          <div class="rd-row"><span class="k">complete</span><span class="v emerald">1</span><span class="pct">0.8%</span></div>
+          <div class="rd-row"><span class="k">partial</span><span class="v amber">63</span><span class="pct">52%</span></div>
+          <div class="rd-row"><span class="k">no-data</span><span class="v rose">57</span><span class="pct">47%</span></div>
+          <div class="rd-row"><span class="k">events</span><span class="v">121</span><span class="pct">·</span></div>
+          <div class="rd-row"><span class="k">queue</span><span class="v cyan">57</span><span class="pct">cand</span></div>
+        </div>
+      </div>
+      <div class="cw-titlerow"><span class="left"><span class="accent">▣</span>&nbsp;&nbsp;COVERAGE MATRIX · per-event status</span><span class="right">click cell → dossier</span></div>
+      <div class="cw-grid" id="cw"></div>
+      <div class="cw-legend">
+        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v">1</span></span>
+        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v">63</span></span>
+        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v">57</span></span>
+      </div>
+    </aside>
+  </section>
+
+  <div class="section-divider"><span class="label">▸ FIELD OPERATIONS</span><span class="meta">live transcription stream · field assignments · mined index</span><div class="line"></div></div>
+
+  <section class="body3">
+    <div class="stack">
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Ingest rate · 24h</span><span class="right">pages/hr</span></div>
+        <div class="histo" id="histo"></div>
+        <div class="histo-axis"><span>00</span><span>12</span><span>24</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Oscillation · 60s</span><span class="right">activity</span></div>
+        <svg viewBox="0 0 320 60" style="width:100%;height:60px;margin-top:6px"><polyline fill="none" stroke="#F2A623" stroke-width="1.8" opacity="0.9" points="0,30 22,22 44,36 66,16 88,40 110,24 132,32 154,10 176,44 198,20 220,36 242,28 264,30 286,22 308,30 320,28"/></svg>
+        <div class="histo-axis"><span>−60s</span><span>NOW</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Channels</span><span class="right">/hr</span></div>
+        <div class="ch-row"><span class="name">Vision</span><span class="rate">0 /hr</span></div>
+        <div class="ch-row"><span class="name">Tesseract</span><span class="rate">0 /hr</span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Media types</span><span class="right">media.json</span></div>
+        <div class="ch-row"><span class="name">Document</span><span class="rate v">105</span></div>
+        <div class="ch-row"><span class="name">Photo</span><span class="rate v">13</span></div>
+        <div class="ch-row"><span class="name">Video</span><span class="rate v">94</span></div>
+        <div class="ch-row"><span class="name">Audio</span><span class="rate v">8</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Arriving signals</span><span class="right">vision × ocr · utc · most recent</span></div>
+      <div class="signals-filter">
+        <span class="pill active">All <span class="count">200</span></span>
+        <span class="pill">Vision <span class="count">3,402</span></span>
+        <span class="pill">Tesseract <span class="count">128</span></span>
+        <span class="refresh">↻ refresh</span>
+      </div>
+      <div class="signal">
+        <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">usper-2025</span><span>FBI · p1</span></div>
+        <p class="signal-quote">"<em>SECRET//NOFORN.</em> On <span class="redacted">_____</span> 2025, at approximately 1700 hours, [<em>witness 1 — a senior US intelligence official</em>] accompanied by two pilots from [<em>state partner organization</em>]…"</p>
+      </div>
+      <div class="signal">
+        <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">western-us-2023</span><span>DEPT/War · p2</span></div>
+        <p class="signal-quote">"<em>Large, Fiery Orb.</em> Two federal law-enforcement special agents witness a glowing orange orb at approximately 500–600 meters. Location: Western U.S. Time of day: dusk."</p>
+      </div>
+      <div class="signal">
+        <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">uae-june-2024</span><span>DEPT/War · p1</span></div>
+        <p class="signal-quote">"Declassified by MG Richard A. Harrison, <em>USCENTCOM</em> Chief of Staff. AT 2100Z <span class="redacted">_____</span> took off from OMAM via SLR. Proceeded to fragged tasking…"</p>
+      </div>
+      <div class="signal">
+        <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">netherlands-1948</span><span>DEPT/War · p3</span></div>
+        <p class="signal-quote">"[stamp: <em>SECRET</em>] USAFE 2 TT 1524 · 4 Nov 48 · To Gen Cabell: we now have one complete set of all reports prepared by special intelligence organization of the European Command…"</p>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Field assignments</span><span class="right">119 open</span></div>
+        <div class="help-row"><span><span class="eid">indopacom-2024</span><span class="pp">· ANCHOR · 24pp</span></span><button class="claim">CLAIM</button></div>
+        <div class="help-row"><span><span class="eid">army-2026</span><span class="pp">· HIGH · 14pp</span></span><button class="claim">CLAIM</button></div>
+        <div class="help-row"><span><span class="eid">dow-uap-d62</span><span class="pp">· MED · 9pp</span></span><button class="claim">CLAIM</button></div>
+        <div class="help-row"><span><span class="eid">dow-uap-d65</span><span class="pp">· MED · 8pp</span></span><button class="claim">CLAIM</button></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><span><span class="icon-sq"></span>Mined index</span><span class="right">199 ents · 67 dates</span></div>
+        <div class="entity-row"><span class="name">USCENTCOM</span><span class="meter"><span style="width:90%"></span></span><span class="count">202</span></div>
+        <div class="entity-row"><span class="name">Air Force</span><span class="meter"><span style="width:100%"></span></span><span class="count">338</span></div>
+        <div class="entity-row"><span class="name">FBI</span><span class="meter"><span style="width:45%"></span></span><span class="count">88</span></div>
+        <div class="entity-row"><span class="name">AARO</span><span class="meter"><span style="width:18%"></span></span><span class="count">31</span></div>
+        <div class="entity-row"><span class="name">USAFE</span><span class="meter"><span style="width:16%"></span></span><span class="count">29</span></div>
+        <div class="entity-row"><span class="name">NORTHCOM</span><span class="meter"><span style="width:13%"></span></span><span class="count">24</span></div>
+        <div class="entity-row"><span class="name">Handwritten</span><span class="meter"><span style="width:100%"></span></span><span class="count">1,649</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+<script>
+  const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
+  let s = 41; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
+  const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(35,0,'complete');
+  const grid = document.getElementById('cw');
+  cls.forEach((c,i) => { const d=document.createElement('div'); d.className='cw-cell'+(c?' '+c:''); d.style.animationDelay=(300+i*6)+'ms'; grid.appendChild(d); });
+  const h = document.getElementById('histo');
+  const bars = [2,1,0,0,1,3,5,8,12,9,7,11,6,4,9,14,10,6,3,8,5,2,1,0]; const mx = Math.max(...bars);
+  bars.forEach((b,i) => { const d=document.createElement('div'); d.style.height='0%'; h.appendChild(d); setTimeout(() => { d.style.transition='height .9s cubic-bezier(.2,.7,.2,1)'; d.style.height=((b/mx)*100)+'%'; }, 1400+i*28); });
+</script>
+</body>
+</html>

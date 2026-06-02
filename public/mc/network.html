@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .nw-shell { padding: 0 56px 64px; display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; position: relative; z-index: 3; align-items: start; }
+    .nw-card { background: var(--surface); border: 1px solid var(--border); padding: 28px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+    .nw-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+    .nw-h .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.30em; color: var(--text-2); text-transform: uppercase; }
+    .nw-h .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
+    .nw-svg { width: 100%; height: 720px; display: block; }
+    .nw-edge { stroke: rgba(242,166,35,0.18); stroke-width: 0.6; }
+    .nw-edge.strong { stroke: rgba(242,166,35,0.55); stroke-width: 1.4; }
+    .nw-edge.weak { stroke: rgba(110,138,124,0.10); stroke-width: 0.3; }
+    .nw-node text { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
+    .nw-node circle { transition: all .15s; cursor: pointer; }
+    .nw-node:hover circle { stroke-width: 2; }
+
+    .nw-ctl { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--text-3); }
+    .nw-ctl .row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); text-transform: uppercase; }
+    .nw-ctl .row:last-child { border-bottom: none; }
+    .nw-ctl .row .label { flex: 1; }
+    .nw-ctl .row .v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; }
+    .nw-ctl .slider { width: 60px; height: 2px; background: var(--hairline); position: relative; }
+    .nw-ctl .slider .knob { position: absolute; width: 40%; height: 100%; background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
+    .nw-mode { display: flex; gap: 8px; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+    .nw-mode .m { padding: 7px 11px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; cursor: pointer; text-transform: uppercase; }
+    .nw-mode .m.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.10); box-shadow: 0 0 12px rgba(242,166,35,0.20); }
+
+    .nw-key { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+    .nw-key .k { display: flex; align-items: center; gap: 9px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.10em; text-transform: uppercase; }
+    .nw-key .k .d { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body data-view="network">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 11 — entity graph</div>
+    <h1>Force-directed clustering. <em>Where the corpus actually connects.</em></h1>
+    <p class="sub">Nodes are events; edges are semantic similarity (cosine ≥ 0.55). Tightest cluster: FBI 62HQ-83894 sections. Second cluster: modern USCENTCOM Middle-East mission reports. Drag, pan, tune the similarity threshold.</p>
+  </section>
+
+  <section class="nw-shell">
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>CONTROLS</span><span class="right">tune</span></div>
+
+      <div class="nw-mode">
+        <span class="m active">ALL</span>
+        <span class="m">EVENTS</span>
+        <span class="m">PATTERNS</span>
+      </div>
+
+      <div class="nw-ctl">
+        <div class="row"><span class="label">MIN COSINE</span><span class="slider"><span class="knob" style="left:20%"></span></span><span class="v">0.55</span></div>
+        <div class="row"><span class="label">REPULSION</span><span class="slider"><span class="knob" style="left:50%"></span></span><span class="v">3.2</span></div>
+        <div class="row"><span class="label">ITERATIONS</span><span class="slider"><span class="knob" style="left:65%"></span></span><span class="v">320</span></div>
+        <div class="row"><span class="label">NODES</span><span class="v">75 / 220</span></div>
+        <div class="row"><span class="label">EDGES</span><span class="v">142</span></div>
+        <div class="row"><span class="label">CLUSTERS</span><span class="v">2 dominant</span></div>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:10px">LEGEND</div>
+        <div class="nw-key">
+          <div class="k"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>DoW · USCENTCOM cluster</div>
+          <div class="k"><span class="d" style="background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)"></span>FBI · 1947 case file</div>
+          <div class="k"><span class="d" style="background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)"></span>NASA · orbital</div>
+          <div class="k"><span class="d" style="background:var(--rose);box-shadow:0 0 6px rgba(224,73,104,0.6)"></span>Anchor event</div>
+          <div class="k"><span class="d" style="background:var(--text-3)"></span>Other / unclassified</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-3);letter-spacing:0.06em">
+        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 1 — FBI 62HQ.</strong> 11 internal-section neighbors at cos 0.94-0.98. Tight intra-document.<br><br>
+        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 2 — CENTCOM/ME.</strong> 18 events anchored on USCENTCOM (202 mentions / 18 docs).
+      </div>
+    </div>
+
+    <div class="nw-card">
+      <div class="nw-h">
+        <div class="t">▣ &nbsp; SEMANTIC GRAPH</div>
+        <div class="meta">220 events · 199 entities · cosine ≥ 0.55</div>
+      </div>
+
+      <svg class="nw-svg" viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="nodeGlow"><stop offset="0%" stop-color="rgba(242,166,35,0.35)"/><stop offset="100%" stop-color="rgba(242,166,35,0)"/></radialGradient>
+        </defs>
+
+        <!-- Edges first (drawn behind) -->
+        <g>
+          <!-- FBI 62HQ tight cluster (top-left) -->
+          <line class="nw-edge strong" x1="180" y1="150" x2="240" y2="120"/>
+          <line class="nw-edge strong" x1="180" y1="150" x2="280" y2="190"/>
+          <line class="nw-edge strong" x1="240" y1="120" x2="280" y2="190"/>
+          <line class="nw-edge strong" x1="240" y1="120" x2="320" y2="140"/>
+          <line class="nw-edge strong" x1="180" y1="150" x2="220" y2="220"/>
+          <line class="nw-edge strong" x1="280" y1="190" x2="320" y2="140"/>
+          <line class="nw-edge strong" x1="280" y1="190" x2="220" y2="220"/>
+          <line class="nw-edge" x1="240" y1="120" x2="380" y2="180"/>
+          <line class="nw-edge" x1="320" y1="140" x2="380" y2="180"/>
+          <line class="nw-edge" x1="320" y1="140" x2="400" y2="100"/>
+
+          <!-- CENTCOM/ME cluster (center-right) -->
+          <line class="nw-edge strong" x1="680" y1="320" x2="740" y2="280"/>
+          <line class="nw-edge strong" x1="680" y1="320" x2="720" y2="380"/>
+          <line class="nw-edge strong" x1="740" y1="280" x2="800" y2="320"/>
+          <line class="nw-edge strong" x1="720" y1="380" x2="800" y2="320"/>
+          <line class="nw-edge strong" x1="680" y1="320" x2="620" y2="280"/>
+          <line class="nw-edge strong" x1="680" y1="320" x2="640" y2="380"/>
+          <line class="nw-edge" x1="620" y1="280" x2="540" y2="260"/>
+          <line class="nw-edge" x1="640" y1="380" x2="600" y2="440"/>
+          <line class="nw-edge" x1="740" y1="280" x2="820" y2="240"/>
+          <line class="nw-edge" x1="800" y1="320" x2="870" y2="290"/>
+          <line class="nw-edge" x1="720" y1="380" x2="780" y2="440"/>
+
+          <!-- USPER bridge -->
+          <line class="nw-edge strong" x1="540" y1="260" x2="500" y2="500"/>
+          <line class="nw-edge" x1="500" y1="500" x2="640" y2="380"/>
+          <line class="nw-edge" x1="500" y1="500" x2="600" y2="440"/>
+
+          <!-- NASA cluster (top right) -->
+          <line class="nw-edge" x1="820" y1="120" x2="880" y2="180"/>
+          <line class="nw-edge" x1="820" y1="120" x2="780" y2="80"/>
+
+          <!-- Weak cross-cluster -->
+          <line class="nw-edge weak" x1="380" y1="180" x2="500" y2="500"/>
+          <line class="nw-edge weak" x1="540" y1="260" x2="220" y2="220"/>
+          <line class="nw-edge weak" x1="820" y1="120" x2="540" y2="260"/>
+
+          <!-- Outliers -->
+          <line class="nw-edge weak" x1="150" y1="520" x2="380" y2="180"/>
+          <line class="nw-edge weak" x1="900" y1="580" x2="800" y2="320"/>
+        </g>
+
+        <!-- Nodes -->
+        <g>
+          <!-- FBI 62HQ section nodes (cyan) -->
+          <g class="nw-node"><circle cx="180" cy="150" r="10" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="194" y="154" fill="rgba(155,213,232,0.9)">62hq-s2</text></g>
+          <g class="nw-node"><circle cx="240" cy="120" r="9" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="254" y="124" fill="rgba(155,213,232,0.85)">62hq-s5</text></g>
+          <g class="nw-node"><circle cx="280" cy="190" r="8" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="294" y="194" fill="rgba(155,213,232,0.85)">62hq-s4</text></g>
+          <g class="nw-node"><circle cx="320" cy="140" r="7" fill="#61D7F0"/></g>
+          <g class="nw-node"><circle cx="220" cy="220" r="6" fill="#61D7F0"/></g>
+          <g class="nw-node"><circle cx="380" cy="180" r="6" fill="#61D7F0"/></g>
+          <g class="nw-node"><circle cx="400" cy="100" r="5" fill="#61D7F0"/></g>
+
+          <!-- CENTCOM/ME amber cluster -->
+          <g class="nw-node"><circle cx="680" cy="320" r="13" fill="#F2A623" stroke="#FFB840" stroke-width="1.5" filter="url(#nodeGlow)"/><text x="697" y="324" fill="rgba(242,166,35,0.95)" font-weight="600">USCENTCOM</text></g>
+          <g class="nw-node"><circle cx="740" cy="280" r="9" fill="#F2A623"/><text x="754" y="284" fill="rgba(242,166,35,0.85)">uae-jun-2024</text></g>
+          <g class="nw-node"><circle cx="720" cy="380" r="8" fill="#F2A623"/><text x="734" y="384" fill="rgba(242,166,35,0.85)">uae-oct-2023</text></g>
+          <g class="nw-node"><circle cx="800" cy="320" r="8" fill="#F2A623"/><text x="814" y="324" fill="rgba(242,166,35,0.85)">d62 hormuz</text></g>
+          <g class="nw-node"><circle cx="620" cy="280" r="7" fill="#F2A623"/></g>
+          <g class="nw-node"><circle cx="640" cy="380" r="7" fill="#F2A623"/></g>
+          <g class="nw-node"><circle cx="820" cy="240" r="6" fill="#F2A623"/></g>
+          <g class="nw-node"><circle cx="870" cy="290" r="6" fill="#F2A623"/></g>
+          <g class="nw-node"><circle cx="780" cy="440" r="6" fill="#F2A623"/></g>
+          <g class="nw-node"><circle cx="600" cy="440" r="5" fill="#F2A623"/></g>
+
+          <!-- Middle East range fouler bridge -->
+          <g class="nw-node"><circle cx="540" cy="260" r="8" fill="#F2A623"/><text x="554" y="264" fill="rgba(242,166,35,0.85)">d38 me-2020</text></g>
+
+          <!-- ANCHOR: USPER-2025 (rose, prominent) -->
+          <g class="nw-node">
+            <circle cx="500" cy="500" r="16" fill="none" stroke="rgba(224,73,104,0.5)" stroke-width="1" opacity="0.7"/>
+            <circle cx="500" cy="500" r="11" fill="#E04968" stroke="#FF8B9D" stroke-width="1.5"/>
+            <text x="517" y="504" fill="rgba(255,139,157,0.95)" font-weight="600">USPER-2025</text>
+            <text x="517" y="516" fill="rgba(224,73,104,0.65)" font-size="9">ANCHOR</text>
+          </g>
+
+          <!-- NASA orbital (emerald, small cluster) -->
+          <g class="nw-node"><circle cx="820" cy="120" r="9" fill="#4ADE80"/><text x="834" y="124" fill="rgba(134,239,172,0.85)">apollo-17</text></g>
+          <g class="nw-node"><circle cx="880" cy="180" r="6" fill="#4ADE80"/></g>
+          <g class="nw-node"><circle cx="780" cy="80" r="6" fill="#4ADE80"/></g>
+          <g class="nw-node"><circle cx="930" cy="120" r="5" fill="#4ADE80"/></g>
+
+          <!-- Outliers (gray) -->
+          <g class="nw-node"><circle cx="150" cy="520" r="5" fill="#75664A"/><text x="160" y="540" fill="rgba(117,102,74,0.7)">netherlands-1948</text></g>
+          <g class="nw-node"><circle cx="900" cy="580" r="5" fill="#75664A"/></g>
+          <g class="nw-node"><circle cx="200" cy="600" r="4" fill="#75664A"/></g>
+          <g class="nw-node"><circle cx="350" cy="600" r="4" fill="#75664A"/></g>
+
+          <!-- DoW d48/d49 sub-cluster -->
+          <g class="nw-node"><circle cx="440" cy="640" r="7" fill="#F2A623"/><text x="454" y="644" fill="rgba(242,166,35,0.85)">d48 1996</text></g>
+          <g class="nw-node"><circle cx="500" cy="660" r="6" fill="#F2A623"/></g>
+        </g>
+
+      </svg>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

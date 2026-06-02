@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Coverage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .body2 { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 380px; gap: 24px; position: relative; z-index: 3; }
+    .cov-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .cov-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 8px; max-width: 700px; margin: 22px auto; }
+    .cov-cell { aspect-ratio: 1; background: #0A1018; border: 1px solid #182232; opacity: 0; animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards; transition: transform .15s; cursor: pointer; }
+    .cov-cell:hover { transform: scale(1.18); border-color: var(--amber); }
+    @keyframes cov-in { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+    .cov-cell.partial { background: rgba(242,166,35,0.18); border-color: rgba(242,166,35,0.55); }
+    .cov-cell.complete { background: rgba(74,222,128,0.25); border-color: var(--emerald); box-shadow: 0 0 14px rgba(74,222,128,0.55); animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards, cp 2.6s ease-in-out 1.5s infinite; }
+    @keyframes cp { 0%,100%{box-shadow:0 0 14px rgba(74,222,128,0.55)} 50%{box-shadow:0 0 26px rgba(74,222,128,0.9)} }
+    .cov-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--hairline); }
+    .cov-summary .s { padding: 6px 18px; border-left: 1px solid var(--hairline); }
+    .cov-summary .s:first-child { border-left: none; padding-left: 0; }
+    .cov-summary .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; }
+    .cov-summary .v { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: var(--text); margin: 8px 0 2px; letter-spacing: -0.025em; }
+    .cov-summary .v.emerald { color: var(--emerald); text-shadow: 0 0 14px rgba(74,222,128,0.4); }
+    .cov-summary .v.amber { color: var(--amber); text-shadow: 0 0 14px var(--amber-glow); }
+    .cov-summary .v.rose { color: var(--rose); }
+    .cov-summary .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; }
+    .queue-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; align-items: baseline; }
+    .queue-row:last-child { border-bottom: none; }
+    .queue-row .left { display: flex; flex-direction: column; gap: 3px; }
+    .queue-row .eid { font-size: 12px; color: var(--text); font-weight: 500; }
+    .queue-row .meta { font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
+    .queue-row .meta .anchor { color: var(--rose); font-weight: 600; }
+    .queue-row .meta .high { color: var(--amber); font-weight: 600; }
+    .queue-row .meta .med { color: var(--text-2); font-weight: 600; }
+    .queue-row .pri { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: var(--text); }
+    .queue-row .pri.amber { color: var(--amber); }
+    .legend-rail { display: flex; gap: 22px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; }
+    .legend-rail .sw { width: 9px; height: 9px; display: inline-block; margin-right: 7px; vertical-align: middle; transform: translateY(-1px); }
+    .legend-rail .lbl { color: var(--text-3); }
+    .legend-rail .v { color: var(--text); margin-left: 5px; font-weight: 700; }
+  </style>
+</head>
+<body data-view="coverage">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 02 — corpus coverage</div>
+    <h1>121 events. <em>One complete.</em> The rest is the work.</h1>
+    <p class="sub">Each cell is one catalogued event coloured by <span class="mono" style="color:var(--amber)">coverage.json</span> status. Hover for the eid; click to open the dossier. Priority queue on the right ranks the highest-impact pages awaiting a transcriber.</p>
+  </section>
+
+  <section class="body2">
+    <div class="cov-card">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px">
+        <span class="mono" style="font-size:11px;letter-spacing:0.26em;color:var(--text-2);font-weight:700">▣ &nbsp; COVERAGE MATRIX · RELEASE 01</span>
+        <span class="mono" style="font-size:10px;color:var(--text-4);letter-spacing:0.2em">SORTED BY STATUS</span>
+      </div>
+      <div class="legend-rail" style="margin-bottom:10px">
+        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v">1</span></span>
+        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v">63</span></span>
+        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v">57</span></span>
+      </div>
+      <div class="cov-grid" id="cg"></div>
+      <div class="cov-summary">
+        <div class="s"><div class="k">Total catalogued</div><div class="v">121</div><div class="sub">of 162 R01 inventory</div></div>
+        <div class="s"><div class="k">Complete</div><div class="v emerald" data-count="1">0</div><div class="sub">all pages OCR'd · 0.8%</div></div>
+        <div class="s"><div class="k">Partial</div><div class="v amber" data-count="63">0</div><div class="sub">gap pages remain · 52%</div></div>
+        <div class="s"><div class="k">No data</div><div class="v rose" data-count="57">0</div><div class="sub">no body text · 47%</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Priority queue</span><span class="right">next-missing.json</span></div>
+      <p style="font-size:11px;color:var(--text-3);line-height:1.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em;margin:0 0 16px">Scored: flag-weight × (1 + gapPages/10) × (1 + chars/10000). Top of this list is the deep-link target for the LIVE-view CTA "Open the next missing page →".</p>
+      <div class="queue-row"><div class="left"><span class="eid">indopacom-2024</span><span class="meta"><span class="anchor">ANCHOR</span> · 24pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">pursue-release-01</span><span class="meta"><span class="anchor">ANCHOR</span> · 12pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">pursue-release-02</span><span class="meta"><span class="anchor">ANCHOR</span> · 8pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">army-2026</span><span class="meta"><span class="high">HIGH</span> · 14pp · 0%</span></div><span class="pri">3.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d62</span><span class="meta"><span class="med">MED</span> · 9pp · 0%</span></div><span class="pri">2.20</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d65</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d63</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d54</span><span class="meta"><span class="med">MED</span> · 7pp · 23%</span></div><span class="pri">2.14</span></div>
+      <a class="primary-cta" href="review.html" style="margin-top:24px;width:100%;justify-content:center">Open queue head <span>→</span></a>
+    </div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+<script>
+  const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
+  let s = 17; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
+  const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(28,0,'complete');
+  const grid = document.getElementById('cg');
+  cls.forEach((c,i) => { const d=document.createElement('div'); d.className='cov-cell'+(c?' '+c:''); d.style.animationDelay=(300+i*5)+'ms'; grid.appendChild(d); });
+</script>
+</body>
+</html>

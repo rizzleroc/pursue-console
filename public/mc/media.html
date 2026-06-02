@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .md-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .md-filterbar { display: flex; align-items: center; gap: 10px; padding: 18px 0; flex-wrap: wrap; }
+    .md-pill { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--text-3); background: var(--surface); border: 1px solid var(--border); padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; }
+    .md-pill .ic { width: 9px; height: 9px; background: var(--text-3); display: inline-block; }
+    .md-pill.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.10); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
+    .md-pill .n { color: var(--text-4); margin-left: 4px; font-size: 9px; }
+    .md-pill.video .ic { background: #61D7F0; }
+    .md-pill.photo .ic { background: #6EE7B7; }
+    .md-pill.diagram .ic { background: #B280FF; }
+    .md-pill.map .ic { background: #F472B6; }
+    .md-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .tile { background: var(--surface); border: 1px solid var(--border); aspect-ratio: 1; padding: 0; backdrop-filter: blur(10px); cursor: pointer; transition: all .2s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .tile:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .tile .thumb { flex: 1; background: linear-gradient(135deg, rgba(242,166,35,0.08), rgba(8,12,20,0.7)); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .tile .thumb::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(242,166,35,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(242,166,35,0.06) 1px, transparent 1px); background-size: 18px 18px; opacity: 0.4; }
+    .tile.video .thumb { background: radial-gradient(circle at center, rgba(97,215,240,0.18), rgba(8,14,22,0.7)); }
+    .tile.photo .thumb { background: radial-gradient(circle at center, rgba(110,231,183,0.16), rgba(8,14,22,0.7)); }
+    .tile.diagram .thumb { background: linear-gradient(135deg, rgba(178,128,255,0.14), rgba(8,14,22,0.7)); }
+    .tile.map .thumb { background: linear-gradient(135deg, rgba(244,114,182,0.14), rgba(8,14,22,0.7)); }
+    .tile .icon { width: 36px; height: 36px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); z-index: 1; background: rgba(0,0,0,0.5); }
+    .tile.video .icon { color: #61D7F0; border-color: rgba(97,215,240,0.5); }
+    .tile.photo .icon { color: #6EE7B7; border-color: rgba(110,231,183,0.5); }
+    .tile.diagram .icon { color: #B280FF; border-color: rgba(178,128,255,0.5); }
+    .tile.map .icon { color: #F472B6; border-color: rgba(244,114,182,0.5); }
+    .tile .ribbon { position: absolute; left: 6px; top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.14em; color: var(--text-3); background: rgba(0,0,0,0.6); padding: 2px 6px; border: 1px solid var(--hairline); text-transform: uppercase; }
+    .tile .views { position: absolute; right: 6px; top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em; color: var(--text-3); background: rgba(0,0,0,0.6); padding: 2px 6px; border: 1px solid var(--hairline); }
+    .tile .views::before { content: '◉ '; color: var(--amber); }
+    .tile .footer { padding: 10px 12px; border-top: 1px solid var(--hairline); background: rgba(0,0,0,0.4); }
+    .tile .kind { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; margin-bottom: 3px; }
+    .tile .title { font-size: 11px; color: var(--text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .tile .ev { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); margin-top: 4px; letter-spacing: 0.06em; }
+  </style>
+</head>
+<body data-view="media">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 06 — visual library</div>
+    <h1>362 tiles. <em>Every diagram, every video, every page worth seeing.</em></h1>
+    <p class="sub">Photos · DVIDS sensor footage · diagrams · maps · sketches · scanned negatives. Tap any tile to open it; video tiles play inline via the DVIDS embed iframe.</p>
+  </section>
+
+  <section class="md-shell">
+    <div class="md-filterbar">
+      <span class="md-pill active"><span class="ic"></span>ALL <span class="n">362</span></span>
+      <span class="md-pill video"><span class="ic"></span>VIDEO <span class="n">106</span></span>
+      <span class="md-pill photo"><span class="ic"></span>PHOTO <span class="n">113</span></span>
+      <span class="md-pill"><span class="ic" style="background:#FFD93D"></span>HAND-DRAWING <span class="n">44</span></span>
+      <span class="md-pill diagram"><span class="ic"></span>DIAGRAM <span class="n">49</span></span>
+      <span class="md-pill map"><span class="ic"></span>MAP <span class="n">11</span></span>
+      <span class="md-pill"><span class="ic" style="background:#94A3B8"></span>NEGATIVE <span class="n">6</span></span>
+      <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">SORT · DVIDS VIEWS DESC · 135 EVENTS · media.json</span>
+    </div>
+
+    <div class="md-grid" id="grid"></div>
+  </section>
+</main>
+
+<script src="chrome.js" defer></script>
+<script>
+  const data = [
+    {k:'video', t:'F/A-18 IR sensor pass · Pacific 2019', e:'pacific-2019', v:'1.2M'},
+    {k:'video', t:'Drone footage · CONUS sighting Mar 2020', e:'south-us-2020', v:'847K'},
+    {k:'photo', t:'Roswell incident debris field, 1947', e:'fbi-62hq-83894', v:'612K'},
+    {k:'diagram', t:'Atlas IIAS ship-hit contour A=3.00', e:'dow-uap-d48 · p63', v:''},
+    {k:'video', t:'Tic-tac sensor recording, 2004', e:'tic-tac-2004', v:'2.4M'},
+    {k:'photo', t:'Witness sketch — orange orb formation', e:'fbi-sept-2023-s3', v:''},
+    {k:'map', t:'Eastern Range impact contours', e:'dow-uap-d48 · p21', v:''},
+    {k:'photo', t:'USPER recreation drawing — "Dark Kite"', e:'western-us-2023', v:''},
+    {k:'video', t:'Range Fouler debrief footage, 2020', e:'dow-uap-pr36', v:'412K'},
+    {k:'diagram', t:'Mode-5 density-function curves', e:'dow-uap-d48 · p51', v:''},
+    {k:'photo', t:'Vandenberg Launch Summary cover', e:'dow-uap-d49 · p1', v:''},
+    {k:'video', t:'CENTCOM ISR mission audio + IR', e:'uae-june-2024', v:'298K'},
+    {k:'map', t:'Coverage map of impact dispersion', e:'dow-uap-d48 · p48', v:''},
+    {k:'photo', t:'1949 radar scope diagram', e:'1949-discs · p50', v:''},
+    {k:'video', t:'Apollo 17 onboard audio + photo', e:'nasa-apollo17', v:'89K'},
+    {k:'diagram', t:'LLV1 simulation results B=1,000', e:'dow-uap-d48 · p79', v:''},
+    {k:'photo', t:'Witness photograph — alleged craft', e:'fbi-photos-2025', v:''},
+    {k:'video', t:'DVIDS clip · Gen Patel briefing', e:'dow-uap-2026-05-08', v:'1.8M'},
+    {k:'map', t:'Atlas IIAS risk contours, A=3.5', e:'dow-uap-d48 · p21', v:''},
+    {k:'photo', t:'30th Space Wing patch — Vandenberg', e:'dow-uap-d49 · p1', v:''},
+  ];
+  const ICONS = { video: '▶', photo: '◫', diagram: '◬', map: '◐', sketch: '✎' };
+  const KIND_NAMES = { video: 'VIDEO', photo: 'PHOTOGRAPH', diagram: 'DIAGRAM', map: 'MAP' };
+  const grid = document.getElementById('grid');
+  data.forEach((d, i) => {
+    const t = document.createElement('div');
+    t.className = 'tile ' + d.k;
+    t.innerHTML = `
+      <div class="thumb">
+        <span class="ribbon">${KIND_NAMES[d.k] || d.k.toUpperCase()}</span>
+        ${d.v ? `<span class="views">${d.v}</span>` : ''}
+        <span class="icon">${ICONS[d.k] || '?'}</span>
+      </div>
+      <div class="footer">
+        <div class="kind">${KIND_NAMES[d.k] || d.k}</div>
+        <div class="title">${d.t}</div>
+        <div class="ev">${d.e}</div>
+      </div>`;
+    t.style.opacity = '0';
+    t.style.animation = `rise 0.5s ${300 + i * 35}ms cubic-bezier(.2,.7,.2,1) forwards`;
+    grid.appendChild(t);
+  });
+</script>
+</body>
+</html>
