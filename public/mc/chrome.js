@@ -16,6 +16,7 @@
     { id: 'atlas',    label: 'Atlas' },
     { id: 'globe',    label: 'Globe' },
     { id: 'network',  label: 'Network' },
+    { id: 'evidence', label: 'Evidence' },
   ];
 
   function el(tag, attrs = {}, children = []) {

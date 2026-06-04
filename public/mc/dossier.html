@@ -63,6 +63,38 @@
     .vis-tile.diagram .k { color: #B280FF; }
     .vis-tile.map { background: linear-gradient(135deg, rgba(244,114,182,0.14), rgba(8,14,22,0.7)); }
     .vis-tile.map .k { color: #F472B6; }
+
+    /* Priority + Evidence-type chips in the header */
+    .ds-header .meta-row .priority { padding: 3px 10px; border: 1px solid rgba(255,138,46,0.55); background: rgba(255,138,46,0.10); color: #FFB07A; font-size: 9px; font-weight: 700; letter-spacing: 0.24em; }
+    .ds-header .meta-row .priority.critical { color: var(--rose); border-color: rgba(224,73,104,0.55); background: rgba(224,73,104,0.10); }
+    .evd-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .evd-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; padding: 3px 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2); text-transform: uppercase; }
+    .evd-badge.primary    { color: var(--amber);   border-color: rgba(242,166,35,0.45); background: rgba(242,166,35,0.08); }
+    .evd-badge.sensor     { color: var(--cyan);    border-color: rgba(97,215,240,0.45); background: rgba(97,215,240,0.08); }
+    .evd-badge.physics    { color: #B280FF;        border-color: rgba(178,128,255,0.45); background: rgba(178,128,255,0.10); }
+    .evd-badge.witness    { color: #FFD93D;        border-color: rgba(255,217,61,0.40); background: rgba(255,217,61,0.07); }
+    .evd-badge.imagery    { color: #6EE7B7;        border-color: rgba(110,231,183,0.40); background: rgba(110,231,183,0.07); }
+
+    /* Cross-References panel */
+    .xr-list { display: flex; flex-direction: column; gap: 10px; }
+    .xr-row { display: grid; grid-template-columns: 84px 1fr auto; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hairline); }
+    .xr-row:last-child { border-bottom: none; }
+    .xr-row .k { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.16em; text-transform: uppercase; }
+    .xr-row .k.report    { color: #B280FF; }
+    .xr-row .k.program   { color: var(--cyan); }
+    .xr-row .k.framework { color: #B280FF; }
+    .xr-row .k.facility  { color: #6EE7B7; }
+    .xr-row .k.sensor    { color: var(--cyan); }
+    .xr-row .k.event     { color: var(--amber); }
+    .xr-row .body { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5; color: var(--text-2); min-width: 0; }
+    .xr-row .body a { color: inherit; text-decoration: none; border-bottom: 1px dashed var(--hairline); }
+    .xr-row .body a:hover { color: var(--amber); border-bottom-color: var(--amber); }
+    .xr-row .body .name { color: var(--text); font-weight: 500; }
+    .xr-row .body .note { display: block; color: var(--text-3); font-size: 11px; margin-top: 4px; }
+    .xr-row .rel { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
+    .xr-empty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-4); padding: 12px 0; }
+    .xr-cta { display: inline-block; margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
+    .xr-cta:hover { color: var(--amber); border-color: var(--amber); }
   </style>
 </head>
 <body data-view="dossier">
@@ -71,6 +103,7 @@
   <section class="ds-header">
     <div class="meta-row">
       <span class="anchor">ANCHOR</span>
+      <span class="priority critical" id="ds-priority" style="display:none">CRITICAL</span>
       <span class="id">USPER-2025</span>
       <span>·</span>
       <span>FBI</span>
@@ -82,6 +115,7 @@
       <span style="color:var(--text-3)">helicopter encounter at US military facility</span>
     </div>
     <h1>USPER Statement — orb gained elevation, came within ten feet of [the helicopter].</h1>
+    <div class="evd-row" id="ds-evidence"></div>
   </section>
 
   <section class="ds-body">
@@ -199,6 +233,12 @@
           <div class="vis-tile diagram"><span class="k">[DIAGRAM]</span><span class="p">p08</span></div>
           <div class="vis-tile photo"><span class="k">[PHOTO]</span><span class="p">p09</span></div>
         </div>
+      </div>
+
+      <div class="ds-section" id="ds-xrefs-section" style="display:none">
+        <div class="ds-h"><span class="t"><span class="icon"></span>CROSS-REFERENCES</span><span class="r" id="ds-xrefs-count">0</span></div>
+        <div class="xr-list" id="ds-xrefs"></div>
+        <a id="ds-xrefs-cta" class="xr-cta" href="evidence.html">→ open evidence chain</a>
       </div>
     </aside>
   </section>
@@ -336,6 +376,10 @@
       }
     });
 
+    // 3b) Priority chip + Evidence badges + Cross-references -------------
+    renderPriorityEvidence(rec);
+    renderCrossRefs(eid);
+
     // 4) Semantic neighbors ------------------------------------------------
     var neigh = MC.neighbors(eid, 10);
     var nbSection = null;
@@ -368,6 +412,73 @@
         if (rHdr) rHdr.textContent = neigh.length + " · event-similarity.json";
       }
     }
+  }
+
+  // ─────────── Priority + evidence badges + cross-references ───────────
+  function renderPriorityEvidence(rec) {
+    var pri = document.getElementById("ds-priority");
+    if (pri) {
+      if (rec.priority) {
+        pri.textContent = String(rec.priority).toUpperCase();
+        pri.className = "priority " + (rec.priority === "critical" ? "critical" : "");
+        pri.style.display = "";
+      } else {
+        pri.style.display = "none";
+      }
+    }
+    var row = document.getElementById("ds-evidence");
+    if (!row) return;
+    var types = Array.isArray(rec.evidenceTypes) ? rec.evidenceTypes : [];
+    if (!types.length) { row.innerHTML = ""; return; }
+    var CLS = {
+      "primary-source":  ["primary",   "PRIMARY SOURCE"],
+      "sensor-derived":  ["sensor",    "SENSOR DATA"],
+      "physics-linked":  ["physics",   "PHYSICS-LINKED"],
+      "witness-account": ["witness",   "WITNESS ACCOUNT"],
+      "imagery":         ["imagery",   "IMAGERY"]
+    };
+    row.innerHTML = types.map(function (t) {
+      var spec = CLS[t] || ["", String(t).toUpperCase()];
+      return '<span class="evd-badge ' + spec[0] + '">' + esc(spec[1]) + '</span>';
+    }).join("");
+  }
+
+  function renderCrossRefs(eid) {
+    var section = document.getElementById("ds-xrefs-section");
+    var list    = document.getElementById("ds-xrefs");
+    var counter = document.getElementById("ds-xrefs-count");
+    var cta     = document.getElementById("ds-xrefs-cta");
+    if (!section || !list) return;
+    var refs = (MC.crossRefsForEvent && MC.crossRefsForEvent(eid)) || [];
+    if (!refs.length) { section.style.display = "none"; return; }
+    section.style.display = "";
+    if (counter) counter.textContent = refs.length + " refs";
+    if (cta && MC.url && MC.url.evidence) cta.href = MC.url.evidence(eid);
+    list.innerHTML = refs.map(function (r) {
+      var kind = String(r.type || "ref");
+      var label = "";
+      if (r.type === "event") {
+        var ev = r.resolved;
+        var href = (MC.url && MC.url.dossier) ? MC.url.dossier(r.id) : ("dossier.html?eid=" + encodeURIComponent(r.id));
+        label = '<a href="' + esc(href) + '"><span class="name">' + esc((ev && ev.title) || r.id) + '</span></a>';
+      } else if (r.resolved) {
+        var t = r.resolved.title || r.resolved.name || r.id;
+        var meta = [];
+        if (r.resolved.year) meta.push(r.resolved.year);
+        if (r.resolved.organization) meta.push(r.resolved.organization);
+        if (r.resolved.operator) meta.push(r.resolved.operator);
+        if (r.resolved.location) meta.push(r.resolved.location);
+        label = '<span class="name">' + esc(t) + '</span>' + (meta.length ? ' <span style="color:var(--text-4)">· ' + esc(meta.join(" · ")) + '</span>' : '');
+      } else {
+        label = '<span class="name">' + esc(r.id) + '</span>';
+      }
+      var note = r.note ? '<span class="note">' + esc(r.note) + '</span>' : '';
+      return '<div class="xr-row">' +
+        '<span class="k ' + esc(kind) + '">' + esc(kind) + '</span>' +
+        '<div class="body">' + label + note + '</div>' +
+        '<span class="rel">' + esc(String(r.relation || "").replace(/-/g, ' ')) + '</span>' +
+      '</div>';
+    }).join("");
   }
 
   MC.ready().then(render);

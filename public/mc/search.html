@@ -48,6 +48,23 @@
     .meaning-note { display: none; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cyan); letter-spacing: 0.10em; }
     .meaning-note.on { display: block; }
     .browse-hint { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; margin: 0 0 12px; }
+
+    /* Priority + Evidence badges on result cards */
+    .rc .badges { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+    .rc .b { font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; padding: 2px 6px; border: 1px solid var(--border); color: var(--text-3); text-transform: uppercase; line-height: 1.4; }
+    .rc .b.crit    { color: var(--rose);   border-color: rgba(224,73,104,0.55); background: rgba(224,73,104,0.10); font-weight: 700; }
+    .rc .b.priority{ color: #FFB07A;       border-color: rgba(255,138,46,0.45); background: rgba(255,138,46,0.08); font-weight: 700; }
+    .rc .b.primary { color: var(--amber);  border-color: rgba(242,166,35,0.45); background: rgba(242,166,35,0.06); }
+    .rc .b.sensor  { color: var(--cyan);   border-color: rgba(97,215,240,0.45); background: rgba(97,215,240,0.07); }
+    .rc .b.physics { color: #B280FF;       border-color: rgba(178,128,255,0.45); background: rgba(178,128,255,0.08); }
+    .rc .b.witness { color: #FFD93D;       border-color: rgba(255,217,61,0.40); background: rgba(255,217,61,0.06); }
+    .rc .b.imagery { color: #6EE7B7;       border-color: rgba(110,231,183,0.40); background: rgba(110,231,183,0.06); }
+
+    /* Physics-relevant toggle pill in the filter row */
+    .toggle-pill { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; padding: 6px 12px; border: 1px solid var(--border); background: var(--surface-2); }
+    .toggle-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-4); }
+    .toggle-pill.on { color: #B280FF; border-color: rgba(178,128,255,0.55); background: rgba(178,128,255,0.10); }
+    .toggle-pill.on .dot { background: #B280FF; box-shadow: 0 0 8px rgba(178,128,255,0.6); }
   </style>
 </head>
 <body data-view="search">
@@ -85,7 +102,8 @@
         <select class="filter-select" id="filter-agency"><option value="ALL">ALL AGENCIES</option></select>
         <select class="filter-select" id="filter-era"><option value="ALL">ALL ERAS</option></select>
         <select class="filter-select" id="filter-type"><option value="ALL">ALL TYPES</option></select>
-        <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">EXACT finds your phrase verbatim · MEANING finds related ideas</span>
+        <span class="toggle-pill" id="filter-physics" title="Physics-Relevant Cases only — events with theoretical-framework cross-references"><span class="dot"></span>PHYSICS-RELEVANT</span>
+        <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">PHYSICS toggle filters to events with theoretical-framework cross-refs</span>
       </div>
     </div>
 
@@ -163,6 +181,9 @@
   // ── Scoring ──
   // title substring → 10 · id substring → 8 · agency/region/type/era substring → 4
   // exact tag/era token match → 2 · per-token sum, top 24.
+  // Tags / cross-references (facility / program / framework / sensor ids) score
+  // at 6 each — they let researchers find a case by physics concept, facility
+  // name, or sensor type even when the title doesn't include those words.
   function scoreEvent(ev, tokens){
     var total = 0;
     var title  = (ev.title  || '').toLowerCase();
@@ -171,11 +192,17 @@
     var region = (ev.region || '').toLowerCase();
     var era    = (ev.era    || '').toLowerCase();
     var type   = (ev.type   || '').toLowerCase();
+    var tagBlob = Array.isArray(ev.tags) ? ev.tags.join(' ').toLowerCase() : '';
+    var refBlob = Array.isArray(ev.crossRefs)
+      ? ev.crossRefs.map(function(r){ return (r && r.id) || ''; }).join(' ').toLowerCase()
+      : '';
     for (var i = 0; i < tokens.length; i++){
       var t = tokens[i];
       if (!t) continue;
       if (title.indexOf(t)  !== -1) total += 10;
       if (id.indexOf(t)     !== -1) total += 8;
+      if (tagBlob.indexOf(t)!== -1) total += 6;
+      if (refBlob.indexOf(t)!== -1) total += 6;
       if (agency.indexOf(t) !== -1) total += 4;
       if (region.indexOf(t) !== -1) total += 4;
       if (type.indexOf(t)   !== -1) total += 4;
@@ -187,6 +214,29 @@
 
   function tokenize(q){
     return (q || '').toLowerCase().split(/\s+/).filter(Boolean);
+  }
+
+  // Evidence-type → badge spec (class, short label).
+  var BADGE_SPEC = {
+    'primary-source':  ['primary',  'PRIMARY'],
+    'sensor-derived':  ['sensor',   'SENSOR'],
+    'physics-linked':  ['physics',  'PHYSICS'],
+    'witness-account': ['witness',  'WITNESS'],
+    'imagery':         ['imagery',  'IMAGERY']
+  };
+
+  function badgesHTML(ev){
+    var out = [];
+    if (ev.priority === 'critical') out.push('<span class="b crit">CRITICAL</span>');
+    else if (ev.priority === 'high') out.push('<span class="b priority">PRIORITY</span>');
+    if (Array.isArray(ev.evidenceTypes)){
+      for (var i = 0; i < ev.evidenceTypes.length; i++){
+        var spec = BADGE_SPEC[ev.evidenceTypes[i]];
+        if (spec) out.push('<span class="b ' + spec[0] + '">' + spec[1] + '</span>');
+      }
+    }
+    if (!out.length) return '';
+    return '<div class="badges">' + out.join('') + '</div>';
   }
 
   // Card renderer.
@@ -202,6 +252,7 @@
           '<span class="eid">' + esc(ev.id) + '</span>' +
           (scoreStr ? '<span class="score">' + esc(scoreStr) + '</span>' : '') +
         '</div>' +
+        badgesHTML(ev) +
         '<h3>' + esc(ev.title || ev.id) + '</h3>' +
         '<p>' + esc(snippet) + '</p>' +
         '<div class="bottom">' +
@@ -212,11 +263,12 @@
   }
 
   function applyFilters(events, f){
-    if (!f.agency && !f.era && !f.type) return events;
+    if (!f.agency && !f.era && !f.type && !f.physics) return events;
     return events.filter(function(e){
       if (f.agency && f.agency !== 'ALL' && (e.agency || '') !== f.agency) return false;
       if (f.era    && f.era    !== 'ALL' && (e.era    || '') !== f.era)    return false;
       if (f.type   && f.type   !== 'ALL' && (e.type   || '') !== f.type)   return false;
+      if (f.physics && !(Array.isArray(e.category) && e.category.indexOf('physics-relevant') !== -1)) return false;
       return true;
     });
   }
@@ -257,9 +309,15 @@
     var statMs     = document.getElementById('stat-ms');
     var statSort   = document.getElementById('stat-sort');
     var browseHint = document.getElementById('browse-hint');
+    var physicsPill= document.getElementById('filter-physics');
 
     function currentFilters(){
-      return { agency: selAgency.value, era: selEra.value, type: selType.value };
+      return {
+        agency:  selAgency.value,
+        era:     selEra.value,
+        type:    selType.value,
+        physics: physicsPill && physicsPill.classList.contains('on')
+      };
     }
 
     function render(){
@@ -329,6 +387,30 @@
     selAgency.addEventListener('change', render);
     selEra.addEventListener('change', render);
     selType.addEventListener('change', render);
+    if (physicsPill){
+      physicsPill.addEventListener('click', function(){
+        physicsPill.classList.toggle('on');
+        render();
+      });
+    }
+
+    // ?q=… / ?physics=1 deep-link from other pages.
+    if (MC.query && MC.query.q){ inp.value = String(MC.query.q); }
+    if (MC.query && (MC.query.physics === '1' || MC.query.physics === 'true') && physicsPill){
+      physicsPill.classList.add('on');
+    }
+    if (MC.query && MC.query.agency && selAgency){
+      var av = String(MC.query.agency);
+      for (var ai = 0; ai < selAgency.options.length; ai++){
+        if (selAgency.options[ai].value === av){ selAgency.value = av; break; }
+      }
+    }
+    if (MC.query && MC.query.era && selEra){
+      var ev = String(MC.query.era);
+      for (var ei = 0; ei < selEra.options.length; ei++){
+        if (selEra.options[ei].value === ev){ selEra.value = ev; break; }
+      }
+    }
 
     // Initial paint.
     render();

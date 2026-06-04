@@ -7,7 +7,10 @@
 //
 // Output: public/events.json { generatedAt, count, events: [...] }
 // Each event carries the fields the analysis surfaces need:
-//   id, title, date, era, region, agency, flag, coords, type, release
+//   id, title, date, era, region, agency, flag, coords, type, release,
+//   priority, category[], evidenceTypes[], crossRefs[], tags[]
+// (priority/category/evidenceTypes/crossRefs are sparse — only events that
+// have been classified carry them; everything else is null.)
 
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -30,6 +33,11 @@ const events = EVENTS.map((e) => ({
   coords: e.coords ?? null,
   type: e.type ?? null,
   release: e.release ?? null,
+  priority: e.priority ?? null,
+  category: e.category ?? null,
+  evidenceTypes: e.evidenceTypes ?? null,
+  crossRefs: e.crossRefs ?? null,
+  tags: e.tags ?? null,
 }));
 
 const payload = {

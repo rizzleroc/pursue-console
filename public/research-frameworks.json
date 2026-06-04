@@ -1,0 +1,136 @@
+{
+  "generatedAt": "2026-06-04T00:00:00.000Z",
+  "_note": "Hand-curated reference index for non-event entities: peer reports, government programs, theoretical-physics frameworks, facilities, and sensor classes. Events in events.json carry crossRefs[] pointing into this file by id. Update HOW-CAN-I-HELP.md to contribute additions.",
+
+  "reports": [
+    {
+      "id": "dia-aawsa-dird-superconductors-2010",
+      "title": "The Role of Superconductors in Gravity Research",
+      "year": 2010,
+      "authors": ["George A. Louis"],
+      "program": "aawsa",
+      "organization": "Defense Intelligence Agency",
+      "type": "theoretical-framework",
+      "series": "Defense Intelligence Reference Document (DIRD)",
+      "summary": "AAWSA-commissioned DIRD surveying claimed and observed coupling between superconductors and the gravitational field — Podkletnov-type rotating-disc experiments, Heim-Dröscher hyperspace coupling, and asymmetric gravitomagnetic effects. Sets the theoretical frame in which DoE/Pantex anomalous sensor returns are interpreted.",
+      "tags": ["superconductor", "gravity", "propulsion", "Podkletnov", "AAWSA", "DIRD"]
+    },
+    {
+      "id": "dia-aawsa-dird-warp-drive-2010",
+      "title": "Warp Drive, Dark Energy, and the Manipulation of Extra Dimensions",
+      "year": 2010,
+      "authors": ["Eric W. Davis"],
+      "program": "aawsa",
+      "organization": "Defense Intelligence Agency",
+      "type": "theoretical-framework",
+      "series": "Defense Intelligence Reference Document (DIRD)",
+      "summary": "Companion AAWSA DIRD on metric-engineering and Alcubierre-class propulsion. Often co-cited with the superconductor paper as the theoretical envelope for the AAWSA programme.",
+      "tags": ["warp drive", "dark energy", "Alcubierre", "AAWSA", "DIRD"]
+    }
+  ],
+
+  "programs": [
+    {
+      "id": "aawsa",
+      "name": "AAWSA",
+      "fullName": "Advanced Aerospace Weapon System Applications Program",
+      "organization": "Defense Intelligence Agency",
+      "active": "2008-2012",
+      "summary": "DIA-funded successor to AAWSAP; produced ~38 Defense Intelligence Reference Documents on advanced propulsion, materials science, and theoretical-physics frameworks for anomalous aerospace phenomena.",
+      "tags": ["DIA", "propulsion", "advanced-aerospace", "DIRD"]
+    },
+    {
+      "id": "aaro",
+      "name": "AARO",
+      "fullName": "All-domain Anomaly Resolution Office",
+      "organization": "Department of Defense",
+      "active": "2022-present",
+      "summary": "Current DoD office of record for UAP investigation, sensor-data review, and historical-record review. Successor to AOIMSG / UAPTF.",
+      "tags": ["DoD", "AOIMSG", "UAPTF"]
+    }
+  ],
+
+  "frameworks": [
+    {
+      "id": "superconductor-gravity-coupling",
+      "title": "Superconductor-mediated gravitomagnetic coupling",
+      "discipline": "theoretical physics — general relativity / condensed matter",
+      "summary": "Hypothesis class in which rotating or oscillating superconductors exhibit anomalous coupling to the gravitational field (Podkletnov 1992, Tajmar 2006). Used by DIA AAWSA as the candidate framework for anomalous radar/imaging returns at nuclear-research sites.",
+      "tags": ["superconductor", "gravity", "Podkletnov", "Tajmar", "physics"]
+    },
+    {
+      "id": "nuclear-site-clustering",
+      "title": "Nuclear-site UAP clustering",
+      "discipline": "incident epidemiology",
+      "summary": "Documented pattern in which UAP sightings cluster at nuclear-weapons assembly, storage, and research facilities (Hastings 2008, Salas 2010). Pantex, Sandia, Los Alamos, and Oak Ridge are all primary sites in the open-archive record.",
+      "tags": ["nuclear", "Pantex", "Sandia", "Los Alamos", "Oak Ridge", "Hastings"]
+    }
+  ],
+
+  "facilities": [
+    {
+      "id": "pantex-plant",
+      "name": "Pantex Plant",
+      "type": "nuclear-weapons-facility",
+      "operator": "Department of Energy / NNSA",
+      "location": "Amarillo, Texas",
+      "coords": [35.32, -101.56],
+      "summary": "Only US facility that assembles, disassembles, and modifies nuclear weapons. Co-located with the Pantex Wildlife Refuge. Ground Surveillance Radar coverage of the perimeter is the data source for DOE-UAP-D001.",
+      "tags": ["nuclear", "DOE", "NNSA", "Texas"]
+    },
+    {
+      "id": "sandia-nat-labs",
+      "name": "Sandia National Laboratories",
+      "type": "weapons-research-laboratory",
+      "operator": "Department of Energy / NNSA",
+      "location": "Albuquerque, New Mexico",
+      "coords": [35.05, -106.54],
+      "summary": "DoE weapons-research lab adjacent to Kirtland AFB. Hosts radar-cross-section ranges and the original Pantex image-enhancement work referenced in DOE-UAP-D001.",
+      "tags": ["nuclear", "DOE", "NNSA", "New Mexico", "Kirtland"]
+    },
+    {
+      "id": "los-alamos-nat-lab",
+      "name": "Los Alamos National Laboratory",
+      "type": "weapons-research-laboratory",
+      "operator": "Department of Energy / NNSA",
+      "location": "Los Alamos, New Mexico",
+      "coords": [35.88, -106.30],
+      "summary": "Manhattan Project laboratory, ongoing weapons-design and applied-physics research. James L. Tuck (DOE-UAP-D002 correspondent) was a staff physicist here.",
+      "tags": ["nuclear", "DOE", "NNSA", "Manhattan Project", "New Mexico"]
+    },
+    {
+      "id": "oak-ridge-nat-lab",
+      "name": "Oak Ridge National Laboratory",
+      "type": "weapons-research-laboratory",
+      "operator": "Department of Energy",
+      "location": "Oak Ridge, Tennessee",
+      "coords": [35.93, -84.31],
+      "summary": "Manhattan Project enrichment site. Section 2 of FBI-62HQ-83894 documents repeated 1947–1950 UAP sightings over Oak Ridge by AEC security and military police.",
+      "tags": ["nuclear", "DOE", "Tennessee", "FBI Vault", "Manhattan Project"]
+    }
+  ],
+
+  "sensors": [
+    {
+      "id": "ground-surveillance-radar",
+      "name": "Ground Surveillance Radar Tower",
+      "kind": "radar",
+      "summary": "Static-tower L/S-band perimeter radar used at nuclear-weapons sites. Cross-references the imagery in DOE-UAP-D001 to a primary sensor of record.",
+      "tags": ["radar", "Pantex", "perimeter"]
+    },
+    {
+      "id": "lp-op-visual",
+      "name": "LP/OP visual observation",
+      "kind": "human-visual",
+      "summary": "Listening-post / observation-post sentinel sighting protocol. The primary sensor for the USPER-2025 helicopter encounter.",
+      "tags": ["visual", "sentinel"]
+    },
+    {
+      "id": "flir-targeting-pod",
+      "name": "FLIR targeting-pod IR",
+      "kind": "infrared",
+      "summary": "Forward-looking infrared targeting pod (ATFLIR / Sniper-XR) — the primary instrument behind the Nimitz Tic-Tac and Gimbal videos.",
+      "tags": ["infrared", "FLIR", "ATFLIR"]
+    }
+  ]
+}
