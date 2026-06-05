@@ -101,6 +101,8 @@
     .entity-row .meter { width: 70px; height: 3px; background: rgba(242, 166, 35, 0.10); }
     .entity-row .meter span { display: block; height: 100%; background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
     .entity-row .count { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; min-width: 50px; text-align: right; }
+    .mc-link { text-decoration: none; color: inherit; display: contents; }
+    a.entity-row { text-decoration: none; color: inherit; }
   </style>
 </head>
 <body data-view="live">
@@ -188,14 +190,14 @@
         <div class="histo-axis"><span>00</span><span>12</span><span>24</span></div>
       </div>
       <div class="panel">
-        <div class="panel-head"><span><span class="icon-sq"></span>Oscillation · 60s</span><span class="right">activity</span></div>
-        <svg viewBox="0 0 320 60" style="width:100%;height:60px;margin-top:6px"><polyline fill="none" stroke="#F2A623" stroke-width="1.8" opacity="0.9" points="0,30 22,22 44,36 66,16 88,40 110,24 132,32 154,10 176,44 198,20 220,36 242,28 264,30 286,22 308,30 320,28"/></svg>
+        <div class="panel-head"><span><span class="icon-sq"></span>Oscillation · 60s</span><span class="right" id="osc-caption">activity</span></div>
+        <svg viewBox="0 0 320 60" style="width:100%;height:60px;margin-top:6px"><polyline id="osc-line" fill="none" stroke="#F2A623" stroke-width="1.8" opacity="0.9" points="0,30 22,22 44,36 66,16 88,40 110,24 132,32 154,10 176,44 198,20 220,36 242,28 264,30 286,22 308,30 320,28"/></svg>
         <div class="histo-axis"><span>−60s</span><span>NOW</span></div>
       </div>
       <div class="panel">
         <div class="panel-head"><span><span class="icon-sq"></span>Channels</span><span class="right">/hr</span></div>
-        <div class="ch-row"><span class="name">Vision</span><span class="rate">0 /hr</span></div>
-        <div class="ch-row"><span class="name">Tesseract</span><span class="rate">0 /hr</span></div>
+        <div class="ch-row"><span class="name">Vision</span><span class="rate" id="ch-vision">0 /hr</span></div>
+        <div class="ch-row"><span class="name">Tesseract</span><span class="rate" id="ch-ocr">0 /hr</span></div>
       </div>
       <div class="panel">
         <div class="panel-head"><span><span class="icon-sq"></span>Media types</span><span class="right">media.json</span></div>
@@ -264,10 +266,23 @@
 
 <script src="chrome.js" defer></script>
 <script>
-  // ── Ingest histogram (static, not data-layer driven) ──
+  // ── Ingest histogram (static fallback; replaced live by renderIngest()) ──
   const h = document.getElementById('histo');
   const bars = [2,1,0,0,1,3,5,8,12,9,7,11,6,4,9,14,10,6,3,8,5,2,1,0]; const mx = Math.max(...bars);
   bars.forEach((b,i) => { const d=document.createElement('div'); d.style.height='0%'; h.appendChild(d); setTimeout(() => { d.style.transition='height .9s cubic-bezier(.2,.7,.2,1)'; d.style.height=((b/mx)*100)+'%'; }, 1400+i*28); });
+
+  // Human-readable "ago" (e.g. "16h ago", "3d ago", "12m ago")
+  function humanAgo(ms){
+    if (!isFinite(ms) || ms < 0) return 'just now';
+    const s = Math.floor(ms/1000);
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s/60);
+    if (m < 60) return m + 'm ago';
+    const hr = Math.floor(m/60);
+    if (hr < 24) return hr + 'h ago';
+    const d = Math.floor(hr/24);
+    return d + 'd ago';
+  }
 
   // ── Coverage grid: deterministic random fallback (used if MC fails) ──
   function renderCoverageFallback() {
@@ -320,9 +335,16 @@
     const faOpen = document.getElementById('fa-open');
     if (faOpen && Array.isArray(D.queue)) faOpen.textContent = D.queue.length;
 
-    // CTA title hint
+    // CTA title hint + redirect to next-missing dossier
     const cta = document.getElementById('next-cta');
-    if (cta && D.queueTop && D.queueTop.eid) cta.title = 'Next: ' + D.queueTop.eid;
+    if (cta) {
+      if (D.queueTop && D.queueTop.eid) cta.title = 'Next: ' + D.queueTop.eid;
+      if (Array.isArray(D.queue) && D.queue.length && D.queue[0] && D.queue[0].eid && MC.url && MC.url.dossier) {
+        cta.href = MC.url.dossier(D.queue[0].eid);
+      } else {
+        cta.href = 'review.html';
+      }
+    }
 
     // Arriving signals from feedEntries
     const sig = document.getElementById('signals');
@@ -330,9 +352,13 @@
       sig.innerHTML = D.feedEntries.slice(0,5).map(e => {
         const src = (e.source || '').toString().toUpperCase() || 'VISION';
         const meta = [e.agency, (e.page != null ? 'p'+e.page : '')].filter(Boolean).join(' · ');
+        const eid = e.eventId || e.title || '';
+        const eidHtml = eid && MC.url && MC.url.dossier
+          ? '<a class="eid" href="'+esc(MC.url.dossier(eid))+'" style="text-decoration:none;color:inherit">'+esc(eid)+'</a>'
+          : '<span class="eid">'+esc(eid)+'</span>';
         return '<div class="signal">'
           + '<div class="signal-meta"><span class="tag">'+esc(src)+'</span>'
-          + '<span class="eid">'+esc(e.eventId||e.title||'')+'</span>'
+          + eidHtml
           + (meta ? '<span>'+esc(meta)+'</span>' : '')
           + '</div>'
           + '<p class="signal-quote">'+esc(e.snippet||'')+'</p>'
@@ -345,10 +371,93 @@
     if (asg && Array.isArray(D.queue) && D.queue.length) {
       asg.innerHTML = D.queue.slice(0,4).map(q => {
         const bits = [q.flag, q.reason].filter(Boolean).map(x => String(x).toUpperCase()).join(' · ');
-        return '<div class="help-row"><span><span class="eid">'+esc(q.eid||'')+'</span>'
+        const eid = q.eid || '';
+        const page = q.page || 1;
+        const dossierUrl = eid && MC.url && MC.url.dossier ? MC.url.dossier(eid) : '#';
+        const claimUrl = eid && MC.url && MC.url.claim ? MC.url.claim(eid, page) : '#';
+        return '<div class="help-row">'
+          + '<a href="'+esc(dossierUrl)+'" style="text-decoration:none;color:inherit;flex:1;min-width:0">'
+          + '<span class="eid">'+esc(eid)+'</span>'
           + (bits ? '<span class="pp">· '+esc(bits)+'</span>' : '')
-          + '</span><button class="claim">CLAIM</button></div>';
+          + '</a>'
+          + '<a class="claim" href="'+esc(claimUrl)+'" target="_blank" rel="noopener">CLAIM</a>'
+          + '</div>';
       }).join('');
+    }
+
+    // Ingest histogram · 24 hourly buckets over the last 24h
+    const histo = document.getElementById('histo');
+    if (histo && Array.isArray(D.feedEntries) && D.feedEntries.length) {
+      const now = Date.now();
+      const counts = new Array(24).fill(0);
+      D.feedEntries.forEach(e => {
+        const t = e && e.modifiedAt;
+        if (typeof t !== 'number') return;
+        const b = Math.max(0, Math.min(23, Math.floor((now - t) / 3600000)));
+        counts[b]++;
+      });
+      // bucket 0 = current hour; display wants "24h ago" on the left, "now" on right.
+      const display = counts.slice().reverse();
+      const maxC = Math.max(1, ...display);
+      histo.innerHTML = '';
+      display.forEach(c => {
+        const d = document.createElement('div');
+        d.style.height = ((c / maxC) * 100) + '%';
+        if (c === 0) d.style.opacity = '0.12';
+        d.title = c + ' page(s)';
+        histo.appendChild(d);
+      });
+    }
+
+    // Oscillation · 60s · 12 buckets of 5s each
+    const osc = document.getElementById('osc-line');
+    const oscCap = document.getElementById('osc-caption');
+    if (osc && Array.isArray(D.feedEntries)) {
+      const now = Date.now();
+      const buckets = new Array(12).fill(0);
+      D.feedEntries.forEach(e => {
+        const t = e && e.modifiedAt;
+        if (typeof t !== 'number') return;
+        const diff = now - t;
+        if (diff >= 0 && diff < 60000) {
+          const b = Math.min(11, Math.floor(diff / 5000));
+          // bucket 0 = freshest (closest to now) → display on right
+          buckets[11 - b]++;
+        }
+      });
+      const total = buckets.reduce((a,b)=>a+b, 0);
+      if (total > 0) {
+        const mx = Math.max(1, ...buckets);
+        const pts = buckets.map((c,i) => (i*26.66).toFixed(2) + ',' + (30 - (c/mx)*22).toFixed(2)).join(' ');
+        osc.setAttribute('points', pts);
+        osc.setAttribute('opacity', '0.9');
+        if (oscCap) oscCap.textContent = total + ' in 60s';
+      } else {
+        // No live activity — keep the demo polyline but dim it, show last-build age.
+        osc.setAttribute('opacity', '0.25');
+        if (oscCap) {
+          const feedRaw = (MC.data && MC.data.feed) || {};
+          const gen = feedRaw.generatedAt ? Date.parse(feedRaw.generatedAt) : NaN;
+          const ageStr = isFinite(gen) ? humanAgo(now - gen) : 'unknown';
+          oscCap.textContent = 'no live activity · last build ' + ageStr;
+        }
+      }
+    }
+
+    // Channels · /hr — vision vs ocr (tesseract) in the last 60 minutes
+    const chV = document.getElementById('ch-vision');
+    const chO = document.getElementById('ch-ocr');
+    if ((chV || chO) && Array.isArray(D.feedEntries)) {
+      const now = Date.now();
+      let v = 0, o = 0;
+      D.feedEntries.forEach(e => {
+        const t = e && e.modifiedAt;
+        if (typeof t !== 'number' || (now - t) > 3600000 || (now - t) < 0) return;
+        if (e.source === 'vision') v++;
+        else if (e.source === 'ocr') o++;
+      });
+      if (chV) chV.textContent = v + ' /hr';
+      if (chO) chO.textContent = o + ' /hr';
     }
 
     // Mined index from topEntities
@@ -358,9 +467,12 @@
       const maxM = Math.max(...top.map(e => e.mentions||0), 1);
       ents.innerHTML = top.map(e => {
         const w = Math.max(6, Math.round(((e.mentions||0)/maxM)*100));
-        return '<div class="entity-row"><span class="name">'+esc(e.term||'')+'</span>'
+        const term = e.term || '';
+        const href = 'search.html?q=' + encodeURIComponent(term);
+        return '<a class="entity-row" href="'+esc(href)+'">'
+          + '<span class="name">'+esc(term)+'</span>'
           + '<span class="meter"><span style="width:'+w+'%"></span></span>'
-          + '<span class="count">'+esc((e.mentions||0).toLocaleString())+'</span></div>';
+          + '<span class="count">'+esc((e.mentions||0).toLocaleString())+'</span></a>';
       }).join('');
     }
   }

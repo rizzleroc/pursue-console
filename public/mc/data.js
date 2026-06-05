@@ -199,6 +199,46 @@
       .sort((a, b) => b.count - a.count)
       .slice(0, n);
   };
+  // shape/behavior/sensor terms for one event (dossier signatures)
+  MC.signaturesForEvent = (eid) => {
+    const out = { shape: [], behavior: [], sensor: [] };
+    for (const k of Object.keys(out)) {
+      const bucket = MC.get(`patterns.byKind.${k}`, []);
+      out[k] = bucket
+        .map((t) => {
+          const hit = (t.events || []).find((x) => x.eid === eid);
+          return hit ? { term: t.term, count: hit.count } : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+    }
+    return out;
+  };
+  // event metadata lookup (by id)
+  MC.byEid = (eid) => {
+    if (!MC.derive || !MC.derive.events) return null;
+    return MC.derive.events.find((e) => e.id === eid) || null;
+  };
+  // URL helpers
+  MC.url = {
+    dossier: (eid, extra = "") => `dossier.html?eid=${encodeURIComponent(eid)}${extra ? "&" + extra : ""}`,
+    claim:   (eid, page) => {
+      // Pre-fill a GitHub issue against the repo, type:cataloguing label,
+      // body referencing the eid + page so a volunteer can pick it up.
+      const repo = "rizzleroc/pursue-console";
+      const title = `[transcribe] ${eid} · p${page || 1}`;
+      const body = `Claim this page for transcription. Source: \`public/next-missing.json\` queue.\n\n- **Event:** \`${eid}\`\n- **Page:** ${page || 1}\n\nSee HOW-CAN-I-HELP.md for the workflow.`;
+      return `https://github.com/${repo}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=cataloguing`;
+    },
+  };
+  // URL query parsing
+  MC.query = (() => {
+    const qs = new URLSearchParams(window.location.search);
+    const out = {};
+    qs.forEach((v, k) => { out[k] = v; });
+    return out;
+  })();
 
   // ─────────── Declarative text binding ───────────
   // <span data-mc="r1Catalogued"></span>  → MC.derive.r1Catalogued

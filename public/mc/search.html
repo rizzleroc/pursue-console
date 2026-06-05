@@ -28,13 +28,13 @@
     .stats-row .v { color: var(--amber); font-weight: 600; }
     .stats-row .right { margin-left: auto; }
     .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .rc { background: var(--surface); border: 1px solid var(--border); padding: 18px 20px; backdrop-filter: blur(10px); transition: all .2s; cursor: pointer; position: relative; overflow: hidden; }
+    .rc { background: var(--surface); border: 1px solid var(--border); padding: 18px 20px; backdrop-filter: blur(10px); transition: all .2s; cursor: pointer; position: relative; overflow: hidden; display: block; color: inherit; text-decoration: none; }
     .rc:hover { border-color: var(--border-strong); }
     .rc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--amber); opacity: 0; transition: opacity .2s; }
     .rc:hover::before { opacity: 1; box-shadow: 0 0 10px var(--amber-glow); }
     .rc .top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
     .rc .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
-    .rc .dot.r { background: var(--rose); } .rc .dot.c { background: var(--cyan); } .rc .dot.e { background: var(--emerald); }
+    .rc .dot.r { background: var(--rose); } .rc .dot.c { background: var(--cyan); } .rc .dot.e { background: var(--emerald); } .rc .dot.g { background: var(--text-4); }
     .rc .eid { color: var(--cyan); }
     .rc .score { margin-left: auto; color: var(--amber); font-weight: 600; }
     .rc h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 600; line-height: 1.25; margin: 0 0 10px; color: var(--text); letter-spacing: -0.01em; }
@@ -42,6 +42,12 @@
     .rc p mark { background: rgba(242,166,35,0.22); color: var(--amber-bright); padding: 0 4px; }
     .rc .bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.14em; text-transform: uppercase; }
     .rc .bottom .pg { color: var(--amber); }
+    .empty-state { display: none; border: 1px dashed var(--border-strong); padding: 40px 32px; text-align: center; font-family: 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.14em; font-size: 12px; background: var(--surface); }
+    .empty-state.on { display: block; }
+    .empty-state h3 { font-family: 'Space Grotesk', sans-serif; color: var(--amber); font-size: 20px; letter-spacing: -0.01em; margin: 0 0 8px; }
+    .meaning-note { display: none; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cyan); letter-spacing: 0.10em; }
+    .meaning-note.on { display: block; }
+    .browse-hint { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; margin: 0 0 12px; }
   </style>
 </head>
 <body data-view="search">
@@ -56,113 +62,278 @@
   <section class="search-shell">
     <div class="search-form">
       <div class="mode-toggle">
-        <a class="mode active">
+        <a class="mode active" id="mode-exact">
           <span class="lbl">▣ &nbsp; EXACT MATCH<span class="badge">DEFAULT</span></span>
           <h3>Lexical · MiniSearch</h3>
           <p>276 docs · fuzzy + prefix · &lt;50ms · loaded</p>
         </a>
-        <a class="mode">
+        <a class="mode" id="mode-meaning">
           <span class="lbl">∿ &nbsp; MEANING MATCH</span>
           <h3>Semantic · FAISS</h3>
           <p>5,665 chunks · 25MB embeddings · loads on click</p>
         </a>
       </div>
+      <div class="meaning-note" id="meaning-note">∿ MEANING MATCH requires the 25MB embedding bundle — coming soon. Sticking with EXACT for now.</div>
 
       <div class="search-input">
         <span class="glyph">⌕</span>
-        <input id="search-q" value="orb hover elevation" placeholder="QUERY · 220 events · 3,530 pages…"/>
-        <span class="clear">⨯ CLEAR</span>
+        <input id="search-q" value="" placeholder="QUERY · 220 events · 3,530 pages…" autocomplete="off"/>
+        <span class="clear" id="search-clear">⨯ CLEAR</span>
       </div>
 
       <div class="search-filters">
-        <select class="filter-select"><option>ALL AGENCIES</option></select>
-        <select class="filter-select"><option>ALL ERAS</option></select>
-        <select class="filter-select"><option>ALL TYPES</option></select>
+        <select class="filter-select" id="filter-agency"><option value="ALL">ALL AGENCIES</option></select>
+        <select class="filter-select" id="filter-era"><option value="ALL">ALL ERAS</option></select>
+        <select class="filter-select" id="filter-type"><option value="ALL">ALL TYPES</option></select>
         <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">EXACT finds your phrase verbatim · MEANING finds related ideas</span>
       </div>
     </div>
 
     <div class="stats-row">
-      <span><span class="v">14</span> RESULTS</span><span>·</span>
-      <span>EXACT MATCH · ⏱ 41ms</span><span>·</span>
-      <span style="color:var(--cyan);cursor:pointer">↻ TRY MEANING FOR FUZZIER RESULTS</span>
-      <span class="right">SORTED BY RELEVANCE</span>
+      <span><span class="v" id="stat-count">0</span> RESULTS</span><span>·</span>
+      <span id="stat-mode">EXACT MATCH · ⏱ <span id="stat-ms">0</span>ms</span><span>·</span>
+      <span style="color:var(--cyan);cursor:pointer" id="hint-meaning">↻ TRY MEANING FOR FUZZIER RESULTS</span>
+      <span class="right" id="stat-sort">SORTED BY RELEVANCE</span>
     </div>
 
-    <div class="results-grid">
-      <article class="rc">
-        <div class="top"><span class="dot r"></span><span class="eid">DOW-UAP-D038</span><span class="score">0.94</span></div>
-        <h3>Middle East — Erratic White Object Over Water</h3>
-        <p>"…sensor cycled <mark>hover</mark> tracking but the <mark>orb</mark> dispersed before a lock could be achieved over the water at…"</p>
-        <div class="bottom"><span class="pg">PAGE 12</span><span>DoW · 2020-05</span></div>
-      </article>
-
-      <article class="rc">
-        <div class="top"><span class="dot r"></span><span class="eid">USPER-STATEMENT</span><span class="score">0.91</span></div>
-        <h3>USPER Statement — Helicopter Encounter</h3>
-        <p>"…the <mark>orb</mark> gained <mark>elevation</mark> and came within ten feet of [the helicopter] before separating into multiple…"</p>
-        <div class="bottom"><span class="pg">PAGE 03</span><span>FBI · 2025-10</span></div>
-      </article>
-
-      <article class="rc">
-        <div class="top"><span class="dot"></span><span class="eid">FBI-62HQ-83894-02</span><span class="score">0.78</span></div>
-        <h3>FBI Flying Discs Case File · Section 2</h3>
-        <p>"…witness reports a bright <mark>orb</mark> seen to <mark>hover</mark> motionless over the field for nearly two minutes…"</p>
-        <div class="bottom"><span class="pg">PAGE 18</span><span>FBI · 1947</span></div>
-      </article>
-
-      <article class="rc">
-        <div class="top"><span class="dot r"></span><span class="eid">DOW-UAP-D045</span><span class="score">0.74</span></div>
-        <h3>Southern US — Air Force Sighting (PR-45)</h3>
-        <p>"…several bright objects maneuvering quickly west to east northeast, then <mark>hover</mark>ed in formation for 20 seconds…"</p>
-        <div class="bottom"><span class="pg">PAGE 04</span><span>DoW · 2020-03</span></div>
-      </article>
-
-      <article class="rc">
-        <div class="top"><span class="dot c"></span><span class="eid">GEMINI-7</span><span class="score">0.69</span></div>
-        <h3>Gemini VII — Borman &amp; Lovell "Bogey"</h3>
-        <p>"…brilliant body in the sun against a black background, debris field of trillions of particles at <mark>elevation</mark>…"</p>
-        <div class="bottom"><span class="pg">PAGE 01</span><span>NASA · 1965</span></div>
-      </article>
-
-      <article class="rc">
-        <div class="top"><span class="dot"></span><span class="eid">UAE-JUNE-2024</span><span class="score">0.62</span></div>
-        <h3>UAE — June 2024 mission report</h3>
-        <p>"…AFSOC ISR mission, target maintained constant <mark>elevation</mark> through observation window despite cycling sensor…"</p>
-        <div class="bottom"><span class="pg">PAGE 02</span><span>DoW · 2024-06</span></div>
-      </article>
+    <p class="browse-hint" id="browse-hint">BROWSE / SUGGESTED · top events by flag weight</p>
+    <div class="results-grid" id="results-grid"></div>
+    <div class="empty-state" id="empty-state">
+      <h3>NO MATCHES</h3>
+      <div>try MEANING MATCH for fuzzier semantic results, or relax your filters</div>
     </div>
   </section>
 </main>
 
 <script src="data.js"></script>
-
 <script src="chrome.js" defer></script>
 <script>
-  // Toggle modes on click (visual demo)
-  document.querySelectorAll('.mode').forEach(m => {
-    m.addEventListener('click', () => {
-      document.querySelectorAll('.mode').forEach(x => x.classList.remove('active'));
-      m.classList.add('active');
-    });
+(function(){
+  // Visual mode toggle — MEANING is out of scope, show note, don't flip.
+  var modeExact = document.getElementById('mode-exact');
+  var modeMeaning = document.getElementById('mode-meaning');
+  var meaningNote = document.getElementById('meaning-note');
+  modeExact.addEventListener('click', function(){
+    modeExact.classList.add('active');
+    modeMeaning.classList.remove('active');
+    meaningNote.classList.remove('on');
+  });
+  modeMeaning.addEventListener('click', function(){
+    // Don't actually flip — just surface the note.
+    meaningNote.classList.add('on');
   });
 
-  // ── Live data layer: corpus-scale numbers in the input placeholder ──
-  // (eventCount + pagesIndexed). Index sizes 276 docs / 5,665 chunks stay static.
+  // Sync placeholder with live corpus scale (kept from original).
   function syncSearchScale(MC){
-    const D = MC && MC.derive; if (!D) return;
-    const q = document.getElementById('search-q');
+    var D = MC && MC.derive; if (!D) return;
+    var q = document.getElementById('search-q');
     if (!q) return;
-    const ev = (typeof D.eventCount === 'number' && D.eventCount > 0)
-      ? D.eventCount : 220;
-    const pg = (typeof D.pagesIndexed === 'number' && D.pagesIndexed > 0)
-      ? D.pagesIndexed.toLocaleString() : '3,530';
+    var ev = (typeof D.eventCount === 'number' && D.eventCount > 0) ? D.eventCount : 220;
+    var pg = (typeof D.pagesIndexed === 'number' && D.pagesIndexed > 0) ? D.pagesIndexed.toLocaleString() : '3,530';
     q.placeholder = 'QUERY · ' + ev + ' events · ' + pg + ' pages…';
   }
-  if (window.MC && typeof window.MC.ready === 'function') {
-    window.MC.ready().then(() => syncSearchScale(window.MC));
-    window.MC.onUpdate(() => syncSearchScale(window.MC));
+
+  // Agency → dot class.
+  function dotClass(agency){
+    var a = (agency || '').toString().toUpperCase();
+    if (a === 'DOW' || a === 'DEPT OF WAR' || a === 'DEPARTMENT OF WAR') return ''; // amber default
+    if (a === 'FBI') return 'c';
+    if (a === 'NASA') return 'e';
+    if (a === 'ANCHOR') return 'r';
+    return 'g';
   }
+
+  // Flag-weight (for default "BROWSE / SUGGESTED" listing).
+  function flagWeight(f){
+    var x = (f || '').toString().toLowerCase();
+    if (x === 'anchor') return 4;
+    if (x === 'high')   return 3;
+    if (x === 'med' || x === 'medium') return 2;
+    if (x === 'low')    return 1;
+    return 0;
+  }
+
+  // Escape for safe HTML interpolation.
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── Scoring ──
+  // title substring → 10 · id substring → 8 · agency/region/type/era substring → 4
+  // exact tag/era token match → 2 · per-token sum, top 24.
+  function scoreEvent(ev, tokens){
+    var total = 0;
+    var title  = (ev.title  || '').toLowerCase();
+    var id     = (ev.id     || '').toLowerCase();
+    var agency = (ev.agency || '').toLowerCase();
+    var region = (ev.region || '').toLowerCase();
+    var era    = (ev.era    || '').toLowerCase();
+    var type   = (ev.type   || '').toLowerCase();
+    for (var i = 0; i < tokens.length; i++){
+      var t = tokens[i];
+      if (!t) continue;
+      if (title.indexOf(t)  !== -1) total += 10;
+      if (id.indexOf(t)     !== -1) total += 8;
+      if (agency.indexOf(t) !== -1) total += 4;
+      if (region.indexOf(t) !== -1) total += 4;
+      if (type.indexOf(t)   !== -1) total += 4;
+      if (era.indexOf(t)    !== -1) total += 4;
+      if (era === t || type === t)  total += 2;
+    }
+    return total;
+  }
+
+  function tokenize(q){
+    return (q || '').toLowerCase().split(/\s+/).filter(Boolean);
+  }
+
+  // Card renderer.
+  function cardHTML(ev, score, MC){
+    var href = (MC && MC.url && MC.url.dossier) ? MC.url.dossier(ev.id) : ('dossier.html?eid=' + encodeURIComponent(ev.id));
+    var dot = dotClass(ev.agency);
+    var snippet = [ev.date, ev.region, ev.agency, ev.type].filter(Boolean).join(' · ');
+    var scoreStr = (typeof score === 'number') ? score.toFixed(0) : '';
+    return '' +
+      '<a class="rc" href="' + esc(href) + '">' +
+        '<div class="top">' +
+          '<span class="dot ' + dot + '"></span>' +
+          '<span class="eid">' + esc(ev.id) + '</span>' +
+          (scoreStr ? '<span class="score">' + esc(scoreStr) + '</span>' : '') +
+        '</div>' +
+        '<h3>' + esc(ev.title || ev.id) + '</h3>' +
+        '<p>' + esc(snippet) + '</p>' +
+        '<div class="bottom">' +
+          '<span class="pg">' + esc((ev.agency || '—').toString().toUpperCase()) + '</span>' +
+          '<span>' + esc(ev.date || ev.era || '') + '</span>' +
+        '</div>' +
+      '</a>';
+  }
+
+  function applyFilters(events, f){
+    if (!f.agency && !f.era && !f.type) return events;
+    return events.filter(function(e){
+      if (f.agency && f.agency !== 'ALL' && (e.agency || '') !== f.agency) return false;
+      if (f.era    && f.era    !== 'ALL' && (e.era    || '') !== f.era)    return false;
+      if (f.type   && f.type   !== 'ALL' && (e.type   || '') !== f.type)   return false;
+      return true;
+    });
+  }
+
+  function populateFilter(sel, values, leadLabel){
+    // Keep the existing leading "ALL ..." option, append the rest.
+    while (sel.options.length > 1) sel.remove(1);
+    values.slice().sort().forEach(function(v){
+      var o = document.createElement('option');
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+
+  MC.ready().then(function(){
+    syncSearchScale(MC);
+    MC.onUpdate(function(){ syncSearchScale(MC); });
+
+    var events = (MC.derive && MC.derive.events) || [];
+    var byAgency = (MC.derive && MC.derive.byAgency) || {};
+    var byEra    = (MC.derive && MC.derive.byEra)    || {};
+    var typeSet  = {};
+    events.forEach(function(e){ if (e && e.type) typeSet[e.type] = true; });
+
+    var selAgency = document.getElementById('filter-agency');
+    var selEra    = document.getElementById('filter-era');
+    var selType   = document.getElementById('filter-type');
+    populateFilter(selAgency, Object.keys(byAgency));
+    populateFilter(selEra,    Object.keys(byEra));
+    populateFilter(selType,   Object.keys(typeSet));
+
+    var inp        = document.getElementById('search-q');
+    var clearBtn   = document.getElementById('search-clear');
+    var grid       = document.getElementById('results-grid');
+    var emptyEl    = document.getElementById('empty-state');
+    var statCount  = document.getElementById('stat-count');
+    var statMs     = document.getElementById('stat-ms');
+    var statSort   = document.getElementById('stat-sort');
+    var browseHint = document.getElementById('browse-hint');
+
+    function currentFilters(){
+      return { agency: selAgency.value, era: selEra.value, type: selType.value };
+    }
+
+    function render(){
+      var t0 = performance.now();
+      var q = (inp.value || '').trim();
+      var f = currentFilters();
+      var base = applyFilters(events, f);
+      var out, isBrowse = false;
+
+      if (!q){
+        // BROWSE / SUGGESTED — top 12 by flag weight.
+        isBrowse = true;
+        out = base.slice().sort(function(a, b){ return flagWeight(b.flag) - flagWeight(a.flag); }).slice(0, 12);
+      } else {
+        var tokens = tokenize(q);
+        var scored = [];
+        for (var i = 0; i < base.length; i++){
+          var s = scoreEvent(base[i], tokens);
+          if (s > 0) scored.push({ ev: base[i], score: s });
+        }
+        scored.sort(function(a, b){ return b.score - a.score; });
+        out = scored.slice(0, 24);
+      }
+
+      var t1 = performance.now();
+      var ms = Math.max(0, Math.round(t1 - t0));
+
+      // Stats row.
+      statCount.textContent = out.length;
+      statMs.textContent = ms;
+      statSort.textContent = isBrowse ? 'SORTED BY FLAG WEIGHT' : 'SORTED BY RELEVANCE';
+
+      // Browse hint vs. results.
+      browseHint.style.display = isBrowse ? '' : 'none';
+
+      // Empty state — only when there's a query AND no hits.
+      if (out.length === 0 && q){
+        emptyEl.classList.add('on');
+        grid.innerHTML = '';
+        return;
+      }
+      emptyEl.classList.remove('on');
+
+      // Cap render at 24.
+      var html = '';
+      var capped = out.slice(0, 24);
+      for (var j = 0; j < capped.length; j++){
+        var row = isBrowse ? { ev: capped[j], score: null } : capped[j];
+        html += cardHTML(row.ev, row.score, MC);
+      }
+      grid.innerHTML = html;
+    }
+
+    // Debounced input (~120ms).
+    var deb;
+    function schedule(){
+      clearTimeout(deb);
+      deb = setTimeout(render, 120);
+    }
+
+    inp.addEventListener('input', schedule);
+    clearBtn.addEventListener('click', function(){
+      inp.value = '';
+      render();
+      inp.focus();
+    });
+    selAgency.addEventListener('change', render);
+    selEra.addEventListener('change', render);
+    selType.addEventListener('change', render);
+
+    // Initial paint.
+    render();
+  });
+})();
 </script>
 </body>
 </html>

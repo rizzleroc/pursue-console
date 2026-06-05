@@ -19,6 +19,7 @@
     .tl-events { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .evt { background: var(--surface-2); border: 1px solid var(--hairline); padding: 12px 14px; transition: all .15s; cursor: pointer; }
     .evt:hover { border-color: var(--amber); transform: translateY(-2px); }
+    .evt a, a.evt { color: inherit; text-decoration: none; display: block; height: 100%; }
     .evt .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.12em; text-transform: uppercase; }
     .evt .dot { width: 7px; height: 7px; }
     .evt .dot.dow { background: var(--amber); }
@@ -177,11 +178,13 @@
   }
 
   function cardHTML(ev) {
-    return '<div class="evt"><div class="top">' +
+    var eid = ev.id || "";
+    var href = (MC.url && MC.url.dossier) ? MC.url.dossier(eid) : ("dossier.html?eid=" + encodeURIComponent(eid));
+    return '<a class="evt" href="' + esc(href) + '" data-eid="' + esc(eid) + '" style="text-decoration:none;color:inherit"><div class="top">' +
       '<span class="dot ' + dotClass(ev.agency) + '"></span>' +
       '<span class="date">' + esc(ev.date || "—") + '</span></div>' +
       '<div class="ttl">' + esc(ev.title || "Untitled") + '</div>' +
-      '<div class="agn">' + agnLine(ev) + '</div></div>';
+      '<div class="agn">' + agnLine(ev) + '</div></a>';
   }
 
   function bandHTML(eraKey, events, maxCount) {

@@ -13,6 +13,7 @@
     .rv-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: padding-left .2s; }
     .rv-row:hover { padding-left: 6px; }
     .rv-row.active { padding-left: 8px; border-left: 2px solid var(--amber); background: rgba(242,166,35,0.05); margin: 0 -22px; padding: 14px 22px 14px 26px; }
+    .rv-row-link { text-decoration: none; color: inherit; display: block; }
     .rv-row .top { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
     .rv-row .top .agree { margin-left: auto; color: var(--rose); font-weight: 700; }
     .rv-row .top .agree.high { color: var(--amber); }
@@ -57,21 +58,21 @@
     <div class="rv-queue">
       <div id="rv-queue-head" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between"><span id="rv-queue-label">QUEUE · WORST AGREEMENT</span><span id="rv-queue-count" style="color:var(--amber)">3</span></div>
       <div id="rv-queue-list">
-      <div class="rv-row active">
+      <a class="rv-row-link" href="dossier.html?eid=usper-2025"><div class="rv-row active">
         <div class="top"><span>FBI</span><span>·</span><span>2025-10</span><span class="agree">0.21</span></div>
         <div class="eid">usper-2025 · p 03</div>
         <div class="meta">vision · ocr · gemini · 4 sources disagree</div>
-      </div>
-      <div class="rv-row">
+      </div></a>
+      <a class="rv-row-link" href="dossier.html?eid=dow-uap-d48"><div class="rv-row">
         <div class="top"><span>DEPT/War</span><span>·</span><span>1996</span><span class="agree">0.34</span></div>
         <div class="eid">dow-uap-d48 · p 087</div>
         <div class="meta">vision · pdfjs · 2 sources disagree</div>
-      </div>
-      <div class="rv-row">
+      </div></a>
+      <a class="rv-row-link" href="dossier.html?eid=dow-uap-d038"><div class="rv-row">
         <div class="top"><span>DEPT/War</span><span>·</span><span>2020-05</span><span class="agree high">0.48</span></div>
         <div class="eid">dow-uap-d038 · p 12</div>
         <div class="meta">vision · ocr · minor</div>
-      </div>
+      </div></a>
       </div>
 
       <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
@@ -108,8 +109,8 @@
 
       <div class="actions-bar">
         <span class="meta">SUBMISSION · opens pre-filled PR · reviewer credit: anonymous OK</span>
-        <button class="ab-btn ghost">SKIP — next page</button>
-        <button class="ab-btn primary">▣ SUBMIT MERGED TEXT →</button>
+        <button class="ab-btn ghost" style="cursor:default">SKIP — next page</button>
+        <a id="rv-submit-btn" class="ab-btn primary" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">▣ SUBMIT MERGED TEXT →</a>
       </div>
     </div>
   </section>
@@ -164,7 +165,8 @@
     const count = document.getElementById('rv-queue-count');
     if (count) count.textContent = n;
 
-    // Queue list — top 12 from the transcription queue
+    // Queue list — top 12 from the transcription queue. Each row is wrapped
+    // in an anchor to MC.url.dossier(eid) so click → dossier.
     const list = document.getElementById('rv-queue-list');
     if (list) {
       list.innerHTML = q.slice(0, 12).map((item, i) => {
@@ -175,12 +177,14 @@
         const reason = (item.reason || '').toString();
         const meta = [reason, 'priority ' + (item.priority ?? '—')]
           .filter(Boolean).join(' · ');
-        return '<div class="rv-row' + (i === 0 ? ' active' : '') + '">'
+        const href = MC.url && MC.url.dossier ? MC.url.dossier(eid) : '#';
+        return '<a class="rv-row-link" href="' + esc(href) + '">'
+          + '<div class="rv-row' + (i === 0 ? ' active' : '') + '">'
           + '<div class="top"><span>' + esc(agency) + '</span><span>·</span>'
           + '<span class="agree high">' + esc(flag || '—') + '</span></div>'
           + '<div class="eid">' + esc(eid) + (pg ? ' · ' + esc(pg) : '') + '</div>'
           + '<div class="meta">' + esc(meta) + '</div>'
-          + '</div>';
+          + '</div></a>';
       }).join('');
     }
 
@@ -188,6 +192,13 @@
     const pane = document.getElementById('rv-pane-title');
     if (pane && q[0] && q[0].eid) {
       pane.textContent = q[0].eid + (q[0].page != null ? ' · page ' + q[0].page : '');
+    }
+
+    // Bind the SUBMIT MERGED TEXT primary button → pre-filled GitHub issue
+    // for the first queued page (MC.url.claim(eid, page)).
+    const submitBtn = document.getElementById('rv-submit-btn');
+    if (submitBtn && q[0] && MC.url && MC.url.claim) {
+      submitBtn.href = MC.url.claim(q[0].eid, q[0].page);
     }
   }
 
