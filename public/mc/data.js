@@ -32,6 +32,7 @@
     similarity: "event-similarity.json",
     work:       "work-available.json",
     events:     "events.json",
+    research:   "research-frameworks.json",
   };
 
   const MC = {
@@ -173,6 +174,30 @@
     // Similarity ------------------------------------------------------------
     D.similarity = (d.similarity && d.similarity.events) || {};
 
+    // Priority / Evidence / Cross-references --------------------------------
+    // Built once at load — cheap, since EVENTS is ~220 rows.
+    D.priorityEvents = ev.filter((e) => e.priority);
+    D.physicsEvents  = ev.filter((e) => Array.isArray(e.category) && e.category.indexOf("physics-relevant") !== -1);
+    D.criticalCount  = ev.filter((e) => e.priority === "critical").length;
+    D.priorityCount  = D.priorityEvents.length;
+    D.physicsCount   = D.physicsEvents.length;
+    D.crossRefCount  = ev.reduce((n, e) => n + (Array.isArray(e.crossRefs) ? e.crossRefs.length : 0), 0);
+
+    // Research index — flatten the four sub-collections so MC.byRefId() is O(1).
+    const research = d.research || {};
+    const refIndex = {};
+    ["reports", "programs", "frameworks", "facilities", "sensors"].forEach((kind) => {
+      (research[kind] || []).forEach((row) => {
+        if (row && row.id) refIndex[row.id] = Object.assign({ kind: kind.replace(/s$/, "") }, row);
+      });
+    });
+    D.refIndex = refIndex;
+    D.reports     = research.reports     || [];
+    D.programs    = research.programs    || [];
+    D.frameworks  = research.frameworks  || [];
+    D.facilities  = research.facilities  || [];
+    D.sensors     = research.sensors     || [];
+
     MC.derive = D;
   };
 
@@ -220,9 +245,34 @@
     if (!MC.derive || !MC.derive.events) return null;
     return MC.derive.events.find((e) => e.id === eid) || null;
   };
+  // research-frameworks lookup — reports / programs / frameworks / facilities / sensors
+  // shaped from public/research-frameworks.json
+  MC.byRefId = (id) => {
+    return (MC.derive && MC.derive.refIndex && MC.derive.refIndex[id]) || null;
+  };
+  // cross-references for an event — each entry is enriched with the resolved target
+  // (resolved=null if the id points outside the index, which is fine; the caller falls back)
+  MC.crossRefsForEvent = (eid) => {
+    const ev = MC.byEid(eid);
+    const out = (ev && Array.isArray(ev.crossRefs)) ? ev.crossRefs : [];
+    return out.map((ref) => ({
+      ...ref,
+      resolved: ref.type === "event" ? MC.byEid(ref.id) : MC.byRefId(ref.id),
+    }));
+  };
+  // reverse: events that reference a given target id (event/report/program/framework/facility/sensor)
+  MC.eventsReferencing = (targetId) => {
+    const events = (MC.derive && MC.derive.events) || [];
+    return events.filter((e) => Array.isArray(e.crossRefs) && e.crossRefs.some((r) => r.id === targetId));
+  };
+  // filter helpers
+  MC.byPriority   = (level)       => ((MC.derive && MC.derive.events) || []).filter((e) => e.priority === level);
+  MC.byCategory   = (categoryTag) => ((MC.derive && MC.derive.events) || []).filter((e) => Array.isArray(e.category) && e.category.indexOf(categoryTag) !== -1);
+  MC.byEvidenceType = (kind)      => ((MC.derive && MC.derive.events) || []).filter((e) => Array.isArray(e.evidenceTypes) && e.evidenceTypes.indexOf(kind) !== -1);
   // URL helpers
   MC.url = {
     dossier: (eid, extra = "") => `dossier.html?eid=${encodeURIComponent(eid)}${extra ? "&" + extra : ""}`,
+    evidence: (eid)            => `evidence.html${eid ? "?eid=" + encodeURIComponent(eid) : ""}`,
     claim:   (eid, page) => {
       // Pre-fill a GitHub issue against the repo, type:cataloguing label,
       // body referencing the eid + page so a volunteer can pick it up.
