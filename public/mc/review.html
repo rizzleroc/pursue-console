@@ -75,10 +75,18 @@
       </div></a>
       </div>
 
-      <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
-        <div style="margin-bottom:8px">FILTER · all agencies</div>
-        <div style="margin-bottom:8px">SORT · worst agreement first</div>
-        <div style="color:var(--text-3);margin-top:14px">Pages graded ≥0.85 are auto-accepted as canonical and never enter this queue. Threshold tunable in <span style="color:var(--amber)">corpus-stats.json</span>.</div>
+      <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.22em;font-weight:700;margin-bottom:10px">GRADED EXAMPLES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Pick an event with completed extracts to see what graded page text looks like.</div>
+        <select id="rv-graded" class="md-select" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;cursor:pointer">
+          <option value="">— pick an event —</option>
+        </select>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
+        <div style="margin-bottom:6px">FILTER · all agencies</div>
+        <div style="margin-bottom:6px">SORT · worst agreement first</div>
+        <div style="color:var(--text-3);margin-top:12px;line-height:1.55">Pages graded ≥0.85 are auto-accepted as canonical and never enter this queue. Threshold tunable in <span style="color:var(--amber)">corpus-stats.json</span>.</div>
       </div>
     </div>
 
@@ -86,29 +94,29 @@
       <div class="rv-head">
         <div>
           <h2 id="rv-pane-title">usper-2025 · page 03</h2>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES · LAST UPDATED 14h ago</div>
+          <div id="rv-pane-sub" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES</div>
         </div>
-        <div class="meta">AGREEMENT <span class="score">0.21</span></div>
+        <div class="meta">EXTRACTS <span class="score" id="rv-score" style="background:rgba(97,215,240,0.10);color:var(--cyan);border-color:rgba(97,215,240,0.4)">live</span></div>
       </div>
 
-      <div class="diff-grid">
+      <div class="diff-grid" id="rv-diff">
         <div class="diff-col">
-          <h4><span class="src-tag g">VISION</span><span>GEMINI · 2.0 Flash</span><span class="conf">0.94 conf</span></h4>
-          <p>"On <span class="del">[redacted]</span> 2025, at approximately 1700 hours [redacted] (a senior US intelligence official), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanied by [WITNESS 2 (a senior US intelligence official)], and two pilots from [STATE PARTNER ORGANIZATION] departed [<span class="add">SITE CODE NAME</span>] to conduct a search…"</p>
+          <h4><span class="src-tag g">VISION</span><span>loading extracts…</span></h4>
+          <p style="color:var(--text-4)">Pick a row in the queue to see the page's top-scoring extracts.</p>
         </div>
         <div class="diff-col">
-          <h4><span class="src-tag o">OCR</span><span>Tesseract 5.4</span><span class="conf">0.62 conf</span></h4>
-          <p>"On <span class="add">[reducted]</span> 2025, at approxlmately 1700 hours [reducted] (a senior US lntelligence offlcial), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanled by [WITNESS 2 (a sentior US Intelligence offlclal)], and two pllots from [STATE PARTNER ORGANIZATION] departed [<span class="del">unknown</span>] to conduct a search…"</p>
+          <h4><span class="src-tag o">CONTEXT</span><span>event metadata</span></h4>
+          <p style="color:var(--text-4)">The event summary and provenance will appear here once the queue row is selected.</p>
         </div>
       </div>
 
       <div class="merge-pane">
-        <h4><span>▣ MERGED TEXT — REVIEWER PROPOSAL</span><span style="margin-left:auto;color:var(--text-3);font-weight:400">edit freely · saves on submit</span></h4>
-        <textarea>On [redacted] 2025, at approximately 1700 hours [redacted] (a senior US intelligence official), [FEDERAL PARTNER 1] and [FEDERAL PARTNER 2], accompanied by [WITNESS 2 (a senior US intelligence official)], and two pilots from [STATE PARTNER ORGANIZATION] departed [SITE CODE NAME] to conduct a search…</textarea>
+        <h4><span>▣ MERGED TEXT — REVIEWER PROPOSAL</span><span style="margin-left:auto;color:var(--text-3);font-weight:400">edit freely · saved to the GitHub issue on submit</span></h4>
+        <textarea id="rv-merge" placeholder="Top extracts auto-seed here when you pick a queue row. Edit freely before opening the prefilled GitHub issue."></textarea>
       </div>
 
       <div class="actions-bar">
-        <span class="meta">SUBMISSION · opens pre-filled PR · reviewer credit: anonymous OK</span>
+        <span class="meta">SUBMISSION · opens pre-filled GitHub issue · reviewer credit: anonymous OK</span>
         <button class="ab-btn ghost" style="cursor:default">SKIP — next page</button>
         <a id="rv-submit-btn" class="ab-btn primary" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">▣ SUBMIT MERGED TEXT →</a>
       </div>
@@ -120,35 +128,97 @@
 
 <script src="chrome.js" defer></script>
 <script>
-  // Active-state toggle via delegation so it survives live re-render.
-  const rvList = document.getElementById('rv-queue-list');
-  if (rvList) rvList.addEventListener('click', (e) => {
-    const row = e.target.closest('.rv-row');
-    if (!row || !rvList.contains(row)) return;
-    rvList.querySelectorAll('.rv-row').forEach(x => x.classList.remove('active'));
-    row.classList.add('active');
-  });
-
   // ── Live data layer ──
-  // The real review queue (pages where engines disagree) may be empty —
-  // MC.derive.reviewCount can be 0. The actionable list is the transcription
-  // queue (MC.derive.queue: next-missing pages). Drive the UI off that, and
-  // reword the header so it stays grammatical. Static rows remain the fallback.
   function esc(v){ const d=document.createElement('div'); d.textContent=(v==null?'':String(v)); return d.innerHTML; }
+
+  // Lazy-loaded once: public/dossier-extracts.json (~570KB) — per-event
+  // per-page top extracts with flag annotations + source. We use it to
+  // populate the diff pane when a queue row is clicked.
+  let _extracts = null;
+  function loadExtracts(){
+    if (_extracts) return _extracts;
+    _extracts = fetch('../dossier-extracts.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .catch(e => { console.warn('extracts load failed:', e); return null; });
+    return _extracts;
+  }
+
+  // Render the diff pane with REAL data for {eid, page}. Uses the
+  // top extracts from dossier-extracts.json on the left ("raw") and the
+  // page's text concatenated as a starting merged proposal on the right.
+  async function renderDetail(item){
+    if (!item) return;
+    const pane = document.getElementById('rv-pane-title');
+    const eid = item.eid, page = item.page;
+    if (pane) pane.textContent = (eid || '—') + (page != null ? ' · page ' + page : '');
+
+    const rec = MC.byEid(eid);
+    document.getElementById('rv-pane-sub').innerHTML = rec
+      ? esc(rec.agency || '—') + ' · ' + esc(rec.date || '—') + ' · ' + esc((rec.type || '').toUpperCase())
+      : esc(eid);
+
+    // Bind SUBMIT MERGED TEXT — pre-fill GitHub issue for THIS item.
+    const submitBtn = document.getElementById('rv-submit-btn');
+    if (submitBtn && MC.url && MC.url.claim) submitBtn.href = MC.url.claim(eid, page);
+
+    const ex = await loadExtracts();
+    const grid = document.getElementById('rv-diff');
+    const merge = document.getElementById('rv-merge');
+    if (!ex || !ex[eid] || !ex[eid].excerptsByPage){
+      grid.innerHTML = '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>no excerpts for this event</span></h4>' +
+        '<p style="color:var(--text-4)">Page-level extracts are produced by the corpus build (scripts/build-dossier-extracts.mjs). When this event has been processed, the top sentences for the requested page will appear here.</p></div>' +
+        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>raw text not bundled</span></h4>' +
+        '<p style="color:var(--text-4)">Multi-source raw text lives in the per-source corpus DB and is not bundled to /mc/. Click <a href="' + esc(MC.url.dossier(eid)) + '" style="color:var(--cyan)">OPEN DOSSIER</a> to view this event in context.</p></div>';
+      merge.value = '';
+      return;
+    }
+    const pgKey = String(page);
+    const pageEntry = ex[eid].excerptsByPage[pgKey];
+    if (!pageEntry){
+      // Pick the closest page that DOES have extracts.
+      const available = Object.keys(ex[eid].excerptsByPage || {}).sort(function(a,b){ return Math.abs(+a - +page) - Math.abs(+b - +page); });
+      grid.innerHTML = '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>page ' + esc(page) + ' has no graded excerpts</span></h4>' +
+        '<p style="color:var(--text-4)">' + (available.length ? 'Nearest graded pages: ' + available.slice(0, 6).join(', ') + '.' : 'No graded pages for this event.') + '</p></div>' +
+        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>raw text not bundled</span></h4>' +
+        '<p style="color:var(--text-4)">The transcription queue surfaces pages waiting for ANY engine to land. When vision or OCR completes this page, it shows up here.</p></div>';
+      merge.value = '';
+      return;
+    }
+    const top = (pageEntry.top || []).slice(0, 6);
+    const source = pageEntry.source || 'vision';
+    // Left column — raw top sentences with flag chips
+    grid.innerHTML = '<div class="diff-col">' +
+      '<h4><span class="src-tag ' + (source === 'vision' ? 'g' : 'o') + '">' + esc(source.toUpperCase()) + '</span><span>top extracts</span><span class="conf">' + top.length + ' sentences</span></h4>' +
+      top.map(function(s){
+        var flags = [];
+        Object.keys(s.flags || {}).forEach(function(f){
+          if (s.flags[f] === true) flags.push(f);
+        });
+        var flagsHTML = flags.length ? '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--cyan);letter-spacing:0.12em;margin-right:8px">[' + flags.map(esc).join(' · ') + ']</span>' : '';
+        return '<p style="margin-bottom:10px">' + flagsHTML + esc(s.text) + ' <span style="color:var(--text-4);font-size:10px;margin-left:6px">· score ' + (s.score || 0).toFixed(1) + '</span></p>';
+      }).join('') +
+      '</div>' +
+      '<div class="diff-col">' +
+      '<h4><span class="src-tag o">CONTEXT</span><span>event metadata</span></h4>' +
+      '<p>' + esc((rec && rec.summary) || 'No summary recorded for this event.') + '</p>' +
+      '<p style="margin-top:14px;color:var(--text-4);font-size:11px">Source-of-truth raw page text is in the per-source corpus DB; only top-scoring sentences are bundled to /mc/. The reviewer task is to merge the engines\' page transcripts elsewhere; this surface routes contributors to the prefilled GitHub issue.</p>' +
+      '</div>';
+    // Seed the merge textarea with the concatenated top sentences.
+    merge.value = top.map(function(s){ return s.text; }).join('\n\n');
+  }
 
   function renderReview(MC){
     const D = MC && MC.derive; if (!D) return;
     const q = Array.isArray(D.queue) ? D.queue : [];
-    if (!q.length) return; // keep hardcoded fallback
+    if (!q.length) return;
 
     const n = q.length;
     const plural = n === 1 ? 'page' : 'pages';
 
-    // Header h1 — disputed-page wording only if there are disputes; otherwise
-    // drive off the transcription queue length.
+    // Header h1
     const title = document.getElementById('rv-title');
-    if (title) {
-      if (typeof D.reviewCount === 'number' && D.reviewCount > 0) {
+    if (title){
+      if (typeof D.reviewCount === 'number' && D.reviewCount > 0){
         const rc = D.reviewCount;
         title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
           + ' where the engines disagree. <em>Pick the truth.</em>';
@@ -157,28 +227,26 @@
           + ' awaiting transcription. <em>Pick the truth.</em>';
       }
     }
-
-    // Queue header label + count
     const label = document.getElementById('rv-queue-label');
     if (label) label.textContent = (typeof D.reviewCount === 'number' && D.reviewCount > 0)
       ? 'QUEUE · WORST AGREEMENT' : 'QUEUE · NEXT MISSING';
     const count = document.getElementById('rv-queue-count');
     if (count) count.textContent = n;
 
-    // Queue list — top 12 from the transcription queue. Each row is wrapped
-    // in an anchor to MC.url.dossier(eid) so click → dossier.
+    // Queue rows — click handler routes to renderDetail(item) instead of
+    // hard-navigating to dossier. The anchor click is preventDefault'd in JS;
+    // ⌘/Ctrl-click still opens dossier in a new tab via the href.
     const list = document.getElementById('rv-queue-list');
-    if (list) {
+    if (list){
       list.innerHTML = q.slice(0, 12).map((item, i) => {
         const eid = item.eid || '';
         const pg = item.page != null ? 'p ' + item.page : '';
         const agency = item.agency || '';
         const flag = (item.flag || '').toString().toUpperCase();
         const reason = (item.reason || '').toString();
-        const meta = [reason, 'priority ' + (item.priority ?? '—')]
-          .filter(Boolean).join(' · ');
+        const meta = [reason, 'priority ' + (item.priority ?? '—')].filter(Boolean).join(' · ');
         const href = MC.url && MC.url.dossier ? MC.url.dossier(eid) : '#';
-        return '<a class="rv-row-link" href="' + esc(href) + '">'
+        return '<a class="rv-row-link" href="' + esc(href) + '" data-idx="' + i + '">'
           + '<div class="rv-row' + (i === 0 ? ' active' : '') + '">'
           + '<div class="top"><span>' + esc(agency) + '</span><span>·</span>'
           + '<span class="agree high">' + esc(flag || '—') + '</span></div>'
@@ -186,26 +254,51 @@
           + '<div class="meta">' + esc(meta) + '</div>'
           + '</div></a>';
       }).join('');
+      list.querySelectorAll('a.rv-row-link').forEach(function(a){
+        a.addEventListener('click', function(e){
+          if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let modifier-click open dossier
+          e.preventDefault();
+          list.querySelectorAll('.rv-row').forEach(function(x){ x.classList.remove('active'); });
+          a.querySelector('.rv-row').classList.add('active');
+          renderDetail(q[parseInt(a.dataset.idx, 10)]);
+        });
+      });
     }
 
-    // Detail-pane title → first queued eid (demo diff stays as-is)
-    const pane = document.getElementById('rv-pane-title');
-    if (pane && q[0] && q[0].eid) {
-      pane.textContent = q[0].eid + (q[0].page != null ? ' · page ' + q[0].page : '');
-    }
-
-    // Bind the SUBMIT MERGED TEXT primary button → pre-filled GitHub issue
-    // for the first queued page (MC.url.claim(eid, page)).
-    const submitBtn = document.getElementById('rv-submit-btn');
-    if (submitBtn && q[0] && MC.url && MC.url.claim) {
-      submitBtn.href = MC.url.claim(q[0].eid, q[0].page);
-    }
+    // Initial detail = top of queue
+    renderDetail(q[0]);
   }
 
-  if (window.MC && typeof window.MC.ready === 'function') {
+  if (window.MC && typeof window.MC.ready === 'function'){
     window.MC.ready().then(() => renderReview(window.MC));
     window.MC.onUpdate(() => renderReview(window.MC));
   }
+
+  // Populate the GRADED EXAMPLES picker from dossier-extracts.json once it lands.
+  (async function(){
+    const ex = await loadExtracts();
+    if (!ex) return;
+    const sel = document.getElementById('rv-graded');
+    if (!sel) return;
+    const opts = Object.keys(ex).map(function(eid){
+      const rec = MC.byEid ? MC.byEid(eid) : null;
+      const label = rec && rec.title ? (eid + ' · ' + rec.title) : eid;
+      return { eid, label };
+    }).sort(function(a, b){ return a.label.localeCompare(b.label); });
+    opts.forEach(function(o){
+      const opt = document.createElement('option');
+      opt.value = o.eid;
+      opt.textContent = o.label.length > 60 ? o.label.slice(0, 60) + '…' : o.label;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function(){
+      const eid = sel.value;
+      if (!eid) return;
+      // Pick the first graded page for this event.
+      const firstPg = Object.keys(ex[eid].excerptsByPage || {})[0];
+      renderDetail({ eid, page: firstPg ? parseInt(firstPg, 10) : 1 });
+    });
+  })();
 </script>
 </body>
 </html>
