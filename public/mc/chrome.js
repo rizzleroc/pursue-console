@@ -64,37 +64,47 @@
 
   // ─────────── Pre-main chrome ───────────
   const classifiedTop = el('div', { class: 'classified' }, [
-    el('span', { class: 'stamp' }, ['// declassified · war.gov · open-source mirror']),
+    el('span', { class: 'stamp', 'data-i18n': 'chrome.classified_top_left', 'data-i18n-default': '// declassified · war.gov · open-source mirror' }, ['// declassified · war.gov · open-source mirror']),
     el('span', { class: 'dash' }, ['— — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —']),
-    el('span', { class: 'stamp' }, ['community-run · not agency-affiliated']),
+    el('span', { class: 'stamp', 'data-i18n': 'chrome.classified_top_right', 'data-i18n-default': 'community-run · not agency-affiliated' }, ['community-run · not agency-affiliated']),
   ]);
   const topbar = el('header', { class: 'topbar' }, [
     el('div', { class: 'brand' }, [
       el('span', { class: 'brand-mark' }),
       el('span', { class: 'brand-name' }, ['PURSUE  CONSOLE']),
-      el('span', { class: 'brand-sub' }, ['MISSION CONTROL · 3.0 · WAR.GOV/UAP']),
+      el('span', { class: 'brand-sub', 'data-i18n': 'chrome.brand_sub', 'data-i18n-default': 'MISSION CONTROL · 3.0 · WAR.GOV/UAP' }, ['MISSION CONTROL · 3.0 · WAR.GOV/UAP']),
     ]),
     el('div', { class: 'center-strip' }, [
-      el('span', { class: 'badge' }, [el('span', { class: 'dot' }), 'OPERATIONAL']),
+      el('span', { class: 'badge' }, [el('span', { class: 'dot' }), el('span', { 'data-i18n': 'chrome.operational', 'data-i18n-default': 'OPERATIONAL' }, ['OPERATIONAL'])]),
       el('span', { class: 'badge', id: 'time-badge' }, [el('span', { class: 'v' }, [stamp()])]),
-      el('span', { class: 'badge amber' }, [el('span', { class: 'dot' }), 'LIVE WATCH']),
+      el('span', { class: 'badge amber' }, [el('span', { class: 'dot' }), el('span', { 'data-i18n': 'chrome.live_watch', 'data-i18n-default': 'LIVE WATCH' }, ['LIVE WATCH'])]),
     ]),
     el('div', { class: 'topbar-actions' }, [
-      el('a', { class: 'ghost', href: 'index.html' }, ['LAUNCH ▾']),
-      el('a', { class: 'ghost', href: '../', title: 'Jump to the live React app at the deployed site root' }, ['OPEN LIVE APP →']),
-      el('a', { class: 'ops-btn', href: 'review.html' }, ['＋ ENLIST']),
+      el('a', { class: 'ghost', href: 'index.html', 'data-i18n': 'chrome.launch', 'data-i18n-default': 'LAUNCH ▾' }, ['LAUNCH ▾']),
+      el('a', { class: 'ghost', href: '../', title: 'Jump to the live React app at the deployed site root', 'data-i18n': 'chrome.open_live_app', 'data-i18n-default': 'OPEN LIVE APP →' }, ['OPEN LIVE APP →']),
+      el('button', { class: 'ops-btn', id: 'enlist-btn', type: 'button', 'data-i18n': 'chrome.enlist', 'data-i18n-default': '＋ ENLIST' }, ['＋ ENLIST']),
     ]),
   ]);
   const nav = el('nav', { class: 'tabs' });
+  let _analysisInserted = false;
   for (const v of VIEWS) {
     if (v === null) {
       nav.appendChild(el('span', { class: 'nav-divider' }));
-      nav.appendChild(el('span', { class: 'nav-group' }, ['ANALYSIS']));
+      const groupSpan = el('span', { class: 'nav-group' }, ['ANALYSIS']);
+      // Only the first divider gets the "ANALYSIS" label; subsequent ones
+      // (e.g. the Help split) get a "SUPPORT" label so the translation key
+      // is distinct.
+      groupSpan.setAttribute('data-i18n', _analysisInserted ? 'nav.support' : 'nav.analysis');
+      groupSpan.dataset.i18nDefault = _analysisInserted ? 'SUPPORT' : 'ANALYSIS';
+      nav.appendChild(groupSpan);
+      _analysisInserted = true;
       continue;
     }
     const tab = el('a', {
       class: 'nav-tab' + (view === v.id ? ' active' : ''),
       href: `${v.id}.html`,
+      'data-i18n': 'nav.' + v.id,
+      'data-i18n-default': v.label,
     }, [v.label]);
     if (v.id === 'review') {
       // live review badge — hidden until we know the count is > 0
@@ -135,14 +145,14 @@
 
   // ─────────── Post-main chrome ───────────
   const footer = el('footer', { class: 'fc' }, [
-    el('span', {}, ['watchkeeper · automated vigil · human-in-loop']),
+    el('span', { 'data-i18n': 'chrome.footer_left', 'data-i18n-default': 'watchkeeper · automated vigil · human-in-loop' }, ['watchkeeper · automated vigil · human-in-loop']),
     el('span', {}, [`// ${stamp().toLowerCase()}`]),
-    el('span', {}, ['community-run · not agency-affiliated']),
+    el('span', { 'data-i18n': 'chrome.footer_right', 'data-i18n-default': 'community-run · not agency-affiliated' }, ['community-run · not agency-affiliated']),
   ]);
   const classifiedBot = el('div', { class: 'classified', style: 'margin-top: 12px;' }, [
-    el('span', { class: 'stamp' }, ['// end of transmission']),
+    el('span', { class: 'stamp', 'data-i18n': 'chrome.eot_left', 'data-i18n-default': '// end of transmission' }, ['// end of transmission']),
     el('span', { class: 'dash' }, ['— — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —']),
-    el('span', { class: 'stamp' }, ['classification · open · public mirror']),
+    el('span', { class: 'stamp', 'data-i18n': 'chrome.eot_right', 'data-i18n-default': 'classification · open · public mirror' }, ['classification · open · public mirror']),
   ]);
   main.parentNode.appendChild(footer);
   main.parentNode.appendChild(classifiedBot);
@@ -197,6 +207,168 @@
     if (typeof n === 'number' && n > 0) { b.textContent = String(n); b.style.display = ''; }
     else { b.style.display = 'none'; }
   }
+
+  // ─── i18n — load saved lang + apply data-i18n attributes ───
+  // Mirrors src/i18n/context.js: persisted to localStorage, en.json is
+  // the authoritative key set, missing keys fall back to en.
+  const I18N_KEY = 'mc.lang.v1';
+  let _i18nDict = null, _i18nEn = null, _i18nLang = 'en';
+  function getNested(obj, dotPath) {
+    const parts = dotPath.split('.');
+    let v = obj;
+    for (const p of parts) { if (v == null) return undefined; v = v[p]; }
+    return v;
+  }
+  function tr(key, defaultVal) {
+    if (_i18nDict) {
+      const v = getNested(_i18nDict, key);
+      if (typeof v === 'string') return v;
+    }
+    if (_i18nEn) {
+      const v = getNested(_i18nEn, key);
+      if (typeof v === 'string') return v;
+    }
+    return defaultVal != null ? defaultVal : key;
+  }
+  function applyI18n(root) {
+    (root || document).querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (!key) return;
+      const fallback = el.dataset.i18nDefault || el.textContent;
+      el.textContent = tr(key, fallback);
+    });
+    document.documentElement.lang = _i18nLang;
+  }
+  async function loadLocale(code) {
+    if (!code || code === 'en') {
+      if (!_i18nEn) _i18nEn = await fetch('../i18n/en.json').then((r) => r.ok ? r.json() : null).catch(() => null);
+      _i18nDict = _i18nEn;
+      _i18nLang = 'en';
+      return;
+    }
+    const url = `../i18n/${code}.json`;
+    try {
+      const r = await fetch(url);
+      _i18nDict = r.ok ? await r.json() : null;
+      _i18nLang = code;
+    } catch (e) { _i18nDict = null; _i18nLang = 'en'; }
+    if (!_i18nEn) _i18nEn = await fetch('../i18n/en.json').then((r) => r.ok ? r.json() : null).catch(() => null);
+  }
+  async function initI18n() {
+    let saved = 'en';
+    try { saved = localStorage.getItem(I18N_KEY) || 'en'; } catch (e) {}
+    await loadLocale(saved);
+    applyI18n();
+  }
+  // Expose for views that want to translate dynamic strings.
+  window.MC && (window.MC.tr = tr);
+
+  // Language picker — pulls available langs from i18n/languages.json.
+  // Dropdown opens on click; selecting persists + reloads the page so
+  // the change is total (every page applies on its own load).
+  async function injectLanguagePicker() {
+    const langs = await fetch('../i18n/languages.json')
+      .then((r) => r.ok ? r.json() : null)
+      .catch(() => null);
+    if (!langs || !Array.isArray(langs.languages)) return;
+    const current = (langs.languages.find((l) => l.code === _i18nLang)) || langs.languages[0];
+    const wrap = document.createElement('span');
+    wrap.className = 'lang-picker';
+    wrap.innerHTML =
+      '<span class="lp-current" id="lp-current">' + (current.native || current.code).toUpperCase() + ' ▾</span>' +
+      '<div class="lp-menu" id="lp-menu">' +
+        langs.languages.map(function(l){
+          return '<a class="lp-opt' + (l.code === _i18nLang ? ' on' : '') + '" data-code="' + l.code + '" dir="' + (l.dir || 'ltr') + '">' +
+            (l.native || l.code) +
+            ' <span class="lp-sub">' + (l.english || l.code) + '</span>' +
+          '</a>';
+        }).join('') +
+      '</div>';
+    // Inject just before ENLIST button.
+    const actions = document.querySelector('.topbar-actions');
+    if (actions) actions.insertBefore(wrap, actions.lastElementChild);
+    const cur = wrap.querySelector('#lp-current');
+    const menu = wrap.querySelector('#lp-menu');
+    cur.addEventListener('click', function(e){
+      e.stopPropagation();
+      menu.classList.toggle('on');
+    });
+    document.addEventListener('click', function(){ menu.classList.remove('on'); });
+    wrap.querySelectorAll('.lp-opt').forEach(function(a){
+      a.addEventListener('click', function(){
+        const code = a.dataset.code;
+        try { localStorage.setItem(I18N_KEY, code); } catch (e) {}
+        window.location.reload();
+      });
+    });
+  }
+
+  // Init i18n: load lang, apply DOM, then inject picker.
+  initI18n().then(injectLanguagePicker);
+
+  // ─── Volunteer modal (chrome-wide) ───
+  // Shared modal triggered by ENLIST button across every page. Mirrors
+  // src/components/VolunteerModal.jsx — three quickstart paths
+  // (Quickstart / GitHub Issue / Browse Queue) and a copy-clipboard
+  // for the install command.
+  const volunteerModal = document.createElement('div');
+  volunteerModal.id = 'volunteer-modal';
+  volunteerModal.className = 'vol-modal';
+  volunteerModal.innerHTML = ''
+    + '<div class="vol-panel">'
+    +   '<button class="vol-close" id="vol-close" type="button">✕ CLOSE</button>'
+    +   '<div class="vol-eyebrow">JOIN THE EFFORT</div>'
+    +   '<h2 class="vol-title">Help transcribe the next page.</h2>'
+    +   '<p class="vol-sub">PURSUE is a civic-tech archive of declassified UAP material. The bottleneck is volume — pages need transcription so the corpus stays searchable. Pick a path:</p>'
+    +   '<div class="vol-paths">'
+    +     '<div class="vol-card">'
+    +       '<div class="vol-card-head"><span class="vol-num">01</span><span class="vol-card-title">QUICKSTART</span></div>'
+    +       '<p>One command. Pulls ~10 MB. Picks 20 pages, OCRs them, opens a PR.</p>'
+    +       '<div class="vol-code">'
+    +         '<button class="vol-copy" id="vol-copy" type="button">⎘ COPY</button>'
+    +         '<pre id="vol-code-pre">curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash\ncd pursue-helper\nnpm start\nnpm run volunteer -- --my-handle=YOU</pre>'
+    +       '</div>'
+    +     '</div>'
+    +     '<div class="vol-card">'
+    +       '<div class="vol-card-head"><span class="vol-num">02</span><span class="vol-card-title">CLAIM A PAGE</span></div>'
+    +       '<p>Open a pre-filled GitHub issue for the next page in the queue.</p>'
+    +       '<a class="vol-btn" id="vol-claim" href="review.html" target="_blank" rel="noopener">→ OPEN GITHUB ISSUE</a>'
+    +     '</div>'
+    +     '<div class="vol-card">'
+    +       '<div class="vol-card-head"><span class="vol-num">03</span><span class="vol-card-title">BROWSE QUEUE</span></div>'
+    +       '<p>Pick from the waiting-pages table — small (≤20) or big (>20) jobs.</p>'
+    +       '<a class="vol-btn" href="help.html">→ OPEN HELP SURFACE</a>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div class="vol-foot">Reviewer credit anonymous OK · see <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md" target="_blank" rel="noopener">HOW-CAN-I-HELP.md</a></div>'
+    + '</div>';
+  document.body.appendChild(volunteerModal);
+  function openVolunteer(){
+    volunteerModal.classList.add('on');
+    // Bind the CLAIM link to the live next-missing top-of-queue.
+    const claim = document.getElementById('vol-claim');
+    if (claim && window.MC && window.MC.derive && window.MC.url) {
+      const top = window.MC.derive.queue && window.MC.derive.queue[0];
+      if (top && top.eid) claim.href = window.MC.url.claim(top.eid, top.page);
+    }
+  }
+  function closeVolunteer(){ volunteerModal.classList.remove('on'); }
+  const enlistBtn = document.getElementById('enlist-btn');
+  if (enlistBtn) enlistBtn.addEventListener('click', openVolunteer);
+  const volClose = document.getElementById('vol-close');
+  if (volClose) volClose.addEventListener('click', closeVolunteer);
+  volunteerModal.addEventListener('click', function(e){ if (e.target === volunteerModal) closeVolunteer(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeVolunteer(); });
+  const volCopy = document.getElementById('vol-copy');
+  if (volCopy) volCopy.addEventListener('click', async function(){
+    const pre = document.getElementById('vol-code-pre');
+    try {
+      await navigator.clipboard.writeText(pre.textContent);
+      volCopy.textContent = '✓ COPIED';
+      volCopy.classList.add('ok');
+      setTimeout(function(){ volCopy.textContent = '⎘ COPY'; volCopy.classList.remove('ok'); }, 1500);
+    } catch (err) { volCopy.textContent = '⨯ ERR'; }
+  });
 
   if (window.MC && typeof window.MC.ready === 'function') {
     // Live data present — animate count-up to LIVE targets once MC is ready,

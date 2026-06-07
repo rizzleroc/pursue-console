@@ -108,7 +108,7 @@
           <p>5,665 chunks · 25MB embeddings · loads on click</p>
         </a>
       </div>
-      <div class="meaning-note" id="meaning-note">∿ MEANING MATCH requires the 25MB embedding bundle — coming soon. Sticking with EXACT for now.</div>
+      <div class="meaning-note" id="meaning-note">∿ MEANING MATCH — loading MiniLM model (~25MB from CDN, cached in IndexedDB after first run)…</div>
 
       <div class="search-input">
         <span class="glyph">⌕</span>
@@ -156,15 +156,140 @@
   var modeExact = document.getElementById('mode-exact');
   var modeMeaning = document.getElementById('mode-meaning');
   var meaningNote = document.getElementById('meaning-note');
+  var searchMode = 'exact'; // 'exact' | 'semantic'
+  var renderRef = null;
   modeExact.addEventListener('click', function(){
     modeExact.classList.add('active');
     modeMeaning.classList.remove('active');
     meaningNote.classList.remove('on');
+    searchMode = 'exact';
+    if (typeof renderRef === 'function') renderRef();
   });
   modeMeaning.addEventListener('click', function(){
-    // Don't actually flip — just surface the note.
+    modeMeaning.classList.add('active');
+    modeExact.classList.remove('active');
     meaningNote.classList.add('on');
+    searchMode = 'semantic';
+    // Lazy-load the model + vectors on first switch; the note doubles as
+    // a progress display.
+    ensureSemantic().then(function(){
+      meaningNote.textContent = '∿ MEANING MATCH — model ready · ' + (_semanticInfo ? _semanticInfo.count + ' vectors · ' + _semanticInfo.dim + 'd' : '');
+      if (typeof renderRef === 'function') renderRef();
+    }).catch(function(err){
+      meaningNote.textContent = '∿ MEANING MATCH failed: ' + err.message + ' — falling back to EXACT';
+    });
   });
+
+  // ─── Semantic search (MiniLM via @huggingface/transformers from CDN) ───
+  // Lazy-load on first MEANING click. Vectors come from
+  // public/embeddings.bin (Float32, L2-normalized), metadata from
+  // embeddings-meta.json, count/dim from embeddings-info.json.
+  var _semanticModel = null;
+  var _semanticVectors = null;
+  var _semanticMeta = null;
+  var _semanticInfo = null;
+  var _semanticLoading = null;
+  async function ensureSemantic(){
+    if (_semanticModel && _semanticVectors) return;
+    if (_semanticLoading) return _semanticLoading;
+    _semanticLoading = (async function(){
+      meaningNote.textContent = '∿ Fetching MiniLM model from CDN…';
+      var trf = await import('https://esm.sh/@huggingface/transformers@3.0.2');
+      trf.env.allowLocalModels = false;
+      trf.env.useBrowserCache = true;
+      // Self-host of ORT WASM lives at /ort/ (scripts/copy-ort-assets.mjs).
+      // From a /mc/ page, that's "../ort/".
+      trf.env.backends.onnx.wasm.wasmPaths = '../ort/';
+      trf.env.backends.onnx.wasm.numThreads = 1;
+      trf.env.backends.onnx.wasm.proxy = false;
+      meaningNote.textContent = '∿ Loading model (int8)…';
+      _semanticModel = await trf.pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+        dtype: 'int8',
+        device: 'wasm',
+        progress_callback: function(p){
+          if (p && p.status === 'progress' && typeof p.progress === 'number'){
+            meaningNote.textContent = '∿ Loading model (' + Math.round(p.progress) + '%)…';
+          }
+        }
+      });
+      meaningNote.textContent = '∿ Fetching embeddings.bin (~8.6MB)…';
+      var [buf, meta, info] = await Promise.all([
+        fetch('../embeddings.bin?t=' + Date.now()).then(function(r){ return r.arrayBuffer(); }),
+        fetch('../embeddings-meta.json?t=' + Date.now()).then(function(r){ return r.json(); }),
+        fetch('../embeddings-info.json?t=' + Date.now()).then(function(r){ return r.json(); })
+      ]);
+      _semanticVectors = new Float32Array(buf);
+      _semanticMeta = meta;
+      _semanticInfo = info;
+      meaningNote.textContent = '∿ MEANING MATCH ready · ' + info.count + ' vectors · ' + info.dim + 'd';
+    })();
+    return _semanticLoading;
+  }
+
+  // Top-K cosine search over the (already L2-normalized) vector index.
+  function semanticTopK(qVec, K){
+    var dim = _semanticInfo.dim, count = _semanticInfo.count;
+    var qNorm = 0; for (var i = 0; i < dim; i++) qNorm += qVec[i] * qVec[i];
+    qNorm = Math.sqrt(qNorm) || 1;
+    var q = new Float32Array(dim);
+    for (var i2 = 0; i2 < dim; i2++) q[i2] = qVec[i2] / qNorm;
+    var scores = new Float32Array(K).fill(-Infinity);
+    var idxs   = new Int32Array(K).fill(-1);
+    var minScore = -Infinity, minPos = 0;
+    var v = _semanticVectors;
+    for (var r = 0; r < count; r++){
+      var s = 0; var base = r * dim;
+      for (var k = 0; k < dim; k++) s += v[base + k] * q[k];
+      if (s > minScore){
+        scores[minPos] = s; idxs[minPos] = r;
+        minScore = scores[0]; minPos = 0;
+        for (var j = 1; j < K; j++) if (scores[j] < minScore){ minScore = scores[j]; minPos = j; }
+      }
+    }
+    var out = [];
+    for (var i3 = 0; i3 < K; i3++) if (idxs[i3] >= 0) out.push({ idx: idxs[i3], score: scores[i3] });
+    out.sort(function(a, b){ return b.score - a.score; });
+    return out;
+  }
+
+  // Literal-token boost — copied from src/views/SemanticSearchView.jsx.
+  function literalBoost(query, hayText){
+    if (!query || !hayText) return 0;
+    var q = String(query).toLowerCase().trim();
+    var h = String(hayText).toLowerCase();
+    var toks = q.split(/\s+/).filter(function(t){ return t.length >= 2; });
+    var boost = 0;
+    if (q.length >= 3 && h.indexOf(q) !== -1) boost += 0.50;
+    if (boost > 0) return Math.min(boost, 0.55);
+    var hits = 0;
+    for (var i = 0; i < toks.length; i++) if (h.indexOf(toks[i]) !== -1) hits++;
+    if (toks.length && hits === toks.length) boost += 0.20;
+    else if (hits > 0) boost += Math.min(0.05 * hits, 0.15);
+    return boost;
+  }
+
+  async function semanticSearch(query, allowedEids){
+    await ensureSemantic();
+    if (!_semanticModel || !_semanticVectors) throw new Error('semantic engine not ready');
+    var emb = await _semanticModel(query, { pooling: 'mean', normalize: true });
+    var qVec = emb.data; // Float32Array of size dim
+    var top = semanticTopK(qVec, 60);
+    var seenEvent = {};
+    var hits = [];
+    for (var i = 0; i < top.length; i++){
+      var m = _semanticMeta[top[i].idx];
+      if (!m) continue;
+      var eid = m.eventId;
+      if (allowedEids && !allowedEids[eid]) continue;
+      var hay = (m.title || '') + ' ' + (m.body || '') + ' ' + (m.agency || '');
+      var final = top[i].score + literalBoost(query, hay);
+      if (!seenEvent[eid]) seenEvent[eid] = { eid: eid, top: m, hits: [], best: 0 };
+      seenEvent[eid].hits.push(Object.assign({ score: final, cos: top[i].score }, m));
+      if (final > seenEvent[eid].best) seenEvent[eid].best = final;
+      if (Object.keys(seenEvent).length >= 24 && seenEvent[eid].hits.length >= 4) break;
+    }
+    return Object.values(seenEvent).sort(function(a, b){ return b.best - a.best; });
+  }
 
   // Sync placeholder with live corpus scale (kept from original).
   function syncSearchScale(MC){
@@ -436,6 +561,7 @@
       };
     }
 
+    // Expose render() so the MEANING-mode click can re-trigger after lazy load.
     function render(){
       var t0 = performance.now();
       var q = (inp.value || '').trim();
@@ -444,6 +570,42 @@
       var allowed = {}; base.forEach(function(e){ allowed[e.id] = true; });
       var out, isBrowse = false, pageHitsByEid = {};
       var tokens = tokenize(q);
+
+      // SEMANTIC MODE — fire async, paint when results land. Keep the
+      // sync render path going so the UI never blanks out.
+      if (searchMode === 'semantic' && q && _semanticModel && _semanticVectors){
+        statSort.textContent = 'SEMANTIC · COSINE + LITERAL BOOST';
+        semanticSearch(q, allowed).then(function(groups){
+          var html = '';
+          var pageCount = 0;
+          for (var g = 0; g < groups.length; g++){
+            var grp = groups[g];
+            var ev = eventById[grp.eid];
+            if (!ev) continue;
+            var hits = grp.hits.slice(0, 4).map(function(h){
+              return { page: h.page, body: h.body, score: h.cos };
+            });
+            pageCount += grp.hits.length;
+            html += cardHTML(ev, grp.best, MC, hits, tokens);
+          }
+          var t1 = performance.now();
+          statCount.textContent = groups.length + (pageCount ? (' / ' + pageCount + ' pg') : '');
+          statMs.textContent = Math.max(0, Math.round(t1 - t0));
+          browseHint.style.display = 'none';
+          if (qqWrap) qqWrap.style.display = 'none';
+          if (!html && q){
+            emptyEl.classList.add('on');
+            grid.innerHTML = '';
+            return;
+          }
+          emptyEl.classList.remove('on');
+          grid.innerHTML = html;
+        }).catch(function(err){
+          statSort.textContent = 'SEMANTIC · ERROR — using EXACT';
+          console.warn(err);
+        });
+        return;
+      }
 
       if (!q){
         // BROWSE / SUGGESTED — top 12 by flag weight.
@@ -592,6 +754,9 @@
     }
     syncFromHeader();
     if (MC.onHeaderFilters) MC.onHeaderFilters(syncFromHeader);
+
+    // Expose render() to the mode-toggle handler outside MC.ready.
+    renderRef = render;
 
     // Initial paint.
     render();
