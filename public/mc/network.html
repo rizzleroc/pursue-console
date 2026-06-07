@@ -535,7 +535,71 @@
   });
   iterInp.addEventListener('change', paint);
 
-  MC.ready().then(function(){ renderEntityKindChips(); paint(); });
+  // Node-size multiplier slider.
+  var sizeInp = document.getElementById('ctl-size');
+  var vSize   = document.getElementById('v-size');
+  if (sizeInp){
+    sizeInp.addEventListener('input', function(){
+      nodeSizeMul = parseFloat(sizeInp.value);
+      if (vSize) vSize.textContent = nodeSizeMul.toFixed(1);
+      paint();
+    });
+  }
+
+  // Edge-style toggle (STRAIGHT / CURVED).
+  var edgeToggle = document.getElementById('edge-style-toggle');
+  if (edgeToggle){
+    edgeToggle.querySelectorAll('.opt').forEach(function(opt){
+      opt.addEventListener('click', function(){
+        edgeToggle.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('on'); });
+        opt.classList.add('on');
+        edgeStyle = opt.dataset.style;
+        paint();
+      });
+    });
+  }
+
+  // Entity-kinds legend (7 swatches with hex codes).
+  function renderEntityKindLegend(){
+    var host = document.getElementById('nw-entity-kinds-legend');
+    if (!host) return;
+    var kindMeta = (MC.derive && MC.derive.entityKinds) || {};
+    host.innerHTML = ENTITY_KINDS.map(function(k){
+      var meta = kindMeta[k] || {};
+      var color = meta.color || '#FFD93D';
+      var label = (meta.label || k).toString().toUpperCase();
+      return '<div class="k">' +
+        '<span class="d" style="background:' + color + '"></span>' +
+        esc(label) +
+        '<span class="hex">' + esc(color.toUpperCase()) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Export current SVG as a downloadable file.
+  var exportBtn = document.getElementById('nw-export-btn');
+  if (exportBtn){
+    exportBtn.addEventListener('click', function(){
+      var svgEl = document.getElementById('graph');
+      if (!svgEl) return;
+      // Clone so we can inline an xmlns for standalone viewing.
+      var clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      var markup = '<?xml version="1.0" encoding="UTF-8"?>\n' + clone.outerHTML;
+      var blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
+      var url  = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'network.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    });
+  }
+
+  MC.ready().then(function(){ renderEntityKindChips(); renderEntityKindLegend(); paint(); });
   MC.onUpdate(function(){ if (!gNodes.children.length) paint(); });
 })();
 </script>

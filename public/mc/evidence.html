@@ -421,6 +421,155 @@
     }).join('');
   }
 
+  // ─────────── Timeline — cross-referenced reports & programs by year ───────────
+  // X mapping: year 1940 → 30, year 2030 → 970, total span 940 in a 1000-wide viewBox.
+  function tlX(year){ return ((year - 1940) / 90) * 940 + 30; }
+
+  function parseYearRange(s){
+    if (s == null) return null;
+    var str = String(s).trim();
+    var m = str.match(/(\d{4})\s*[-–—]\s*(\d{4})/);
+    if (m) return { start: +m[1], end: +m[2] };
+    var m2 = str.match(/(\d{4})\s*[-–—]\s*(present|current|now)/i);
+    if (m2) return { start: +m2[1], end: (new Date()).getFullYear() };
+    var m3 = str.match(/(\d{4})/);
+    if (m3) return { start: +m3[1], end: +m3[1] };
+    return null;
+  }
+
+  function tlTooltipHandlers(el, html){
+    var tip = document.getElementById('tl-tooltip');
+    var panel = document.getElementById('tl-panel');
+    if (!tip || !panel) return;
+    function show(e){
+      tip.innerHTML = html;
+      tip.classList.add('show');
+      var pr = panel.getBoundingClientRect();
+      var x = e.clientX - pr.left + 14;
+      var y = e.clientY - pr.top + 14;
+      // keep inside panel bounds
+      var maxX = pr.width - 300;
+      if (x > maxX) x = maxX;
+      if (x < 4) x = 4;
+      tip.style.left = x + 'px';
+      tip.style.top  = y + 'px';
+    }
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mousemove', show);
+    el.addEventListener('mouseleave', function(){ tip.classList.remove('show'); });
+  }
+
+  function buildTimeline(focusEid){
+    var svg = document.getElementById('tl-svg');
+    var countEl = document.getElementById('tl-count');
+    if (!svg) return;
+    var refs = (MC.crossRefsForEvent && MC.crossRefsForEvent(focusEid)) || [];
+
+    // Build entries (only report / program with a resolvable year or active range)
+    var entries = [];
+    refs.forEach(function(r){
+      if (r.type !== 'report' && r.type !== 'program') return;
+      var res = r.resolved || null;
+      if (!res) return;
+      var range = null;
+      if (r.type === 'program'){
+        range = parseYearRange(res.active) || (res.year ? { start: +res.year, end: +res.year } : null);
+      } else { // report
+        range = (res.year ? { start: +res.year, end: +res.year } : parseYearRange(res.active));
+      }
+      if (!range || !isFinite(range.start)) return;
+      // Clamp to [1940, 2030]
+      var s = Math.max(1940, Math.min(2030, range.start));
+      var e = Math.max(1940, Math.min(2030, range.end));
+      var label = (res.name || res.title || r.id);
+      // Compact label: "AAWSA 2008-2012" or "Superconductors… 2010"
+      var year = (s === e) ? String(s) : (s + '-' + e);
+      var shortName = label;
+      if (shortName.length > 22) shortName = shortName.split(/\s+/).slice(0, 3).join(' ') + '…';
+      entries.push({
+        ref: r,
+        type: r.type,
+        start: s,
+        end: e,
+        title: res.title || res.name || r.id,
+        organization: res.organization || res.operator || '',
+        summary: res.summary || '',
+        label: shortName + ' ' + year
+      });
+    });
+
+    if (countEl) countEl.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
+
+    var parts = [];
+    // Baseline axis at y=70
+    parts.push('<line class="axis" x1="30" y1="70" x2="970" y2="70"/>');
+    // Decade ticks
+    for (var y = 1940; y <= 2030; y += 10){
+      var xp = tlX(y);
+      var major = (y % 20 === 0);
+      parts.push('<line class="tick'+(major?' tick-major':'')+'" x1="'+xp+'" y1="64" x2="'+xp+'" y2="76"/>');
+      parts.push('<text class="tick-label" x="'+xp+'" y="92">'+y+'</text>');
+    }
+
+    if (!entries.length){
+      svg.innerHTML = parts.join('');
+      // Show empty hint via overlay text in SVG
+      var note = '<text x="500" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(180,200,220,0.55)" letter-spacing="2">NO REPORT OR PROGRAM CROSS-REFS WITH DATED METADATA</text>';
+      svg.innerHTML = parts.join('') + note;
+      return;
+    }
+
+    // Stagger labels vertically so neighbours don't collide. Keep markers on the axis.
+    // Sort by start year, assign alternating label positions above the axis.
+    entries.sort(function(a,b){ return a.start - b.start; });
+    var labelYTop = 30;   // primary above-axis label row
+    var labelYAlt = 14;   // higher row for crowded clusters
+    var lastX = -Infinity;
+    entries.forEach(function(en, i){
+      var x1 = tlX(en.start), x2 = tlX(en.end);
+      var midX = (x1 + x2) / 2;
+      // pick label row — alternate if close to previous marker
+      var ly = (midX - lastX < 90) ? labelYAlt : labelYTop;
+      lastX = midX;
+
+      var dataAttrs = ' data-type="'+esc(en.type)+'"';
+      if (en.type === 'report'){
+        parts.push(
+          '<g class="marker report"'+dataAttrs+' data-idx="'+i+'">' +
+            '<circle class="dot" cx="'+midX+'" cy="70" r="6"/>' +
+            '<text class="lbl" x="'+midX+'" y="'+ly+'">'+esc(en.label)+'</text>' +
+          '</g>'
+        );
+      } else { // program — horizontal range bar
+        var w = Math.max(8, x2 - x1);
+        parts.push(
+          '<g class="marker program"'+dataAttrs+' data-idx="'+i+'">' +
+            '<rect class="bar" x="'+x1+'" y="64" width="'+w+'" height="12" rx="2"/>' +
+            '<line class="cap" x1="'+x1+'" y1="60" x2="'+x1+'" y2="80"/>' +
+            '<line class="cap" x1="'+x2+'" y1="60" x2="'+x2+'" y2="80"/>' +
+            '<text class="lbl" x="'+midX+'" y="'+ly+'">'+esc(en.label)+'</text>' +
+          '</g>'
+        );
+      }
+    });
+
+    svg.innerHTML = parts.join('');
+
+    // Attach tooltip handlers
+    svg.querySelectorAll('.marker').forEach(function(g){
+      var idx = +g.dataset.idx;
+      var en = entries[idx];
+      if (!en) return;
+      var yrTxt = (en.start === en.end) ? String(en.start) : (en.start + '–' + en.end);
+      var html = '<div class="tt-title">'+esc(en.title)+'</div>' +
+                 (en.organization ? '<div class="tt-org">'+esc(en.organization)+'</div>' : '') +
+                 '<div class="tt-year">'+esc(yrTxt)+' · '+esc(en.type.toUpperCase())+'</div>';
+      tlTooltipHandlers(g, html);
+      // Click → show in right rail like graph nodes
+      g.addEventListener('click', function(){ showNode(en.type, en.ref.id, focusEid); });
+    });
+  }
+
   function render(){
     var eid = pickFocus();
     if (!eid) return;
@@ -432,6 +581,7 @@
     }
     buildGraph(eid);
     renderLeftRail(eid);
+    buildTimeline(eid);
   }
 
   MC.ready().then(render);

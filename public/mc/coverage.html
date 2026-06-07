@@ -285,12 +285,27 @@
         else if (c.status === 'partial') partial++;
         else empty++;
       });
-      // Override [data-mc] legend + summary nodes to reflect cell counts.
       const total = data.length;
+      // Override [data-mc] legend nodes to reflect cell counts.
       document.querySelectorAll('[data-mc="coverageComplete"]').forEach((el) => { el.textContent = complete; });
       document.querySelectorAll('[data-mc="coveragePartial"]').forEach((el) => { el.textContent = partial; });
       document.querySelectorAll('[data-mc="coverageNoData"]').forEach((el) => { el.textContent = empty; });
       document.querySelectorAll('[data-mc="coverageTotal"]').forEach((el) => { el.textContent = total; });
+      // Summary cards (count-up via chrome.js' data-count/data-mc-count). Set
+      // both the static fallback (data-count) AND the rendered text so they
+      // line up immediately — and clear the _mcAnimated flag so subsequent
+      // MC revalidations re-snap to the new numbers.
+      const setCount = (selector, value) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          el.dataset.count = String(value);
+          el.textContent = value.toLocaleString();
+          el._mcAnimated = true; // prevent the easing animation from blowing this away
+        });
+      };
+      setCount('.cov-summary [data-mc-count="coverageTotal"]', total);
+      setCount('.cov-summary [data-mc-count="coverageComplete"]', complete);
+      setCount('.cov-summary [data-mc-count="coveragePartial"]', partial);
+      setCount('.cov-summary [data-mc-count="coverageNoData"]', empty);
       // Summary card percentages — keep them in lockstep with the legend.
       const pct = (n) => total ? Math.round((n / total) * 1000) / 10 + '%' : '0%';
       const set = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
