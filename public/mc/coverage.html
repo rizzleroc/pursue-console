@@ -299,13 +299,26 @@
         document.querySelectorAll(selector).forEach((el) => {
           el.dataset.count = String(value);
           el.textContent = value.toLocaleString();
-          el._mcAnimated = true; // prevent the easing animation from blowing this away
+          el._mcAnimated = true; // skip future easing animations
         });
       };
-      setCount('.cov-summary [data-mc-count="coverageTotal"]', total);
-      setCount('.cov-summary [data-mc-count="coverageComplete"]', complete);
-      setCount('.cov-summary [data-mc-count="coveragePartial"]', partial);
-      setCount('.cov-summary [data-mc-count="coverageNoData"]', empty);
+      const cardTargets = [
+        ['.cov-summary [data-mc-count="coverageTotal"]', total],
+        ['.cov-summary [data-mc-count="coverageComplete"]', complete],
+        ['.cov-summary [data-mc-count="coveragePartial"]', partial],
+        ['.cov-summary [data-mc-count="coverageNoData"]', empty],
+      ];
+      cardTargets.forEach(([sel, v]) => setCount(sel, v));
+      // chrome.js' count-up may have a still-running step() closure that
+      // overwrites text after we settle. Re-stamp once its 1.5s easing has
+      // finished so the final numbers reflect *our* legend, not the stale
+      // MC.derive snapshot the animation was targeting.
+      clearTimeout(updateLegend._t);
+      updateLegend._t = setTimeout(() => {
+        cardTargets.forEach(([sel, v]) => {
+          document.querySelectorAll(sel).forEach((el) => { el.textContent = v.toLocaleString(); });
+        });
+      }, 1700);
       // Summary card percentages — keep them in lockstep with the legend.
       const pct = (n) => total ? Math.round((n / total) * 1000) / 10 + '%' : '0%';
       const set = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };

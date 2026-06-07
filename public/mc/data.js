@@ -303,14 +303,15 @@
   };
 
   // Coverage row for one event, normalised to {status, complete, total, percent}.
+  // Tolerates both {eid,complete,total} and the corpus shape {eventId,pagesTouched,totalPages}.
   MC.coverageForEid = (eid) => {
     if (!eid) return null;
     const byEvent = MC.get("coverage.byEvent", []);
     if (!Array.isArray(byEvent)) return null;
-    const row = byEvent.find((e) => e && e.eid === eid);
+    const row = byEvent.find((e) => e && (e.eid === eid || e.eventId === eid || e.id === eid));
     if (!row) return null;
-    const complete = row.complete || 0;
-    const total = row.total || 0;
+    const complete = (row.complete != null ? row.complete : row.pagesTouched) || 0;
+    const total = (row.total != null ? row.total : row.totalPages) || 0;
     const percent = total > 0 ? Math.round((complete / total) * 100) : 0;
     return { status: row.status || null, complete, total, percent };
   };
