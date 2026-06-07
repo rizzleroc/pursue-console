@@ -10,10 +10,27 @@
   <style>
     .body2 { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 380px; gap: 24px; position: relative; z-index: 3; }
     .cov-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
-    .cov-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 8px; max-width: 700px; margin: 22px auto; }
-    .cov-cell { aspect-ratio: 1; background: #0A1018; border: 1px solid #182232; opacity: 0; animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards; transition: transform .15s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
-    .cov-cell:hover { transform: scale(1.18); border-color: var(--amber); }
+    .cov-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 6px; max-width: 760px; margin: 22px auto; }
+    .cov-cell { aspect-ratio: 1; background: #0A1018; border: 1px solid #182232; opacity: 0; animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards; transition: transform .15s; cursor: pointer; display: block; text-decoration: none; color: inherit; position: relative; }
+    .cov-cell:hover { transform: scale(1.35); border-color: var(--amber); z-index: 5; }
+    .cov-cell:hover::after {
+      content: attr(data-title);
+      position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      background: rgba(6,11,18,0.95); border: 1px solid var(--border-strong);
+      color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 0.06em; padding: 6px 9px; white-space: nowrap; z-index: 10;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.55);
+    }
     a.cov-cell { display: block; text-decoration: none; color: inherit; }
+    .cov-mode-rail { display: flex; gap: 8px; align-items: center; }
+    .cov-mode {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--text-3); background: var(--surface-2); border: 1px solid var(--border);
+      padding: 5px 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer; user-select: none; transition: color .15s, background .15s, border-color .15s;
+    }
+    .cov-mode:hover { color: var(--text); border-color: var(--border-strong); }
+    .cov-mode.active { color: var(--amber); background: rgba(242,166,35,0.10); border-color: rgba(242,166,35,0.55); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
     .queue-row.linked { text-decoration: none; color: inherit; cursor: pointer; transition: background .15s; }
     .queue-row.linked:hover { background: rgba(242,166,35,0.04); }
     .queue-row .right-actions { display: flex; align-items: center; gap: 10px; }
@@ -59,9 +76,13 @@
 
   <section class="body2">
     <div class="cov-card">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px">
         <span class="mono" style="font-size:11px;letter-spacing:0.26em;color:var(--text-2);font-weight:700">▣ &nbsp; COVERAGE MATRIX · RELEASE 01</span>
-        <span class="mono" style="font-size:10px;color:var(--text-4);letter-spacing:0.2em">SORTED BY STATUS</span>
+        <div class="cov-mode-rail" id="cov-mode-rail" role="tablist" aria-label="Sort coverage cells">
+          <span class="cov-mode active" data-mode="status" role="tab" tabindex="0">SORT BY STATUS</span>
+          <span class="cov-mode" data-mode="priority" role="tab" tabindex="0">BY PRIORITY</span>
+          <span class="cov-mode" data-mode="region" role="tab" tabindex="0">BY REGION</span>
+        </div>
       </div>
       <div class="legend-rail" style="margin-bottom:10px">
         <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v" data-mc="coverageComplete">1</span></span>
@@ -101,29 +122,205 @@
 <script>
   (function () {
     const grid = document.getElementById('cg');
+    const PRIORITY_RANK = { critical: 0, high: 1, medium: 2, low: 3 };
+    let currentMode = 'status';
+    let cellData = []; // [{ eid, status, title, agency, region, priority, date, complete, total }]
 
-    // Render the coverage matrix from an array of status strings.
-    // 'complete' | 'partial' | (anything else → empty/dark cell, bare .cov-cell).
-    function renderGrid(cells) {
+    // Build a unified cell descriptor list. Drives every render + every sort.
+    // Source-of-truth ordering:
+    //   - MC.derive.coverageCells (status string per coverage.byEvent row)
+    //   - MC.data.coverage.byEvent (richer metadata: complete/total/eventId)
+    //   - MC.derive.events       (220 events with priority/region/date/agency)
+    //
+    // Strategy: produce one cell per event in MC.derive.events (220 if loaded),
+    // joining the matching coverage row when present. Events with no coverage
+    // row default to status='empty'. If events aren't loaded yet (or there
+    // are fewer events than coverage rows) we fall back to a coverage-only
+    // build so the page still renders ~128 cells.
+    function buildCellData() {
+      const D = (window.MC && window.MC.derive) || {};
+      const byEvent = (window.MC && typeof window.MC.get === 'function')
+        ? window.MC.get('coverage.byEvent', []) : [];
+      const events = Array.isArray(D.events) ? D.events : [];
+      const cells = Array.isArray(D.coverageCells) ? D.coverageCells : [];
+
+      const covByEid = {};
+      byEvent.forEach((row, i) => {
+        const eid = row && (row.eventId || row.eid);
+        if (!eid) return;
+        const status = cells[i] || (row.status === 'complete' ? 'complete'
+          : row.status === 'no-data' ? 'empty' : 'partial');
+        covByEid[eid] = {
+          status,
+          complete: row.bothMachineSources || row.humanPages || 0,
+          total: row.totalPages || 0,
+          rawStatus: row.status,
+        };
+      });
+
+      const out = [];
+      const seen = {};
+
+      if (events.length) {
+        events.forEach((ev) => {
+          const eid = ev.id || ev.eid;
+          if (!eid) return;
+          const cov = covByEid[eid];
+          const status = (cov && cov.status) || 'empty';
+          const agency = ev.agency || '—';
+          const date = ev.date || '—';
+          out.push({
+            eid,
+            status,
+            agency,
+            date,
+            region: ev.region || 'Unknown',
+            priority: ev.priority || null,
+            title: agency + ' · ' + date,
+            displayTitle: ev.title || eid,
+            complete: cov ? cov.complete : 0,
+            total: cov ? cov.total : 0,
+          });
+          seen[eid] = true;
+        });
+      }
+
+      // Coverage rows that aren't in events.json — keep them so we never
+      // drop cells when joining (e.g. interim corpus rebuild).
+      byEvent.forEach((row, i) => {
+        const eid = row && (row.eventId || row.eid);
+        if (!eid || seen[eid]) return;
+        const status = cells[i] || (row.status === 'complete' ? 'complete'
+          : row.status === 'no-data' ? 'empty' : 'partial');
+        out.push({
+          eid,
+          status,
+          agency: row.agency || '—',
+          date: '—',
+          region: 'Unknown',
+          priority: null,
+          title: (row.agency || '—') + ' · —',
+          displayTitle: row.title || eid,
+          complete: row.bothMachineSources || row.humanPages || 0,
+          total: row.totalPages || 0,
+        });
+      });
+
+      return out;
+    }
+
+    const STATUS_RANK = { complete: 0, partial: 1, empty: 2 };
+    function sortCells(data, mode) {
+      const cp = data.slice();
+      if (mode === 'priority') {
+        // critical first, then high/medium/low, then unprioritised.
+        // Tie-break on coverage status (complete > partial > empty) so
+        // critical-and-complete bubbles up.
+        cp.sort((a, b) => {
+          const pa = a.priority ? (PRIORITY_RANK[a.priority] ?? 4) : 5;
+          const pb = b.priority ? (PRIORITY_RANK[b.priority] ?? 4) : 5;
+          if (pa !== pb) return pa - pb;
+          const sa = STATUS_RANK[a.status] ?? 9;
+          const sb = STATUS_RANK[b.status] ?? 9;
+          if (sa !== sb) return sa - sb;
+          return a.eid.localeCompare(b.eid);
+        });
+      } else if (mode === 'region') {
+        cp.sort((a, b) => {
+          const ra = (a.region || 'Unknown').toLowerCase();
+          const rb = (b.region || 'Unknown').toLowerCase();
+          if (ra !== rb) return ra < rb ? -1 : 1;
+          return a.eid.localeCompare(b.eid);
+        });
+      } else {
+        // status (default): complete → partial → empty, eid alpha within group.
+        cp.sort((a, b) => {
+          const sa = STATUS_RANK[a.status] ?? 9;
+          const sb = STATUS_RANK[b.status] ?? 9;
+          if (sa !== sb) return sa - sb;
+          return a.eid.localeCompare(b.eid);
+        });
+      }
+      return cp;
+    }
+
+    function statusClass(status) {
+      return status === 'complete' ? ' complete'
+        : status === 'partial' ? ' partial'
+        : '';
+    }
+
+    function renderGrid(data) {
       grid.innerHTML = '';
-      const byEvent = (window.MC && typeof window.MC.get === 'function') ? window.MC.get('coverage.byEvent', []) : [];
-      cells.forEach((c, i) => {
-        const cls = c === 'complete' ? ' complete' : c === 'partial' ? ' partial' : '';
-        const status = c === 'complete' ? 'complete' : c === 'partial' ? 'partial' : 'empty';
-        const entry = byEvent[i];
-        const eid = entry && (entry.eventId || entry.eid);
+      const hasUrl = window.MC && window.MC.url && typeof window.MC.url.dossier === 'function';
+      data.forEach((c, i) => {
         let cell;
-        if (eid && window.MC && window.MC.url && typeof window.MC.url.dossier === 'function') {
+        if (c.eid && hasUrl) {
           cell = document.createElement('a');
-          cell.href = window.MC.url.dossier(eid);
-          cell.dataset.eid = eid;
-          cell.title = eid + ' · ' + status;
+          cell.href = window.MC.url.dossier(c.eid);
         } else {
           cell = document.createElement('div');
         }
-        cell.className = 'cov-cell' + cls;
-        cell.style.animationDelay = (300 + i * 5) + 'ms';
+        cell.className = 'cov-cell' + statusClass(c.status);
+        cell.style.animationDelay = (160 + i * 3) + 'ms';
+        if (c.eid) cell.dataset.eid = c.eid;
+        cell.dataset.status = c.status;
+        cell.dataset.region = c.region || '';
+        cell.dataset.priority = c.priority || '';
+        // title= attribute (native tooltip) holds the agency · date pair
+        // requested by the spec; data-title (CSS ::after) carries the
+        // richer hover label with the event title for the floating chip.
+        cell.title = c.title;
+        cell.setAttribute('data-title', c.displayTitle + ' — ' + c.title);
+        cell.setAttribute('aria-label', c.displayTitle + ' (' + c.status + ')');
         grid.appendChild(cell);
+      });
+      updateLegend(data);
+    }
+
+    function updateLegend(data) {
+      let complete = 0, partial = 0, empty = 0;
+      data.forEach((c) => {
+        if (c.status === 'complete') complete++;
+        else if (c.status === 'partial') partial++;
+        else empty++;
+      });
+      // Override [data-mc] legend + summary nodes to reflect cell counts.
+      const total = data.length;
+      document.querySelectorAll('[data-mc="coverageComplete"]').forEach((el) => { el.textContent = complete; });
+      document.querySelectorAll('[data-mc="coveragePartial"]').forEach((el) => { el.textContent = partial; });
+      document.querySelectorAll('[data-mc="coverageNoData"]').forEach((el) => { el.textContent = empty; });
+      document.querySelectorAll('[data-mc="coverageTotal"]').forEach((el) => { el.textContent = total; });
+      // Summary card percentages — keep them in lockstep with the legend.
+      const pct = (n) => total ? Math.round((n / total) * 1000) / 10 + '%' : '0%';
+      const set = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
+      set('.cov-summary .s:nth-child(1) .sub', 'of ' + total + ' events');
+      set('.cov-summary .s:nth-child(2) .sub', "all pages OCR'd · " + pct(complete));
+      set('.cov-summary .s:nth-child(3) .sub', 'gap pages remain · ' + pct(partial));
+      set('.cov-summary .s:nth-child(4) .sub', 'no body text · ' + pct(empty));
+    }
+
+    function rerender() {
+      renderGrid(sortCells(cellData, currentMode));
+    }
+
+    // Toggle wiring — pure DOM, no framework. Re-renders the grid on change.
+    function wireModeToggle() {
+      const rail = document.getElementById('cov-mode-rail');
+      if (!rail || rail.dataset.wired === '1') return;
+      rail.dataset.wired = '1';
+      rail.querySelectorAll('.cov-mode').forEach((btn) => {
+        const activate = () => {
+          const mode = btn.dataset.mode;
+          if (!mode || mode === currentMode) return;
+          currentMode = mode;
+          rail.querySelectorAll('.cov-mode').forEach((b) => b.classList.toggle('active', b === btn));
+          rerender();
+        };
+        btn.addEventListener('click', activate);
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        });
       });
     }
 
@@ -133,7 +330,14 @@
       let s = 17; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
       for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
       const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(28,0,'complete');
-      renderGrid(cls);
+      cellData = cls.map((c, i) => ({
+        eid: '',
+        status: c === 'complete' ? 'complete' : c === 'partial' ? 'partial' : 'empty',
+        agency: '—', date: '—', region: 'Unknown', priority: null,
+        title: '—', displayTitle: 'cell ' + (i + 1),
+        complete: 0, total: 0,
+      }));
+      rerender();
     }
 
     // Priority queue → render from MC.derive.queueTop8.
@@ -197,7 +401,11 @@
     function renderFromMC() {
       const D = window.MC && window.MC.derive;
       if (!D) return false;
-      if (Array.isArray(D.coverageCells) && D.coverageCells.length) renderGrid(D.coverageCells);
+      const next = buildCellData();
+      if (next.length) {
+        cellData = next;
+        rerender();
+      }
       renderQueue(D.queueTop8);
       // Update bottom CTA → deep-link into queue head dossier.
       const cta = document.getElementById('queue-head-cta');
@@ -212,6 +420,8 @@
       }
       return true;
     }
+
+    wireModeToggle();
 
     if (window.MC && typeof window.MC.ready === 'function') {
       window.MC.ready().then(() => { if (!renderFromMC()) randomFill(); });

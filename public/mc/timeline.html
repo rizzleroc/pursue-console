@@ -16,9 +16,27 @@
     .tl-band .ct .v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; }
     .tl-density { height: 4px; background: var(--hairline); margin: 16px 0 20px; }
     .tl-density .fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 8px var(--amber-glow); }
+    .tl-overview { background: var(--surface); border: 1px solid var(--border); padding: 18px 22px 14px; margin-bottom: 26px; }
+    .tl-overview .ovh { display:flex; align-items:baseline; gap:14px; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-3); letter-spacing:0.18em; text-transform:uppercase; margin-bottom:12px; }
+    .tl-overview .ovh .v { color: var(--text); font-family:'Space Grotesk', sans-serif; font-size:18px; letter-spacing:-0.01em; }
+    .tl-decadebars { display:flex; align-items:flex-end; gap:8px; height:88px; }
+    .tl-decadebars .col { flex:1; display:flex; flex-direction:column; align-items:stretch; gap:6px; height:100%; }
+    .tl-decadebars .bar-wrap { flex:1; display:flex; align-items:flex-end; }
+    .tl-decadebars .bar { width:100%; background: linear-gradient(180deg, var(--amber-bright), var(--amber)); box-shadow: 0 0 8px var(--amber-glow); min-height:2px; transition: filter .15s; }
+    .tl-decadebars .col:hover .bar { filter: brightness(1.3); }
+    .tl-decadebars .lbl { font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--text-3); letter-spacing:0.12em; text-align:center; }
+    .tl-decadebars .lbl .n { display:block; color: var(--text); font-size:11px; margin-bottom:2px; font-weight:600; }
+    .tl-band h2 { position: sticky; top: 0; background: var(--surface); z-index: 2; padding: 4px 0; }
     .tl-events { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .evt { background: var(--surface-2); border: 1px solid var(--hairline); padding: 12px 14px; transition: all .15s; cursor: pointer; }
-    .evt:hover { border-color: var(--amber); transform: translateY(-2px); }
+    .evt { background: var(--surface-2); border: 1px solid var(--hairline); border-left: 3px solid var(--text-3); padding: 12px 14px; transition: all .15s; cursor: pointer; }
+    .evt:hover { border-color: var(--amber); border-left-color: var(--amber); transform: translateY(-2px); }
+    .evt[data-ag="dow"]    { border-left-color: var(--amber); }
+    .evt[data-ag="fbi"]    { border-left-color: var(--cyan); }
+    .evt[data-ag="nasa"]   { border-left-color: #7CFFB2; }
+    .evt[data-ag="cia"]    { border-left-color: #94A3B8; }
+    .evt[data-ag="odni"]   { border-left-color: var(--rose); }
+    .evt[data-ag="energy"] { border-left-color: #B280FF; }
+    .evt[data-ag="state"]  { border-left-color: #7FB6FF; }
     .evt a, a.evt { color: inherit; text-decoration: none; display: block; height: 100%; }
     .evt .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.12em; text-transform: uppercase; }
     .evt .dot { width: 7px; height: 7px; }
@@ -55,6 +73,11 @@
       <span class="a"><span class="d" style="background:#F472B6"></span>ENERGY · <span class="lg-ct" data-ag="Department of Energy">3</span></span>
       <span class="a"><span class="d" style="background:#B280FF"></span>CIA · <span class="lg-ct" data-ag="Central Intelligence Agency">1</span></span>
       <span class="a"><span class="d" style="background:#FFD93D"></span>ODNI · <span class="lg-ct" data-ag="Office of the Director of National Intelligence">1</span></span>
+    </div>
+
+    <div id="tl-overview" class="tl-overview" hidden>
+      <div class="ovh">Events per decade<span class="v" id="tl-overview-total"></span><span style="margin-left:auto;font-family:'JetBrains Mono', monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;">DENSITY · 40S → 20S</span></div>
+      <div class="tl-decadebars" id="tl-decadebars"></div>
     </div>
 
     <div id="tl-bands">
@@ -180,8 +203,9 @@
   function cardHTML(ev) {
     var eid = ev.id || "";
     var href = (MC.url && MC.url.dossier) ? MC.url.dossier(eid) : ("dossier.html?eid=" + encodeURIComponent(eid));
-    return '<a class="evt" href="' + esc(href) + '" data-eid="' + esc(eid) + '" style="text-decoration:none;color:inherit"><div class="top">' +
-      '<span class="dot ' + dotClass(ev.agency) + '"></span>' +
+    var ag = dotClass(ev.agency);
+    return '<a class="evt" href="' + esc(href) + '" data-eid="' + esc(eid) + '" data-ag="' + esc(ag) + '" style="text-decoration:none;color:inherit"><div class="top">' +
+      '<span class="dot ' + ag + '"></span>' +
       '<span class="date">' + esc(ev.date || "—") + '</span></div>' +
       '<div class="ttl">' + esc(ev.title || "Untitled") + '</div>' +
       '<div class="agn">' + agnLine(ev) + '</div></a>';
@@ -191,12 +215,37 @@
     var label = ERA_LABEL[eraKey] || [eraKey, ""];
     var count = events.length;
     var width = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
-    var cards = events.slice(0, 8).map(cardHTML).join("");
+    var cards = events.map(cardHTML).join("");
     return '<div class="tl-band">' +
       '<h2><span class="era">' + esc(label[0]) + '</span>' + esc(label[1]) +
       '<span class="ct"><span class="v">' + count + '</span> events</span></h2>' +
       '<div class="tl-density"><div class="fill" style="width:' + width + '%"></div></div>' +
       '<div class="tl-events">' + cards + '</div></div>';
+  }
+
+  // Decades to chart in chronological order (40s → 20s)
+  var DECADE_CHRON = ["40s", "50s", "60s", "70s", "80s", "90s", "00s", "10s", "20s"];
+  var DECADE_LABEL = { "40s":"40s","50s":"50s","60s":"60s","70s":"70s","80s":"80s","90s":"90s","00s":"00s","10s":"10s","20s":"20s" };
+
+  function renderOverview(groups) {
+    var host = document.getElementById("tl-overview");
+    var bars = document.getElementById("tl-decadebars");
+    var totalEl = document.getElementById("tl-overview-total");
+    if (!host || !bars) return;
+    var counts = DECADE_CHRON.map(function (k) { return (groups[k] || []).length; });
+    var max = counts.reduce(function (a, b) { return Math.max(a, b); }, 0);
+    if (max === 0) return;
+    var total = counts.reduce(function (a, b) { return a + b; }, 0);
+    var html = DECADE_CHRON.map(function (k, i) {
+      var c = counts[i];
+      var pct = max > 0 ? (c / max) * 100 : 0;
+      return '<div class="col" title="' + DECADE_LABEL[k] + ' · ' + c + ' events">' +
+        '<div class="bar-wrap"><div class="bar" style="height:' + pct.toFixed(1) + '%"></div></div>' +
+        '<div class="lbl"><span class="n">' + c + '</span>' + esc(DECADE_LABEL[k]) + '</div></div>';
+    }).join("");
+    bars.innerHTML = html;
+    if (totalEl) totalEl.textContent = total + " events";
+    host.hidden = false;
   }
 
   function renderBands() {
@@ -222,6 +271,8 @@
       if (groups[k] && groups[k].length) html += bandHTML(k, groups[k], maxCount);
     });
     if (html) host.innerHTML = html;
+
+    renderOverview(groups);
   }
 
   function renderLegend() {

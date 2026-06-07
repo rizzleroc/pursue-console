@@ -23,8 +23,13 @@
     .ask-input-row .meta .v { color: var(--amber); }
     .ask-input-row .send { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); padding: 10px 22px; cursor: pointer; }
 
-    .qa { margin-top: 28px; display: flex; flex-direction: column; gap: 0; }
+    .qa { margin-top: 28px; display: flex; flex-direction: column; gap: 0; position: relative; }
+    .qa-clear { position: absolute; top: 4px; right: 0; background: transparent; border: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-4); padding: 4px 8px; text-transform: uppercase; transition: color .15s; }
+    .qa-clear:hover { color: var(--rose, #f87171); }
+    .qa-clear[hidden] { display: none; }
     .q { display: flex; align-items: flex-start; gap: 14px; padding: 22px 0 16px; border-bottom: 1px solid var(--hairline); }
+    .q.user { cursor: pointer; transition: background .15s; }
+    .q.user:hover { background: rgba(97,215,240,0.04); }
     .q:last-child { border-bottom: none; }
     .q .avatar { width: 32px; height: 32px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-2); flex-shrink: 0; }
     .q .avatar.user { background: rgba(97,215,240,0.10); border-color: rgba(97,215,240,0.4); color: var(--cyan); }
@@ -262,14 +267,23 @@
 
   function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-  function nowLabel(){
-    var d = new Date(), p = function(n){ return String(n).padStart(2, '0'); };
+  function nowLabel(ts){
+    var d = ts ? new Date(ts) : new Date(), p = function(n){ return String(n).padStart(2, '0'); };
     return p(d.getUTCMonth()+1) + '·' + p(d.getUTCDate()) + ' · ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) + ' UTC · PATTERN';
   }
 
-  function ansHTML(q, res){
-    if (!res){ return ''; }
-    var rows = res.events.map(function(ev){
+  // Build a pure-data result envelope from the live ask() output (for storage).
+  function resultsForStorage(res){
+    if (!res) return [];
+    return res.events.map(function(ev){
+      return { id: ev.id, title: ev.title || '—', agency: ev.agency || '', date: ev.date || '', flag: ev.flag || null };
+    });
+  }
+
+  function ansHTML(entry){
+    // entry: { ts, q, headline (html), total, results: [{id,title,agency,date,flag}] }
+    var ts = entry.ts;
+    var rows = (entry.results || []).map(function(ev){
       var dot = dotClass(ev);
       return '<a class="a-row" href="' + esc(MC.url.dossier(ev.id)) + '">' +
         '<span class="dot ' + dot + '"></span>' +
@@ -277,15 +291,41 @@
         '<span class="pg">' + esc(ev.agency || '') + (ev.date ? ' · ' + esc(ev.date) : '') + '</span>' +
       '</a>';
     }).join('');
-    var more = (res.total > res.events.length) ? '<div class="more-row">+ ' + (res.total - res.events.length) + ' more · refine the query to narrow</div>' : '';
-    var headline = res.total
-      ? 'Found <strong>' + res.total + '</strong> ' + (res.total === 1 ? 'event' : 'events') + ' matching <em>' + esc(res.reasonLabel) + '</em>.'
-      : 'No catalogue events match this query. Try <em>physics-relevant</em>, <em>NASA</em>, <em>1960s</em>, <em>release 02</em>, or a keyword like <em>Borman</em> or <em>Pantex</em>.';
-    return '<div class="q"><div class="avatar user">YOU</div><div class="body"><div class="meta">' + nowLabel() + '</div><p>' + esc(q) + '</p></div></div>' +
-      '<div class="q"><div class="avatar ai">▣</div><div class="body"><div class="meta">' + nowLabel() + ' · ' + res.total + ' RESULTS</div>' +
+    var total = entry.total != null ? entry.total : (entry.results ? entry.results.length : 0);
+    var shown = entry.results ? entry.results.length : 0;
+    var more = (total > shown) ? '<div class="more-row">+ ' + (total - shown) + ' more · refine the query to narrow</div>' : '';
+    var headline = entry.headline || '';
+    return '<div class="q user" data-q="' + esc(entry.q) + '" title="Click to re-run this query"><div class="avatar user">YOU</div><div class="body"><div class="meta">' + nowLabel(ts) + '</div><p>' + esc(entry.q) + '</p></div></div>' +
+      '<div class="q ai"><div class="avatar ai">▣</div><div class="body"><div class="meta">' + nowLabel(ts) + ' · ' + total + ' RESULTS</div>' +
       '<p>' + headline + '</p>' +
-      (res.events.length ? '<div class="a-rows">' + rows + more + '</div>' : '') +
+      (shown ? '<div class="a-rows">' + rows + more + '</div>' : '') +
       '</div></div>';
+  }
+
+  // ─── Conversation history (sessionStorage) ───
+  var HISTORY_KEY = 'mc.ask.history.v1';
+  var HISTORY_MAX = 20;
+
+  function loadHistory(){
+    try {
+      var raw = sessionStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch(_){ return []; }
+  }
+  function saveHistory(arr){
+    try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_MAX))); } catch(_){}
+  }
+  function pushHistory(entry){
+    var arr = loadHistory();
+    arr.unshift(entry);
+    if (arr.length > HISTORY_MAX) arr = arr.slice(0, HISTORY_MAX);
+    saveHistory(arr);
+    return arr;
+  }
+  function clearHistory(){
+    try { sessionStorage.removeItem(HISTORY_KEY); } catch(_){}
   }
 
   // ─── DOM wiring ───
@@ -296,15 +336,57 @@
   var smartNote = document.getElementById('smart-note');
   var mode = 'pattern';
 
+  function renderHistory(){
+    var arr = loadHistory();
+    var clearBtn = '<button class="qa-clear" id="qa-clear-btn"' + (arr.length ? '' : ' hidden') + '>✕ CLEAR HISTORY</button>';
+    if (!arr.length){
+      qaEl.innerHTML = clearBtn;
+      bindQaEvents();
+      return;
+    }
+    var body = arr.map(function(entry){ return ansHTML(entry); }).join('');
+    qaEl.innerHTML = clearBtn + body;
+    bindQaEvents();
+  }
+
+  function bindQaEvents(){
+    var btn = document.getElementById('qa-clear-btn');
+    if (btn){
+      btn.addEventListener('click', function(){
+        clearHistory();
+        renderHistory();
+      });
+    }
+    qaEl.querySelectorAll('.q.user').forEach(function(card){
+      card.addEventListener('click', function(){
+        var q = card.getAttribute('data-q');
+        if (!q) return;
+        inputEl.value = q;
+        runQuery(q);
+      });
+    });
+  }
+
   function runQuery(q){
     if (!q) return;
     if (mode === 'smart'){
       smartNote.style.display = '';
-      qaEl.innerHTML = '';
       return;
     }
     var res = ask(q);
-    qaEl.innerHTML = ansHTML(q, res);
+    if (!res) return;
+    var headline = res.total
+      ? 'Found <strong>' + res.total + '</strong> ' + (res.total === 1 ? 'event' : 'events') + ' matching <em>' + esc(res.reasonLabel) + '</em>.'
+      : 'No catalogue events match this query. Try <em>physics-relevant</em>, <em>NASA</em>, <em>1960s</em>, <em>release 02</em>, or a keyword like <em>Borman</em> or <em>Pantex</em>.';
+    var entry = {
+      ts: Date.now(),
+      q: q,
+      headline: headline,
+      total: res.total,
+      results: resultsForStorage(res)
+    };
+    pushHistory(entry);
+    renderHistory();
     qaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -332,8 +414,14 @@
   });
 
   MC.ready().then(function(){
-    // Initial run so the page lands on a real answer (default question).
-    runQuery(inputEl.value.trim());
+    var existing = loadHistory();
+    if (existing.length){
+      // Restore prior conversation across reloads.
+      renderHistory();
+    } else {
+      // Initial run so the page lands on a real answer (default question).
+      runQuery(inputEl.value.trim());
+    }
   });
 })();
 </script>

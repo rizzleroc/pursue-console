@@ -318,6 +318,17 @@
     });
   };
 
+  // Lazy-load dossier-extracts.json once per page (~570KB). Returns a Promise
+  // that resolves to the parsed object (keyed by eid) or null on failure.
+  var _extracts = null;
+  function loadExtracts() {
+    if (_extracts) return _extracts;
+    _extracts = fetch('../dossier-extracts.json?t=' + Date.now())
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .catch(function (e) { console.warn('dossier extracts load failed:', e); return null; });
+    return _extracts;
+  }
+
   function pickSubject() {
     var events = (MC.derive && MC.derive.events) || [];
     var hasN = function (id) { return MC.neighbors(id, 1).length > 0; };
@@ -431,6 +442,8 @@
     // 3b) Priority chip + Evidence badges + Cross-references -------------
     renderPriorityEvidence(rec);
     renderCrossRefs(eid);
+    renderExcerpts(eid);
+    renderVisuals(eid);
 
     // 4) Semantic neighbors ------------------------------------------------
     var neigh = MC.neighbors(eid, 10);
@@ -531,6 +544,97 @@
         '<span class="rel">' + esc(String(r.relation || "").replace(/-/g, ' ')) + '</span>' +
       '</div>';
     }).join("");
+  }
+
+  // ─────────── Excerpts by page (real data from dossier-extracts.json) ───────────
+  // Find the dossier section whose header text matches `title`. Used to locate
+  // EXCERPTS BY PAGE / VISUALS without relying on DOM order or extra ids.
+  function findSectionByHeader(title) {
+    var sections = document.querySelectorAll(".ds-section");
+    for (var i = 0; i < sections.length; i++) {
+      var t = sections[i].querySelector(".ds-h .t");
+      if (t && t.textContent.trim().toUpperCase().indexOf(title.toUpperCase()) >= 0) return sections[i];
+    }
+    return null;
+  }
+
+  function renderExcerpts(eid) {
+    var section = findSectionByHeader("EXCERPTS BY PAGE");
+    if (!section) return;
+    loadExtracts().then(function (ex) {
+      if (!ex || !ex[eid] || !ex[eid].excerptsByPage) return; // keep static fallback
+      var pages = ex[eid].excerptsByPage;
+      // Sort numerically and take top 3 pages with at least one extract.
+      var keys = Object.keys(pages)
+        .filter(function (k) { return pages[k] && Array.isArray(pages[k].top) && pages[k].top.length; })
+        .sort(function (a, b) { return (+a) - (+b); })
+        .slice(0, 3);
+      if (!keys.length) return;
+      var html = keys.map(function (k) {
+        var pg = pages[k];
+        var t = pg.top[0];
+        var pgLabel = "PAGE " + String(k).padStart(3, "0");
+        var src = pg.source || "vision";
+        var score = (typeof t.score === "number") ? t.score.toFixed(2) : "—";
+        var flagNames = (t.flags && typeof t.flags === "object")
+          ? Object.keys(t.flags).filter(function (f) { return t.flags[f] === true; })
+          : [];
+        var flagList = flagNames.length ? flagNames.join(", ") : "—";
+        var text = String(t.text || "").replace(/\s+/g, " ").trim();
+        return '<div class="excerpt">' +
+          '<div class="meta">' +
+          '<span class="pg">' + esc(pgLabel) + '</span>' +
+          '<span>' + esc(src) + ' · score ' + esc(score) + '</span>' +
+          '<span>·</span>' +
+          '<span>flags: ' + esc(flagList) + '</span>' +
+          '</div>' +
+          '<p>"' + esc(text) + '"</p>' +
+          '</div>';
+      }).join("");
+      // Idempotent: only write if content changed.
+      var current = section.getAttribute("data-mc-excerpts-eid");
+      if (current === eid) return;
+      // Remove existing .excerpt children, then append fresh ones.
+      section.querySelectorAll(".excerpt").forEach(function (n) { n.remove(); });
+      section.insertAdjacentHTML("beforeend", html);
+      section.setAttribute("data-mc-excerpts-eid", eid);
+      var rHdr = section.querySelector(".ds-h .r");
+      if (rHdr) rHdr.textContent = "vision-cache · " + Object.keys(pages).length + " pages";
+    });
+  }
+
+  function renderVisuals(eid) {
+    var section = findSectionByHeader("VISUALS");
+    if (!section) return;
+    var grid = section.querySelector(".vis-grid");
+    if (!grid) return;
+    var all = (MC.derive && MC.derive.mediaItems) || [];
+    var items = all.filter(function (m) { return m && m.eventId === eid; }).slice(0, 6);
+    if (!items.length) return; // keep hardcoded fallback
+    if (grid.getAttribute("data-mc-visuals-eid") === eid) return; // idempotent
+    var KIND_CLS = { photograph: "photo", photo: "photo", diagram: "diagram", map: "map" };
+    var KIND_LABEL = { photograph: "PHOTO", photo: "PHOTO", diagram: "DIAGRAM", map: "MAP" };
+    var html = items.map(function (m) {
+      var pg = (m.page != null) ? ("p" + String(m.page).padStart(2, "0")) : "";
+      if (m.imagePath) {
+        var href = "../" + m.imagePath;
+        var cls = KIND_CLS[m.kind] || "";
+        return '<a class="vis-tile ' + cls + '" href="' + esc(href) + '" target="_blank" style="position:relative;overflow:hidden;text-decoration:none">' +
+          '<img src="' + esc(href) + '" alt="' + esc(m.title || m.id || "") + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>' +
+          '<span class="p" style="position:absolute;right:6px;bottom:6px;background:rgba(8,14,22,0.72);padding:2px 6px;border-radius:2px;z-index:2">' + esc(pg) + '</span>' +
+          '</a>';
+      }
+      var kCls = KIND_CLS[m.kind] || "";
+      var kLab = KIND_LABEL[m.kind] || String(m.kind || "ITEM").toUpperCase();
+      return '<div class="vis-tile ' + kCls + '">' +
+        '<span class="k">[' + esc(kLab) + ']</span>' +
+        '<span class="p">' + esc(pg) + '</span>' +
+        '</div>';
+    }).join("");
+    grid.innerHTML = html;
+    grid.setAttribute("data-mc-visuals-eid", eid);
+    var rHdr = section.querySelector(".ds-h .r");
+    if (rHdr) rHdr.textContent = items.length + " tiles";
   }
 
   MC.ready().then(render);

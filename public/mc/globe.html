@@ -34,6 +34,14 @@
     .reg-row .l .d { width: 9px; height: 9px; }
     .reg-row .ct { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; color: var(--text); }
     .reg-row .ct.cold { color: var(--rose); }
+    .gl-stage { position: relative; }
+    .gl-stage.dragging { cursor: grabbing; }
+    .gl-stage .globe-svg { cursor: grab; }
+    .gl-stage.dragging .globe-svg { cursor: grabbing; }
+    .gl-reset { position: absolute; top: 10px; right: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--text-3); background: var(--surface-2); border: 1px solid var(--border); padding: 6px 10px; cursor: pointer; text-transform: uppercase; z-index: 4; }
+    .gl-reset:hover { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
+    .gl-tip { position: absolute; pointer-events: none; background: var(--surface-2); border: 1px solid var(--border-strong); padding: 6px 9px; font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.5; color: var(--text); letter-spacing: 0.04em; max-width: 320px; z-index: 5; opacity: 0; transition: opacity 80ms linear; box-shadow: 0 4px 14px rgba(0,0,0,0.45); white-space: nowrap; }
+    .gl-tip.on { opacity: 1; }
   </style>
 </head>
 <body data-view="globe">
@@ -52,7 +60,10 @@
         <div class="meta">LAT/LON · <span id="gl-meta-count">220</span> EVENTS · projection equirectangular</div>
       </div>
 
-      <svg class="globe-svg" viewBox="0 0 1100 580" xmlns="http://www.w3.org/2000/svg">
+      <div class="gl-stage" id="gl-stage">
+      <button type="button" class="gl-reset" id="gl-reset" title="Reset pan and zoom">RESET</button>
+      <div class="gl-tip" id="gl-tip" role="tooltip" aria-hidden="true"></div>
+      <svg class="globe-svg" id="gl-svg" viewBox="0 0 1100 580" xmlns="http://www.w3.org/2000/svg">
         <!-- Latitude/longitude grid -->
         <g>
           <line class="longitude" x1="100"  y1="40" x2="100"  y2="540"/>
@@ -139,6 +150,7 @@
         <line x1="475" y1="285" x2="475" y2="295" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
         <line x1="470" y1="290" x2="480" y2="290" stroke="rgba(244,236,212,0.5)" stroke-width="1"/>
       </svg>
+      </div>
 
       <div class="gl-ctl">
         <span class="btn active">EQUIRECTANGULAR</span>
@@ -231,9 +243,21 @@
       'Unknown':       'rgba(184,168,135,0.55)'
     };
 
+    // Interaction state for pan/zoom. Default values keep the projection
+    // identical to the original static layout.
+    var view = { lonCenter: 0, zoom: 1 };
+    // Latest event list cached so we can re-project on pan/zoom without
+    // waiting for MC to push another update.
+    var lastEvents = null;
+
     function project(lat, lng) {
-      var x = 80 + ((lng + 180) / 360) * 940;
-      var y = 290 - (lat / 90) * 250;
+      // Centre x at the canvas midpoint (475) so that zoom scales around the
+      // origin/equator and pan shifts the longitude window. With lonCenter=0
+      // and zoom=1, x reduces to 80 + ((lng+180)/360)*940 — identical to the
+      // original projection.
+      var lngOffset = (((lng - view.lonCenter) + 540) % 360) - 180;
+      var x = 475 + (lngOffset / 360) * 940 * view.zoom;
+      var y = 290 - (lat / 90) * 250 * view.zoom;
       if (x < 80)   x = 80;
       if (x > 1020) x = 1020;
       if (y < 40)   y = 40;
@@ -244,6 +268,7 @@
     function renderEventPins(events) {
       var host = document.getElementById('event-pins');
       if (!host || !events) return 0;
+      lastEvents = events;
       // Clear any previously-rendered pins (idempotent under MC.onUpdate).
       while (host.firstChild) host.removeChild(host.firstChild);
       var plotted = 0;
@@ -260,6 +285,9 @@
         var a = document.createElementNS(SVG_NS, 'a');
         a.setAttributeNS(XLINK_NS, 'href', dossier(ev.id));
         a.setAttribute('href', dossier(ev.id));
+        a.setAttribute('data-eid', ev.id || '');
+        a.setAttribute('data-title', ev.title || ev.id || '');
+        a.setAttribute('data-agency', ev.agency || '');
 
         if (isAnchor) {
           var ring = document.createElementNS(SVG_NS, 'circle');
@@ -289,6 +317,129 @@
       return plotted;
     }
 
+    // --- Interaction: drag-to-pan, wheel-to-zoom, reset, hover tooltip ---
+    function setupGlobeInteraction() {
+      var stage = document.getElementById('gl-stage');
+      var svg = document.getElementById('gl-svg');
+      var reset = document.getElementById('gl-reset');
+      var tip = document.getElementById('gl-tip');
+      if (!stage || !svg || !reset || !tip) return;
+
+      var rafPending = false;
+      function scheduleRerender() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function () {
+          rafPending = false;
+          if (lastEvents) renderEventPins(lastEvents);
+        });
+      }
+
+      // Drag-to-pan. Convert pixel deltas into longitude degrees using the
+      // SVG viewBox width (940 user-units span 360°), then divide by zoom
+      // so panning feels consistent at any scale.
+      var dragging = false;
+      var startX = 0, startY = 0, startLon = 0;
+      var moved = false;
+
+      svg.addEventListener('pointerdown', function (e) {
+        // Only left-button drags initiate a pan.
+        if (e.button !== 0) return;
+        dragging = true;
+        moved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLon = view.lonCenter;
+        stage.classList.add('dragging');
+        try { svg.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      svg.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        var rect = svg.getBoundingClientRect();
+        var pxPerUnit = rect.width / 1100;
+        var dxUnits = (e.clientX - startX) / pxPerUnit;
+        if (Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) > 3) moved = true;
+        // 940 user-units cover 360° at zoom=1; account for current zoom.
+        var degPerUnit = 360 / 940 / view.zoom;
+        var newLon = startLon - dxUnits * degPerUnit;
+        // Normalize to (-180, 180].
+        newLon = (((newLon + 540) % 360) + 360) % 360 - 180;
+        view.lonCenter = newLon;
+        scheduleRerender();
+      });
+      function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        stage.classList.remove('dragging');
+        try { svg.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+      svg.addEventListener('pointerup', endDrag);
+      svg.addEventListener('pointercancel', endDrag);
+
+      // Suppress click-through to pin anchors when the user actually dragged.
+      svg.addEventListener('click', function (e) {
+        if (moved) {
+          e.preventDefault();
+          e.stopPropagation();
+          moved = false;
+        }
+      }, true);
+
+      // Wheel-to-zoom. Clamp to a sensible range so pins stay on-canvas.
+      svg.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        var factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        var next = view.zoom * factor;
+        if (next < 0.5) next = 0.5;
+        if (next > 8)   next = 8;
+        view.zoom = next;
+        scheduleRerender();
+      }, { passive: false });
+
+      // Reset button — restore defaults.
+      reset.addEventListener('click', function () {
+        view.lonCenter = 0;
+        view.zoom = 1;
+        scheduleRerender();
+      });
+
+      // Hover tooltip — delegated on the #event-pins group.
+      var pinsHost = document.getElementById('event-pins');
+      if (pinsHost) {
+        pinsHost.addEventListener('mouseover', function (e) {
+          var a = e.target && e.target.closest && e.target.closest('a[data-eid]');
+          if (!a) return;
+          var id = a.getAttribute('data-eid') || '';
+          var title = a.getAttribute('data-title') || '';
+          var agency = a.getAttribute('data-agency') || '';
+          var short = title.length > 40 ? title.slice(0, 40) : title;
+          var parts = [id, short];
+          if (agency) parts.push(agency);
+          tip.textContent = parts.filter(Boolean).join(' · ');
+          tip.classList.add('on');
+          tip.setAttribute('aria-hidden', 'false');
+        });
+        pinsHost.addEventListener('mousemove', function (e) {
+          if (!tip.classList.contains('on')) return;
+          var rect = stage.getBoundingClientRect();
+          var x = e.clientX - rect.left + 12;
+          var y = e.clientY - rect.top + 12;
+          // Keep tooltip inside the stage horizontally.
+          var maxX = rect.width - tip.offsetWidth - 6;
+          if (x > maxX) x = maxX;
+          if (x < 4) x = 4;
+          tip.style.left = x + 'px';
+          tip.style.top = y + 'px';
+        });
+        pinsHost.addEventListener('mouseout', function (e) {
+          var to = e.relatedTarget;
+          if (to && to.closest && to.closest('a[data-eid]')) return;
+          tip.classList.remove('on');
+          tip.setAttribute('aria-hidden', 'true');
+        });
+      }
+    }
+
     function setText(id, value) {
       var el = document.getElementById(id);
       if (el) el.textContent = value;
@@ -313,6 +464,10 @@
       if (total) setText('gl-meta-count', total);
       return true;
     }
+
+    // Wire pan/zoom/reset/tooltip once the DOM is ready. Safe to call before
+    // events arrive — handlers are attached to the static stage/svg/pins host.
+    setupGlobeInteraction();
 
     if (window.MC && typeof window.MC.ready === 'function') {
       window.MC.ready().then(renderFromMC);

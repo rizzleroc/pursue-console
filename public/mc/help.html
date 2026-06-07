@@ -51,6 +51,17 @@
     .resource-list a { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); text-decoration: none; padding: 8px 0; border-bottom: 1px solid var(--hairline); display: flex; justify-content: space-between; letter-spacing: 0.04em; }
     .resource-list a:hover { color: var(--amber); }
     .resource-list a .arr { color: var(--text-4); }
+
+    .cf-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); line-height: 1.55; letter-spacing: 0.04em; margin-bottom: 14px; }
+    .cf-meta .ago { color: var(--amber); }
+    .cf-meta .ts { color: var(--text-3); font-size: 10px; display: block; margin-top: 2px; }
+    .cf-meta .sha { color: var(--cyan); }
+    .cf-grid { display: grid; grid-template-columns: 1fr auto; row-gap: 6px; column-gap: 12px; align-items: baseline; }
+    .cf-grid .lab { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.18em; text-transform: uppercase; }
+    .cf-grid .v   { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); text-align: right; letter-spacing: -0.01em; }
+    .cf-grid .v.dim { color: var(--text-3); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; }
+    .cf-refresh { display: inline-block; margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; letter-spacing: 0.18em; cursor: pointer; }
+    .cf-refresh:hover { color: var(--amber); border-color: var(--amber); }
   </style>
 </head>
 <body data-view="help">
@@ -102,7 +113,23 @@ npm run volunteer -- --my-handle=<span class="v">YOU</span>     <span class="c">
     </div>
 
     <div>
-      <div class="hp-card">
+      <div class="hp-card" id="hp-corpus-freshness">
+        <div class="hp-h"><span class="t">CORPUS BUILD</span><span class="meta" id="cf-version">—</span></div>
+        <div class="cf-meta">
+          Built <span class="ago" id="cf-ago">—</span>
+          <span class="ts" id="cf-ts">—</span>
+        </div>
+        <div class="cf-grid">
+          <span class="lab">Pages</span>      <span class="v" id="cf-pages">—</span>
+          <span class="lab">Events</span>     <span class="v" id="cf-events">—</span>
+          <span class="lab">Media</span>      <span class="v" id="cf-media">—</span>
+          <span class="lab">Patterns</span>   <span class="v" id="cf-patterns">—</span>
+          <span class="lab">Build</span>      <span class="v dim sha" id="cf-sha">—</span>
+        </div>
+        <a class="cf-refresh" id="cf-refresh">↻ REFRESH NOW</a>
+      </div>
+
+      <div class="hp-card" style="margin-top:22px">
         <div class="hp-h"><span class="t">CONTRIBUTOR GUIDES</span><span class="meta">docs</span></div>
         <div class="resource-list">
           <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md" target="_blank" rel="noopener"><span>HOW-CAN-I-HELP.md</span><span class="arr">↗</span></a>
@@ -229,8 +256,118 @@ npm run volunteer -- --my-handle=<span class="v">YOU</span>     <span class="c">
     document.getElementById('hp-events-graded').textContent = graded;
   }
 
-  MC.ready().then(function(){ renderStats(); renderDocs(); });
-  MC.onUpdate(function(){ renderStats(); renderDocs(); });
+  // ── Corpus freshness card ───────────────────────────────────────────────
+  // humanAgo: ms diff → "Nm ago" / "Nh ago" / "Nd ago" / "just now"
+  function humanAgo(ms){
+    if (!isFinite(ms) || ms < 0) return '—';
+    var s = Math.floor(ms / 1000);
+    if (s < 45) return 'just now';
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    var h = Math.floor(m / 60);
+    if (h < 48) return h + 'h ago';
+    var d = Math.floor(h / 24);
+    return d + 'd ago';
+  }
+  function fmtTs(iso){
+    if (!iso) return '';
+    try {
+      var dt = new Date(iso);
+      if (isNaN(dt.getTime())) return iso;
+      return dt.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
+    } catch (e) { return iso; }
+  }
+  function fmtNum(n){
+    return (typeof n === 'number' && isFinite(n)) ? n.toLocaleString() : '—';
+  }
+
+  // Lazy, memoised fetch of corpus-version.json (one level up).
+  var corpusVersionPromise = null;
+  function getCorpusVersion(){
+    if (corpusVersionPromise) return corpusVersionPromise;
+    corpusVersionPromise = fetch('../corpus-version.json', { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
+    return corpusVersionPromise;
+  }
+
+  function buildTimestamp(){
+    // Prefer corpus-stats.generatedAt, then live-feed.generatedAt, then version.
+    var s = (MC.data && MC.data.stats) || {};
+    var f = (MC.data && MC.data.feed) || {};
+    return s.generatedAt || f.generatedAt || null;
+  }
+
+  // Track the latest ISO timestamp so the interval can re-render "Nm ago".
+  var lastBuiltAt = null;
+
+  function patternCount(){
+    var pk = MC.get('patterns.byKind', {}) || {};
+    var n = 0;
+    Object.keys(pk).forEach(function(k){
+      var arr = pk[k];
+      if (Array.isArray(arr)) n += arr.length;
+    });
+    return n;
+  }
+
+  function paintFreshness(version){
+    var D = MC.derive || {};
+    var builtAt = (version && version.builtAt) || buildTimestamp() || (version && version.generatedAt) || null;
+    lastBuiltAt = builtAt;
+
+    var ago = document.getElementById('cf-ago');
+    var ts  = document.getElementById('cf-ts');
+    if (ago) ago.textContent = builtAt ? humanAgo(Date.now() - new Date(builtAt).getTime()) : '—';
+    if (ts)  ts.textContent  = builtAt ? fmtTs(builtAt) : '';
+
+    var pages    = (D.pagesIndexed != null) ? D.pagesIndexed
+                 : (version && version.docsIndexed != null) ? version.docsIndexed
+                 : null;
+    var events   = (D.eventCount != null) ? D.eventCount : null;
+    var media    = (D.mediaTotal != null) ? D.mediaTotal : null;
+    var patterns = patternCount();
+
+    document.getElementById('cf-pages').textContent    = fmtNum(pages);
+    document.getElementById('cf-events').textContent   = fmtNum(events);
+    document.getElementById('cf-media').textContent    = fmtNum(media);
+    document.getElementById('cf-patterns').textContent = fmtNum(patterns);
+
+    var shaEl = document.getElementById('cf-sha');
+    var vEl   = document.getElementById('cf-version');
+    if (version) {
+      var sha = version.sha || version.commit || version.gitSha || '';
+      var shortSha = sha ? String(sha).slice(0, 7) : '';
+      if (shaEl) shaEl.textContent = shortSha || (version.embeddingsCount != null ? (version.embeddingsCount.toLocaleString() + ' vec') : '—');
+      if (vEl)   vEl.textContent   = version.version ? ('v' + version.version) : (shortSha || 'live');
+    } else {
+      if (shaEl) shaEl.textContent = '—';
+      if (vEl)   vEl.textContent   = 'live';
+    }
+  }
+
+  function tickAgo(){
+    if (!lastBuiltAt) return;
+    var ago = document.getElementById('cf-ago');
+    if (ago) ago.textContent = humanAgo(Date.now() - new Date(lastBuiltAt).getTime());
+  }
+
+  function renderFreshness(){
+    getCorpusVersion().then(paintFreshness);
+  }
+
+  var refreshBtn = document.getElementById('cf-refresh');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      window.location.reload();
+    });
+  }
+  // Keep "Nm ago" current without waiting for the 60s data revalidation.
+  setInterval(tickAgo, 60_000);
+
+  MC.ready().then(function(){ renderStats(); renderDocs(); renderFreshness(); });
+  MC.onUpdate(function(){ renderStats(); renderDocs(); renderFreshness(); });
 })();
 </script>
 </body>

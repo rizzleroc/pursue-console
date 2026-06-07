@@ -68,9 +68,19 @@
 
     /* Quick-query chips */
     .qq-wrap { margin: 0 0 16px; }
-    .qq-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.22em; margin-bottom: 10px; text-transform: uppercase; }
+    .qq-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.22em; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 12px; }
+    .qq-more { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-3); letter-spacing: 0.22em; cursor: pointer; padding: 2px 8px; border: 1px solid var(--border); background: var(--surface-2); }
+    .qq-more:hover { color: var(--amber); border-color: var(--amber); }
     .qq { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); padding: 3px 10px; margin: 0 6px 6px 0; cursor: pointer; letter-spacing: 0.04em; }
     .qq:hover { color: var(--amber); border-color: var(--amber); }
+    /* Per-kind colour hints — subtle tint on the chip background + border so
+       four kinds are visually distinguishable but still legible against the
+       dark surface. Hover still bumps to amber. */
+    .qq.qq-entity   { color: var(--cyan);        border-color: rgba(97,215,240,0.40);  background: rgba(97,215,240,0.07); }
+    .qq.qq-shape    { color: #B280FF;            border-color: rgba(178,128,255,0.40); background: rgba(178,128,255,0.08); }
+    .qq.qq-behavior { color: #FFD93D;            border-color: rgba(255,217,61,0.40);  background: rgba(255,217,61,0.07); }
+    .qq.qq-sensor   { color: #6EC1FF;            border-color: rgba(110,193,255,0.40); background: rgba(110,193,255,0.07); }
+    .qq.qq-entity:hover, .qq.qq-shape:hover, .qq.qq-behavior:hover, .qq.qq-sensor:hover { color: var(--amber); border-color: var(--amber); }
 
     /* Page-hit snippets nested inside a result card */
     .rc-pages { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 10px; }
@@ -133,8 +143,14 @@
     </div>
 
     <div class="qq-wrap" id="qq-wrap">
-      <div class="qq-label">TRY · QUICK QUERIES</div>
-      <div id="qq-list">
+      <div class="qq-label">
+        <span>TRY · QUICK QUERIES</span>
+        <span class="qq-more" id="qq-more">+ SHOW ALL</span>
+      </div>
+      <div id="qq-list" class="qq-list">
+        <!-- Hardcoded fallback chips — replaced by terms derived from
+             patterns.json once MC.data loads. Kept here for SSR / no-JS
+             and as a safety net when the patterns file is unavailable. -->
         <span class="qq">borman</span><span class="qq">uap</span><span class="qq">cernan</span><span class="qq">centcom</span><span class="qq">swir</span><span class="qq">fvey</span><span class="qq">carol rosin</span><span class="qq">ellipsoid</span><span class="qq">bouncy ball</span><span class="qq">orb</span><span class="qq">diamond</span><span class="qq">bronze</span><span class="qq">saucer</span><span class="qq">pantex</span><span class="qq">aawsa</span><span class="qq">oak ridge</span>
       </div>
     </div>
@@ -526,6 +542,96 @@
     var idxStatus  = document.getElementById('idx-status');
     var qqWrap     = document.getElementById('qq-wrap');
     var qqList     = document.getElementById('qq-list');
+    var qqMore     = document.getElementById('qq-more');
+
+    // ── Quick-query chips, derived from patterns.json ────────────────────
+    // Pull the top terms per kind (entity / shape / behavior / sensor),
+    // tag each with a CSS class so the four kinds tint distinctly, then
+    // combine + shuffle. Re-derives on every MC.onUpdate so a corpus
+    // refresh (or index re-validation) keeps the chips in sync.
+    //
+    // qqMode: 'top' shows top-16 (4 per kind), 'all' shows up to 40.
+    var qqMode = 'top';
+    var QQ_KINDS = ['entity', 'shape', 'behavior', 'sensor'];
+
+    function _isUsefulTerm(t){
+      if (!t || typeof t !== 'string') return false;
+      var s = t.trim();
+      if (s.length < 3 || s.length > 25) return false;
+      if (/^[0-9]+$/.test(s)) return false; // pure numeric
+      return true;
+    }
+    // Mulberry32-ish shuffle seeded by the corpus generatedAt so the chip
+    // order is stable across reloads of the same data but changes when the
+    // corpus actually changes.
+    function _seededShuffle(arr, seed){
+      var a = arr.slice();
+      var s = (seed >>> 0) || 1;
+      for (var i = a.length - 1; i > 0; i--){
+        s = (s + 0x6D2B79F5) >>> 0;
+        var r = s;
+        r = Math.imul(r ^ (r >>> 15), r | 1);
+        r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+        var j = ((r ^ (r >>> 14)) >>> 0) % (i + 1);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+    function _deriveChips(perKind, totalCap){
+      var pk = (MC.data && MC.data.patterns && MC.data.patterns.byKind) || {};
+      var combined = [];
+      for (var i = 0; i < QQ_KINDS.length; i++){
+        var kind = QQ_KINDS[i];
+        var bucket = (pk[kind] || [])
+          .filter(function(row){ return row && _isUsefulTerm(row.term); })
+          .slice()
+          .sort(function(a, b){
+            return (b.docCount || 0) - (a.docCount || 0) ||
+                   (b.total    || 0) - (a.total    || 0);
+          })
+          .slice(0, perKind);
+        for (var j = 0; j < bucket.length; j++){
+          combined.push({ term: bucket[j].term, kind: kind });
+        }
+      }
+      // de-dupe terms that appear in multiple kinds (rare but possible)
+      var seen = {};
+      combined = combined.filter(function(c){
+        var k = c.term.toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = true;
+        return true;
+      });
+      var ga = (MC.data && MC.data.patterns && MC.data.patterns.generatedAt) || '';
+      var seed = 0;
+      for (var s = 0; s < ga.length; s++) seed = (seed * 31 + ga.charCodeAt(s)) >>> 0;
+      combined = _seededShuffle(combined, seed || 42);
+      if (typeof totalCap === 'number') combined = combined.slice(0, totalCap);
+      return combined;
+    }
+    function renderQQ(){
+      if (!qqList) return;
+      var perKind = (qqMode === 'all') ? 10 : 4;
+      var cap     = (qqMode === 'all') ? 40 : 16;
+      var chips = _deriveChips(perKind, cap);
+      if (!chips.length) return; // keep hardcoded fallback
+      var html = chips.map(function(c){
+        // esc() is defined at outer scope — reuse it for safe interpolation.
+        return '<span class="qq qq-' + c.kind + '">' + esc(c.term) + '</span>';
+      }).join('');
+      qqList.innerHTML = html;
+      if (qqMore) qqMore.textContent = (qqMode === 'all') ? '− SHOW TOP 16' : '+ SHOW ALL';
+    }
+    if (qqMore){
+      qqMore.addEventListener('click', function(){
+        qqMode = (qqMode === 'all') ? 'top' : 'all';
+        renderQQ();
+      });
+    }
+    // Initial paint from already-loaded patterns (data.js fetches in ready()).
+    renderQQ();
+    // Survive index re-validation — re-derive whenever the data layer updates.
+    if (MC.onUpdate) MC.onUpdate(function(){ renderQQ(); });
 
     // Module-level: the loaded MiniSearch instance (or null until ready).
     var mini = null;
