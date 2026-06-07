@@ -151,11 +151,8 @@
           <circle cx="140" cy="140" r="22"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
           <line x1="140" y1="8"  x2="140" y2="272" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
           <line x1="8"  y1="140" x2="272" y2="140" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
-          <g class="sweep-g"><path d="M140 140 L270 140 A130 130 0 0 1 200 240 Z" fill="url(#sg)" stroke="rgba(242,166,35,0.55)" stroke-width="0.7"/></g>
-          <g class="ping-pulse"><circle cx="200" cy="84" r="3.6" fill="#F2A623"/><circle cx="200" cy="84" r="8" fill="none" stroke="rgba(242,166,35,0.45)" stroke-width="0.6"/></g>
-          <g class="ping-pulse" style="animation-delay:0.6s"><circle cx="86" cy="68" r="3" fill="#61D7F0"/><circle cx="86" cy="68" r="7" fill="none" stroke="rgba(97,215,240,0.4)" stroke-width="0.5"/></g>
-          <g class="ping-pulse" style="animation-delay:1.4s"><circle cx="58" cy="196" r="3.4" fill="#F2A623"/></g>
-          <g class="ping-pulse" style="animation-delay:0.4s"><circle cx="198" cy="190" r="3.2" fill="#4ADE80"/><circle cx="198" cy="190" r="9" fill="none" stroke="rgba(74,222,128,0.5)" stroke-width="0.6"/></g>
+          <g id="radar-sweep" class="sweep-g"></g>
+          <g id="radar-pings"></g>
           <circle cx="140" cy="140" r="3" fill="var(--text)"/>
           <text x="146" y="22" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">N</text>
           <text x="262" y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">E</text>
@@ -484,6 +481,92 @@
     setTimeout(() => { if (!window.MC._loaded) renderCoverageFallback(); }, 1500);
   } else {
     renderCoverageFallback();
+  }
+
+  // ─── Radar BearingDial — live projection of recent feed entries ───
+  // Ported from src/views/LiveFeedView.jsx BearingDial. Each recent
+  // (modifiedAt within 7 days) feed entry whose eventId has coords gets
+  // projected: longitude → angle around the dial, freshness → radius.
+  // Vision entries render larger / hotter; OCR/tesseract render cooler.
+  function projectRadarPoints(entries) {
+    // The feed is build-time generated, not realtime — so "now" for the
+    // freshness calculation is the most-recent modifiedAt in the feed,
+    // not the wall clock. This keeps the radar populated even when the
+    // corpus hasn't rebuilt in days.
+    let now = 0;
+    for (const e of entries) { if (e && e.modifiedAt > now) now = e.modifiedAt; }
+    if (!now) now = Date.now();
+    const cut = now - 7 * 86_400_000;
+    const out = [];
+    for (const e of entries) {
+      if (!e || !e.modifiedAt || e.modifiedAt < cut) continue;
+      const rec = e.eventId ? MC.byEid(e.eventId) : null;
+      if (!rec || !Array.isArray(rec.coords)) continue;
+      const [lat, lon] = rec.coords;
+      if (typeof lon !== 'number') continue;
+      const ageHr = Math.max(0, (now - e.modifiedAt) / 3_600_000);
+      const fresh = Math.max(0.3, 1 - ageHr / (24 * 7));
+      // Convert lon (-180..180) → angle radians, N=0 at top.
+      const rad = (lon * Math.PI) / 180 - Math.PI / 2;
+      out.push({
+        x: 140 + Math.cos(rad) * (120 * fresh),
+        y: 140 + Math.sin(rad) * (120 * fresh),
+        source: (e.source || 'ocr').toLowerCase(),
+        fresh,
+      });
+      if (out.length >= 60) break;
+    }
+    return out;
+  }
+  function paintRadar() {
+    const pings = document.getElementById('radar-pings');
+    if (!pings || !window.MC || !MC.derive || !Array.isArray(MC.derive.feedEntries)) return;
+    const pts = projectRadarPoints(MC.derive.feedEntries);
+    if (!pts.length) {
+      pings.innerHTML = '';
+      return;
+    }
+    pings.innerHTML = pts.map(p => {
+      const isVis = p.source === 'vision' || p.source === 'gemini';
+      const color = isVis ? '#F2A623' : (p.source === 'ocr' || p.source === 'tesseract' ? '#61D7F0' : '#4ADE80');
+      const r     = isVis ? 4.2 : 3.2;
+      const ringR = isVis ? 8.4 : 7.2;
+      return '<g class="ping-pulse" style="animation-delay:' + (Math.random() * 1.6).toFixed(2) + 's">' +
+        '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + r + '" fill="' + color + '" opacity="' + p.fresh.toFixed(2) + '"/>' +
+        '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + ringR + '" fill="none" stroke="' + color + '" stroke-opacity="0.45" stroke-width="0.6"/>' +
+      '</g>';
+    }).join('');
+  }
+
+  // Sweep wedge — a fan of 24 lines rotating around the radar center.
+  // Smooth setTimeout-driven animation (matches the count-up fix's reasoning:
+  // rAF can throttle to 0 fps in some rendering contexts).
+  function paintSweep(angDeg) {
+    const g = document.getElementById('radar-sweep');
+    if (!g) return;
+    const segments = 24;
+    let parts = '<g transform="rotate(' + angDeg.toFixed(1) + ' 140 140)">';
+    for (let i = 0; i < segments; i++) {
+      const a = (-i * 2 - 90) * Math.PI / 180;
+      const x = 140 + Math.cos(a) * 130;
+      const y = 140 + Math.sin(a) * 130;
+      const opacity = Math.max(0, 0.32 - i * 0.011);
+      parts += '<line x1="140" y1="140" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="#7CFFB2" stroke-width="0.6" opacity="' + opacity.toFixed(2) + '"/>';
+    }
+    parts += '</g>';
+    g.innerHTML = parts;
+  }
+  (function tickSweep(){
+    let ang = 0;
+    setInterval(function(){
+      ang = (ang + 1.0) % 360;  // ~30 deg/sec at 30fps; visually a tactical sweep
+      paintSweep(ang);
+    }, 33);
+  })();
+
+  if (window.MC && typeof window.MC.ready === 'function'){
+    window.MC.ready().then(paintRadar);
+    window.MC.onUpdate(paintRadar);
   }
 </script>
 </body>

@@ -362,8 +362,44 @@
     populateEventFilter(allItems);
     renderGrid();
   }
-  MC.ready().then(hydrate);
+  // Header-filter integration — mirrors src/components/Header.jsx: typing
+  // in the topbar pipes into the local search query; the agency filter
+  // restricts by event-agency via MC.byEid; the type filter maps to the
+  // media-kind taxonomy (Image/Video/Document buckets).
+  var HEADER_TYPE_TO_KIND = {
+    'Video':    ['video'],
+    'Image':    ['photograph','hand-drawing','photocopied-negative','newspaper-clipping','map','diagram','table'],
+    'Document': ['table','photocopied-negative'],
+  };
+  function syncFromHeader(){
+    var HF = MC.headerFilters || {};
+    query = HF.query || '';
+    if (inp) inp.value = query;
+    if (HF.type && HEADER_TYPE_TO_KIND[HF.type]){
+      activeKinds = new Set(HEADER_TYPE_TO_KIND[HF.type]);
+    } else if (HF.type === 'all'){
+      activeKinds = new Set(['ALL']);
+    }
+    setActivePill();
+    renderGrid();
+  }
+  // Wrap filterAndSort so agency filter from the header constrains the result set.
+  var _origFAS = filterAndSort;
+  filterAndSort = function(){
+    var rows = _origFAS();
+    var HF = MC.headerFilters || {};
+    if (HF.agency && HF.agency !== 'all'){
+      rows = rows.filter(function(it){
+        var rec = it.eventId ? MC.byEid(it.eventId) : null;
+        return rec && rec.agency === HF.agency;
+      });
+    }
+    return rows;
+  };
+
+  MC.ready().then(function(){ hydrate(); syncFromHeader(); });
   MC.onUpdate(hydrate);
+  if (MC.onHeaderFilters) MC.onHeaderFilters(syncFromHeader);
 })();
 </script>
 </body>

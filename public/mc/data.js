@@ -33,6 +33,7 @@
     work:       "work-available.json",
     events:     "events.json",
     research:   "research-frameworks.json",
+    entities:   "entities.json",
   };
 
   const MC = {
@@ -198,6 +199,24 @@
     D.facilities  = research.facilities  || [];
     D.sensors     = research.sensors     || [];
 
+    // Entity catalogue — hand-curated bipartite event↔entity index.
+    // Each entity carries { id, name, kind, events: [...] }. We build
+    // forward + reverse indexes once so MC.entityById / MC.entitiesByEid
+    // are O(1) lookups.
+    const ents = (d.entities && d.entities.entities) || [];
+    D.entities = ents;
+    D.entityKinds = (d.entities && d.entities.kinds) || {};
+    D.entityById = {};
+    D.entitiesByEid = {};
+    ents.forEach((en) => {
+      D.entityById[en.id] = en;
+      (en.events || []).forEach((eid) => {
+        if (!D.entitiesByEid[eid]) D.entitiesByEid[eid] = [];
+        D.entitiesByEid[eid].push(en);
+      });
+    });
+    D.entityCatalogueCount = ents.length;
+
     MC.derive = D;
   };
 
@@ -269,6 +288,34 @@
   MC.byPriority   = (level)       => ((MC.derive && MC.derive.events) || []).filter((e) => e.priority === level);
   MC.byCategory   = (categoryTag) => ((MC.derive && MC.derive.events) || []).filter((e) => Array.isArray(e.category) && e.category.indexOf(categoryTag) !== -1);
   MC.byEvidenceType = (kind)      => ((MC.derive && MC.derive.events) || []).filter((e) => Array.isArray(e.evidenceTypes) && e.evidenceTypes.indexOf(kind) !== -1);
+
+  // ── Entity catalogue (entities.json) ──
+  MC.entityById     = (id)   => (MC.derive && MC.derive.entityById && MC.derive.entityById[id]) || null;
+  MC.entitiesForEid = (eid)  => ((MC.derive && MC.derive.entitiesByEid && MC.derive.entitiesByEid[eid]) || []).slice();
+  MC.entitiesByKind = (kind) => ((MC.derive && MC.derive.entities) || []).filter((e) => e.kind === kind);
+
+  // ── Header filters — sessionStorage-backed, piped into every view ──
+  // Lets the topbar's search box + agency / type dropdowns drive every
+  // surface the way the React Header does. Pages read MC.headerFilters
+  // on load; live filter changes fire a 'mc:filters' CustomEvent on
+  // window so views can refresh without a reload.
+  const HF_KEY = 'mc.headerFilters.v1';
+  MC.headerFilters = (() => {
+    try {
+      const raw = sessionStorage.getItem(HF_KEY);
+      return raw ? Object.assign({ query: '', agency: 'all', type: 'all' }, JSON.parse(raw)) : { query: '', agency: 'all', type: 'all' };
+    } catch (e) { return { query: '', agency: 'all', type: 'all' }; }
+  })();
+  MC.setHeaderFilters = (patch) => {
+    MC.headerFilters = Object.assign({}, MC.headerFilters, patch || {});
+    try { sessionStorage.setItem(HF_KEY, JSON.stringify(MC.headerFilters)); } catch (e) {}
+    try { window.dispatchEvent(new CustomEvent('mc:filters', { detail: MC.headerFilters })); } catch (e) {}
+  };
+  MC.onHeaderFilters = (fn) => {
+    const h = (e) => fn(e.detail || MC.headerFilters);
+    window.addEventListener('mc:filters', h);
+    return () => window.removeEventListener('mc:filters', h);
+  };
   // URL helpers
   MC.url = {
     dossier: (eid, extra = "") => `dossier.html?eid=${encodeURIComponent(eid)}${extra ? "&" + extra : ""}`,
