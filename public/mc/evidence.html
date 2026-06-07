@@ -100,10 +100,11 @@
     .tl-svg .tick { stroke: rgba(180,200,220,0.30); stroke-width: 1; }
     .tl-svg .tick-major { stroke: rgba(180,200,220,0.45); }
     .tl-svg .tick-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--text-4); letter-spacing: 0.14em; text-anchor: middle; }
-    .tl-svg .marker { cursor: pointer; }
+    .tl-svg .marker { cursor: pointer; pointer-events: bounding-box; }
     .tl-svg .marker.report .dot { fill: #B280FF; stroke: rgba(178,128,255,0.9); stroke-width: 1.5; }
     .tl-svg .marker.program .bar { fill: rgba(97,215,240,0.20); stroke: var(--cyan); stroke-width: 1.5; }
     .tl-svg .marker.program .cap { stroke: var(--cyan); stroke-width: 1.5; }
+    .tl-svg .marker .hit { fill: transparent; pointer-events: all; }
     .tl-svg .marker:hover .dot { filter: drop-shadow(0 0 5px rgba(178,128,255,0.8)); }
     .tl-svg .marker:hover .bar { fill: rgba(97,215,240,0.35); filter: drop-shadow(0 0 5px rgba(97,215,240,0.6)); }
     .tl-svg .marker .lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--text-3); letter-spacing: 0.08em; text-anchor: middle; pointer-events: none; }
@@ -533,17 +534,26 @@
       lastX = midX;
 
       var dataAttrs = ' data-type="'+esc(en.type)+'"';
+      // Hit rect — bigger than the visible mark so hover/click work reliably.
+      // Spans from a bit before the label row up through below the axis.
+      var hitTop    = Math.min(ly - 10, 8);
+      var hitBottom = 86;
       if (en.type === 'report'){
+        var hx = midX - 18, hw = 36;
         parts.push(
           '<g class="marker report"'+dataAttrs+' data-idx="'+i+'">' +
+            '<rect class="hit" x="'+hx+'" y="'+hitTop+'" width="'+hw+'" height="'+(hitBottom-hitTop)+'"/>' +
             '<circle class="dot" cx="'+midX+'" cy="70" r="6"/>' +
             '<text class="lbl" x="'+midX+'" y="'+ly+'">'+esc(en.label)+'</text>' +
           '</g>'
         );
       } else { // program — horizontal range bar
         var w = Math.max(8, x2 - x1);
+        var hx2 = Math.min(x1, midX - 40) - 4;
+        var hw2 = Math.max(w + 8, 80);
         parts.push(
           '<g class="marker program"'+dataAttrs+' data-idx="'+i+'">' +
+            '<rect class="hit" x="'+hx2+'" y="'+hitTop+'" width="'+hw2+'" height="'+(hitBottom-hitTop)+'"/>' +
             '<rect class="bar" x="'+x1+'" y="64" width="'+w+'" height="12" rx="2"/>' +
             '<line class="cap" x1="'+x1+'" y1="60" x2="'+x1+'" y2="80"/>' +
             '<line class="cap" x1="'+x2+'" y1="60" x2="'+x2+'" y2="80"/>' +
