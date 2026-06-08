@@ -175,12 +175,39 @@ npm run volunteer -- --my-handle=<span class="v">YOU</span>     <span class="c">
     var btn = this;
     var pre = document.getElementById('qstart-pre');
     var text = pre ? pre.textContent : '';
+    // Strip the HTML highlighting spans from the textContent — pre's
+    // textContent already concatenates text-only.
+    var ok = false;
+    // 1) Preferred: async Clipboard API (requires secure context + permission)
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      }
+    } catch (e) {}
+    // 2) Fallback: hidden textarea + document.execCommand('copy')
+    if (!ok) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.top = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) {}
+    }
+    if (ok) {
       btn.textContent = '✓ COPIED';
       btn.classList.add('ok');
       setTimeout(function(){ btn.textContent = '⎘ COPY'; btn.classList.remove('ok'); }, 1500);
-    } catch (e) { btn.textContent = '⨯ ERR'; }
+    } else {
+      btn.textContent = '⨯ COPY FAILED · select text manually';
+      setTimeout(function(){ btn.textContent = '⎘ COPY'; }, 2500);
+    }
   });
 
   // Filter state — survives onUpdate re-render.

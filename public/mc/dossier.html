@@ -439,6 +439,18 @@
       }
     });
 
+    // 3a) Summary — bind to the resolved event's real summary text.
+    // Without this every event inherits the hardcoded USPER fallback.
+    var sumEl = document.querySelector(".ds-summary");
+    if (sumEl && rec.summary) {
+      // Emphasis: bold/light proper-noun-ish tokens via simple heuristic —
+      // wrap UPPER-case multi-letter words and quoted strings in <em>.
+      var html = esc(rec.summary)
+        .replace(/&quot;([^&]{2,80}?)&quot;/g, '"<em>$1</em>"')
+        .replace(/\b([A-Z]{3,}(?:[ -][A-Z0-9]{2,}){0,3})\b/g, '<em>$1</em>');
+      sumEl.innerHTML = html;
+    }
+
     // 3b) Priority chip + Evidence badges + Cross-references -------------
     renderPriorityEvidence(rec);
     renderCrossRefs(eid);
