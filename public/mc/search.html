@@ -210,7 +210,13 @@
     if (_semanticLoading) return _semanticLoading;
     _semanticLoading = (async function(){
       meaningNote.textContent = '∿ Fetching MiniLM model from CDN…';
-      var trf = await import('https://esm.sh/@huggingface/transformers@3.0.2');
+      // Pin to the same major version used by the React app's bundled
+      // transformers.js (see package.json "@huggingface/transformers": "^4.2.0").
+      // The ORT WASM artefacts shipped in /ort/ (copied via
+      // scripts/copy-ort-assets.mjs from onnxruntime-web@1.26-dev) match the
+      // transformers.js v4 ABI — pinning a v3 here triggers a WebAssembly
+      // LinkError at instantiate time ("function import requires a callable").
+      var trf = await import('https://esm.sh/@huggingface/transformers@4.2.0');
       trf.env.allowLocalModels = false;
       trf.env.useBrowserCache = true;
       // Self-host of ORT WASM lives at /ort/ (scripts/copy-ort-assets.mjs).
