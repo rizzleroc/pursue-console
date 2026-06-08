@@ -554,7 +554,7 @@
       });
     }
 
-    // ?q=… / ?physics=1 deep-link from other pages.
+    // Deep-links: URL ?q=… ?physics=1 ?agency=… ?era=…
     if (MC.query && MC.query.q){ inp.value = String(MC.query.q); }
     if (MC.query && (MC.query.physics === '1' || MC.query.physics === 'true') && physicsPill){
       physicsPill.classList.add('on');
@@ -571,6 +571,27 @@
         if (selEra.options[ei].value === ev){ selEra.value = ev; break; }
       }
     }
+
+    // Shared header filters (chrome.js) — pipe into the in-page filters so
+    // typing in the topbar search updates SEARCH live, just like the React Header.
+    function syncFromHeader(){
+      var HF = MC.headerFilters || {};
+      if (typeof HF.query === 'string' && HF.query && HF.query !== inp.value) inp.value = HF.query;
+      if (HF.agency && HF.agency !== 'all' && selAgency){
+        for (var i = 0; i < selAgency.options.length; i++){
+          if (selAgency.options[i].value === HF.agency){ selAgency.value = HF.agency; break; }
+        }
+      }
+      // Type filter from the header maps to the in-page type select.
+      if (HF.type && HF.type !== 'all' && selType){
+        for (var j = 0; j < selType.options.length; j++){
+          if (selType.options[j].value === HF.type){ selType.value = HF.type; break; }
+        }
+      }
+      render();
+    }
+    syncFromHeader();
+    if (MC.onHeaderFilters) MC.onHeaderFilters(syncFromHeader);
 
     // Initial paint.
     render();

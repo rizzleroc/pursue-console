@@ -95,6 +95,57 @@
     .xr-empty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-4); padding: 12px 0; }
     .xr-cta { display: inline-block; margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
     .xr-cta:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* Reading-mode toggle button (in the header) */
+    .ds-reading-toggle { margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--amber); background: rgba(242,166,35,0.06); border: 1px solid rgba(242,166,35,0.35); padding: 8px 14px; cursor: pointer; transition: all .15s; }
+    .ds-reading-toggle:hover { background: rgba(242,166,35,0.16); border-color: var(--amber); }
+
+    /* Reading-mode body styling — applied when body has .reading-mode class */
+    body.reading-mode .topbar,
+    body.reading-mode .header-filters,
+    body.reading-mode .tabs,
+    body.reading-mode .classified,
+    body.reading-mode .scanline,
+    body.reading-mode .bg-grid,
+    body.reading-mode .bg-noise,
+    body.reading-mode .vignette,
+    body.reading-mode .fc,
+    body.reading-mode .corner,
+    body.reading-mode .ds-body > aside,
+    body.reading-mode .vis-grid,
+    body.reading-mode .date-scatter,
+    body.reading-mode .date-axis,
+    body.reading-mode .sig-grid,
+    body.reading-mode .ed-grid > div:nth-child(2),
+    body.reading-mode #ds-xrefs-section,
+    body.reading-mode .evd-row { display: none !important; }
+    body.reading-mode .bg-void { background: #f5f1e8 !important; }
+    body.reading-mode { color: #1a1a1a; }
+    body.reading-mode main { background: #f5f1e8; max-width: 820px; margin: 0 auto; padding: 60px 40px 80px; }
+    body.reading-mode .ds-header { padding: 0 0 32px; }
+    body.reading-mode .ds-header h1 { color: #1a1a1a; font-family: 'Space Grotesk', sans-serif; font-size: 36px; line-height: 1.15; letter-spacing: -0.02em; }
+    body.reading-mode .ds-header .meta-row { color: #6b6b6b; }
+    body.reading-mode .ds-header .meta-row .id { color: #2a6ea8; }
+    body.reading-mode .ds-header .meta-row .stamp { color: #a05a1a; }
+    body.reading-mode .ds-body { grid-template-columns: 1fr; padding: 0; }
+    body.reading-mode .ds-section { background: transparent; border: none; padding: 24px 0; backdrop-filter: none; border-bottom: 1px solid #d0c8b8; }
+    body.reading-mode .ds-section:last-child { border-bottom: none; }
+    body.reading-mode .ds-h { border-color: #d0c8b8; }
+    body.reading-mode .ds-h .t { color: #6b6b6b; }
+    body.reading-mode .ds-h .t .icon { background: #a05a1a; box-shadow: none; }
+    body.reading-mode .ds-h .r { color: #999; }
+    body.reading-mode .ds-summary { color: #2a2a2a; font-size: 18px; line-height: 1.8; }
+    body.reading-mode .ds-summary em { background: rgba(160,90,26,0.10); color: #a05a1a; }
+    body.reading-mode .excerpt { padding: 22px 0; border-bottom: 1px solid #d0c8b8; }
+    body.reading-mode .excerpt p { color: #2a2a2a; font-size: 17px; line-height: 1.85; }
+    body.reading-mode .excerpt .meta { color: #999; }
+    body.reading-mode .excerpt .pg { background: rgba(42,110,168,0.10); border-color: rgba(42,110,168,0.35); color: #2a6ea8; }
+    body.reading-mode .ent-row { color: #2a2a2a; border-color: #d0c8b8; }
+    body.reading-mode .ent-row .name { color: #1a1a1a; }
+    body.reading-mode .ent-row .docs { color: #2a6ea8; }
+    body.reading-mode .ent-row .ct { color: #a05a1a; }
+    body.reading-mode .ds-reading-toggle { position: fixed; top: 16px; right: 16px; background: #f5f1e8; color: #a05a1a; border-color: #a05a1a; z-index: 1000; }
+    body.reading-mode .ds-reading-toggle:hover { background: rgba(160,90,26,0.10); }
   </style>
 </head>
 <body data-view="dossier">
@@ -116,6 +167,7 @@
     </div>
     <h1>USPER Statement — orb gained elevation, came within ten feet of [the helicopter].</h1>
     <div class="evd-row" id="ds-evidence"></div>
+    <button class="ds-reading-toggle" id="ds-reading-toggle" type="button" title="Strip chrome — long-form reading mode">📖 READING MODE</button>
   </section>
 
   <section class="ds-body">
@@ -483,6 +535,20 @@
 
   MC.ready().then(render);
   MC.onUpdate(render);
+
+  // Reading-mode toggle. Persists via sessionStorage so re-navigating to
+  // dossier.html?eid=… keeps the mode you picked.
+  var RM_KEY = 'mc.readingMode.v1';
+  var rmBtn = document.getElementById('ds-reading-toggle');
+  function setReadingMode(on){
+    document.body.classList.toggle('reading-mode', on);
+    if (rmBtn) rmBtn.textContent = on ? '✕ EXIT READING MODE' : '📖 READING MODE';
+    try { sessionStorage.setItem(RM_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+  if (rmBtn) rmBtn.addEventListener('click', function(){
+    setReadingMode(!document.body.classList.contains('reading-mode'));
+  });
+  try { if (sessionStorage.getItem(RM_KEY) === '1') setReadingMode(true); } catch (e) {}
 })();
 </script>
 

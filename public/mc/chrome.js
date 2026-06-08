@@ -17,6 +17,8 @@
     { id: 'globe',    label: 'Globe' },
     { id: 'network',  label: 'Network' },
     { id: 'evidence', label: 'Evidence' },
+    null,
+    { id: 'help',     label: 'Help' },
   ];
 
   function el(tag, attrs = {}, children = []) {
@@ -103,9 +105,33 @@
     }
     nav.appendChild(tab);
   }
+  // Shared filter strip — search box + agency / type dropdowns persisted
+  // via MC.headerFilters (sessionStorage). Every view subscribes via
+  // MC.onHeaderFilters and re-renders. Mirrors src/components/Header.jsx.
+  const HF = (window.MC && window.MC.headerFilters) || { query: '', agency: 'all', type: 'all' };
+  const hf = el('div', { class: 'header-filters' }, [
+    el('span', { class: 'hf-label' }, ['FILTER']),
+    el('input', {
+      class: 'hf-input',
+      id: 'hf-query',
+      type: 'search',
+      placeholder: 'search title · agency · region · era · tag…',
+      value: HF.query || '',
+      autocomplete: 'off',
+    }),
+    el('select', { class: 'hf-select', id: 'hf-agency' }, [
+      el('option', { value: 'all' }, ['ALL AGENCIES']),
+    ]),
+    el('select', { class: 'hf-select', id: 'hf-type' }, [
+      el('option', { value: 'all' }, ['ALL TYPES']),
+    ]),
+    el('span', { class: 'hf-clear', id: 'hf-clear', title: 'reset all filters' }, ['✕ RESET']),
+  ]);
+
   main.parentNode.insertBefore(classifiedTop, main);
   main.parentNode.insertBefore(topbar, main);
   main.parentNode.insertBefore(nav, main);
+  main.parentNode.insertBefore(hf, main);
 
   // ─────────── Post-main chrome ───────────
   const footer = el('footer', { class: 'fc' }, [
@@ -175,11 +201,63 @@
   if (window.MC && typeof window.MC.ready === 'function') {
     // Live data present — animate count-up to LIVE targets once MC is ready,
     // and re-sync (without re-animating) on every revalidation.
-    window.MC.ready().then(() => { runCountUp(); updateReviewBadge(); });
-    window.MC.onUpdate(() => { runCountUp(); updateReviewBadge(); });
+    window.MC.ready().then(() => { runCountUp(); updateReviewBadge(); hydrateHeaderFilters(); });
+    window.MC.onUpdate(() => { runCountUp(); updateReviewBadge(); hydrateHeaderFilters(); });
     // Fallback if MC stays slow: still animate the static data-count targets.
     setTimeout(() => { if (!window.MC._loaded) runCountUp(); }, 1500);
   } else {
     setTimeout(runCountUp, 600);
+  }
+
+  // ─── Header filter strip hydration ───
+  // Populate the agency + type dropdowns from MC.derive tallies and wire
+  // change events to MC.setHeaderFilters (which persists + dispatches a
+  // 'mc:filters' CustomEvent so every view can react).
+  let _hfHydrated = false;
+  function hydrateHeaderFilters() {
+    if (_hfHydrated) return;
+    if (!window.MC || !window.MC.derive) return;
+    const qInp = document.getElementById('hf-query');
+    const agSel = document.getElementById('hf-agency');
+    const tySel = document.getElementById('hf-type');
+    const clr   = document.getElementById('hf-clear');
+    if (!qInp || !agSel || !tySel) return;
+
+    const D = window.MC.derive;
+    const byAgency = D.byAgency || {};
+    const typeSet = {};
+    (D.events || []).forEach(e => { if (e && e.type) typeSet[e.type] = true; });
+
+    // Populate options
+    Object.keys(byAgency).sort().forEach(a => {
+      const o = document.createElement('option');
+      o.value = a; o.textContent = a;
+      agSel.appendChild(o);
+    });
+    Object.keys(typeSet).sort().forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      tySel.appendChild(o);
+    });
+    // Restore from MC.headerFilters
+    const HF = window.MC.headerFilters || {};
+    if (HF.query)  qInp.value = HF.query;
+    if (HF.agency) agSel.value = HF.agency;
+    if (HF.type)   tySel.value = HF.type;
+
+    let deb;
+    qInp.addEventListener('input', () => {
+      clearTimeout(deb);
+      deb = setTimeout(() => window.MC.setHeaderFilters({ query: qInp.value }), 120);
+    });
+    agSel.addEventListener('change', () => window.MC.setHeaderFilters({ agency: agSel.value }));
+    tySel.addEventListener('change', () => window.MC.setHeaderFilters({ type: tySel.value }));
+    if (clr) clr.addEventListener('click', () => {
+      qInp.value = '';
+      agSel.value = 'all';
+      tySel.value = 'all';
+      window.MC.setHeaderFilters({ query: '', agency: 'all', type: 'all' });
+    });
+    _hfHydrated = true;
   }
 })();

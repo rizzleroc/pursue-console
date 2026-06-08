@@ -19,7 +19,14 @@
     .nw-edge.strong { stroke: rgba(242,166,35,0.55); stroke-width: 1.4; }
     .nw-edge.weak   { stroke: rgba(110,138,124,0.10); stroke-width: 0.3; }
     .nw-edge.pattern{ stroke: rgba(178,128,255,0.28); stroke-dasharray: 3 3; }
+    .nw-edge.entity { stroke: rgba(255,217,61,0.30); }
     .nw-edge.hilite { stroke: var(--amber); stroke-width: 2; }
+
+    /* Entity-kind filter chips */
+    .ek-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.12em; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); cursor: pointer; text-transform: uppercase; user-select: none; }
+    .ek-chip .d { width: 7px; height: 7px; border-radius: 50%; }
+    .ek-chip.on { color: var(--text); border-color: var(--border-strong); background: rgba(255,255,255,0.04); }
+    .ek-chip.off { opacity: 0.45; }
 
     .nw-node { cursor: pointer; }
     .nw-node circle { transition: stroke-width .12s; }
@@ -58,7 +65,7 @@
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 11 — entity graph</div>
     <h1>Force-directed clustering. <em>Where the corpus actually connects.</em></h1>
-    <p class="sub">Nodes are events; edges are semantic cosine similarity from <code>event-similarity.json</code>. Tune the cosine threshold; hover a node for its top neighbors; click to open the dossier.</p>
+    <p class="sub">Nodes are events, entities, and mined patterns. Edges are semantic cosine similarity (event↔event), hand-curated bipartite event↔entity, and text-mined pattern↔event. Switch modes to compose; tune cosine; hover for top-neighbors; click to open.</p>
   </section>
 
   <section class="nw-shell">
@@ -67,8 +74,14 @@
 
       <div class="nw-mode">
         <span class="m active" data-mode="semantic">SEMANTIC</span>
+        <span class="m" data-mode="entities">ENTITIES</span>
         <span class="m" data-mode="patterns">PATTERNS</span>
         <span class="m" data-mode="all">ALL</span>
+      </div>
+
+      <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;color:var(--text-3);margin-bottom:8px;text-transform:uppercase">ENTITY KINDS</div>
+        <div id="nw-entity-kinds" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
 
       <div class="nw-ctl">
@@ -122,6 +135,10 @@
 <script>
 (function(){
   if (!window.MC || !MC.ready) return;
+
+  // Entity kind filter — defaults to all 6 visible kinds for ENTITY mode.
+  var ENTITY_KINDS = ['person','program','command','platform','sensor','morphology','behavior'];
+  var activeEntityKinds = new Set(ENTITY_KINDS);
 
   var W = 1000, H = 720;
   var svg     = document.getElementById('graph');
@@ -183,6 +200,25 @@
           seenLink[key] = true;
           links.push({ a: 'e:' + eid, b: 'e:' + n.eid, kind: 'semantic', weight: n.cos });
         }
+      });
+    }
+
+    if (mode === 'entities' || mode === 'all'){
+      // Entity catalogue from entities.json — bipartite event↔entity edges.
+      var ents = (MC.derive && MC.derive.entities) || [];
+      var kindMeta = (MC.derive && MC.derive.entityKinds) || {};
+      ents.forEach(function(en){
+        if (!activeEntityKinds.has(en.kind)) return;
+        var linked = (en.events || []).filter(function(eid){ return byEid[eid]; });
+        if (!linked.length) return;
+        var nid = 'n:' + en.id;
+        nodes.push({ id: nid, kind: 'entity:' + en.kind, ref: Object.assign({}, en, { kindMeta: kindMeta[en.kind] || null }) });
+        linked.forEach(function(eid){
+          if (!nodes.some(function(n){ return n.id === 'e:' + eid; })){
+            nodes.push({ id: 'e:' + eid, kind: 'event', ref: byEid[eid] });
+          }
+          links.push({ a: nid, b: 'e:' + eid, kind: 'entity', weight: 1 });
+        });
       });
     }
 
@@ -276,6 +312,11 @@
 
   function nodeSize(n, posById, links){
     if (n.kind === 'pattern') return 5;
+    if (n.kind && n.kind.indexOf('entity:') === 0){
+      // Entity nodes sized by degree (how many events reference them).
+      var ed = (n.ref && Array.isArray(n.ref.events)) ? n.ref.events.length : 1;
+      return 5 + Math.min(7, ed * 0.7);
+    }
     // Degree-aware sizing for events.
     var d = 0;
     for (var k = 0; k < links.length; k++){
@@ -285,10 +326,17 @@
   }
   function nodeColor(n){
     if (n.kind === 'pattern') return '#B280FF';
+    if (n.kind && n.kind.indexOf('entity:') === 0){
+      return (n.ref && n.ref.kindMeta && n.ref.kindMeta.color) || '#FFD93D';
+    }
     return agencyColor(n.ref);
   }
   function nodeLabel(n){
     if (n.kind === 'pattern') return (n.ref && n.ref.name) || '';
+    if (n.kind && n.kind.indexOf('entity:') === 0){
+      var nm = (n.ref && n.ref.name) || '';
+      return nm.length > 14 ? nm.slice(0, 14) + '…' : nm;
+    }
     var ref = n.ref || {};
     var id = (ref.id || '').toString();
     return id.length > 14 ? id.slice(0, 14) + '…' : id;
@@ -380,6 +428,22 @@
         '<h4>' + esc(term) + '</h4>' +
         '<div class="sub">PATTERN · ' + esc(kind) + '</div>' +
         '<div style="color:var(--text-4);font-size:10px;line-height:1.5">Mined from corpus pages. Edges connect to every event whose vision/OCR text mentions this term.</div>';
+    } else if (nodeId.indexOf('n:') === 0){
+      var enId = nodeId.slice(2);
+      var en = MC.entityById ? MC.entityById(enId) : null;
+      if (!en){ detail.innerHTML = '<div style="color:var(--text-4)">' + esc(enId) + '</div>'; return; }
+      var kindMeta = (MC.derive && MC.derive.entityKinds && MC.derive.entityKinds[en.kind]) || null;
+      var eventLinks = (en.events || []).slice(0, 8).map(function(eid){
+        var rec = MC.byEid(eid);
+        var label = (rec && rec.title) || eid;
+        return '<div class="nb"><a href="' + esc(MC.url.dossier(eid)) + '">' + esc(label) + '</a><span class="cos">' + esc((rec && rec.agency) || '') + '</span></div>';
+      }).join('');
+      var more = en.events.length > 8 ? '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--text-4);margin-top:6px">+ ' + (en.events.length - 8) + ' more events</div>' : '';
+      detail.innerHTML =
+        '<h4>' + esc(en.name || enId) + '</h4>' +
+        '<div class="sub">' + esc((kindMeta && kindMeta.label) || en.kind) + ' · ' + en.events.length + ' events</div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:0.18em;color:var(--text-4);margin-bottom:8px;text-transform:uppercase">EVENTS REFERENCING</div>' +
+        eventLinks + more;
     }
   }
 
@@ -392,6 +456,29 @@
       paint();
     });
   });
+
+  // Entity-kind chips — only meaningful in ENTITY or ALL modes.
+  function renderEntityKindChips(){
+    var host = document.getElementById('nw-entity-kinds');
+    if (!host) return;
+    var kindMeta = (MC.derive && MC.derive.entityKinds) || {};
+    host.innerHTML = ENTITY_KINDS.map(function(k){
+      var color = (kindMeta[k] && kindMeta[k].color) || '#FFD93D';
+      var on = activeEntityKinds.has(k);
+      return '<span class="ek-chip ' + (on ? 'on' : 'off') + '" data-kind="' + esc(k) + '" style="--c:' + color + '">' +
+        '<span class="d" style="background:' + color + '"></span>' + k.toUpperCase() +
+      '</span>';
+    }).join('');
+    host.querySelectorAll('.ek-chip').forEach(function(c){
+      c.addEventListener('click', function(){
+        var k = c.dataset.kind;
+        if (activeEntityKinds.has(k)) activeEntityKinds.delete(k);
+        else activeEntityKinds.add(k);
+        renderEntityKindChips();
+        paint();
+      });
+    });
+  }
   cosInp.addEventListener('input', function(){
     minCos = parseFloat(cosInp.value);
     vCos.textContent = minCos.toFixed(2);
@@ -403,7 +490,7 @@
   });
   iterInp.addEventListener('change', paint);
 
-  MC.ready().then(paint);
+  MC.ready().then(function(){ renderEntityKindChips(); paint(); });
   MC.onUpdate(function(){ if (!gNodes.children.length) paint(); });
 })();
 </script>

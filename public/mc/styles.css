@@ -232,6 +232,39 @@ nav.tabs::-webkit-scrollbar { display: none; }
 }
 .nav-divider { width: 1px; height: 14px; background: var(--border); margin: 0 14px; }
 .nav-group { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: var(--text-4); }
+
+/* Shared header filter strip (chrome.js) — pipes into every view via MC.headerFilters */
+.header-filters {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 56px; border-bottom: 1px solid var(--hairline);
+  background: rgba(8, 14, 22, 0.55); backdrop-filter: blur(8px);
+  position: relative; z-index: 4;
+}
+.header-filters .hf-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.24em; color: var(--text-3); text-transform: uppercase;
+}
+.header-filters .hf-input {
+  flex: 1; max-width: 460px;
+  background: var(--surface-3); border: 1px solid var(--border);
+  color: var(--text); padding: 6px 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
+  outline: none; transition: border-color .15s;
+}
+.header-filters .hf-input::placeholder { color: var(--text-4); }
+.header-filters .hf-input:focus { border-color: var(--amber); box-shadow: 0 0 8px rgba(242,166,35,0.25); }
+.header-filters .hf-select {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-2); padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.10em;
+  cursor: pointer;
+}
+.header-filters .hf-clear {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em;
+  color: var(--text-4); cursor: pointer; margin-left: auto; padding: 6px 10px;
+  border: 1px solid var(--hairline); background: transparent;
+}
+.header-filters .hf-clear:hover { color: var(--rose); border-color: rgba(224,73,104,0.4); }
 .nav-badge {
   margin-left: 8px;
   font-family: 'JetBrains Mono', monospace;

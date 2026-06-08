@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Help</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .hp-shell { padding: 0 56px 64px; position: relative; z-index: 3; display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 26px; }
+    .hp-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .hp-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+    .hp-h .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.28em; color: var(--text-2); text-transform: uppercase; }
+    .hp-h .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat { padding: 18px 20px; background: var(--surface-2); border: 1px solid var(--hairline); }
+    .stat .lab { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.18em; margin-bottom: 6px; text-transform: uppercase; }
+    .stat .v { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; color: var(--amber); letter-spacing: -0.02em; line-height: 1; }
+    .stat.warm .v { color: var(--rose); }
+    .stat.cool .v { color: var(--cyan); }
+    .stat.live .v { color: var(--emerald, #6EE7B7); }
+    .stat .sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.12em; margin-top: 6px; }
+
+    .qstart { background: #0b0f16; border: 1px solid var(--border-strong); padding: 18px 22px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text); line-height: 1.7; position: relative; overflow-x: auto; }
+    .qstart pre { margin: 0; }
+    .qstart .copy { position: absolute; top: 14px; right: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); background: rgba(242,166,35,0.08); border: 1px solid rgba(242,166,35,0.30); padding: 4px 10px; cursor: pointer; letter-spacing: 0.18em; }
+    .qstart .copy:hover { background: rgba(242,166,35,0.18); }
+    .qstart .copy.ok { color: var(--emerald, #6EE7B7); border-color: rgba(110,231,183,0.45); }
+    .qstart .c { color: var(--text-4); }
+    .qstart .v { color: var(--cyan); }
+
+    .doc-filter { display: flex; gap: 8px; margin: 12px 0 14px; flex-wrap: wrap; }
+    .doc-filter .f { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; padding: 6px 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); cursor: pointer; user-select: none; }
+    .doc-filter .f.on { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
+
+    .doc-row { display: grid; grid-template-columns: 1fr 60px 80px 110px; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+    .doc-row:last-child { border-bottom: none; }
+    .doc-row .title { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .doc-row .title a { color: inherit; text-decoration: none; }
+    .doc-row .title a:hover { color: var(--amber); }
+    .doc-row .pg { color: var(--rose); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; text-align: right; }
+    .doc-row .pri { font-size: 9px; padding: 2px 6px; border: 1px solid var(--border); color: var(--text-3); letter-spacing: 0.18em; text-align: center; text-transform: uppercase; }
+    .doc-row .pri.anchor { color: var(--rose); border-color: rgba(224,73,104,0.4); background: rgba(224,73,104,0.10); }
+    .doc-row .pri.high { color: #FFB07A; border-color: rgba(255,138,46,0.4); background: rgba(255,138,46,0.08); }
+    .doc-row .claim { font-size: 10px; color: var(--amber); text-decoration: none; border: 1px solid rgba(242,166,35,0.40); padding: 4px 8px; background: rgba(242,166,35,0.06); letter-spacing: 0.16em; text-align: center; }
+    .doc-row .claim:hover { background: rgba(242,166,35,0.16); }
+
+    .resource-list { display: flex; flex-direction: column; gap: 8px; }
+    .resource-list a { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); text-decoration: none; padding: 8px 0; border-bottom: 1px solid var(--hairline); display: flex; justify-content: space-between; letter-spacing: 0.04em; }
+    .resource-list a:hover { color: var(--amber); }
+    .resource-list a .arr { color: var(--text-4); }
+  </style>
+</head>
+<body data-view="help">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 12 — how can I help?</div>
+    <h1>One command. <em>Twenty pages.</em> A PR with your name on it.</h1>
+    <p class="sub">PURSUE is an open civic-tech archive of declassified UAP material. The work that's left is volume — transcribing each page so the corpus is searchable + analysable. You don't need credentials. You need ten minutes and a terminal.</p>
+  </section>
+
+  <section class="hp-shell">
+
+    <div>
+      <div class="hp-card">
+        <div class="hp-h"><span class="t">LIVE WORK QUEUE</span><span class="meta">work-available.json · revalidates every 60s</span></div>
+        <div class="stats-grid">
+          <div class="stat warm"><div class="lab">PAGES NEEDED</div><div class="v" id="hp-pages-needed">—</div><div class="sub">no canonical text yet</div></div>
+          <div class="stat"><div class="lab">EVENTS WAITING</div><div class="v" id="hp-events-waiting">—</div><div class="sub">have ≥1 ungraded page</div></div>
+          <div class="stat cool"><div class="lab">~ HOURS</div><div class="v" id="hp-hours">—</div><div class="sub">@ 2 min/page</div></div>
+          <div class="stat live"><div class="lab">EVENTS GRADED</div><div class="v" id="hp-events-graded">—</div><div class="sub">≥85% confidence</div></div>
+        </div>
+
+        <div class="hp-h" style="margin-top:6px"><span class="t">QUICKSTART</span><span class="meta">copy → terminal · ~10 MB</span></div>
+        <div class="qstart">
+          <button class="copy" id="qcopy" aria-label="Copy quickstart">⎘ COPY</button>
+<pre id="qstart-pre"><span class="c"># One command. Pulls only what helpers need (~10MB instead of 1GB):</span>
+curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash
+
+<span class="c"># Then start helping:</span>
+cd pursue-helper
+npm start                                <span class="c"># launches Chrome + daemon</span>
+npm run volunteer -- --my-handle=<span class="v">YOU</span>     <span class="c"># picks 20 pages, OCRs them, opens a PR</span></pre>
+        </div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);line-height:1.6;margin-top:14px;letter-spacing:0.04em">
+          The helper script runs OCR + vision locally, commits the results to a fork, and opens a pull request with your handle as the contributor. Reviewers verify on the <a href="review.html" style="color:var(--cyan);text-decoration:none">REVIEW</a> surface. Anonymous OK — set <code style="color:var(--cyan)">--my-handle=anon</code>.
+        </p>
+      </div>
+
+      <div class="hp-card" style="margin-top:22px">
+        <div class="hp-h"><span class="t">DOCUMENTS WAITING</span><span class="meta">sorted by pages-needed desc</span></div>
+        <div class="doc-filter">
+          <span class="f on" data-filter="all">ALL · <span id="hp-cnt-all">0</span></span>
+          <span class="f" data-filter="small">SMALL (≤20 PAGES) · <span id="hp-cnt-small">0</span></span>
+          <span class="f" data-filter="big">BIG (&gt;20 PAGES) · <span id="hp-cnt-big">0</span></span>
+        </div>
+        <div id="hp-docs"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hp-card">
+        <div class="hp-h"><span class="t">CONTRIBUTOR GUIDES</span><span class="meta">docs</span></div>
+        <div class="resource-list">
+          <a href="https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md" target="_blank" rel="noopener"><span>HOW-CAN-I-HELP.md</span><span class="arr">↗</span></a>
+          <a href="https://github.com/rizzleroc/pursue-console/blob/main/README.md" target="_blank" rel="noopener"><span>README.md</span><span class="arr">↗</span></a>
+          <a href="https://github.com/rizzleroc/pursue-console/blob/main/ROADMAP.md" target="_blank" rel="noopener"><span>ROADMAP.md</span><span class="arr">↗</span></a>
+          <a href="https://github.com/rizzleroc/pursue-console/blob/main/CHANGELOG.md" target="_blank" rel="noopener"><span>CHANGELOG.md</span><span class="arr">↗</span></a>
+          <a href="https://github.com/rizzleroc/pursue-console/blob/main/VISUAL-EXTRACTION-PROCESS.md" target="_blank" rel="noopener"><span>VISUAL-EXTRACTION-PROCESS.md</span><span class="arr">↗</span></a>
+          <a href="https://github.com/rizzleroc/pursue-console/issues?q=is%3Aopen+label%3Acataloguing" target="_blank" rel="noopener"><span>open cataloguing issues</span><span class="arr">↗</span></a>
+        </div>
+      </div>
+
+      <div class="hp-card" style="margin-top:22px">
+        <div class="hp-h"><span class="t">ABOUT</span><span class="meta">v3.0</span></div>
+        <p style="font-family:'Inter',sans-serif;font-size:14px;color:var(--text-2);line-height:1.6;margin:0 0 14px">
+          PURSUE Mission Control is the static tactical-aesthetic mirror of the live React app at <a href="../" style="color:var(--cyan);text-decoration:none">↗ ../</a>. Same corpus, same data, no build step required. Both surfaces refresh from the JSON outputs of the corpus build chain.
+        </p>
+        <p style="font-family:'Inter',sans-serif;font-size:14px;color:var(--text-2);line-height:1.6;margin:0">
+          Not agency-affiliated. Community-run. Open source under the repo's licence.
+        </p>
+      </div>
+
+      <div class="hp-card" style="margin-top:22px">
+        <div class="hp-h"><span class="t">PRIORITY EVIDENCE</span><span class="meta">live</span></div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);line-height:1.55;letter-spacing:0.04em">
+          <span style="color:var(--rose);font-weight:600"><span data-mc="criticalCount">1</span></span> CRITICAL events · <span style="color:#FFB07A;font-weight:600"><span data-mc="priorityCount">5</span></span> total priority-flagged · <span style="color:#B280FF;font-weight:600"><span data-mc="physicsCount">5</span></span> physics-relevant · <span style="color:var(--cyan);font-weight:600"><span data-mc="crossRefCount">24</span></span> cross-references indexed.
+        </p>
+        <a href="evidence.html" style="display:inline-block;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);text-decoration:none;border-bottom:1px dashed var(--cyan);padding-bottom:1px;letter-spacing:0.18em">→ OPEN EVIDENCE CHAINS</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Copy-to-clipboard for the quickstart block.
+  document.getElementById('qcopy').addEventListener('click', async function(){
+    var btn = this;
+    var pre = document.getElementById('qstart-pre');
+    var text = pre ? pre.textContent : '';
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '✓ COPIED';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = '⎘ COPY'; btn.classList.remove('ok'); }, 1500);
+    } catch (e) { btn.textContent = '⨯ ERR'; }
+  });
+
+  // Filter state — survives onUpdate re-render.
+  var docFilter = 'all';
+  document.querySelectorAll('.doc-filter .f').forEach(function(f){
+    f.addEventListener('click', function(){
+      document.querySelectorAll('.doc-filter .f').forEach(function(x){ x.classList.remove('on'); });
+      f.classList.add('on');
+      docFilter = f.dataset.filter;
+      renderDocs();
+    });
+  });
+
+  function flagPriClass(flag){
+    if (flag === 'anchor') return 'anchor';
+    if (flag === 'high')   return 'high';
+    return '';
+  }
+
+  // Work-available.json is loaded by data.js as MC.data.work. Shape:
+  // { totalPagesNeeded, byEvent: { eid: { pagesNeeded, agency, ... } } }
+  function getDocs(){
+    var w = (MC.data && MC.data.work) || null;
+    if (!w || !w.byEvent) return [];
+    return Object.keys(w.byEvent).map(function(eid){
+      var d = w.byEvent[eid];
+      var ev = MC.byEid ? MC.byEid(eid) : null;
+      return {
+        eid: eid,
+        title: (ev && ev.title) || d.title || eid,
+        agency: (ev && ev.agency) || d.agency || '',
+        pagesNeeded: d.pagesNeeded || 0,
+        flag: (ev && ev.flag) || d.flag || ''
+      };
+    }).sort(function(a, b){ return b.pagesNeeded - a.pagesNeeded; });
+  }
+
+  function renderDocs(){
+    var all = getDocs();
+    var small = all.filter(function(d){ return d.pagesNeeded > 0 && d.pagesNeeded <= 20; });
+    var big   = all.filter(function(d){ return d.pagesNeeded > 20; });
+    document.getElementById('hp-cnt-all').textContent = all.length;
+    document.getElementById('hp-cnt-small').textContent = small.length;
+    document.getElementById('hp-cnt-big').textContent = big.length;
+    var src = docFilter === 'small' ? small : docFilter === 'big' ? big : all;
+    var rows = src.slice(0, 50).map(function(d){
+      var priCls = flagPriClass(d.flag);
+      var priLbl = (d.flag || 'std').toUpperCase();
+      var dossier = MC.url.dossier(d.eid);
+      var claim = MC.url.claim(d.eid, 1);
+      return '<div class="doc-row">' +
+        '<div class="title"><a href="' + esc(dossier) + '">' + esc(d.title) + '</a></div>' +
+        '<div class="pg">' + d.pagesNeeded + '</div>' +
+        '<div class="pri ' + priCls + '">' + esc(priLbl) + '</div>' +
+        '<a class="claim" href="' + esc(claim) + '" target="_blank" rel="noopener">CLAIM →</a>' +
+      '</div>';
+    }).join('');
+    if (!rows) rows = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-4);padding:20px 0;text-align:center">queue is empty at this filter</div>';
+    document.getElementById('hp-docs').innerHTML = rows;
+  }
+
+  function renderStats(){
+    var w = (MC.data && MC.data.work) || null;
+    var queue = (MC.derive && MC.derive.queue) || [];
+    var stats = (MC.data && MC.data.stats) || {};
+    var pagesNeeded = (w && w.totalPagesNeeded) || queue.length;
+    var docs = getDocs();
+    var hours = (pagesNeeded * 2 / 60);
+    document.getElementById('hp-pages-needed').textContent = pagesNeeded.toLocaleString();
+    document.getElementById('hp-events-waiting').textContent = docs.filter(function(d){ return d.pagesNeeded > 0; }).length;
+    document.getElementById('hp-hours').textContent = hours >= 1 ? Math.round(hours) : hours.toFixed(1);
+    var graded = (stats.events && (stats.events.fullyVision || stats.events.fully)) || 0;
+    document.getElementById('hp-events-graded').textContent = graded;
+  }
+
+  MC.ready().then(function(){ renderStats(); renderDocs(); });
+  MC.onUpdate(function(){ renderStats(); renderDocs(); });
+})();
+</script>
+</body>
+</html>
