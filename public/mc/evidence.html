@@ -194,7 +194,12 @@
 
   // Focus eid: ?eid=… else DOE-UAP-D001 else first physics-relevant else first event.
   function pickFocus(){
-    var q = MC.query && MC.query.eid;
+    // Re-parse the URL on each call. MC.query is cached at module-load time,
+    // but history.replaceState (used by event-node dblclick to refocus the
+    // graph in-page) changes location.search without refreshing MC.query —
+    // so the cached value points at the original load eid forever.
+    var liveQuery = new URLSearchParams(window.location.search);
+    var q = liveQuery.get('eid') || (MC.query && MC.query.eid);
     if (q && MC.byEid(q)) return q;
     if (MC.byEid('DOE-UAP-D001')) return 'DOE-UAP-D001';
     var phys = (MC.derive && MC.derive.physicsEvents) || [];

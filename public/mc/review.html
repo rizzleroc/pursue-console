@@ -283,10 +283,24 @@
 
     const ex = await loadExtracts();
     if (!ex || !ex[eid] || !ex[eid].excerptsByPage){
-      grid.innerHTML = '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>no excerpts for this event</span></h4>' +
-        '<p style="color:var(--text-4)">Page-level extracts are produced by the corpus build (scripts/build-dossier-extracts.mjs). When this event has been processed, the top sentences for the requested page will appear here.</p></div>' +
-        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>raw text not bundled</span></h4>' +
-        '<p style="color:var(--text-4)">Multi-source raw text lives in the per-source corpus DB and is not bundled to /mc/. Click <a href="' + esc(MC.url.dossier(eid)) + '" style="color:var(--cyan)">OPEN DOSSIER</a> to view this event in context.</p></div>';
+      // Friendly empty-state: instead of two walls of "no data" engineering
+      // jargon, show the event's summary + clear CTAs (claim for transcription,
+      // or browse the multi-source picker for a graded example).
+      const claimHref = MC.url.claim(eid, page);
+      const dossierHref = MC.url.dossier(eid);
+      const evSummary = (rec && rec.summary) ? rec.summary : 'No summary recorded for this event yet.';
+      const evMeta = [rec && rec.agency, rec && rec.date, rec && rec.type].filter(Boolean).join(' · ') || 'metadata pending';
+      grid.innerHTML =
+        '<div class="diff-col" style="grid-column:1 / -1">' +
+          '<h4><span class="src-tag g" style="border-color:rgba(74,222,128,0.4);color:var(--emerald,#6EE7B7);background:rgba(74,222,128,0.08)">NEEDS TRANSCRIPTION</span><span>' + esc(eid) + ' · page ' + esc(page) + '</span><span class="conf" style="color:var(--cyan)">' + esc(evMeta) + '</span></h4>' +
+          '<p style="font-family:\'Inter\',sans-serif;font-size:14px;line-height:1.65;color:var(--text-2);margin:6px 0 14px">' + esc(evSummary) + '</p>' +
+          '<p style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-3);line-height:1.55;letter-spacing:0.06em;margin:0 0 16px">This event has no graded extracts yet — no engine has produced a canonical transcript for page ' + esc(page) + '. Be the first.</p>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+            '<a class="ab-btn primary" href="' + esc(claimHref) + '" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">▣ CLAIM THIS PAGE →</a>' +
+            '<a class="ab-btn ghost" href="' + esc(dossierHref) + '" style="text-decoration:none;display:inline-block">→ OPEN DOSSIER</a>' +
+            '<span style="margin-left:auto;font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;align-self:center">OR pick a multi-source page from the picker ↓</span>' +
+          '</div>' +
+        '</div>';
       merge.value = '';
       return;
     }
@@ -333,21 +347,32 @@
     const n = q.length;
     const plural = n === 1 ? 'page' : 'pages';
 
-    // Header h1
+    // Header h1 — disputed-review surface is honest about state:
+    //   • reviewCount > 0  → "N pages where the engines disagree"
+    //   • reviewCount = 0  → "0 disputed pages right now" + secondary line
+    //                        surfacing the N transcription queue items below.
+    // Conflating "transcription queue" with "review queue" was confusing —
+    // users see "149 awaiting transcription" on the disputed-review surface
+    // and assume the queue rows are disputes.
     const title = document.getElementById('rv-title');
+    const sub   = document.querySelector('.page-title .sub');
     if (title){
       if (typeof D.reviewCount === 'number' && D.reviewCount > 0){
         const rc = D.reviewCount;
         title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
           + ' where the engines disagree. <em>Pick the truth.</em>';
       } else {
-        title.innerHTML = n + ' ' + plural
-          + ' awaiting transcription. <em>Pick the truth.</em>';
+        // Honest empty-state — 0 disputes today, but show the transcription
+        // queue as a SECONDARY card the user can still help with.
+        title.innerHTML = '0 disputed pages right now. <em>Quiet on the western front.</em>';
+        if (sub) {
+          sub.innerHTML = 'No engine disagreements in the current corpus build. The queue below shows the <strong>' + n + ' page' + (n === 1 ? '' : 's') + ' awaiting first-pass transcription</strong> — click any row to start.';
+        }
       }
     }
     const label = document.getElementById('rv-queue-label');
     if (label) label.textContent = (typeof D.reviewCount === 'number' && D.reviewCount > 0)
-      ? 'QUEUE · WORST AGREEMENT' : 'QUEUE · NEXT MISSING';
+      ? 'QUEUE · WORST AGREEMENT' : 'TRANSCRIPTION QUEUE · NEXT MISSING';
     const count = document.getElementById('rv-queue-count');
     if (count) count.textContent = n;
 

@@ -33,6 +33,8 @@ const events = EVENTS.map((e) => ({
   coords: e.coords ?? null,
   type: e.type ?? null,
   release: e.release ?? null,
+  summary: e.summary ?? null,
+  loc: e.loc ?? null,
   priority: e.priority ?? null,
   category: e.category ?? null,
   evidenceTypes: e.evidenceTypes ?? null,
