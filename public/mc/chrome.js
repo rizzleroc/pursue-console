@@ -80,7 +80,9 @@
       el('span', { class: 'badge amber' }, [el('span', { class: 'dot' }), el('span', { 'data-i18n': 'chrome.live_watch', 'data-i18n-default': 'LIVE WATCH' }, ['LIVE WATCH'])]),
     ]),
     el('div', { class: 'topbar-actions' }, [
-      el('a', { class: 'ghost', href: 'index.html', 'data-i18n': 'chrome.launch', 'data-i18n-default': 'LAUNCH ▾' }, ['LAUNCH ▾']),
+      // Highlight LAUNCH when on the index/launcher page (body data-view="")
+      // so users see a visible "you are here" cue (no nav-tab matches index).
+      el('a', { class: 'ghost' + (view === '' ? ' active' : ''), href: 'index.html', 'data-i18n': 'chrome.launch', 'data-i18n-default': 'LAUNCH ▾' }, ['LAUNCH ▾']),
       el('a', { class: 'ghost', href: '../', title: 'Jump to the live React app at the deployed site root', 'data-i18n': 'chrome.open_live_app', 'data-i18n-default': 'OPEN LIVE APP →' }, ['OPEN LIVE APP →']),
       el('button', { class: 'ops-btn', id: 'enlist-btn', type: 'button', 'data-i18n': 'chrome.enlist', 'data-i18n-default': '＋ ENLIST' }, ['＋ ENLIST']),
     ]),

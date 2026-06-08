@@ -22,13 +22,36 @@ const OUT = path.join(ROOT, "public", "events.json");
 
 const { EVENTS } = await import(path.join(ROOT, "src/data/events.js"));
 
+// Agency inference for auto-imported records — events-auto.js stubs
+// (slug ids like "nasa-uap-d5-apollo-17-…") arrive with agency:"Unknown"
+// because the auto-cataloguer can't read it from the PDF. Infer from the
+// id prefix so downstream surfaces don't render "Unknown" for events that
+// clearly came from a known agency.
+const AGENCY_FROM_PREFIX = {
+  "nasa-uap-": "NASA",
+  "dow-uap-":  "Department of War",
+  "fbi-uap-":  "FBI",
+  "cia-uap-":  "Central Intelligence Agency",
+  "doe-uap-":  "Department of Energy",
+  "dos-uap-":  "Department of State",
+  "odni-uap-": "Office of the Director of National Intelligence",
+};
+function inferAgency(e) {
+  if (e.agency && e.agency !== "Unknown") return e.agency;
+  const id = (e.id || "").toLowerCase();
+  for (const [pfx, ag] of Object.entries(AGENCY_FROM_PREFIX)) {
+    if (id.startsWith(pfx)) return ag;
+  }
+  return e.agency ?? null;
+}
+
 const events = EVENTS.map((e) => ({
   id: e.id,
   title: e.title,
   date: e.date ?? null,
   era: e.era ?? null,
   region: e.region ?? null,
-  agency: e.agency ?? null,
+  agency: inferAgency(e),
   flag: e.flag ?? null,
   coords: e.coords ?? null,
   type: e.type ?? null,

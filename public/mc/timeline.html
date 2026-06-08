@@ -224,8 +224,11 @@
   }
 
   // Decades to chart in chronological order (40s → 20s)
-  var DECADE_CHRON = ["40s", "50s", "60s", "70s", "80s", "90s", "00s", "10s", "20s"];
-  var DECADE_LABEL = { "40s":"40s","50s":"50s","60s":"60s","70s":"70s","80s":"80s","90s":"90s","00s":"00s","10s":"10s","20s":"20s" };
+  // Include UNDATED + MODERN buckets so the density-bar overview accurately
+  // represents the corpus — previously the chart only covered 9 decades
+  // and silently dropped ~86 events sitting in MODERN / UNDATED.
+  var DECADE_CHRON = ["40s", "50s", "60s", "70s", "80s", "90s", "00s", "10s", "20s", "modern", "Unknown"];
+  var DECADE_LABEL = { "40s":"40s","50s":"50s","60s":"60s","70s":"70s","80s":"80s","90s":"90s","00s":"00s","10s":"10s","20s":"20s","modern":"MOD","Unknown":"UNK" };
 
   function renderOverview(groups) {
     var host = document.getElementById("tl-overview");
