@@ -342,37 +342,64 @@
   function renderReview(MC){
     const D = MC && MC.derive; if (!D) return;
     const q = Array.isArray(D.queue) ? D.queue : [];
-    if (!q.length) return;
 
+    const reviewActive = (typeof D.reviewCount === 'number' && D.reviewCount > 0);
+    const title = document.getElementById('rv-title');
+    const sub   = document.querySelector('.page-title .sub');
+    const shell = document.querySelector('.rv-shell');
+
+    // Empty-state: when there are no disputed pages, the Review surface is
+    // single-purpose and has nothing to show. Hide the queue + diff scaffold
+    // entirely and route users to /mc/help for transcription work. The
+    // previous "show the transcription queue here too" UX confused users
+    // because the queue eids are non-disputes — they're untranscribed pages,
+    // not engine-disagreements.
+    if (!reviewActive){
+      if (title) title.innerHTML = '0 disputed pages right now. <em>Quiet on the western front.</em>';
+      if (sub)   sub.innerHTML = 'No engine disagreements in the current corpus build — every catalogued page either agrees across sources or hasn\'t been touched yet. Looking for work? The <a href="help.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px dashed var(--cyan);padding-bottom:1px">transcription queue lives on the Help surface</a>.';
+      if (shell){
+        shell.style.display = 'none';
+        // Inject a single empty-state panel so the body isn\'t blank.
+        if (!document.getElementById('rv-empty')){
+          const empty = document.createElement('section');
+          empty.id = 'rv-empty';
+          empty.style.cssText = 'padding:24px 56px 80px;position:relative;z-index:3';
+          empty.innerHTML =
+            '<div style="background:var(--surface);border:1px solid var(--border);padding:48px 56px;text-align:center;backdrop-filter:blur(10px)">' +
+              '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:80px;color:var(--emerald,#6EE7B7);line-height:1;margin-bottom:18px">✓</div>' +
+              '<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:32px;color:var(--text);font-weight:600;margin:0 0 12px;letter-spacing:-0.02em">All engines agree.</h2>' +
+              '<p style="font-family:\'Inter\',sans-serif;font-size:15px;color:var(--text-2);line-height:1.6;margin:0 0 28px;max-width:580px;margin-left:auto;margin-right:auto">' +
+                'When two or more transcription engines (vision · OCR · gemini · tesseract) produce conflicting text for the same page, it lands here. Today the corpus has none — every multi-engine page is consensus.' +
+              '</p>' +
+              '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+                '<a href="help.html" class="ab-btn primary" style="text-decoration:none;display:inline-block">▣ TRANSCRIBE A PAGE INSTEAD →</a>' +
+                '<a href="coverage.html" class="ab-btn ghost" style="text-decoration:none;display:inline-block">→ BROWSE COVERAGE</a>' +
+              '</div>' +
+              '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;margin-top:32px;padding-top:20px;border-top:1px solid var(--hairline)">' +
+                'review-queue.json revalidates every 60s · disputes will surface here when an engine disagrees' +
+              '</div>' +
+            '</div>';
+          shell.parentNode.insertBefore(empty, shell);
+        }
+      }
+      return;
+    }
+    // Re-show on transition back to disputed pages.
+    if (shell) shell.style.display = '';
+    const evp = document.getElementById('rv-empty');
+    if (evp) evp.remove();
+
+    if (!q.length) return;
     const n = q.length;
     const plural = n === 1 ? 'page' : 'pages';
 
-    // Header h1 — disputed-review surface is honest about state:
-    //   • reviewCount > 0  → "N pages where the engines disagree"
-    //   • reviewCount = 0  → "0 disputed pages right now" + secondary line
-    //                        surfacing the N transcription queue items below.
-    // Conflating "transcription queue" with "review queue" was confusing —
-    // users see "149 awaiting transcription" on the disputed-review surface
-    // and assume the queue rows are disputes.
-    const title = document.getElementById('rv-title');
-    const sub   = document.querySelector('.page-title .sub');
     if (title){
-      if (typeof D.reviewCount === 'number' && D.reviewCount > 0){
-        const rc = D.reviewCount;
-        title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
-          + ' where the engines disagree. <em>Pick the truth.</em>';
-      } else {
-        // Honest empty-state — 0 disputes today, but show the transcription
-        // queue as a SECONDARY card the user can still help with.
-        title.innerHTML = '0 disputed pages right now. <em>Quiet on the western front.</em>';
-        if (sub) {
-          sub.innerHTML = 'No engine disagreements in the current corpus build. The queue below shows the <strong>' + n + ' page' + (n === 1 ? '' : 's') + ' awaiting first-pass transcription</strong> — click any row to start.';
-        }
-      }
+      const rc = D.reviewCount;
+      title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
+        + ' where the engines disagree. <em>Pick the truth.</em>';
     }
     const label = document.getElementById('rv-queue-label');
-    if (label) label.textContent = (typeof D.reviewCount === 'number' && D.reviewCount > 0)
-      ? 'QUEUE · WORST AGREEMENT' : 'TRANSCRIPTION QUEUE · NEXT MISSING';
+    if (label) label.textContent = 'QUEUE · WORST AGREEMENT';
     const count = document.getElementById('rv-queue-count');
     if (count) count.textContent = n;
 
