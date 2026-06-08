@@ -65,6 +65,24 @@
     .toggle-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-4); }
     .toggle-pill.on { color: #B280FF; border-color: rgba(178,128,255,0.55); background: rgba(178,128,255,0.10); }
     .toggle-pill.on .dot { background: #B280FF; box-shadow: 0 0 8px rgba(178,128,255,0.6); }
+
+    /* Quick-query chips */
+    .qq-wrap { margin: 0 0 16px; }
+    .qq-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.22em; margin-bottom: 10px; text-transform: uppercase; }
+    .qq { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); padding: 3px 10px; margin: 0 6px 6px 0; cursor: pointer; letter-spacing: 0.04em; }
+    .qq:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* Page-hit snippets nested inside a result card */
+    .rc-pages { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 10px; }
+    .rc-pages .ph { padding-left: 10px; border-left: 1px solid rgba(97,215,240,0.35); font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.5; color: var(--text-2); }
+    .rc-pages .ph .lab { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 0.18em; margin-right: 8px; font-weight: 600; }
+    .rc-pages .ph mark { background: rgba(242,166,35,0.30); color: var(--amber-bright); padding: 0 3px; }
+    .rc-pages .more { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; padding-left: 10px; }
+
+    /* Index-loading inline status */
+    .idx-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; margin-left: 12px; }
+    .idx-status.ready { color: var(--emerald, #6EE7B7); }
+    .idx-status.error { color: var(--rose); }
   </style>
 </head>
 <body data-view="search">
@@ -109,9 +127,16 @@
 
     <div class="stats-row">
       <span><span class="v" id="stat-count">0</span> RESULTS</span><span>·</span>
-      <span id="stat-mode">EXACT MATCH · ⏱ <span id="stat-ms">0</span>ms</span><span>·</span>
-      <span style="color:var(--cyan);cursor:pointer" id="hint-meaning">↻ TRY MEANING FOR FUZZIER RESULTS</span>
+      <span id="stat-mode">EXACT MATCH · ⏱ <span id="stat-ms">0</span>ms</span>
+      <span class="idx-status" id="idx-status">· FULL-TEXT INDEX: loading 276 docs…</span>
       <span class="right" id="stat-sort">SORTED BY RELEVANCE</span>
+    </div>
+
+    <div class="qq-wrap" id="qq-wrap">
+      <div class="qq-label">TRY · QUICK QUERIES</div>
+      <div id="qq-list">
+        <span class="qq">borman</span><span class="qq">uap</span><span class="qq">cernan</span><span class="qq">centcom</span><span class="qq">swir</span><span class="qq">fvey</span><span class="qq">carol rosin</span><span class="qq">ellipsoid</span><span class="qq">bouncy ball</span><span class="qq">orb</span><span class="qq">diamond</span><span class="qq">bronze</span><span class="qq">saucer</span><span class="qq">pantex</span><span class="qq">aawsa</span><span class="qq">oak ridge</span>
+      </div>
     </div>
 
     <p class="browse-hint" id="browse-hint">BROWSE / SUGGESTED · top events by flag weight</p>
@@ -216,6 +241,56 @@
     return (q || '').toLowerCase().split(/\s+/).filter(Boolean);
   }
 
+  // ─────────── Full-text index (MiniSearch over public/search-index.json) ───────────
+  // Module-level cache — the index is 8.6MB; load + parse once per page.
+  var _miniPromise = null;
+  function loadFullTextIndex(){
+    if (_miniPromise) return _miniPromise;
+    _miniPromise = (async () => {
+      var MiniSearch = (await import('./lib/minisearch.js')).default;
+      var t = await fetch('../search-index.json').then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      });
+      return MiniSearch.loadJSON(t, {
+        fields: ['title','body','agency'],
+        storeFields: ['eventId','page','kind','title','agency','date','flag','body'],
+        searchOptions: { boost: { title: 3, body: 1 }, prefix: true, fuzzy: 0.15 },
+        tokenize: function(s){ return s.toLowerCase().split(/[^a-z0-9']+/).filter(function(t){ return t.length >= 2 && t.length <= 30; }); }
+      });
+    })();
+    return _miniPromise;
+  }
+
+  // Pull a ~280-char snippet centered around the first token match.
+  function snippetAround(body, tokens, span){
+    if (!body) return '';
+    span = span || 140;
+    var lower = body.toLowerCase();
+    var bestPos = -1;
+    for (var i = 0; i < tokens.length; i++){
+      var p = lower.indexOf(tokens[i]);
+      if (p !== -1 && (bestPos === -1 || p < bestPos)) bestPos = p;
+    }
+    if (bestPos === -1) return body.slice(0, span * 2).replace(/\s+/g, ' ').trim();
+    var start = Math.max(0, bestPos - span);
+    var end   = Math.min(body.length, bestPos + span);
+    return (start > 0 ? '…' : '') + body.slice(start, end).replace(/\s+/g, ' ').trim() + (end < body.length ? '…' : '');
+  }
+
+  // Wrap each token in <mark>; safe-escapes the rest.
+  function highlightSnippet(text, tokens){
+    if (!text) return '';
+    if (!tokens || !tokens.length) return esc(text);
+    try {
+      var safe = tokens.map(function(t){ return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
+      var re = new RegExp('(' + safe + ')', 'ig');
+      return text.split(re).map(function(s){
+        return re.test(s) ? '<mark>' + esc(s) + '</mark>' : esc(s);
+      }).join('');
+    } catch (e) { return esc(text); }
+  }
+
   // Evidence-type → badge spec (class, short label).
   var BADGE_SPEC = {
     'primary-source':  ['primary',  'PRIMARY'],
@@ -239,12 +314,24 @@
     return '<div class="badges">' + out.join('') + '</div>';
   }
 
-  // Card renderer.
-  function cardHTML(ev, score, MC){
+  // Card renderer. `pageHits` is optional — when present, each is a
+  // {page, body} object surfaced from the full-text index; we render up to
+  // 4 inline snippets with the query tokens marked.
+  function cardHTML(ev, score, MC, pageHits, tokens){
     var href = (MC && MC.url && MC.url.dossier) ? MC.url.dossier(ev.id) : ('dossier.html?eid=' + encodeURIComponent(ev.id));
     var dot = dotClass(ev.agency);
     var snippet = [ev.date, ev.region, ev.agency, ev.type].filter(Boolean).join(' · ');
     var scoreStr = (typeof score === 'number') ? score.toFixed(0) : '';
+    var pagesHTML = '';
+    if (pageHits && pageHits.length){
+      var shown = pageHits.slice(0, 4).map(function(h){
+        var snip = highlightSnippet(snippetAround(h.body || '', tokens || []), tokens || []);
+        var pg = (h.page != null) ? ('PAGE ' + String(h.page).padStart(3, '0')) : 'PAGE —';
+        return '<div class="ph"><span class="lab">' + esc(pg) + '</span>' + snip + '</div>';
+      }).join('');
+      var more = (pageHits.length > 4) ? '<div class="more">+ ' + (pageHits.length - 4) + ' more page' + (pageHits.length - 4 === 1 ? '' : 's') + '</div>' : '';
+      pagesHTML = '<div class="rc-pages">' + shown + more + '</div>';
+    }
     return '' +
       '<a class="rc" href="' + esc(href) + '">' +
         '<div class="top">' +
@@ -255,6 +342,7 @@
         badgesHTML(ev) +
         '<h3>' + esc(ev.title || ev.id) + '</h3>' +
         '<p>' + esc(snippet) + '</p>' +
+        pagesHTML +
         '<div class="bottom">' +
           '<span class="pg">' + esc((ev.agency || '—').toString().toUpperCase()) + '</span>' +
           '<span>' + esc(ev.date || ev.era || '') + '</span>' +
@@ -310,6 +398,34 @@
     var statSort   = document.getElementById('stat-sort');
     var browseHint = document.getElementById('browse-hint');
     var physicsPill= document.getElementById('filter-physics');
+    var idxStatus  = document.getElementById('idx-status');
+    var qqWrap     = document.getElementById('qq-wrap');
+    var qqList     = document.getElementById('qq-list');
+
+    // Module-level: the loaded MiniSearch instance (or null until ready).
+    var mini = null;
+    var eventById = {};
+    events.forEach(function(e){ eventById[e.id] = e; });
+
+    // Quick-query chips just fill the input.
+    if (qqList){
+      qqList.addEventListener('click', function(e){
+        if (e.target && e.target.classList.contains('qq')){
+          inp.value = e.target.textContent.trim();
+          render();
+          inp.focus();
+        }
+      });
+    }
+
+    // Kick the full-text index load. Render uses event-meta scoring meanwhile.
+    loadFullTextIndex().then(function(m){
+      mini = m;
+      if (idxStatus){ idxStatus.textContent = '· FULL-TEXT INDEX: 276 docs · fuzzy + prefix · ready'; idxStatus.classList.add('ready'); }
+      render();
+    }).catch(function(err){
+      if (idxStatus){ idxStatus.textContent = '· FULL-TEXT INDEX: ' + err.message + ' — falling back to event-meta search'; idxStatus.classList.add('error'); }
+    });
 
     function currentFilters(){
       return {
@@ -325,18 +441,57 @@
       var q = (inp.value || '').trim();
       var f = currentFilters();
       var base = applyFilters(events, f);
-      var out, isBrowse = false;
+      var allowed = {}; base.forEach(function(e){ allowed[e.id] = true; });
+      var out, isBrowse = false, pageHitsByEid = {};
+      var tokens = tokenize(q);
 
       if (!q){
         // BROWSE / SUGGESTED — top 12 by flag weight.
         isBrowse = true;
-        out = base.slice().sort(function(a, b){ return flagWeight(b.flag) - flagWeight(a.flag); }).slice(0, 12);
+        out = base.slice().sort(function(a, b){ return flagWeight(b.flag) - flagWeight(a.flag); }).slice(0, 12)
+          .map(function(ev){ return { ev: ev, score: null }; });
+      } else if (mini){
+        // FULL-TEXT — page-level hits via MiniSearch, grouped by event.
+        // boosts come from the field config (title 3, body 1), AND-combined,
+        // then we score-merge with the event-meta score so a strong title or
+        // tag/crossRef match outranks a one-page body hit on a junky event.
+        var raw = mini.search(q, { combineWith: 'AND' });
+        // Each raw hit is a page-doc; group by eventId.
+        var byEid = {};
+        var metaBoosted = {};
+        for (var i = 0; i < raw.length; i++){
+          var h = raw[i];
+          if (!allowed[h.eventId]) continue;
+          if (!byEid[h.eventId]){ byEid[h.eventId] = { ev: eventById[h.eventId], hits: [], topScore: 0 }; }
+          byEid[h.eventId].hits.push(h);
+          if (h.score > byEid[h.eventId].topScore) byEid[h.eventId].topScore = h.score;
+        }
+        out = Object.keys(byEid).map(function(eid){
+          var g = byEid[eid];
+          var metaScore = scoreEvent(g.ev, tokens);
+          // Combine: page-relevance + event-meta weight (sum), event-meta
+          // alone breaks ties from "only one fuzzy body hit" events.
+          var combined = g.topScore + (metaScore * 0.5) + (g.hits.length * 0.5);
+          metaBoosted[eid] = metaScore;
+          pageHitsByEid[eid] = g.hits;
+          return { ev: g.ev, score: combined };
+        });
+        // Add events with strong meta match but no body hits (e.g. id/tag/crossRef
+        // queries like "aawsa" — the literal string isn't in any page body).
+        for (var k = 0; k < base.length; k++){
+          var ev2 = base[k];
+          if (byEid[ev2.id]) continue;
+          var sMeta = scoreEvent(ev2, tokens);
+          if (sMeta >= 6){ out.push({ ev: ev2, score: sMeta }); }
+        }
+        out.sort(function(a, b){ return b.score - a.score; });
+        out = out.slice(0, 24);
       } else {
-        var tokens = tokenize(q);
+        // No index loaded yet — pure event-meta scoring (back-compat).
         var scored = [];
-        for (var i = 0; i < base.length; i++){
-          var s = scoreEvent(base[i], tokens);
-          if (s > 0) scored.push({ ev: base[i], score: s });
+        for (var i2 = 0; i2 < base.length; i2++){
+          var s = scoreEvent(base[i2], tokens);
+          if (s > 0) scored.push({ ev: base[i2], score: s });
         }
         scored.sort(function(a, b){ return b.score - a.score; });
         out = scored.slice(0, 24);
@@ -346,12 +501,17 @@
       var ms = Math.max(0, Math.round(t1 - t0));
 
       // Stats row.
-      statCount.textContent = out.length;
+      var pageCount = 0;
+      for (var pE in pageHitsByEid) pageCount += pageHitsByEid[pE].length;
+      statCount.textContent = out.length + (pageCount ? (' / ' + pageCount + ' pg') : '');
       statMs.textContent = ms;
-      statSort.textContent = isBrowse ? 'SORTED BY FLAG WEIGHT' : 'SORTED BY RELEVANCE';
+      statSort.textContent = isBrowse
+        ? 'SORTED BY FLAG WEIGHT'
+        : (mini ? 'PAGE-LEVEL · SORTED BY RELEVANCE' : 'EVENT-META · INDEX LOADING…');
 
-      // Browse hint vs. results.
+      // Browse hint + quick chips visible only on no-query.
       browseHint.style.display = isBrowse ? '' : 'none';
+      if (qqWrap) qqWrap.style.display = isBrowse ? '' : 'none';
 
       // Empty state — only when there's a query AND no hits.
       if (out.length === 0 && q){
@@ -363,10 +523,10 @@
 
       // Cap render at 24.
       var html = '';
-      var capped = out.slice(0, 24);
-      for (var j = 0; j < capped.length; j++){
-        var row = isBrowse ? { ev: capped[j], score: null } : capped[j];
-        html += cardHTML(row.ev, row.score, MC);
+      for (var j = 0; j < out.length; j++){
+        var row = out[j];
+        var hits = pageHitsByEid[row.ev.id] || null;
+        html += cardHTML(row.ev, row.score, MC, hits, tokens);
       }
       grid.innerHTML = html;
     }

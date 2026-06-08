@@ -8,33 +8,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
   <style>
-    .nw-shell { padding: 0 56px 64px; display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; position: relative; z-index: 3; align-items: start; }
-    .nw-card { background: var(--surface); border: 1px solid var(--border); padding: 28px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
-    .nw-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+    .nw-shell { padding: 0 56px 64px; display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 24px; position: relative; z-index: 3; align-items: start; }
+    .nw-card { background: var(--surface); border: 1px solid var(--border); padding: 26px 28px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+    .nw-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid var(--hairline); }
     .nw-h .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.30em; color: var(--text-2); text-transform: uppercase; }
     .nw-h .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
-    .nw-svg { width: 100%; height: 720px; display: block; }
-    .nw-edge { stroke: rgba(242,166,35,0.18); stroke-width: 0.6; }
-    .nw-edge.strong { stroke: rgba(242,166,35,0.55); stroke-width: 1.4; }
-    .nw-edge.weak { stroke: rgba(110,138,124,0.10); stroke-width: 0.3; }
-    .nw-node text { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.06em; }
-    .nw-node circle { transition: all .15s; cursor: pointer; }
-    .nw-node:hover circle { stroke-width: 2; }
 
-    .nw-ctl { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--text-3); }
-    .nw-ctl .row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); text-transform: uppercase; }
+    .nw-svg { width: 100%; height: 720px; display: block; background: radial-gradient(ellipse at center, rgba(20,28,38,0.30), rgba(8,14,22,0.65) 75%); border: 1px solid var(--hairline); }
+    .nw-edge { stroke: rgba(242,166,35,0.18); stroke-width: 0.6; fill: none; pointer-events: none; }
+    .nw-edge.strong { stroke: rgba(242,166,35,0.55); stroke-width: 1.4; }
+    .nw-edge.weak   { stroke: rgba(110,138,124,0.10); stroke-width: 0.3; }
+    .nw-edge.pattern{ stroke: rgba(178,128,255,0.28); stroke-dasharray: 3 3; }
+    .nw-edge.hilite { stroke: var(--amber); stroke-width: 2; }
+
+    .nw-node { cursor: pointer; }
+    .nw-node circle { transition: stroke-width .12s; }
+    .nw-node:hover circle { stroke: var(--amber); stroke-width: 2.5; filter: drop-shadow(0 0 4px var(--amber-glow)); }
+    .nw-node.pinned circle { stroke: var(--amber); stroke-width: 2.5; filter: drop-shadow(0 0 6px var(--amber-glow)); }
+    .nw-node text { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.06em; pointer-events: none; }
+
+    .nw-mode { display: flex; gap: 6px; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); flex-wrap: wrap; }
+    .nw-mode .m { padding: 6px 10px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; cursor: pointer; text-transform: uppercase; user-select: none; }
+    .nw-mode .m.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.10); box-shadow: 0 0 12px rgba(242,166,35,0.20); }
+
+    .nw-ctl .row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--text-3); text-transform: uppercase; }
     .nw-ctl .row:last-child { border-bottom: none; }
     .nw-ctl .row .label { flex: 1; }
     .nw-ctl .row .v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; }
-    .nw-ctl .slider { width: 60px; height: 2px; background: var(--hairline); position: relative; }
-    .nw-ctl .slider .knob { position: absolute; width: 40%; height: 100%; background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
-    .nw-mode { display: flex; gap: 8px; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
-    .nw-mode .m { padding: 7px 11px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; cursor: pointer; text-transform: uppercase; }
-    .nw-mode .m.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.10); box-shadow: 0 0 12px rgba(242,166,35,0.20); }
+    .nw-ctl input[type="range"] { width: 92px; accent-color: var(--amber); cursor: pointer; }
+    .nw-ctl input[type="range"]::-webkit-slider-thumb { background: var(--amber); }
 
-    .nw-key { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+    .nw-key { display: flex; flex-direction: column; gap: 8px; }
     .nw-key .k { display: flex; align-items: center; gap: 9px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.10em; text-transform: uppercase; }
     .nw-key .k .d { width: 10px; height: 10px; border-radius: 50%; }
+
+    .nw-detail { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); }
+    .nw-detail h4 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: var(--text); margin: 0 0 6px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
+    .nw-detail .sub { color: var(--text-4); font-size: 10px; letter-spacing: 0.16em; margin-bottom: 12px; text-transform: uppercase; }
+    .nw-detail .nb { display: flex; align-items: baseline; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--hairline); font-size: 10px; color: var(--text-2); }
+    .nw-detail .nb:last-child { border-bottom: none; }
+    .nw-detail .nb .cos { color: var(--cyan); font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; }
+    .nw-detail a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
+    .nw-detail a:hover { color: var(--amber); border-color: var(--amber); }
   </style>
 </head>
 <body data-view="network">
@@ -43,208 +58,354 @@
   <section class="page-title">
     <div class="eyebrow"><span class="div"></span>SURFACE · 11 — entity graph</div>
     <h1>Force-directed clustering. <em>Where the corpus actually connects.</em></h1>
-    <p class="sub">Nodes are events; edges are semantic similarity (cosine ≥ 0.55). Tightest cluster: FBI 62HQ-83894 sections. Second cluster: modern USCENTCOM Middle-East mission reports. Drag, pan, tune the similarity threshold.</p>
+    <p class="sub">Nodes are events; edges are semantic cosine similarity from <code>event-similarity.json</code>. Tune the cosine threshold; hover a node for its top neighbors; click to open the dossier.</p>
   </section>
 
   <section class="nw-shell">
-    <div class="panel">
-      <div class="panel-head"><span><span class="icon-sq"></span>CONTROLS</span><span class="right">tune</span></div>
+    <div class="nw-card">
+      <div class="nw-h"><span class="t">CONTROLS</span><span class="meta">tune</span></div>
 
       <div class="nw-mode">
-        <span class="m active">ALL</span>
-        <span class="m">EVENTS</span>
-        <span class="m">PATTERNS</span>
+        <span class="m active" data-mode="semantic">SEMANTIC</span>
+        <span class="m" data-mode="patterns">PATTERNS</span>
+        <span class="m" data-mode="all">ALL</span>
       </div>
 
       <div class="nw-ctl">
-        <div class="row"><span class="label">MIN COSINE</span><span class="slider"><span class="knob" style="left:20%"></span></span><span class="v">0.55</span></div>
-        <div class="row"><span class="label">REPULSION</span><span class="slider"><span class="knob" style="left:50%"></span></span><span class="v">3.2</span></div>
-        <div class="row"><span class="label">ITERATIONS</span><span class="slider"><span class="knob" style="left:65%"></span></span><span class="v">320</span></div>
-        <div class="row"><span class="label">NODES</span><span class="v" id="nw-nodes">75 / 220</span></div>
-        <div class="row"><span class="label">EDGES</span><span class="v">142</span></div>
-        <div class="row"><span class="label">CLUSTERS</span><span class="v">2 dominant</span></div>
+        <div class="row">
+          <span class="label">MIN COSINE</span>
+          <input type="range" id="ctl-cos" min="0.30" max="0.95" step="0.01" value="0.55">
+          <span class="v" id="v-cos">0.55</span>
+        </div>
+        <div class="row">
+          <span class="label">ITERATIONS</span>
+          <input type="range" id="ctl-iter" min="80" max="500" step="20" value="240">
+          <span class="v" id="v-iter">240</span>
+        </div>
+        <div class="row"><span class="label">NODES</span><span class="v" id="v-nodes">0</span></div>
+        <div class="row"><span class="label">EDGES</span><span class="v" id="v-edges">0</span></div>
       </div>
 
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
         <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:10px">LEGEND</div>
         <div class="nw-key">
-          <div class="k"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>DoW · USCENTCOM cluster</div>
-          <div class="k"><span class="d" style="background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)"></span>FBI · 1947 case file</div>
-          <div class="k"><span class="d" style="background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)"></span>NASA · orbital</div>
+          <div class="k"><span class="d" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>DoW · DEPT/WAR</div>
+          <div class="k"><span class="d" style="background:var(--cyan);box-shadow:0 0 6px rgba(97,215,240,0.6)"></span>FBI</div>
+          <div class="k"><span class="d" style="background:var(--emerald);box-shadow:0 0 6px rgba(74,222,128,0.6)"></span>NASA</div>
           <div class="k"><span class="d" style="background:var(--rose);box-shadow:0 0 6px rgba(224,73,104,0.6)"></span>Anchor event</div>
+          <div class="k"><span class="d" style="background:#B280FF"></span>Pattern term</div>
           <div class="k"><span class="d" style="background:var(--text-3)"></span>Other / unclassified</div>
         </div>
       </div>
 
-      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.6;color:var(--text-3);letter-spacing:0.06em">
-        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 1 — FBI 62HQ.</strong> 11 internal-section neighbors at cos 0.94-0.98. Tight intra-document.<br><br>
-        <strong style="color:var(--text);letter-spacing:0.14em">CLUSTER 2 — CENTCOM/ME.</strong> 18 events anchored on USCENTCOM (<span data-entity="USCENTCOM"><span data-entity-mentions>202</span> mentions / <span data-entity-docs>18</span> docs</span>).
+      <div id="detail" class="nw-detail" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
+        <div style="color:var(--text-4);font-size:10px;letter-spacing:0.18em">HOVER OR CLICK A NODE</div>
       </div>
     </div>
 
     <div class="nw-card">
       <div class="nw-h">
-        <div class="t">▣ &nbsp; SEMANTIC GRAPH</div>
-        <div class="meta"><span id="nw-eventcount">220</span> events · <span id="nw-entitycount">199</span> entities · cosine ≥ 0.55</div>
+        <div class="t">▣ &nbsp; <span id="nw-mode-label">SEMANTIC</span> GRAPH</div>
+        <div class="meta"><span id="v-evcount">220</span> events · <span id="v-cosabove">0</span> above threshold</div>
       </div>
 
-      <svg class="nw-svg" viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="nodeGlow"><stop offset="0%" stop-color="rgba(242,166,35,0.35)"/><stop offset="100%" stop-color="rgba(242,166,35,0)"/></radialGradient>
-        </defs>
-
-        <!-- Edges first (drawn behind) -->
-        <g>
-          <!-- FBI 62HQ tight cluster (top-left) -->
-          <line class="nw-edge strong" x1="180" y1="150" x2="240" y2="120"/>
-          <line class="nw-edge strong" x1="180" y1="150" x2="280" y2="190"/>
-          <line class="nw-edge strong" x1="240" y1="120" x2="280" y2="190"/>
-          <line class="nw-edge strong" x1="240" y1="120" x2="320" y2="140"/>
-          <line class="nw-edge strong" x1="180" y1="150" x2="220" y2="220"/>
-          <line class="nw-edge strong" x1="280" y1="190" x2="320" y2="140"/>
-          <line class="nw-edge strong" x1="280" y1="190" x2="220" y2="220"/>
-          <line class="nw-edge" x1="240" y1="120" x2="380" y2="180"/>
-          <line class="nw-edge" x1="320" y1="140" x2="380" y2="180"/>
-          <line class="nw-edge" x1="320" y1="140" x2="400" y2="100"/>
-
-          <!-- CENTCOM/ME cluster (center-right) -->
-          <line class="nw-edge strong" x1="680" y1="320" x2="740" y2="280"/>
-          <line class="nw-edge strong" x1="680" y1="320" x2="720" y2="380"/>
-          <line class="nw-edge strong" x1="740" y1="280" x2="800" y2="320"/>
-          <line class="nw-edge strong" x1="720" y1="380" x2="800" y2="320"/>
-          <line class="nw-edge strong" x1="680" y1="320" x2="620" y2="280"/>
-          <line class="nw-edge strong" x1="680" y1="320" x2="640" y2="380"/>
-          <line class="nw-edge" x1="620" y1="280" x2="540" y2="260"/>
-          <line class="nw-edge" x1="640" y1="380" x2="600" y2="440"/>
-          <line class="nw-edge" x1="740" y1="280" x2="820" y2="240"/>
-          <line class="nw-edge" x1="800" y1="320" x2="870" y2="290"/>
-          <line class="nw-edge" x1="720" y1="380" x2="780" y2="440"/>
-
-          <!-- USPER bridge -->
-          <line class="nw-edge strong" x1="540" y1="260" x2="500" y2="500"/>
-          <line class="nw-edge" x1="500" y1="500" x2="640" y2="380"/>
-          <line class="nw-edge" x1="500" y1="500" x2="600" y2="440"/>
-
-          <!-- NASA cluster (top right) -->
-          <line class="nw-edge" x1="820" y1="120" x2="880" y2="180"/>
-          <line class="nw-edge" x1="820" y1="120" x2="780" y2="80"/>
-
-          <!-- Weak cross-cluster -->
-          <line class="nw-edge weak" x1="380" y1="180" x2="500" y2="500"/>
-          <line class="nw-edge weak" x1="540" y1="260" x2="220" y2="220"/>
-          <line class="nw-edge weak" x1="820" y1="120" x2="540" y2="260"/>
-
-          <!-- Outliers -->
-          <line class="nw-edge weak" x1="150" y1="520" x2="380" y2="180"/>
-          <line class="nw-edge weak" x1="900" y1="580" x2="800" y2="320"/>
-        </g>
-
-        <!-- Nodes -->
-        <g>
-          <!-- FBI 62HQ section nodes (cyan) -->
-          <g class="nw-node"><circle cx="180" cy="150" r="10" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="194" y="154" fill="rgba(155,213,232,0.9)">62hq-s2</text></g>
-          <g class="nw-node"><circle cx="240" cy="120" r="9" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="254" y="124" fill="rgba(155,213,232,0.85)">62hq-s5</text></g>
-          <g class="nw-node"><circle cx="280" cy="190" r="8" fill="#61D7F0" stroke="rgba(97,215,240,0.5)" stroke-width="1"/><text x="294" y="194" fill="rgba(155,213,232,0.85)">62hq-s4</text></g>
-          <g class="nw-node"><circle cx="320" cy="140" r="7" fill="#61D7F0"/></g>
-          <g class="nw-node"><circle cx="220" cy="220" r="6" fill="#61D7F0"/></g>
-          <g class="nw-node"><circle cx="380" cy="180" r="6" fill="#61D7F0"/></g>
-          <g class="nw-node"><circle cx="400" cy="100" r="5" fill="#61D7F0"/></g>
-
-          <!-- CENTCOM/ME amber cluster -->
-          <g class="nw-node"><circle cx="680" cy="320" r="13" fill="#F2A623" stroke="#FFB840" stroke-width="1.5" filter="url(#nodeGlow)"/><text x="697" y="324" fill="rgba(242,166,35,0.95)" font-weight="600">USCENTCOM</text></g>
-          <g class="nw-node"><circle cx="740" cy="280" r="9" fill="#F2A623"/><text x="754" y="284" fill="rgba(242,166,35,0.85)">uae-jun-2024</text></g>
-          <g class="nw-node"><circle cx="720" cy="380" r="8" fill="#F2A623"/><text x="734" y="384" fill="rgba(242,166,35,0.85)">uae-oct-2023</text></g>
-          <g class="nw-node"><circle cx="800" cy="320" r="8" fill="#F2A623"/><text x="814" y="324" fill="rgba(242,166,35,0.85)">d62 hormuz</text></g>
-          <g class="nw-node"><circle cx="620" cy="280" r="7" fill="#F2A623"/></g>
-          <g class="nw-node"><circle cx="640" cy="380" r="7" fill="#F2A623"/></g>
-          <g class="nw-node"><circle cx="820" cy="240" r="6" fill="#F2A623"/></g>
-          <g class="nw-node"><circle cx="870" cy="290" r="6" fill="#F2A623"/></g>
-          <g class="nw-node"><circle cx="780" cy="440" r="6" fill="#F2A623"/></g>
-          <g class="nw-node"><circle cx="600" cy="440" r="5" fill="#F2A623"/></g>
-
-          <!-- Middle East range fouler bridge -->
-          <g class="nw-node"><circle cx="540" cy="260" r="8" fill="#F2A623"/><text x="554" y="264" fill="rgba(242,166,35,0.85)">d38 me-2020</text></g>
-
-          <!-- ANCHOR: USPER-2025 (rose, prominent) -->
-          <g class="nw-node">
-            <circle cx="500" cy="500" r="16" fill="none" stroke="rgba(224,73,104,0.5)" stroke-width="1" opacity="0.7"/>
-            <circle cx="500" cy="500" r="11" fill="#E04968" stroke="#FF8B9D" stroke-width="1.5"/>
-            <text x="517" y="504" fill="rgba(255,139,157,0.95)" font-weight="600">USPER-2025</text>
-            <text x="517" y="516" fill="rgba(224,73,104,0.65)" font-size="9">ANCHOR</text>
-          </g>
-
-          <!-- NASA orbital (emerald, small cluster) -->
-          <g class="nw-node"><circle cx="820" cy="120" r="9" fill="#4ADE80"/><text x="834" y="124" fill="rgba(134,239,172,0.85)">apollo-17</text></g>
-          <g class="nw-node"><circle cx="880" cy="180" r="6" fill="#4ADE80"/></g>
-          <g class="nw-node"><circle cx="780" cy="80" r="6" fill="#4ADE80"/></g>
-          <g class="nw-node"><circle cx="930" cy="120" r="5" fill="#4ADE80"/></g>
-
-          <!-- Outliers (gray) -->
-          <g class="nw-node"><circle cx="150" cy="520" r="5" fill="#75664A"/><text x="160" y="540" fill="rgba(117,102,74,0.7)">netherlands-1948</text></g>
-          <g class="nw-node"><circle cx="900" cy="580" r="5" fill="#75664A"/></g>
-          <g class="nw-node"><circle cx="200" cy="600" r="4" fill="#75664A"/></g>
-          <g class="nw-node"><circle cx="350" cy="600" r="4" fill="#75664A"/></g>
-
-          <!-- DoW d48/d49 sub-cluster -->
-          <g class="nw-node"><circle cx="440" cy="640" r="7" fill="#F2A623"/><text x="454" y="644" fill="rgba(242,166,35,0.85)">d48 1996</text></g>
-          <g class="nw-node"><circle cx="500" cy="660" r="6" fill="#F2A623"/></g>
-        </g>
-
+      <svg class="nw-svg" id="graph" viewBox="0 0 1000 720" preserveAspectRatio="xMidYMid meet">
+        <g id="edges"></g>
+        <g id="nodes"></g>
       </svg>
     </div>
   </section>
 </main>
 
 <script src="data.js"></script>
-
-<script>
-  (function () {
-    function setText(id, val) {
-      var el = document.getElementById(id);
-      if (el && val != null) el.textContent = val;
-    }
-
-    // Update an entity reference (mentions / docs) from topEntities,
-    // matched by the term in data-entity. If no match, leave as-is.
-    function renderEntities(topEntities) {
-      if (!topEntities || !topEntities.length) return;
-      var byTerm = {};
-      topEntities.forEach(function (e) { byTerm[e.term] = e; });
-      var hosts = document.querySelectorAll('[data-entity]');
-      for (var i = 0; i < hosts.length; i++) {
-        var host = hosts[i];
-        var ent = byTerm[host.getAttribute('data-entity')];
-        if (!ent) continue; // no matching term → leave hardcoded fallback
-        var m = host.querySelector('[data-entity-mentions]');
-        var dc = host.querySelector('[data-entity-docs]');
-        if (m && ent.mentions != null) m.textContent = ent.mentions;
-        if (dc && ent.docs != null) dc.textContent = ent.docs;
-      }
-    }
-
-    function renderFromMC() {
-      var D = window.MC && window.MC.derive;
-      if (!D) return false;
-      // NODES "75 / 220" — similarity node count / total events.
-      var nodes = D.similarity ? Object.keys(D.similarity).length : null;
-      if (nodes != null && D.eventCount != null) {
-        setText('nw-nodes', nodes + ' / ' + D.eventCount);
-      }
-      // EDGES / iterations stay static (graph-layout params).
-      setText('nw-eventcount', D.eventCount);
-      setText('nw-entitycount', D.entityCount);
-      renderEntities(D.topEntities);
-      return true;
-    }
-
-    if (window.MC && typeof window.MC.ready === 'function') {
-      window.MC.ready().then(renderFromMC);
-      window.MC.onUpdate(renderFromMC);
-    }
-    // If MC never loads, the baked-in markup remains as the fallback.
-  })();
-</script>
-
 <script src="chrome.js" defer></script>
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  var W = 1000, H = 720;
+  var svg     = document.getElementById('graph');
+  var gEdges  = document.getElementById('edges');
+  var gNodes  = document.getElementById('nodes');
+  var detail  = document.getElementById('detail');
+  var modeBar = document.querySelector('.nw-mode');
+  var cosInp  = document.getElementById('ctl-cos');
+  var iterInp = document.getElementById('ctl-iter');
+  var vCos    = document.getElementById('v-cos');
+  var vIter   = document.getElementById('v-iter');
+  var vNodes  = document.getElementById('v-nodes');
+  var vEdges  = document.getElementById('v-edges');
+  var vCosAbove = document.getElementById('v-cosabove');
+  var vEvCount= document.getElementById('v-evcount');
+  var modeLbl = document.getElementById('nw-mode-label');
+
+  var minCos = 0.55, iters = 240, mode = 'semantic';
+  var pinnedId = null;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // Agency → color
+  function agencyColor(rec){
+    if (!rec) return '#7CFFB2';
+    if (rec.flag === 'anchor') return '#E04968';
+    var a = (rec.agency || '').toLowerCase();
+    if (a === 'fbi') return '#61D7F0';
+    if (a === 'nasa') return '#7CFFB2';
+    if (a.indexOf('department of war') >= 0 || a === 'dow') return '#F2A623';
+    if (a.indexOf('central intelligence') >= 0 || a === 'cia') return '#94A3B8';
+    return '#7CFFB2';
+  }
+
+  // Build {nodes, links}. Nodes: events (and pattern-term nodes in pattern/all modes).
+  // Links: semantic event↔event from event-similarity, pattern↔event from patterns.byKind.
+  function buildGraph(){
+    var sim = (MC.derive && MC.derive.similarity) || {};
+    var events = (MC.derive && MC.derive.events) || [];
+    var byEid = {}; events.forEach(function(e){ byEid[e.id] = e; });
+    var nodes = [], links = [];
+    var seenLink = {};
+
+    if (mode === 'semantic' || mode === 'all'){
+      // Only include events that appear in the similarity index (the 75-event cohort).
+      Object.keys(sim).forEach(function(eid){
+        if (!byEid[eid]) return;
+        nodes.push({ id: 'e:' + eid, kind: 'event', ref: byEid[eid] });
+      });
+      // Edges (dedup undirected pairs).
+      Object.keys(sim).forEach(function(eid){
+        var ns = (sim[eid] && sim[eid].neighbors) || [];
+        for (var i = 0; i < ns.length; i++){
+          var n = ns[i];
+          if (n.cos < minCos) continue;
+          if (!byEid[n.eid] || !sim[n.eid]) continue;
+          var key = eid < n.eid ? (eid + '|' + n.eid) : (n.eid + '|' + eid);
+          if (seenLink[key]) continue;
+          seenLink[key] = true;
+          links.push({ a: 'e:' + eid, b: 'e:' + n.eid, kind: 'semantic', weight: n.cos });
+        }
+      });
+    }
+
+    if (mode === 'patterns' || mode === 'all'){
+      var data = MC.data || {};
+      var pk = (data.patterns && data.patterns.byKind) || {};
+      ['shape','behavior','sensor'].forEach(function(kind){
+        var top = (pk[kind] || []).slice(0, 6); // top 6 per kind
+        top.forEach(function(row){
+          var linked = (row.events || []).filter(function(e){ return byEid[e.eid]; });
+          if (!linked.length) return;
+          var nid = 'p:' + kind + ':' + row.term;
+          nodes.push({ id: nid, kind: 'pattern', ref: { name: row.term, sub: kind, docs: row.docCount, total: row.total } });
+          // Make sure each linked event is in the node set even if SEMANTIC mode didn't pick it.
+          linked.forEach(function(e){
+            if (!nodes.some(function(n){ return n.id === 'e:' + e.eid; })){
+              nodes.push({ id: 'e:' + e.eid, kind: 'event', ref: byEid[e.eid] });
+            }
+            links.push({ a: nid, b: 'e:' + e.eid, kind: 'pattern', weight: Math.min(1, e.count / 50) });
+          });
+        });
+      });
+    }
+
+    // Drop isolated nodes (no edges) so the canvas stays informative.
+    var deg = {};
+    links.forEach(function(l){ deg[l.a] = (deg[l.a]||0)+1; deg[l.b] = (deg[l.b]||0)+1; });
+    nodes = nodes.filter(function(n){ return deg[n.id]; });
+
+    return { nodes: nodes, links: links };
+  }
+
+  // Simple force-directed layout — repel each pair, spring along links, center pull, damp.
+  // O(N^2 * iter); N ≤ 75 events + ≤ 18 pattern nodes → fast in vanilla JS.
+  function layout(nodes, links, iterations){
+    var cx = W / 2, cy = H / 2;
+    var idx = {}, N = nodes.map(function(n, i){
+      idx[n.id] = i;
+      var ang = (i / nodes.length) * Math.PI * 2;
+      return { id: n.id, kind: n.kind, ref: n.ref,
+        x: cx + Math.cos(ang) * 220 + (Math.random() - 0.5) * 12,
+        y: cy + Math.sin(ang) * 220 + (Math.random() - 0.5) * 12,
+        vx: 0, vy: 0 };
+    });
+    var L = links.map(function(l){ return { a: idx[l.a], b: idx[l.b], kind: l.kind, w: l.weight }; })
+      .filter(function(l){ return l.a != null && l.b != null; });
+    var alpha = 1;
+    for (var it = 0; it < iterations; it++){
+      alpha = Math.max(0.05, 1 - it / iterations);
+      // Repel
+      for (var i = 0; i < N.length; i++){
+        var a = N[i];
+        for (var j = i + 1; j < N.length; j++){
+          var b = N[j];
+          var dx = b.x - a.x, dy = b.y - a.y;
+          var d2 = dx*dx + dy*dy + 0.01;
+          var d = Math.sqrt(d2);
+          var force = 220 / d2;
+          if (force > 1.2) force = 1.2;
+          var fx = (dx/d) * force, fy = (dy/d) * force;
+          a.vx -= fx; a.vy -= fy;
+          b.vx += fx; b.vy += fy;
+        }
+      }
+      // Spring along links
+      for (var k = 0; k < L.length; k++){
+        var aN = N[L[k].a], bN = N[L[k].b];
+        var dx2 = bN.x - aN.x, dy2 = bN.y - aN.y;
+        var dd = Math.sqrt(dx2*dx2 + dy2*dy2) + 0.01;
+        var target = 90;
+        var spring = (dd - target) * 0.04;
+        var sfx = (dx2/dd) * spring, sfy = (dy2/dd) * spring;
+        aN.vx += sfx; aN.vy += sfy;
+        bN.vx -= sfx; bN.vy -= sfy;
+      }
+      // Center pull + damping + integrate
+      for (var p = 0; p < N.length; p++){
+        N[p].vx += (cx - N[p].x) * 0.003;
+        N[p].vy += (cy - N[p].y) * 0.003;
+        N[p].vx *= 0.82; N[p].vy *= 0.82;
+        N[p].x += N[p].vx * alpha;
+        N[p].y += N[p].vy * alpha;
+        N[p].x = Math.max(20, Math.min(W - 20, N[p].x));
+        N[p].y = Math.max(20, Math.min(H - 20, N[p].y));
+      }
+    }
+    var posById = {};
+    N.forEach(function(n){ posById[n.id] = n; });
+    return { positioned: N, posById: posById };
+  }
+
+  function nodeSize(n, posById, links){
+    if (n.kind === 'pattern') return 5;
+    // Degree-aware sizing for events.
+    var d = 0;
+    for (var k = 0; k < links.length; k++){
+      if (links[k].a === n.id || links[k].b === n.id) d++;
+    }
+    return 5 + Math.min(8, d * 0.6);
+  }
+  function nodeColor(n){
+    if (n.kind === 'pattern') return '#B280FF';
+    return agencyColor(n.ref);
+  }
+  function nodeLabel(n){
+    if (n.kind === 'pattern') return (n.ref && n.ref.name) || '';
+    var ref = n.ref || {};
+    var id = (ref.id || '').toString();
+    return id.length > 14 ? id.slice(0, 14) + '…' : id;
+  }
+
+  function paint(){
+    var built = buildGraph();
+    if (vNodes) vNodes.textContent = built.nodes.length;
+    if (vEdges) vEdges.textContent = built.links.length;
+    if (vCosAbove) vCosAbove.textContent = built.links.filter(function(l){ return l.kind === 'semantic'; }).length;
+    if (vEvCount) vEvCount.textContent = ((MC.derive && MC.derive.events) || []).length;
+    if (modeLbl) modeLbl.textContent = mode.toUpperCase();
+    if (!built.nodes.length){
+      gEdges.innerHTML = ''; gNodes.innerHTML = '';
+      return;
+    }
+    var out = layout(built.nodes, built.links, iters);
+    // Edges
+    var edgeHtml = built.links.map(function(l){
+      var a = out.posById[l.a], b = out.posById[l.b];
+      if (!a || !b) return '';
+      var cls = 'nw-edge';
+      if (l.kind === 'pattern') cls += ' pattern';
+      else if (l.weight >= 0.75) cls += ' strong';
+      else if (l.weight < 0.50)  cls += ' weak';
+      return '<line class="' + cls + '" x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1) + '" y2="' + b.y.toFixed(1) + '" data-a="' + esc(l.a) + '" data-b="' + esc(l.b) + '"/>';
+    }).join('');
+    gEdges.innerHTML = edgeHtml;
+
+    // Nodes
+    var nodeHtml = out.positioned.map(function(n){
+      var size = nodeSize(n, out.posById, built.links);
+      var fill = nodeColor(n);
+      var lbl  = nodeLabel(n);
+      return '<g class="nw-node' + (n.id === pinnedId ? ' pinned' : '') + '" data-id="' + esc(n.id) + '" transform="translate(' + n.x.toFixed(1) + ',' + n.y.toFixed(1) + ')">' +
+        '<circle r="' + size + '" fill="' + fill + '" stroke="rgba(0,0,0,0.5)" stroke-width="1"/>' +
+        '<text x="' + (size + 4) + '" y="3" fill="rgba(220,220,220,0.85)">' + esc(lbl) + '</text>' +
+      '</g>';
+    }).join('');
+    gNodes.innerHTML = nodeHtml;
+
+    // Bind hover / click
+    gNodes.querySelectorAll('.nw-node').forEach(function(g){
+      var id = g.dataset.id;
+      g.addEventListener('mouseenter', function(){ showDetail(id, built.links); highlightEdges(id); });
+      g.addEventListener('mouseleave', function(){ if (!pinnedId) clearHighlight(); });
+      g.addEventListener('click', function(){
+        if (id.indexOf('e:') === 0){
+          var eid = id.slice(2);
+          window.location.href = MC.url.dossier(eid);
+        }
+      });
+    });
+  }
+
+  function highlightEdges(nodeId){
+    gEdges.querySelectorAll('line').forEach(function(ln){
+      if (ln.dataset.a === nodeId || ln.dataset.b === nodeId){
+        ln.classList.add('hilite');
+      } else {
+        ln.classList.remove('hilite');
+      }
+    });
+  }
+  function clearHighlight(){
+    gEdges.querySelectorAll('line.hilite').forEach(function(ln){ ln.classList.remove('hilite'); });
+  }
+
+  function showDetail(nodeId, links){
+    if (nodeId.indexOf('e:') === 0){
+      var eid = nodeId.slice(2);
+      var rec = MC.byEid(eid);
+      if (!rec){ detail.innerHTML = '<div style="color:var(--text-4)">' + esc(eid) + '</div>'; return; }
+      var neighbors = MC.neighbors(eid, 6);
+      var nbHTML = neighbors.length ? neighbors.map(function(nb){
+        var nbRec = MC.byEid(nb.eid);
+        return '<div class="nb"><a href="' + esc(MC.url.dossier(nb.eid)) + '">' + esc((nbRec && nbRec.id) || nb.eid) + '</a><span class="cos">' + nb.cos.toFixed(2) + '</span></div>';
+      }).join('') : '<div style="color:var(--text-4);font-size:10px">no neighbors at this threshold</div>';
+      detail.innerHTML =
+        '<h4>' + esc(rec.title || rec.id) + '</h4>' +
+        '<div class="sub">' + esc(rec.id) + ' · ' + esc(rec.agency || '') + ' · ' + esc(rec.date || '') + '</div>' +
+        '<div style="font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:0.18em;color:var(--text-4);margin-bottom:8px;text-transform:uppercase">TOP NEIGHBORS</div>' +
+        nbHTML +
+        '<div style="margin-top:12px"><a href="' + esc(MC.url.dossier(eid)) + '">→ OPEN DOSSIER</a></div>';
+    } else if (nodeId.indexOf('p:') === 0){
+      var parts = nodeId.split(':');
+      var kind = parts[1], term = parts.slice(2).join(':');
+      detail.innerHTML =
+        '<h4>' + esc(term) + '</h4>' +
+        '<div class="sub">PATTERN · ' + esc(kind) + '</div>' +
+        '<div style="color:var(--text-4);font-size:10px;line-height:1.5">Mined from corpus pages. Edges connect to every event whose vision/OCR text mentions this term.</div>';
+    }
+  }
+
+  // ─── Wire controls ───
+  modeBar.querySelectorAll('.m').forEach(function(m){
+    m.addEventListener('click', function(){
+      modeBar.querySelectorAll('.m').forEach(function(o){ o.classList.remove('active'); });
+      m.classList.add('active');
+      mode = m.dataset.mode;
+      paint();
+    });
+  });
+  cosInp.addEventListener('input', function(){
+    minCos = parseFloat(cosInp.value);
+    vCos.textContent = minCos.toFixed(2);
+    paint();
+  });
+  iterInp.addEventListener('input', function(){
+    iters = parseInt(iterInp.value, 10);
+    vIter.textContent = iters;
+  });
+  iterInp.addEventListener('change', paint);
+
+  MC.ready().then(paint);
+  MC.onUpdate(function(){ if (!gNodes.children.length) paint(); });
+})();
+</script>
 </body>
 </html>
