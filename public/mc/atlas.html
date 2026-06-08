@@ -351,11 +351,8 @@
           cell.appendChild(el("span", "v", String(n)));
           var pct = rt ? Math.round((n / rt) * 100) : 0;
           cell.appendChild(el("span", "pct", pct + "%"));
-          // Numeric count overlay (top-right). Only when n > 0 (we're in the
-          // n > 0 branch already). Skips when count equals the main number so
-          // the badge stays a redundancy-free indicator — but the spec asks
-          // for an explicit overlay, so always render it.
-          cell.appendChild(el("span", "count-badge", String(n)));
+          // (Removed: `.count-badge` was duplicating `.v` — readers saw "5" + "5"
+          // for the same cell. The main `.v` already carries the count.)
 
           // Tooltip wiring.
           (function (ids, agencyShort, eraLabelStr) {

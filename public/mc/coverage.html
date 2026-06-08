@@ -39,6 +39,9 @@
     @keyframes cov-in { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
     .cov-cell.partial { background: rgba(242,166,35,0.18); border-color: rgba(242,166,35,0.55); }
     .cov-cell.complete { background: rgba(74,222,128,0.25); border-color: var(--emerald); box-shadow: 0 0 14px rgba(74,222,128,0.55); animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards, cp 2.6s ease-in-out 1.5s infinite; }
+    /* `.empty` cells are no-data — distinct from "no class assigned" so
+       the headline counts (coverageNoData=149) match what's painted. */
+    .cov-cell.empty { background: rgba(224,73,104,0.05); border-color: rgba(224,73,104,0.20); border-style: dashed; }
     @keyframes cp { 0%,100%{box-shadow:0 0 14px rgba(74,222,128,0.55)} 50%{box-shadow:0 0 26px rgba(74,222,128,0.9)} }
     .cov-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--hairline); }
     .cov-summary .s { padding: 6px 18px; border-left: 1px solid var(--hairline); }
@@ -247,6 +250,7 @@
     function statusClass(status) {
       return status === 'complete' ? ' complete'
         : status === 'partial' ? ' partial'
+        : status === 'empty' || status === 'no-data' ? ' empty'
         : '';
     }
 

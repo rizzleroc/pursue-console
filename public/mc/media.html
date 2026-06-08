@@ -264,10 +264,22 @@
       return true;
     });
     if (sortMode === 'POPULAR'){
+      // Items don't carry view counts in this corpus, so when views are
+      // absent fall back to event-flag weight (anchor→4, high→3, med→2,
+      // low→1) so the toggle visibly reorders the grid by importance.
+      var fw = { anchor: 4, high: 3, med: 2, low: 1 };
       out.sort(function(a, b){
-        var av = typeof a.views === 'number' ? a.views : -Infinity;
-        var bv = typeof b.views === 'number' ? b.views : -Infinity;
-        return bv - av;
+        var av = typeof a.views === 'number' ? a.views : null;
+        var bv = typeof b.views === 'number' ? b.views : null;
+        if (av != null && bv != null) return bv - av;
+        if (av != null) return -1;
+        if (bv != null) return 1;
+        // Both views absent — use the event's flag weight as the tiebreaker.
+        var arec = a.eventId ? MC.byEid(a.eventId) : null;
+        var brec = b.eventId ? MC.byEid(b.eventId) : null;
+        var aw = (arec && fw[arec.flag]) || 0;
+        var bw = (brec && fw[brec.flag]) || 0;
+        return bw - aw;
       });
     }
     return out;
@@ -276,7 +288,10 @@
   function renderGrid(){
     var rows = filterAndSort();
     statTotal.textContent = rows.length;
-    var shown = rows.slice(0, 200); // cap for perf; the React app shows all
+    // Cap visible tiles for paint perf. When INCLUDE PLACEHOLDERS is on, bump
+    // the cap to 500 so the extra ~120 placeholder items actually become
+    // visible (without this, the cap masked the toggle as inert).
+    var shown = rows.slice(0, inclPlace ? 500 : 200);
     currentFiltered = shown;
     statShown.textContent = shown.length;
     var html = shown.map(function(m, i){

@@ -189,6 +189,7 @@ header.topbar {
   text-decoration: none; display: inline-block;
 }
 .ghost:hover { color: var(--text); border-color: var(--border-strong); }
+.ghost.active { color: var(--amber); border-color: var(--amber); background: rgba(242,166,35,0.10); box-shadow: 0 0 10px var(--amber-glow); }
 .ops-btn {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px; letter-spacing: 0.14em; font-weight: 600;
