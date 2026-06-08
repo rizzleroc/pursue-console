@@ -294,6 +294,96 @@
   MC.entitiesForEid = (eid)  => ((MC.derive && MC.derive.entitiesByEid && MC.derive.entitiesByEid[eid]) || []).slice();
   MC.entitiesByKind = (kind) => ((MC.derive && MC.derive.entities) || []).filter((e) => e.kind === kind);
 
+  // ── Convenience helpers (additive) ──
+  // Media items attached to an event (returns [] if media not loaded).
+  MC.mediaForEid = (eid) => {
+    if (!eid) return [];
+    const items = (MC.derive && Array.isArray(MC.derive.mediaItems)) ? MC.derive.mediaItems : [];
+    return items.filter((m) => m && m.eventId === eid);
+  };
+
+  // Coverage row for one event, normalised to {status, complete, total, percent}.
+  // Tolerates both {eid,complete,total} and the corpus shape {eventId,pagesTouched,totalPages}.
+  MC.coverageForEid = (eid) => {
+    if (!eid) return null;
+    const byEvent = MC.get("coverage.byEvent", []);
+    if (!Array.isArray(byEvent)) return null;
+    const row = byEvent.find((e) => e && (e.eid === eid || e.eventId === eid || e.id === eid));
+    if (!row) return null;
+    const complete = (row.complete != null ? row.complete : row.pagesTouched) || 0;
+    const total = (row.total != null ? row.total : row.totalPages) || 0;
+    const percent = total > 0 ? Math.round((complete / total) * 100) : 0;
+    return { status: row.status || null, complete, total, percent };
+  };
+
+  // Quick free-text search across event metadata. Returns array sorted by score desc.
+  MC.searchEvents = (query, options) => {
+    const events = (MC.derive && MC.derive.events) || [];
+    if (!events.length) return [];
+    const q = (query == null ? "" : String(query)).trim().toLowerCase();
+    if (!q) return [];
+    const opts = options || {};
+    const limit = typeof opts.limit === "number" ? opts.limit : 24;
+    const fields = Array.isArray(opts.fields) && opts.fields.length
+      ? opts.fields
+      : ["title", "id", "agency", "region", "era", "type"];
+    const terms = q.split(/\s+/).filter(Boolean);
+    const scored = [];
+    for (const ev of events) {
+      let score = 0;
+      for (const f of fields) {
+        const raw = ev && ev[f];
+        if (raw == null) continue;
+        const hay = String(Array.isArray(raw) ? raw.join(" ") : raw).toLowerCase();
+        for (const t of terms) {
+          if (!t) continue;
+          if (hay === t) score += 10;
+          else if (hay.startsWith(t)) score += 5;
+          else if (hay.indexOf(t) !== -1) score += 2;
+        }
+      }
+      if (score > 0) scored.push({ ev, score });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map((s) => s.ev);
+  };
+
+  // Most-recent generatedAt across every loaded source. Returns ISO string or "" if none.
+  MC.lastBuildAt = () => {
+    const d = MC.data || {};
+    let best = 0;
+    let bestRaw = "";
+    for (const key of Object.keys(d)) {
+      const src = d[key];
+      if (!src) continue;
+      const raw = src.generatedAt || src.generated_at || src.builtAt || src.built_at || null;
+      if (!raw) continue;
+      const t = Date.parse(raw);
+      if (!isNaN(t) && t > best) { best = t; bestRaw = raw; }
+    }
+    return bestRaw;
+  };
+
+  // Human-friendly "Nm ago" / "Nh ago" / "Nd ago" relative string.
+  MC.humanAgo = (ts) => {
+    if (ts == null || ts === "") return "";
+    let t;
+    if (typeof ts === "number") t = ts;
+    else if (ts instanceof Date) t = ts.getTime();
+    else t = Date.parse(String(ts));
+    if (isNaN(t)) return "";
+    const diff = Date.now() - t;
+    if (diff < 0) return "just now";
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return s + "s ago";
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + "m ago";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + "h ago";
+    const days = Math.floor(h / 24);
+    return days + "d ago";
+  };
+
   // ── Header filters — sessionStorage-backed, piped into every view ──
   // Lets the topbar's search box + agency / type dropdowns drive every
   // surface the way the React Header does. Pages read MC.headerFilters

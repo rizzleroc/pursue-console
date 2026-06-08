@@ -43,7 +43,18 @@
     .ab-btn.primary { color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); box-shadow: 0 12px 28px -10px rgba(242,166,35,0.55); }
     .ab-btn.ghost { color: var(--text-2); background: var(--surface); border: 1px solid var(--border); }
     .ab-btn.ghost:hover { color: var(--text); border-color: var(--border-strong); }
-  </style>
+    .source-mix-wrap { margin: 0 0 18px; }
+    .source-mix { display: flex; height: 8px; width: 100%; background: var(--surface-3); border: 1px solid var(--hairline); overflow: hidden; }
+    .source-mix .seg { display: block; height: 100%; transition: width .25s ease; }
+    .source-mix .seg.vision { background: linear-gradient(180deg, rgba(74,222,128,0.85), rgba(74,222,128,0.6)); }
+    .source-mix .seg.ocr    { background: linear-gradient(180deg, rgba(97,215,240,0.85), rgba(97,215,240,0.6)); }
+    .source-mix .seg.human  { background: linear-gradient(180deg, rgba(242,166,35,0.85), rgba(242,166,35,0.6)); }
+    .source-mix-labels { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--text-3); margin-top: 8px; text-transform: uppercase; display: flex; gap: 14px; flex-wrap: wrap; }
+    .source-mix-labels .lbl-vision { color: var(--emerald); }
+    .source-mix-labels .lbl-ocr    { color: var(--cyan); }
+    .source-mix-labels .lbl-human  { color: var(--amber); }
+    .source-mix-labels .lbl-total  { color: var(--text-2); margin-left: auto; }
+</style>
 </head>
 <body data-view="review">
 
@@ -76,8 +87,16 @@
       </div>
 
       <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.22em;font-weight:700;margin-bottom:10px">MULTI-SOURCE PAGES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Real side-by-side · gemini vision vs tesseract OCR.</div>
+        <select id="rv-multi" class="md-select" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;cursor:pointer">
+          <option value="">— pick a page —</option>
+        </select>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
         <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.22em;font-weight:700;margin-bottom:10px">GRADED EXAMPLES</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Pick an event with completed extracts to see what graded page text looks like.</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Top-scored extracts only.</div>
         <select id="rv-graded" class="md-select" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;cursor:pointer">
           <option value="">— pick an event —</option>
         </select>
@@ -97,6 +116,20 @@
           <div id="rv-pane-sub" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES</div>
         </div>
         <div class="meta">EXTRACTS <span class="score" id="rv-score" style="background:rgba(97,215,240,0.10);color:var(--cyan);border-color:rgba(97,215,240,0.4)">live</span></div>
+      </div>
+
+      <div class="source-mix-wrap" id="rv-source-mix-wrap" hidden>
+        <div class="source-mix" id="rv-source-mix">
+          <span class="seg vision" style="width:0%"></span>
+          <span class="seg ocr" style="width:0%"></span>
+          <span class="seg human" style="width:0%"></span>
+        </div>
+        <div class="source-mix-labels" id="rv-source-mix-labels">
+          <span class="lbl-vision">VISION 0p</span>
+          <span class="lbl-ocr">OCR 0p</span>
+          <span class="lbl-human">HUMAN 0p</span>
+          <span class="lbl-total">TOTAL 0p</span>
+        </div>
       </div>
 
       <div class="diff-grid" id="rv-diff">
@@ -143,6 +176,58 @@
     return _extracts;
   }
 
+  // Multi-source side-by-side: real per-source page texts (gemini vision
+  // vs tesseract OCR). Built by scripts/build-multi-source-review.mjs.
+  let _multi = null;
+  function loadMulti(){
+    if (_multi) return _multi;
+    _multi = fetch('../multi-source-review.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .catch(e => { console.warn('multi-source load failed:', e); return null; });
+    return _multi;
+  }
+
+  // Render the SourceMix horizontal bar for the given eid. Counts pages in
+  // MC.data.multiSource.pages[eid] (loaded by loadMulti) by source: vision
+  // (gemini), ocr (tesseract), human (none yet; placeholder for reviewer
+  // canon). Hides the bar entirely when the event has no multi-source data.
+  async function renderSourceMix(eid){
+    const wrap = document.getElementById('rv-source-mix-wrap');
+    if (!wrap) return;
+    const ms = await loadMulti();
+    const pages = (ms && ms.pages && eid && ms.pages[eid]) || null;
+    if (!pages){ wrap.hidden = true; return; }
+    let visionCount = 0, ocrCount = 0, humanCount = 0, totalPages = 0;
+    Object.keys(pages).forEach(function(pg){
+      const entry = pages[pg] || {};
+      totalPages++;
+      if (entry.gemini) visionCount++;
+      if (entry.ocr)    ocrCount++;
+      if (entry.human)  humanCount++;
+    });
+    if (!totalPages){ wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const sumSources = Math.max(visionCount + ocrCount + humanCount, 1);
+    const vPct = (visionCount / sumSources) * 100;
+    const oPct = (ocrCount    / sumSources) * 100;
+    const hPct = (humanCount  / sumSources) * 100;
+    const bar = document.getElementById('rv-source-mix');
+    if (bar){
+      const segs = bar.querySelectorAll('.seg');
+      if (segs[0]) segs[0].style.width = vPct.toFixed(2) + '%';
+      if (segs[1]) segs[1].style.width = oPct.toFixed(2) + '%';
+      if (segs[2]) segs[2].style.width = hPct.toFixed(2) + '%';
+    }
+    const labels = document.getElementById('rv-source-mix-labels');
+    if (labels){
+      labels.innerHTML =
+        '<span class="lbl-vision">VISION ' + visionCount + 'p</span>' +
+        '<span class="lbl-ocr">OCR '       + ocrCount    + 'p</span>' +
+        '<span class="lbl-human">HUMAN '   + humanCount  + 'p</span>' +
+        '<span class="lbl-total">TOTAL '   + totalPages  + 'p</span>';
+    }
+  }
+
   // Render the diff pane with REAL data for {eid, page}. Uses the
   // top extracts from dossier-extracts.json on the left ("raw") and the
   // page's text concatenated as a starting merged proposal on the right.
@@ -161,9 +246,42 @@
     const submitBtn = document.getElementById('rv-submit-btn');
     if (submitBtn && MC.url && MC.url.claim) submitBtn.href = MC.url.claim(eid, page);
 
-    const ex = await loadExtracts();
+    // SourceMix bar — fire-and-forget; reflects this event's per-source page mix.
+    renderSourceMix(eid);
+
     const grid = document.getElementById('rv-diff');
     const merge = document.getElementById('rv-merge');
+
+    // Prefer real multi-source side-by-side when both gemini + ocr exist.
+    const ms = await loadMulti();
+    if (ms && ms.pages && ms.pages[eid] && ms.pages[eid][String(page)]){
+      const entry = ms.pages[eid][String(page)];
+      const hasBoth = entry.gemini && entry.ocr;
+      const agree = (typeof entry.agreement === 'number') ? entry.agreement.toFixed(2) : '—';
+      const scoreEl = document.getElementById('rv-score');
+      if (scoreEl){
+        scoreEl.textContent = hasBoth ? ('agreement ' + agree) : (entry.gemini ? 'VISION ONLY' : 'OCR ONLY');
+        scoreEl.style.color = hasBoth && entry.agreement < 0.5 ? 'var(--rose)' : 'var(--cyan)';
+        scoreEl.style.borderColor = hasBoth && entry.agreement < 0.5 ? 'rgba(224,73,104,0.4)' : 'rgba(97,215,240,0.4)';
+        scoreEl.style.background = hasBoth && entry.agreement < 0.5 ? 'rgba(224,73,104,0.10)' : 'rgba(97,215,240,0.10)';
+      }
+      const visBody = entry.gemini || '(no vision output)';
+      const ocrBody = entry.ocr    || '(no OCR output)';
+      grid.innerHTML =
+        '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>Gemini 2.0</span><span class="conf">' + visBody.length + ' chars</span></h4>' +
+          '<p style="white-space:pre-wrap;font-size:11px;line-height:1.55;max-height:520px;overflow:auto">' + esc(visBody) + '</p>' +
+        '</div>' +
+        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>Tesseract 5.x</span><span class="conf">' + ocrBody.length + ' chars</span></h4>' +
+          '<p style="white-space:pre-wrap;font-size:11px;line-height:1.55;max-height:520px;overflow:auto">' + esc(ocrBody) + '</p>' +
+        '</div>';
+      // Seed merge textarea with the LONGER source — usually the cleaner one.
+      merge.value = (entry.gemini && (!entry.ocr || entry.gemini.length >= entry.ocr.length))
+        ? entry.gemini
+        : (entry.ocr || '');
+      return;
+    }
+
+    const ex = await loadExtracts();
     if (!ex || !ex[eid] || !ex[eid].excerptsByPage){
       grid.innerHTML = '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>no excerpts for this event</span></h4>' +
         '<p style="color:var(--text-4)">Page-level extracts are produced by the corpus build (scripts/build-dossier-extracts.mjs). When this event has been processed, the top sentences for the requested page will appear here.</p></div>' +
@@ -297,6 +415,45 @@
       // Pick the first graded page for this event.
       const firstPg = Object.keys(ex[eid].excerptsByPage || {})[0];
       renderDetail({ eid, page: firstPg ? parseInt(firstPg, 10) : 1 });
+    });
+  })();
+
+  // Populate the MULTI-SOURCE picker. Each option is "<eid> p<N> · agree X" —
+  // sorted by agreement ascending so the most-divergent pages float to the top.
+  (async function(){
+    const ms = await loadMulti();
+    if (!ms || !ms.pages) return;
+    const sel = document.getElementById('rv-multi');
+    if (!sel) return;
+    const items = [];
+    Object.keys(ms.pages).forEach(function(eid){
+      Object.keys(ms.pages[eid]).forEach(function(page){
+        const entry = ms.pages[eid][page];
+        const hasBoth = entry.gemini && entry.ocr;
+        const ag = typeof entry.agreement === 'number' ? entry.agreement : (hasBoth ? 1 : 2);
+        items.push({ eid, page: parseInt(page, 10), agreement: ag, hasBoth });
+      });
+    });
+    // Both-source pages first (sorted by agreement asc), then single-source.
+    items.sort(function(a, b){
+      if (a.hasBoth !== b.hasBoth) return a.hasBoth ? -1 : 1;
+      return a.agreement - b.agreement;
+    });
+    items.slice(0, 80).forEach(function(it){
+      const rec = MC.byEid ? MC.byEid(it.eid) : null;
+      const title = (rec && rec.title) || it.eid;
+      const tag = it.hasBoth ? ('agree ' + it.agreement.toFixed(2)) : 'vision only';
+      const opt = document.createElement('option');
+      opt.value = it.eid + '|' + it.page;
+      const label = it.eid + ' · p' + it.page + ' · ' + tag + ' — ' + title;
+      opt.textContent = label.length > 70 ? label.slice(0, 70) + '…' : label;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function(){
+      const v = sel.value;
+      if (!v) return;
+      const [eid, page] = v.split('|');
+      renderDetail({ eid, page: parseInt(page, 10) });
     });
   })();
 </script>

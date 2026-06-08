@@ -51,6 +51,51 @@
     .lc .meta .v { color: var(--amber); font-weight: 600; }
     .lc.feat { grid-column: span 2; background: linear-gradient(135deg, rgba(242,166,35,0.10), rgba(12,19,28,0.55) 60%); border-color: var(--border-strong); }
     .lc.feat h3 { font-size: 36px; }
+
+    /* Freshness banner — tucked between H1 and launch grid */
+    .freshness {
+      margin: 6px 0 0;
+      padding: 10px 14px;
+      display: flex; align-items: center; gap: 14px;
+      flex-wrap: wrap;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-left: 2px solid var(--border);
+      max-width: 880px;
+    }
+    .freshness .fresh-label { color: var(--amber); font-weight: 600; }
+    .freshness .fresh-sep   { color: var(--text-4); }
+    .freshness .fresh-counts { color: var(--text-2); letter-spacing: 0.12em; }
+    .freshness .fresh-delta {
+      color: var(--amber-bright);
+      letter-spacing: 0.12em;
+      padding-left: 10px;
+      border-left: 1px solid var(--hairline);
+    }
+    .freshness .fresh-delta[hidden] { display: none; }
+
+    /* Live revalidation pulse dot */
+    .pulse-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber-glow);
+      flex: 0 0 auto;
+    }
+    .pulse-dot.pulse {
+      animation: freshPulse 1.1s ease-out;
+    }
+    @keyframes freshPulse {
+      0%   { transform: scale(1);   box-shadow: 0 0 8px var(--amber-glow); }
+      35%  { transform: scale(2.0); box-shadow: 0 0 18px var(--amber-glow); }
+      100% { transform: scale(1);   box-shadow: 0 0 8px var(--amber-glow); }
+    }
   </style>
 </head>
 <body data-view="">
@@ -60,6 +105,16 @@
     <div class="eyebrow">▣ &nbsp; PURSUE Console · Mission Control · Release 3.0</div>
     <h1>Investigate the record <em>the Department of War released.</em></h1>
     <p>Eleven mission surfaces. Same corpus, ten access modes plus the launch grid. Every value bound to live JSON regenerated on every build. Every page implements the Mission Control tactical aesthetic.</p>
+
+    <div class="freshness" id="freshness" role="status" aria-live="polite" hidden>
+      <span class="pulse-dot" id="pulseDot" aria-hidden="true"></span>
+      <span class="fresh-label">CORPUS</span>
+      <span class="fresh-sep">·</span>
+      <span>last built <span id="freshAgo">—</span></span>
+      <span class="fresh-sep">·</span>
+      <span class="fresh-counts"><span id="freshEvents">—</span> events / <span id="freshPages">—</span> pages</span>
+      <span class="fresh-delta" id="freshDelta" hidden></span>
+    </div>
   </section>
 
   <section class="launch-grid">
@@ -68,7 +123,7 @@
       <span class="code">SURFACE · 01</span>
       <h3>Live</h3>
       <p>Tactical overview with the corpus-coverage matrix, mission status readout, the arriving signals stream, telemetry rails, field assignments, and the mined-entity index. The home of the console.</p>
-      <span class="meta"><span>11×11 grid · radar dome · signals · help wanted</span><span class="v">→</span></span>
+      <span class="meta"><span><span data-mc="feedCount">11</span> signals · 11×11 grid · radar dome · help wanted</span><span class="v">→</span></span>
     </a>
 
     <a class="lc" href="coverage.html">
@@ -82,7 +137,7 @@
       <span class="code">SURFACE · 03</span>
       <h3>Search</h3>
       <p>Unified search with an EXACT/MEANING toggle. Lexical MiniSearch over 276 docs by default; flip to semantic for 5,665-chunk FAISS retrieval.</p>
-      <span class="meta"><span>2 modes · result cards</span><span class="v">→</span></span>
+      <span class="meta"><span><span data-mc="pagesIndexed" data-mc-format="comma">276</span> pages · 2 modes</span><span class="v">→</span></span>
     </a>
 
     <a class="lc" href="ask.html">
@@ -96,7 +151,7 @@
       <span class="code">SURFACE · 05</span>
       <h3>Review</h3>
       <p>Disputed-page queue. Side-by-side source diffs, merged-text proposal, one-click GitHub PR.</p>
-      <span class="meta"><span>3 pending · diff viewer</span><span class="v">→</span></span>
+      <span class="meta"><span><span data-mc="reviewCount">3</span> pending · diff viewer</span><span class="v">→</span></span>
     </a>
 
     <a class="lc" href="media.html">
@@ -159,6 +214,111 @@
 </main>
 
 <script src="data.js"></script>
+
+<script>
+  // ── Freshness banner — live build-time + revalidation pulse + "what's new" delta
+  (function () {
+    if (typeof MC === 'undefined' || !MC.ready) return;
+
+    function humanAgo(ms) {
+      if (!isFinite(ms) || ms < 0) return 'just now';
+      var s = Math.floor(ms / 1000);
+      if (s < 45)         return 'just now';
+      var m = Math.floor(s / 60);
+      if (m < 60)         return m + 'm ago';
+      var h = Math.floor(m / 60);
+      if (h < 24)         return h + 'h ago';
+      var d = Math.floor(h / 24);
+      if (d < 30)         return d + 'd ago';
+      var mo = Math.floor(d / 30);
+      if (mo < 12)        return mo + 'mo ago';
+      return Math.floor(mo / 12) + 'y ago';
+    }
+
+    function pickBuildTs() {
+      var statsTs = MC.get('stats.generatedAt', null);
+      var feedTs  = MC.get('feed.generatedAt', null);
+      var sa = statsTs ? Date.parse(statsTs) : NaN;
+      var fa = feedTs  ? Date.parse(feedTs)  : NaN;
+      var picked = NaN;
+      if (isFinite(sa) && isFinite(fa)) picked = Math.max(sa, fa);
+      else if (isFinite(sa))            picked = sa;
+      else if (isFinite(fa))            picked = fa;
+      return picked;
+    }
+
+    var SS_EVENTS = 'mc.lastSeen.eventCount';
+    var SS_PAGES  = 'mc.lastSeen.pagesIndexed';
+
+    function readSS(key) {
+      try { var v = sessionStorage.getItem(key); return v == null ? null : Number(v); }
+      catch (e) { return null; }
+    }
+    function writeSS(key, v) {
+      try { sessionStorage.setItem(key, String(v)); } catch (e) {}
+    }
+
+    var banner    = document.getElementById('freshness');
+    var dot       = document.getElementById('pulseDot');
+    var elAgo     = document.getElementById('freshAgo');
+    var elEvents  = document.getElementById('freshEvents');
+    var elPages   = document.getElementById('freshPages');
+    var elDelta   = document.getElementById('freshDelta');
+    if (!banner) return;
+
+    var deltaShown = false; // freeze the "since last visit" message on the first paint
+    var prevEvents = readSS(SS_EVENTS);
+    var prevPages  = readSS(SS_PAGES);
+
+    function render(reason) {
+      var d = MC.derive || {};
+      var ts = pickBuildTs();
+      var ago = isFinite(ts) ? humanAgo(Date.now() - ts) : '—';
+      var events = (typeof d.eventCount === 'number') ? d.eventCount : null;
+      var pages  = (typeof d.pagesIndexed === 'number') ? d.pagesIndexed : null;
+
+      elAgo.textContent    = ago;
+      elEvents.textContent = events == null ? '—' : events.toLocaleString();
+      elPages.textContent  = pages  == null ? '—' : pages.toLocaleString();
+
+      if (!deltaShown) {
+        var parts = [];
+        if (events != null && prevEvents != null && events > prevEvents)
+          parts.push('+ ' + (events - prevEvents) + ' new events');
+        if (pages  != null && prevPages  != null && pages  > prevPages)
+          parts.push('+ ' + (pages  - prevPages)  + ' new pages');
+        if (parts.length) {
+          elDelta.textContent = parts.join(' / ') + ' since last visit';
+          elDelta.hidden = false;
+        } else {
+          elDelta.hidden = true;
+        }
+        deltaShown = true;
+      }
+
+      // Persist current as last-seen for the next visit
+      if (events != null) writeSS(SS_EVENTS, events);
+      if (pages  != null) writeSS(SS_PAGES,  pages);
+
+      banner.hidden = false;
+
+      // Trigger the pulse on every update
+      if (dot && reason !== 'tick') {
+        dot.classList.remove('pulse');
+        // force reflow so the animation restarts on repeated updates
+        void dot.offsetWidth;
+        dot.classList.add('pulse');
+      }
+    }
+
+    MC.ready().then(function () {
+      render('ready');
+      MC.onUpdate(function () { render('update'); });
+      // Keep the "X ago" label honest without re-pulsing
+      setInterval(function () { render('tick'); }, 60 * 1000);
+    });
+  })();
+</script>
 
 <script src="chrome.js" defer></script>
 </body>

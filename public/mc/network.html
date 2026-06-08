@@ -48,6 +48,15 @@
     .nw-key { display: flex; flex-direction: column; gap: 8px; }
     .nw-key .k { display: flex; align-items: center; gap: 9px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.10em; text-transform: uppercase; }
     .nw-key .k .d { width: 10px; height: 10px; border-radius: 50%; }
+    .nw-key .k .hex { color: var(--text-4); font-size: 9px; letter-spacing: 0.12em; margin-left: auto; }
+
+    .nw-toggle { display: inline-flex; gap: 0; margin: 6px 0 10px; border: 1px solid var(--border); background: var(--surface-2); }
+    .nw-toggle .opt { padding: 5px 9px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: var(--text-3); cursor: pointer; text-transform: uppercase; user-select: none; }
+    .nw-toggle .opt.on { color: var(--amber); background: rgba(242,166,35,0.10); }
+    .nw-toggle .lbl { padding: 5px 8px 5px 10px; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--text-4); text-transform: uppercase; }
+
+    .nw-export { display: block; width: 100%; margin-top: 14px; padding: 9px 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; cursor: pointer; text-transform: uppercase; text-align: center; }
+    .nw-export:hover { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
 
     .nw-detail { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); }
     .nw-detail h4 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: var(--text); margin: 0 0 6px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
@@ -84,11 +93,22 @@
         <div id="nw-entity-kinds" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
 
+      <div class="nw-toggle" id="edge-style-toggle">
+        <span class="lbl">EDGE STYLE ·</span>
+        <span class="opt on" data-style="straight">STRAIGHT</span>
+        <span class="opt" data-style="curved">CURVED</span>
+      </div>
+
       <div class="nw-ctl">
         <div class="row">
           <span class="label">MIN COSINE</span>
           <input type="range" id="ctl-cos" min="0.30" max="0.95" step="0.01" value="0.55">
           <span class="v" id="v-cos">0.55</span>
+        </div>
+        <div class="row">
+          <span class="label">NODE SIZE</span>
+          <input type="range" id="ctl-size" min="0.5" max="2.5" step="0.1" value="1.0">
+          <span class="v" id="v-size">1.0</span>
         </div>
         <div class="row">
           <span class="label">ITERATIONS</span>
@@ -110,6 +130,13 @@
           <div class="k"><span class="d" style="background:var(--text-3)"></span>Other / unclassified</div>
         </div>
       </div>
+
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:10px">ENTITY KINDS</div>
+        <div class="nw-key" id="nw-entity-kinds-legend"></div>
+      </div>
+
+      <button class="nw-export" id="nw-export-btn" type="button">EXPORT GRAPH ▾ SVG</button>
 
       <div id="detail" class="nw-detail" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
         <div style="color:var(--text-4);font-size:10px;letter-spacing:0.18em">HOVER OR CLICK A NODE</div>
@@ -157,6 +184,8 @@
   var modeLbl = document.getElementById('nw-mode-label');
 
   var minCos = 0.55, iters = 240, mode = 'semantic';
+  var nodeSizeMul = 1.0;
+  var edgeStyle = 'straight';
   var pinnedId = null;
 
   function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -354,7 +383,7 @@
       return;
     }
     var out = layout(built.nodes, built.links, iters);
-    // Edges
+    // Edges — straight lines or quadratic-bezier curves depending on edgeStyle.
     var edgeHtml = built.links.map(function(l){
       var a = out.posById[l.a], b = out.posById[l.b];
       if (!a || !b) return '';
@@ -362,13 +391,29 @@
       if (l.kind === 'pattern') cls += ' pattern';
       else if (l.weight >= 0.75) cls += ' strong';
       else if (l.weight < 0.50)  cls += ' weak';
-      return '<line class="' + cls + '" x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1) + '" y2="' + b.y.toFixed(1) + '" data-a="' + esc(l.a) + '" data-b="' + esc(l.b) + '"/>';
+      var d;
+      if (edgeStyle === 'curved'){
+        var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        var dx = b.x - a.x, dy = b.y - a.y;
+        var len = Math.sqrt(dx*dx + dy*dy) || 1;
+        // Perpendicular unit vector × 15% of edge length.
+        var off = len * 0.15;
+        var cx = mx + (-dy / len) * off;
+        var cy = my + ( dx / len) * off;
+        d = 'M ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) +
+            ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' +
+            b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+      } else {
+        d = 'M ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) +
+            ' L ' + b.x.toFixed(1) + ' ' + b.y.toFixed(1);
+      }
+      return '<path class="' + cls + '" d="' + d + '" data-a="' + esc(l.a) + '" data-b="' + esc(l.b) + '"/>';
     }).join('');
     gEdges.innerHTML = edgeHtml;
 
     // Nodes
     var nodeHtml = out.positioned.map(function(n){
-      var size = nodeSize(n, out.posById, built.links);
+      var size = nodeSize(n, out.posById, built.links) * nodeSizeMul;
       var fill = nodeColor(n);
       var lbl  = nodeLabel(n);
       return '<g class="nw-node' + (n.id === pinnedId ? ' pinned' : '') + '" data-id="' + esc(n.id) + '" transform="translate(' + n.x.toFixed(1) + ',' + n.y.toFixed(1) + ')">' +
@@ -393,7 +438,7 @@
   }
 
   function highlightEdges(nodeId){
-    gEdges.querySelectorAll('line').forEach(function(ln){
+    gEdges.querySelectorAll('path').forEach(function(ln){
       if (ln.dataset.a === nodeId || ln.dataset.b === nodeId){
         ln.classList.add('hilite');
       } else {
@@ -402,7 +447,7 @@
     });
   }
   function clearHighlight(){
-    gEdges.querySelectorAll('line.hilite').forEach(function(ln){ ln.classList.remove('hilite'); });
+    gEdges.querySelectorAll('path.hilite').forEach(function(ln){ ln.classList.remove('hilite'); });
   }
 
   function showDetail(nodeId, links){
@@ -490,7 +535,71 @@
   });
   iterInp.addEventListener('change', paint);
 
-  MC.ready().then(function(){ renderEntityKindChips(); paint(); });
+  // Node-size multiplier slider.
+  var sizeInp = document.getElementById('ctl-size');
+  var vSize   = document.getElementById('v-size');
+  if (sizeInp){
+    sizeInp.addEventListener('input', function(){
+      nodeSizeMul = parseFloat(sizeInp.value);
+      if (vSize) vSize.textContent = nodeSizeMul.toFixed(1);
+      paint();
+    });
+  }
+
+  // Edge-style toggle (STRAIGHT / CURVED).
+  var edgeToggle = document.getElementById('edge-style-toggle');
+  if (edgeToggle){
+    edgeToggle.querySelectorAll('.opt').forEach(function(opt){
+      opt.addEventListener('click', function(){
+        edgeToggle.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('on'); });
+        opt.classList.add('on');
+        edgeStyle = opt.dataset.style;
+        paint();
+      });
+    });
+  }
+
+  // Entity-kinds legend (7 swatches with hex codes).
+  function renderEntityKindLegend(){
+    var host = document.getElementById('nw-entity-kinds-legend');
+    if (!host) return;
+    var kindMeta = (MC.derive && MC.derive.entityKinds) || {};
+    host.innerHTML = ENTITY_KINDS.map(function(k){
+      var meta = kindMeta[k] || {};
+      var color = meta.color || '#FFD93D';
+      var label = (meta.label || k).toString().toUpperCase();
+      return '<div class="k">' +
+        '<span class="d" style="background:' + color + '"></span>' +
+        esc(label) +
+        '<span class="hex">' + esc(color.toUpperCase()) + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Export current SVG as a downloadable file.
+  var exportBtn = document.getElementById('nw-export-btn');
+  if (exportBtn){
+    exportBtn.addEventListener('click', function(){
+      var svgEl = document.getElementById('graph');
+      if (!svgEl) return;
+      // Clone so we can inline an xmlns for standalone viewing.
+      var clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      var markup = '<?xml version="1.0" encoding="UTF-8"?>\n' + clone.outerHTML;
+      var blob = new Blob([markup], { type: 'image/svg+xml;charset=utf-8' });
+      var url  = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'network.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    });
+  }
+
+  MC.ready().then(function(){ renderEntityKindChips(); renderEntityKindLegend(); paint(); });
   MC.onUpdate(function(){ if (!gNodes.children.length) paint(); });
 })();
 </script>
