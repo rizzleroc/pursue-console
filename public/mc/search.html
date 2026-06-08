@@ -220,8 +220,16 @@
       trf.env.allowLocalModels = false;
       trf.env.useBrowserCache = true;
       // Self-host of ORT WASM lives at /ort/ (scripts/copy-ort-assets.mjs).
-      // From a /mc/ page, that's "../ort/".
-      trf.env.backends.onnx.wasm.wasmPaths = '../ort/';
+      // Because transformers.js is loaded from esm.sh (cross-origin), the
+      // ORT loader's internal `import.meta.url` resolves to esm.sh — any
+      // relative wasmPaths ("../ort/") it tries gets routed back to esm.sh
+      // and 404s the .mjs glue. Force a fully-qualified URL pointing at
+      // our own deployment instead. For /mc/search.html → strip "/mc/…"
+      // and append "/ort/". Works on rizzleroc.github.io/pursue-console/
+      // and on any local mirror.
+      var ortBase = window.location.origin +
+        window.location.pathname.replace(/\/mc\/[^/]*$/, '/ort/');
+      trf.env.backends.onnx.wasm.wasmPaths = ortBase;
       trf.env.backends.onnx.wasm.numThreads = 1;
       trf.env.backends.onnx.wasm.proxy = false;
       meaningNote.textContent = '∿ Loading model (int8)…';
