@@ -620,3 +620,201 @@ footer.fc {
   0%, 100% { box-shadow: 0 0 14px rgba(74, 222, 128, 0.55), inset 0 0 8px rgba(74, 222, 128, 0.4); }
   50%      { box-shadow: 0 0 22px rgba(74, 222, 128, 0.85), inset 0 0 12px rgba(74, 222, 128, 0.6); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AAA POLISH LAYER — site-wide motion + signature treatments
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Cinematic fade-in for every section above the fold. The first paint
+   feels like a tactical brief opening, not a blank page filling in.
+   Uses CSS-only animation with stagger via CSS custom properties set on
+   each element. Respects prefers-reduced-motion. */
+@keyframes mc-rise-in {
+  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+.mc-rise { animation: mc-rise-in 0.85s cubic-bezier(.16, .8, .2, 1) backwards; }
+.mc-rise[data-delay="1"] { animation-delay: 0.05s; }
+.mc-rise[data-delay="2"] { animation-delay: 0.15s; }
+.mc-rise[data-delay="3"] { animation-delay: 0.30s; }
+.mc-rise[data-delay="4"] { animation-delay: 0.50s; }
+.mc-rise[data-delay="5"] { animation-delay: 0.75s; }
+
+/* Scanline sweep across H1s on first paint — a single bright line wipes
+   right→left, dragging amber glow with it. Subtle but cinematic. */
+.mc-scan { position: relative; overflow: hidden; }
+.mc-scan::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(95deg, transparent 0%, transparent 38%,
+    rgba(255, 214, 107, 0.32) 50%, transparent 62%, transparent 100%);
+  transform: translateX(120%);
+  animation: mc-scan-sweep 1.6s cubic-bezier(.4, 0, .15, 1) 0.4s 1 forwards;
+}
+@keyframes mc-scan-sweep {
+  0%   { transform: translateX(120%); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateX(-120%); opacity: 0; }
+}
+
+/* Soft ambient noise sweep — a slow vertical pan that loops, gives the
+   surface that "live feed" feeling without burning CPU. */
+@keyframes mc-ambient-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(0, -20px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.bg-noise { animation: mc-ambient-drift 28s ease-in-out infinite; }
+
+/* Topbar UTC clock — make the colon blink subtly so it reads "live".
+   Pure CSS — chrome.js already updates the text every second, but the
+   colon itself gets a separate pulse animation via :nth-letter trickery
+   isn't possible, so we wrap with a span injected by chrome.js if we
+   ever want it. For now, light glow on the entire badge. */
+header.topbar .badge { transition: box-shadow .3s ease, color .15s ease; }
+header.topbar .badge:hover { color: var(--amber); }
+header.topbar .badge.amber {
+  box-shadow: 0 0 0 1px rgba(242, 166, 35, 0.20);
+  animation: mc-live-pulse 3.2s ease-in-out infinite;
+}
+@keyframes mc-live-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(242, 166, 35, 0.20),
+                          0 0 12px -2px rgba(242, 166, 35, 0.0); }
+  50%      { box-shadow: 0 0 0 1px rgba(242, 166, 35, 0.45),
+                          0 0 18px -2px rgba(242, 166, 35, 0.55); }
+}
+
+/* Nav tabs — animated amber underline that scales from the center on
+   hover and slides to the active tab. Premium IDE feel. */
+.nav-tab { position: relative; transition: color .15s ease; }
+.nav-tab::after {
+  content: ''; position: absolute;
+  left: 50%; bottom: -6px;
+  width: 0; height: 2px;
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber-glow);
+  transform: translateX(-50%);
+  transition: width .25s cubic-bezier(.4, 0, .2, 1);
+}
+.nav-tab:hover::after { width: calc(100% - 6px); }
+.nav-tab.active::after { width: calc(100% - 6px); }
+
+/* Header filter — focus glow + subtle amber halo */
+.header-filters .hf-input:focus,
+.header-filters .hf-select:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 1px rgba(242, 166, 35, 0.35),
+              0 0 20px -4px rgba(242, 166, 35, 0.55);
+  outline: none;
+}
+
+/* Button micro-polish — every interactive .ghost / .ops-btn gets a
+   subtle "press" affordance + amber-hover glow. */
+.ghost, .ops-btn {
+  transition: transform .12s ease, color .15s ease,
+              border-color .15s ease, box-shadow .15s ease,
+              background .15s ease;
+}
+.ghost:active, .ops-btn:active { transform: translateY(1px); }
+.ops-btn { position: relative; overflow: hidden; }
+.ops-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.16), transparent 35%);
+  opacity: 0; transition: opacity .25s ease;
+  pointer-events: none;
+}
+.ops-btn:hover::before { opacity: 1; }
+
+/* Count-up smoothing — numbers being animated get an explicit width
+   reservation so the layout doesn't jump as digits change. */
+[data-count], [data-mc-count] {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Featured-case card — depth on hover and a slow amber-rim breathing
+   when idle. The whole card lifts; the amber border breathes. */
+.fc-card {
+  transition: transform .25s cubic-bezier(.16, .8, .2, 1),
+              box-shadow .25s cubic-bezier(.16, .8, .2, 1);
+}
+.fc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 48px 100px -32px rgba(242, 166, 35, 0.45),
+              inset 0 0 0 1px rgba(242, 166, 35, 0.20);
+}
+.fc-card::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  border-left: 3px solid transparent;
+  animation: fc-breath 4.8s ease-in-out infinite;
+}
+@keyframes fc-breath {
+  0%, 100% { box-shadow: -3px 0 0 0 var(--amber), -3px 0 18px -2px var(--amber); }
+  50%      { box-shadow: -3px 0 0 0 var(--amber-bright, #FFD66B),
+                         -3px 0 26px -2px var(--amber-bright, #FFD66B); }
+}
+
+/* Sensor frame orbs — gentle drift so the still-image feels alive. */
+@keyframes orb-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+  50%      { transform: translate(-2px, -3px) scale(1.05); opacity: 0.92; }
+}
+@keyframes orb-drift-b {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(2px, 1px); }
+}
+.fc-sensor .orb:nth-child(odd)  { animation: orb-drift-a 6s ease-in-out infinite; }
+.fc-sensor .orb:nth-child(even) { animation: orb-drift-b 8s ease-in-out infinite; }
+.share-sensor .orb:nth-child(odd)  { animation: orb-drift-a 6s ease-in-out infinite; }
+.share-sensor .orb:nth-child(even) { animation: orb-drift-b 8s ease-in-out infinite; }
+
+/* Receipts row — sequential reveal with a slight lift per stat */
+.receipts .r { animation: mc-rise-in 0.7s cubic-bezier(.16, .8, .2, 1) backwards; }
+.receipts .r:nth-child(1) { animation-delay: 0.20s; }
+.receipts .r:nth-child(3) { animation-delay: 0.27s; }
+.receipts .r:nth-child(5) { animation-delay: 0.34s; }
+.receipts .r:nth-child(7) { animation-delay: 0.41s; }
+.receipts .r:nth-child(9) { animation-delay: 0.48s; }
+.receipts .r:nth-child(11) { animation-delay: 0.55s; }
+
+/* Analytical-surfaces tiles — depth + amber accent on hover */
+.as-tile { transform: translateZ(0); will-change: transform; }
+.as-tile:hover {
+  background: linear-gradient(135deg, rgba(242, 166, 35, 0.07), var(--surface) 60%);
+}
+.as-tile:hover .name { color: var(--amber); }
+
+/* Section dividers — subtle horizontal scanline that breaths */
+.section-divider {
+  display: flex; align-items: center; gap: 18px;
+  padding: 32px 56px 24px; position: relative; z-index: 3;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--text-3); letter-spacing: 0.28em; text-transform: uppercase;
+}
+.section-divider .label { color: var(--amber); font-weight: 700; }
+.section-divider .meta { color: var(--text-4); }
+.section-divider .line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--hairline) 50%, transparent 100%);
+  opacity: 0.7;
+}
+
+/* Reduced motion — kill everything that animates. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
+
+/* Topbar UTC clock — colons blink subtly (live tick feel) */
+header.topbar #time-badge .bk {
+  animation: bk-blink 1s steps(2, end) infinite;
+  color: var(--amber);
+  margin: 0 1px;
+}
+@keyframes bk-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0.35; }
+}
