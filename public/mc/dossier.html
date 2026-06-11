@@ -3,6 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>PURSUE Mission Control · Dossier</title>
+  <meta name="description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Dossier — case file">
+  <meta property="og:description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/dossier.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Dossier — case file">
+  <meta name="twitter:description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -168,6 +180,7 @@
     <h1>USPER Statement — orb gained elevation, came within ten feet of [the helicopter].</h1>
     <div class="evd-row" id="ds-evidence"></div>
     <button class="ds-reading-toggle" id="ds-reading-toggle" type="button" title="Strip chrome — long-form reading mode">📖 READING MODE</button>
+    <button class="ds-reading-toggle" id="ds-share-btn" type="button" title="Share this case file" style="margin-left:10px">⎘ SHARE CASE FILE</button>
   </section>
 
   <section class="ds-body">
@@ -297,6 +310,7 @@
 </main>
 
 <script src="data.js"></script>
+<script src="share.js" defer></script>
 
 <script>
 // ── Dossier live-data wiring ──────────────────────────────────────────────
@@ -387,6 +401,27 @@
     if (!rec) return; // keep the static fallback content and bail
     if (eid === lastRenderedEid) return; // no-op on re-fire with same subject
     lastRenderedEid = eid;
+
+    // OG/Twitter Card meta updates — page-specific preview when the URL is
+    // pasted into chat clients that execute JS for OG fetches (Slack, iMessage,
+    // Facebook, Discord). Twitter Cards stay on the static defaults.
+    if (MC.setShareMeta) {
+      var quote = (rec.summary || '').slice(0, 240);
+      MC.setShareMeta({
+        title: rec.title,
+        description: quote + (rec.summary && rec.summary.length > 240 ? '…' : ''),
+        url: window.location.href,
+      });
+    }
+    // Wire the SHARE button to the share.html permalink for THIS event.
+    var shareBtn = document.getElementById('ds-share-btn');
+    if (shareBtn && MC.url && MC.url.share) {
+      shareBtn.onclick = function () {
+        var shareUrl = MC.url.share(eid);
+        var payload = '"' + (rec.summary || rec.title).slice(0, 240) + '"\n\n— ' + (rec.agency || '') + ' · ' + (rec.date || '') + '\n\n' + shareUrl;
+        MC.share({ title: rec.title, text: payload, url: shareUrl }, shareBtn);
+      };
+    }
 
     // 1) Header ------------------------------------------------------------
     var metaRow = document.querySelector(".ds-header .meta-row");
