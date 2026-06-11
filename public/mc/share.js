@@ -38,6 +38,10 @@
     if (m.title) {
       try { document.title = m.title + ' · PURSUE Console'; } catch (e) {}
     }
+    // Auto-resolve og:image from eid if no explicit image was passed.
+    if (m.image == null && m.eid != null && MC.url && MC.url.ogImage) {
+      m.image = MC.url.ogImage(m.eid);
+    }
     Object.keys(META_KEYS).forEach((k) => {
       if (m[k] == null) return;
       const selectors = META_KEYS[k];
@@ -101,6 +105,21 @@
     MC.url.share = function (eid, extra) {
       const base = window.location.origin + window.location.pathname.replace(/\/mc\/.*$/, '/mc/');
       return base + 'share.html?eid=' + encodeURIComponent(eid) + (extra ? '&' + extra : '');
+    };
+    // og:image lookup — points at the pre-rendered per-event card for the
+    // 6 curated events; falls back to og/default.png otherwise. Twitter
+    // Cards only honour the static og:image baked into the HTML at request
+    // time, so this getter is used by the runtime overrider only for the
+    // chat clients that DO execute JS (Slack/iMessage/Discord/Facebook).
+    const CURATED_OG = new Set(['usper-2025', 'DOE-UAP-D001', 'fbi-62hq83894', 'gemini-7', 'apollo-17', 'cometa']);
+    MC.url.ogImage = function (eid) {
+      const origin = window.location.origin;
+      const base = window.location.pathname.replace(/\/mc\/.*$/, '/').replace(/\/[^/]+$/, '/');
+      const safe = (eid || '').replace(/[^a-z0-9_.-]/gi, '_');
+      if (eid && CURATED_OG.has(eid)) {
+        return origin + base + 'og/event-' + safe + '.png';
+      }
+      return origin + base + 'og/default.png';
     };
   }
 
