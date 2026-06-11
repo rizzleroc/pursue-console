@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Console · Shareable case file</title>
+  <meta name="description" content="A shareable single-screen view of any declassified UAP record in the PURSUE corpus.">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="Declassified UAP case file">
+  <meta property="og:description" content="From the PURSUE corpus — 220 events catalogued from the Department of War's UAP release.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Declassified UAP case file">
+  <meta name="twitter:description" content="From the PURSUE corpus — 220 events catalogued from the Department of War's UAP release.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    /* Screenshot-first layout — 1200×630 viewport equivalent, but flexes
+       on real screens so people can also USE this page as a landing. */
+    body.share-mode { background: #0A1018; }
+    .share-frame {
+      max-width: 1200px; margin: 32px auto; padding: 56px;
+      background: linear-gradient(135deg, rgba(20,28,40,0.95), rgba(8,12,20,0.95));
+      border: 1px solid var(--border-strong);
+      position: relative; overflow: hidden;
+      box-shadow: 0 60px 120px -40px rgba(0,0,0,0.75), inset 0 0 0 1px rgba(242,166,35,0.10);
+    }
+    .share-frame::before { content:''; position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(circle at 80% 20%, rgba(242,166,35,0.10), transparent 60%),
+        linear-gradient(rgba(242,166,35,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(242,166,35,0.02) 1px, transparent 1px);
+      background-size: auto, 28px 28px, 28px 28px;
+    }
+    .share-corner { position: absolute; width: 28px; height: 28px; border: 1px solid var(--amber); }
+    .share-corner.tl { top: 14px; left: 14px; border-right: none; border-bottom: none; }
+    .share-corner.tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+    .share-corner.bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
+    .share-corner.br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+
+    .share-classified { position: relative; z-index: 2; font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; letter-spacing: 0.30em; color: var(--amber); margin-bottom: 28px;
+      display: flex; justify-content: space-between; align-items: baseline; text-transform: uppercase; }
+    .share-classified .dot { display: inline-block; width: 8px; height: 8px; background: var(--amber);
+      box-shadow: 0 0 10px var(--amber-glow); margin-right: 10px; transform: rotate(45deg); }
+
+    .share-body { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0,1.45fr) 1fr; gap: 40px; }
+    .share-left { display: flex; flex-direction: column; gap: 22px; }
+
+    .share-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.32em;
+      color: var(--text-3); text-transform: uppercase; display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+    .share-eyebrow .id { color: var(--cyan); font-weight: 700; }
+    .share-eyebrow .agency { color: var(--amber); }
+    .share-eyebrow .anchor { padding: 2px 8px; border: 1px solid var(--rose); color: var(--rose);
+      background: rgba(224,73,104,0.10); font-size: 9px; letter-spacing: 0.24em; font-weight: 700; }
+    .share-eyebrow .critical { padding: 2px 8px; border: 1px solid #FFB07A; color: #FFB07A;
+      background: rgba(255,138,46,0.10); font-size: 9px; letter-spacing: 0.24em; font-weight: 700; }
+
+    .share-h1 { font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700;
+      line-height: 1.05; color: var(--text); letter-spacing: -0.03em; margin: 0; }
+
+    .share-quote { font-family: 'Inter', sans-serif; font-style: italic; font-size: 19px;
+      line-height: 1.65; color: var(--text-2); margin: 0; padding-left: 22px;
+      border-left: 3px solid var(--amber); }
+
+    .share-attribution { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: var(--text-3); letter-spacing: 0.16em; text-transform: uppercase; margin: 0; }
+
+    .share-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding-top: 24px; margin-top: auto; border-top: 1px solid var(--hairline); }
+    .share-brand { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.24em;
+      color: var(--amber); text-transform: uppercase; font-weight: 700; }
+    .share-brand .v { color: var(--text-3); font-weight: 500; }
+    .share-url { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3);
+      letter-spacing: 0.10em; text-decoration: none; }
+    .share-url:hover { color: var(--amber); }
+
+    /* Right side — sensor frame */
+    .share-sensor { position: relative; background: #050a12; border: 1px solid var(--border-strong);
+      min-height: 360px; overflow: hidden; }
+    .share-sensor::before { content:''; position:absolute; inset:0;
+      background-image: radial-gradient(circle at 50% 46%, rgba(242,166,35,0.10), transparent 60%),
+        repeating-linear-gradient(0deg, rgba(242,166,35,0.06) 0px, rgba(242,166,35,0.06) 1px, transparent 1px, transparent 4px);
+      pointer-events: none; }
+    .share-sensor .sscorner { position: absolute; width: 16px; height: 16px; border: 1px solid rgba(242,166,35,0.55); }
+    .share-sensor .sscorner.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    .share-sensor .sscorner.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+    .share-sensor .sscorner.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+    .share-sensor .sscorner.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+    .share-sensor .hud { position: absolute; top: 16px; left: 18px; font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: rgba(242,166,35,0.85); letter-spacing: 0.18em;
+      display: grid; grid-template-columns: auto 1fr; gap: 4px 18px; }
+    .share-sensor .hud .k { color: rgba(242,166,35,0.55); }
+    .share-sensor .hud .v { color: var(--amber-bright, #FFD66B); font-weight: 700; }
+    .share-sensor .stamp { position: absolute; bottom: 14px; left: 18px; right: 18px;
+      display: flex; justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(242,166,35,0.55); letter-spacing: 0.16em; }
+    .share-sensor svg.reticle { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.6; pointer-events: none; }
+    .share-sensor .orb { position: absolute; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #FFE7A8, #F2A623 50%, rgba(160, 90, 26, 0) 75%);
+      box-shadow: 0 0 28px rgba(242,166,35,0.65); }
+
+    /* CTA tray below the screenshot zone */
+    .share-tray { max-width: 1200px; margin: -8px auto 56px; padding: 24px 56px;
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .share-tray h2 { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.24em;
+      color: var(--text-3); text-transform: uppercase; margin: 0 18px 0 0; }
+    .share-tray button, .share-tray a {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.16em;
+      padding: 12px 18px; cursor: pointer; text-decoration: none;
+      border: 1px solid var(--border-strong); color: var(--text-2); background: var(--surface);
+    }
+    .share-tray button:hover, .share-tray a:hover { color: var(--amber); border-color: var(--amber); }
+    .share-tray .primary { color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold));
+      border-color: var(--amber); box-shadow: 0 14px 32px -10px rgba(242,166,35,0.55); }
+    .share-tray .primary:hover { color: var(--void); }
+
+    /* About strip */
+    .share-about { max-width: 1200px; margin: 0 auto 64px; padding: 0 56px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--text-3);
+      letter-spacing: 0.04em; }
+    .share-about a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
+    .share-about a:hover { color: var(--amber); border-color: var(--amber); }
+
+    @media (max-width: 900px){
+      .share-frame { margin: 14px; padding: 28px; }
+      .share-body { grid-template-columns: 1fr; gap: 22px; }
+      .share-h1 { font-size: 34px; }
+      .share-sensor { min-height: 240px; }
+      .share-tray { padding: 18px 22px; }
+      .share-about { padding: 0 22px; }
+    }
+  </style>
+</head>
+<body class="share-mode" data-view="share">
+
+<main>
+  <article class="share-frame" id="share-frame">
+    <span class="share-corner tl"></span><span class="share-corner tr"></span>
+    <span class="share-corner bl"></span><span class="share-corner br"></span>
+
+    <header class="share-classified">
+      <span><span class="dot"></span>// DECLASSIFIED · WAR.GOV · OPEN-SOURCE MIRROR</span>
+      <span id="share-stamp">PURSUE · MISSION CONTROL · 2026</span>
+    </header>
+
+    <div class="share-body">
+      <div class="share-left">
+        <div class="share-eyebrow">
+          <span class="anchor" id="share-anchor" style="display:none">ANCHOR</span>
+          <span class="critical" id="share-critical" style="display:none">CRITICAL</span>
+          <span class="id" id="share-eid">USPER-2025</span>
+          <span>·</span>
+          <span class="agency" id="share-agency">FBI</span>
+          <span>·</span>
+          <span id="share-date">2025-10</span>
+        </div>
+        <h1 class="share-h1" id="share-title">Senior US Intelligence Official describes orb encounter at helicopter altitude.</h1>
+        <blockquote class="share-quote" id="share-quote">"the orb gained elevation and came within ten feet of [the helicopter] before separating into multiple objects of indeterminate count."</blockquote>
+        <p class="share-attribution" id="share-attribution">— USPER FBI 302 narrative · SECRET//NOFORN · declassified May 2026</p>
+        <footer class="share-footer">
+          <span class="share-brand">PURSUE · <span class="v">220 events / 3,530 pages</span></span>
+          <a class="share-url" id="share-permalink" href="dossier.html?eid=usper-2025">rizzleroc.github.io/pursue-console →</a>
+        </footer>
+      </div>
+
+      <aside class="share-sensor" aria-hidden="true">
+        <span class="sscorner tl"></span><span class="sscorner tr"></span>
+        <span class="sscorner bl"></span><span class="sscorner br"></span>
+        <div class="hud">
+          <span class="k">ALT</span><span class="v" id="share-alt">0824 FT</span>
+          <span class="k">SPD</span><span class="v" id="share-spd">082 KTS</span>
+          <span class="k">HDG</span><span class="v" id="share-hdg">124°</span>
+          <span class="k">IR</span><span class="v">WH</span>
+          <span class="k">RNG</span><span class="v" id="share-rng">0.2 NM</span>
+        </div>
+        <svg class="reticle" viewBox="0 0 400 360" preserveAspectRatio="none">
+          <line x1="200" y1="40" x2="200" y2="320" stroke="rgba(242,166,35,0.45)" stroke-width="0.5" stroke-dasharray="2 6"/>
+          <line x1="40" y1="180" x2="360" y2="180" stroke="rgba(242,166,35,0.45)" stroke-width="0.5" stroke-dasharray="2 6"/>
+          <circle cx="200" cy="180" r="56" fill="none" stroke="rgba(242,166,35,0.5)" stroke-width="0.6"/>
+          <circle cx="200" cy="180" r="110" fill="none" stroke="rgba(242,166,35,0.25)" stroke-width="0.5"/>
+          <line x1="180" y1="180" x2="220" y2="180" stroke="rgba(242,166,35,0.8)" stroke-width="0.8"/>
+          <line x1="200" y1="160" x2="200" y2="200" stroke="rgba(242,166,35,0.8)" stroke-width="0.8"/>
+        </svg>
+        <span class="orb" style="top:34%;left:55%;width:18px;height:18px"></span>
+        <span class="orb" style="top:50%;left:40%;width:7px;height:7px;opacity:0.55"></span>
+        <span class="orb" style="top:62%;left:62%;width:6px;height:6px;opacity:0.45"></span>
+        <div class="stamp">
+          <span>SENSOR · MX-20 EO/IR</span>
+          <span id="share-frame-time">2024-09-17 · 02:13:48Z</span>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  <section class="share-tray">
+    <h2>SHARE</h2>
+    <button class="primary" id="btn-copy-quote" type="button">⎘ COPY QUOTE + LINK</button>
+    <button id="btn-share-native" type="button">↗ SHARE …</button>
+    <button id="btn-copy-link" type="button">⎘ COPY LINK</button>
+    <a id="btn-open-dossier" href="dossier.html">→ READ FULL CASE FILE</a>
+    <a href="index.html">← BACK TO MISSION CONTROL</a>
+  </section>
+
+  <section class="share-about">
+    <p>You're looking at a single record in the <strong style="color:var(--text)">PURSUE Console</strong> archive — a community-run open-source mirror of the U.S. Department of War's UAP document release at <a href="https://www.war.gov/UFO" target="_blank" rel="noopener">war.gov/UFO</a>. The corpus carries 220 events, 3,530 pages of OCR-and-vision-transcribed text, 85 curated entities, and 24 cross-references from primary-source sensor data to theoretical-physics frameworks like the DIA AAWSA superconductor research. Every claim links back to a primary-source document. The site is 100% open source — <a href="https://github.com/rizzleroc/pursue-console" target="_blank" rel="noopener">github.com/rizzleroc/pursue-console</a>.</p>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script src="share.js" defer></script>
+
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  // Mirror of index.html's FEATURED list — keeps the curated quote +
+  // sensor HUD in one place. Future improvement: pull from a static
+  // public/featured.json so authoring lives outside the HTML.
+  var FEATURED = {
+    'usper-2025': {
+      source: 'FBI 302',
+      title: 'Senior US Intelligence Official describes orb encounter at helicopter altitude.',
+      quote: 'the orb gained elevation and came within ten feet of [the helicopter] before separating into multiple objects of indeterminate count.',
+      attribution: '— USPER FBI 302 narrative · SECRET//NOFORN · declassified May 2026',
+      hud: { alt: '0824 FT', spd: '082 KTS', hdg: '124°', rng: '0.2 NM' },
+      frameTime: '2024-09-17 · 02:13:48Z'
+    },
+    'DOE-UAP-D001': {
+      source: 'DOE / Pantex',
+      title: 'Pantex Plant ground-surveillance radar captures anomalous return at a nuclear-weapons assembly site.',
+      quote: 'Enhanced imagery from Sandia National Labs — Pantex Unidentified Object Incident Report, Ground Surveillance Radar Tower ENE.',
+      attribution: '— DOE-UAP-D001 · Department of Energy · Release 02',
+      hud: { alt: '01230 FT', spd: '—', hdg: '—', rng: '—' },
+      frameTime: 'PANTEX · 35.32°N · 101.56°W'
+    },
+    'fbi-62hq83894': {
+      source: 'FBI Vault',
+      title: '21-year FBI investigation into flying discs, with Oak Ridge nuclear-site photo evidence.',
+      quote: 'Flying discs case file 62-HQ-83894 — eighteen sections, including 1947–1950 sightings over Oak Ridge nuclear facility.',
+      attribution: '— FBI 62HQ-83894 · 18 sections · declassified May 2026',
+      hud: { alt: '—', spd: '—', hdg: '—', rng: '—' },
+      frameTime: 'OAK RIDGE · 35.93°N · 84.31°W'
+    },
+    'gemini-7': {
+      source: 'NASA',
+      title: 'Borman & Lovell observe a "bogey" during Gemini VII orbital mission, 1965.',
+      quote: 'GEMINI-7 HERE HOUSTON, HOW DO YOU READ? LOUD AND CLEAR SEVEN, GO AHEAD. (BORMAN) A BOGEY AT TEN O\'CLOCK HIGH.',
+      attribution: '— Gemini VII air-to-ground transcript · NASA · 5 December 1965',
+      hud: { alt: 'ORBIT', spd: '17,500 MPH', hdg: 'PERIGEE', rng: '—' },
+      frameTime: '1965-12-05 · GEMINI VII ORBIT'
+    },
+    'apollo-17': {
+      source: 'NASA',
+      title: 'Apollo 17 astronaut Schmitt reports continuous light-flashes during translunar flight.',
+      quote: 'We had light flashes just about continuously during the whole flight when we were dark adapted. I had one which I thought was a flash on the lunar surface.',
+      attribution: '— Apollo 17 Technical Crew Debriefing · 4 January 1973',
+      hud: { alt: 'TRANSLUNAR', spd: '—', hdg: 'LUNAR INSERTION', rng: '—' },
+      frameTime: '1973-01-04 · APOLLO 17 TLI'
+    }
+  };
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function pickEid(){
+    var q = MC.query && MC.query.eid;
+    if (q && MC.byEid(q)) return q;
+    return 'usper-2025';
+  }
+
+  function render(){
+    var eid = pickEid();
+    var rec = MC.byEid(eid);
+    var f = FEATURED[eid] || null;
+
+    // Fall back to event metadata if the eid isn't in the curated list —
+    // share.html still works for every event, just with the event summary
+    // instead of a hand-curated pull-quote.
+    var title, quote, attribution, hud, source, frameTime;
+    if (f){
+      title       = f.title;
+      quote       = f.quote;
+      attribution = f.attribution;
+      hud         = f.hud;
+      source      = f.source;
+      frameTime   = f.frameTime;
+    } else if (rec){
+      title       = rec.title;
+      quote       = (rec.summary || '').slice(0, 280);
+      attribution = '— ' + (rec.agency || 'Department of War') + ' · ' + (rec.date || 'declassified') + (rec.release ? ' · ' + rec.release : '');
+      hud         = { alt: '—', spd: '—', hdg: '—', rng: '—' };
+      source      = rec.agency || '';
+      frameTime   = rec.id + ' · ' + (rec.date || '');
+    } else {
+      title       = 'Declassified UAP case file';
+      quote       = 'No event metadata found.';
+      attribution = '— PURSUE corpus';
+      hud         = { alt: '—', spd: '—', hdg: '—', rng: '—' };
+      source      = '';
+      frameTime   = '';
+    }
+
+    // Header chips
+    document.getElementById('share-eid').textContent = (rec ? rec.id : eid).toUpperCase();
+    document.getElementById('share-agency').textContent = (rec && rec.agency) || source || '—';
+    document.getElementById('share-date').textContent   = (rec && rec.date) || '—';
+    var anchorPill = document.getElementById('share-anchor');
+    var criticalPill = document.getElementById('share-critical');
+    anchorPill.style.display = (rec && rec.flag === 'anchor') ? '' : 'none';
+    criticalPill.style.display = (rec && rec.priority === 'critical') ? '' : 'none';
+
+    document.getElementById('share-title').textContent = title;
+    document.getElementById('share-quote').textContent = '"' + quote.replace(/^"+|"+$/g, '') + '"';
+    document.getElementById('share-attribution').textContent = attribution;
+    document.getElementById('share-alt').textContent = hud.alt || '—';
+    document.getElementById('share-spd').textContent = hud.spd || '—';
+    document.getElementById('share-hdg').textContent = hud.hdg || '—';
+    document.getElementById('share-rng').textContent = hud.rng || '—';
+    document.getElementById('share-frame-time').textContent = frameTime || '';
+
+    var dossierHref = MC.url.dossier(eid);
+    document.getElementById('share-permalink').href = dossierHref;
+    document.getElementById('btn-open-dossier').href = dossierHref;
+
+    // Update OG tags so links pasted into chat clients show the case-specific preview.
+    if (MC.setShareMeta){
+      MC.setShareMeta({
+        title: title,
+        description: '"' + quote + '" — ' + attribution.replace(/^— /, ''),
+        url: window.location.href,
+      });
+    }
+
+    // ── Action wiring ──
+    var copyQuoteBtn = document.getElementById('btn-copy-quote');
+    var copyLinkBtn  = document.getElementById('btn-copy-link');
+    var shareBtn     = document.getElementById('btn-share-native');
+    var shareUrl     = window.location.href;
+    var quotePayload = '"' + quote + '"\n\n' + attribution + '\n\n' + shareUrl;
+
+    copyQuoteBtn.onclick = function(){ MC.copyToClipboard(quotePayload, copyQuoteBtn); };
+    copyLinkBtn.onclick  = function(){ MC.copyToClipboard(shareUrl, copyLinkBtn); };
+    shareBtn.onclick = function(){
+      MC.share({ title: title, text: '"' + quote + '"\n\n' + attribution, url: shareUrl }, shareBtn);
+    };
+  }
+
+  MC.ready().then(render);
+  MC.onUpdate(function(){ render(); });
+})();
+</script>
+</body>
+</html>
