@@ -412,31 +412,61 @@ nav.tabs::-webkit-scrollbar { display: none; }
   font-size: 10px; color: var(--text-4); letter-spacing: 0.18em;
 }
 
+/* Shared editorial hero — matches the /mc/index.html front page treatment.
+   Every surface lands here for visual consistency: same eyebrow rhythm,
+   same Space Grotesk H1 weight, same amber-gradient emphasis, same
+   JetBrains Mono subtitle voice. Polished up to match the new front-page
+   spec (bigger H1, tighter letter-spacing, slightly more vertical air). */
 .page-title {
-  padding: 64px 56px 32px;
+  padding: 60px 56px 28px;
   position: relative; z-index: 4;
 }
 .page-title .eyebrow {
   display: flex; align-items: center; gap: 18px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; font-weight: 600;
+  font-size: 11px; font-weight: 700;
   color: var(--amber);
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  text-shadow: 0 0 18px rgba(242, 166, 35, 0.25);
 }
-.page-title .eyebrow .div { width: 32px; height: 1px; background: var(--amber); opacity: 0.6; }
+.page-title .eyebrow .div { width: 36px; height: 1px; background: var(--amber); opacity: 0.6; box-shadow: 0 0 6px var(--amber-glow); }
 .page-title h1 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 56px; font-weight: 700;
-  line-height: 1.04;
+  font-size: 72px; font-weight: 700;
+  line-height: 1.02;
   color: var(--text);
-  letter-spacing: -0.028em;
+  letter-spacing: -0.034em;
   margin: 0;
-  max-width: 900px;
+  max-width: 1100px;
 }
-.page-title h1 em { font-style: normal; background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.page-title p.sub { font-size: 17px; line-height: 1.6; color: var(--text-2); max-width: 720px; margin: 20px 0 0; }
+.page-title h1 em {
+  font-style: normal;
+  background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 60px rgba(242, 166, 35, 0.32);
+}
+.page-title p.sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px; line-height: 1.85;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+  max-width: 820px;
+  margin: 22px 0 0;
+}
+.page-title p.sub em {
+  font-style: normal; color: var(--amber); font-weight: 600;
+}
+
+@media (max-width: 900px){
+  .page-title { padding: 40px 22px 22px; }
+  .page-title h1 { font-size: 44px; }
+  .page-title p.sub { font-size: 12.5px; }
+}
+@media (max-width: 480px){
+  .page-title h1 { font-size: 34px; }
+}
 
 /* Panel base */
 .panel {
