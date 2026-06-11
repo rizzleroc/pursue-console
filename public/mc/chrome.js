@@ -41,6 +41,13 @@
     const pad = n => String(n).padStart(2, '0');
     return `${d.getUTCFullYear()}·${pad(d.getUTCMonth() + 1)}·${pad(d.getUTCDate())}  ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`;
   }
+  // HTML version with blinking colons in the time portion — used for the
+  // live topbar clock so the seconds tick feels alive. Each ":" becomes
+  // <span class="bk">:</span>, animated via styles.css.
+  function stampHTML() {
+    return stamp().replace(/(\d{2}):(\d{2}):(\d{2})/, (m, h, mn, s) =>
+      `${h}<span class="bk">:</span>${mn}<span class="bk">:</span>${s}`);
+  }
 
   // Background overlays (fixed-position, order doesn't matter)
   document.body.append(
@@ -76,7 +83,7 @@
     ]),
     el('div', { class: 'center-strip' }, [
       el('span', { class: 'badge' }, [el('span', { class: 'dot' }), el('span', { 'data-i18n': 'chrome.operational', 'data-i18n-default': 'OPERATIONAL' }, ['OPERATIONAL'])]),
-      el('span', { class: 'badge', id: 'time-badge' }, [el('span', { class: 'v' }, [stamp()])]),
+      el('span', { class: 'badge', id: 'time-badge' }, [el('span', { class: 'v', html: stampHTML() })]),
       el('span', { class: 'badge amber' }, [el('span', { class: 'dot' }), el('span', { 'data-i18n': 'chrome.live_watch', 'data-i18n-default': 'LIVE WATCH' }, ['LIVE WATCH'])]),
     ]),
     el('div', { class: 'topbar-actions' }, [
@@ -159,10 +166,22 @@
   main.parentNode.appendChild(footer);
   main.parentNode.appendChild(classifiedBot);
 
+  // Load the AAA polish runtime — count-up, scroll-reveal, ops ripple,
+  // tactical chime on revalidation. Single shared script that runs on
+  // every MC page via chrome.js so individual pages don't need a tag.
+  (function loadFx() {
+    const here = document.currentScript && document.currentScript.src;
+    const base = here ? here.replace(/chrome\.js.*$/, '') : '';
+    const s = document.createElement('script');
+    s.src = base + 'mc-fx.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  })();
+
   // Live UTC tick
   setInterval(() => {
     const t = document.querySelector('#time-badge .v');
-    if (t) t.textContent = stamp();
+    if (t) t.innerHTML = stampHTML();
   }, 1000);
 
   // Count-up helper. Targets come from the static data-count attribute by
