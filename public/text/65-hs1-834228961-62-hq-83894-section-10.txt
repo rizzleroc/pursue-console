@@ -5,7 +5,7 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 182 pages
+Source extraction: VISION · 184 pages
 
 ---
 
@@ -2676,6 +2676,11 @@ F B I
 DEC 22 5 26 PM '66
 
 [The remainder of the page is blank.]
+
+
+=== Page 48 (vision) ===
+
+(blank)
 
 
 === Page 49 (vision) ===
@@ -6310,6 +6315,11 @@ WFMC RADIO                                  RURAL ROUTE 4
 W. VIRGINIA                                 WATERLOO, ILLINOIS
 
                                             62248
+
+
+=== Page 120 (vision) ===
+
+62-83894-466
 
 
 === Page 121 (vision) ===

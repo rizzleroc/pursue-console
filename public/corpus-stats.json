@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T23:41:31.404Z",
+  "generatedAt": "2026-06-12T17:04:40.623Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -7,8 +7,8 @@
       "published": "2026-05-08",
       "status": "mirrored",
       "inventoryTotal": 162,
-      "catalogued": 121,
-      "uncatalogued": 41,
+      "catalogued": 128,
+      "uncatalogued": 34,
       "files": {
         "total": 162,
         "pdf": 120,
@@ -22,8 +22,8 @@
       "published": "2026-05-22",
       "status": "partial-mirror",
       "inventoryTotal": 64,
-      "catalogued": 7,
-      "uncatalogued": 57,
+      "catalogued": 92,
+      "uncatalogued": 0,
       "files": {
         "total": 64,
         "pdf": 6,
@@ -38,28 +38,28 @@
     }
   },
   "inventory": {
-    "total": 162,
-    "enumerated": 123,
-    "placeholders": 34,
-    "pdfs": 123,
+    "total": 244,
+    "enumerated": 154,
+    "placeholders": 0,
+    "pdfs": 148,
     "videos": 0,
-    "images": 0,
+    "images": 6,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 128,
+    "catalogued": 220,
     "withPdfDownloaded": 0,
     "withAnyPages": 71,
     "withVisionPages": 65,
     "fullyVision": 65
   },
   "pages": {
-    "totalKnown": 3475,
+    "totalKnown": 3483,
     "totalIndexed": 3530,
     "vision": 3402,
     "ocrOnly": 81,
     "visualsAnnotated": 0,
-    "totalChars": 7107658
+    "totalChars": 7107664
   },
   "bySource": {
     "gemini": 3370,
@@ -71,8 +71,8 @@
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 452,
-    "gemini": 2950,
+    "gptVision": 453,
+    "gemini": 2949,
     "claude": 0,
     "ocr": 128
   },
@@ -88,19 +88,19 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-05-26T23:41:31.404Z",
+      "ts": "2026-06-12T17:04:40.623Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 4220,
-      "note": "events=128 inventory=162 contributions=80"
+      "duration_ms": 3702,
+      "note": "events=220 inventory=244 contributions=80"
     },
     "recent": [
       {
-        "ts": "2026-05-26T23:41:31.404Z",
+        "ts": "2026-06-12T17:04:40.623Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 4220,
-        "note": "events=128 inventory=162 contributions=80"
+        "duration_ms": 3702,
+        "note": "events=220 inventory=244 contributions=80"
       },
       {
         "ts": "2026-05-25T17:45:13.904Z",
@@ -168,17 +168,17 @@
     ]
   },
   "gap": {
-    "uncataloguedRecords": 34,
-    "cataloguedButNoPages": 57,
+    "uncataloguedRecords": 24,
+    "cataloguedButNoPages": 149,
     "partialOcrNeedsVision": 6
   },
   "review": {
     "pagesNeedingReview": 0,
-    "pagesHighConfidence": 389,
-    "pagesMediumConfidence": 36,
+    "pagesHighConfidence": 392,
+    "pagesMediumConfidence": 46,
     "pagesLowConfidence": 128,
     "topEventsByReviewQueue": [],
-    "reevaluated": 22,
+    "reevaluated": 23,
     "resolvedByPromptStandard": 3,
     "pageIntrinsicDisputes": 0,
     "partialImprovementByReeval": 0
@@ -613,7 +613,7 @@
     },
     "incident-summaries": {
       "pages": 209,
-      "chars": 228780,
+      "chars": 228786,
       "sources": [
         "gemini",
         "gpt-vision",

@@ -5,11 +5,11 @@ Agency: Department of War
 Date: 2025
 Location: Djibouti
 Type: Mission Report + Video
-Source extraction: MIXED · 7 pages
+Source extraction: VISION · 7 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
 1.4(a)
 
@@ -44,7 +44,7 @@ Page 2 of 7
 [The remainder of the page is redacted.]
 
 
-=== Page 6 ===
+=== Page 6 (vision) ===
 
 1.4(a)
 
