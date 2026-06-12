@@ -22,11 +22,22 @@ const buffers = [];
 for (const p of resultPaths) {
   const raw = await readFile(p, "utf8");
   const j = JSON.parse(raw);
-  if (j.status !== "done") {
-    console.error(`job not done for ${p}: status=${j.status}`);
+  // Support both whipgen_job_status format {status,result.value} and
+  // synchronous whipgen_web_eval format {value} (no status wrapper).
+  let valueStr;
+  if (j.status !== undefined) {
+    if (j.status !== "done") {
+      console.error(`job not done for ${p}: status=${j.status}`);
+      process.exit(1);
+    }
+    valueStr = j.result.value;
+  } else if (j.value !== undefined) {
+    valueStr = j.value;
+  } else {
+    console.error(`unrecognised result format for ${p}`);
     process.exit(1);
   }
-  const v = JSON.parse(j.result.value);
+  const v = JSON.parse(valueStr);
   if (!v.ok) {
     console.error(`fetch failed for ${p}: httpStatus=${v.status}`);
     process.exit(1);
