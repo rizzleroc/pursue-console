@@ -1,17 +1,8 @@
 {
   "kind": "photograph",
   "title": "of record player",
-  "description": "Image of record player",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of candelabrum"
-    },
-    {
-      "kind": "photograph",
-      "title": "of night stand"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.489Z"
+  "description": "“Simplest, surest automatic record changer... “Victrola”45”\n“Complete phonograph AC ‘Golden Throat’ tone system.”\n“Model 45EY2, $34.95 (suggested list price)”\n“Plays up to 14 records at one loading”\n“The only record and changer designed for each other”\n“Records change from the center—the modern way”\n“Includes $6 worth of RCA Victor albums at no extra charge.”\n“Other ‘Victrola’ 45 record changers as low as $16.75.”\n“Only RCA Victor makes the ‘Victrola’”\n“Tmks. © Division of Radio Corporation of America”\n“page 67, 68”\n“FROM the beginning, the officers in charge of Project Saucer recognized a peculiar difficulty in their assignment. ‘If you look out the window and see something, how can I prove or disprove what it was if I didn’t see it and you can’t tell me much about what you”\n“saw?’ Major [illegible], who was then the chief intelligence officer between Wright Field and the [illegible]ing command in Washington, said to me one day shortly after Project Saucer had presumably become a thing of the past.”\n“Then, there are more than five hundred outfits of one kind or another that release balloons from time to time. These range from simple weather balloons, no larger than”\n“it had behaved like a normal aircraft in the way it disappeared over the line of sight.”",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.685Z",
+  "contributor": "Rizzleroc"
 }
