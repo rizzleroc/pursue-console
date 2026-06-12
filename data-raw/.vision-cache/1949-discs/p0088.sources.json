@@ -27,11 +27,11 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.435Z",
+    "computed_at": "2026-06-12T18:43:56.308Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.149,
+    "agreement_score": 0.159,
     "pairs": [
       {
         "a": "gpt-vision",
@@ -41,12 +41,12 @@
       {
         "a": "gpt-vision",
         "b": "merged",
-        "score": 0.149
+        "score": 0.159
       },
       {
         "a": "gemini",
         "b": "merged",
-        "score": 0.667
+        "score": 0.673
       }
     ],
     "confidence": "high",
@@ -65,17 +65,6 @@
         "gpt-vision (v2)"
       ]
     },
-    "dispute_kind": "judged",
-    "reevaluation": {
-      "providers": {
-        "gpt-vision": {
-          "text_file": "p0088.gpt-vision.v2.txt",
-          "chars": 533,
-          "imported_at": "2026-05-26T21:46:41.380Z",
-          "contributor": "Rizzleroc",
-          "via": "volunteer-review"
-        }
-      }
-    }
+    "dispute_kind": "judged"
   }
 }

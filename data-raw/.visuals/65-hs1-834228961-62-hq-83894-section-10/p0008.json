@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of UFO",
-  "description": "Image of UFO",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of UFO over trees"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.160Z"
+  "description": "62-83894-448\n62-83894-448\nFLYING\nSAUCERS\nINTERNATIONAL\nOfficial Journal of the\nAmalgamated Flying Saucer Clubs of America, Inc.\nSPECIAL AFSCA THIRD NATIONAL FLYING SAUCER CONVENTION ISSUE\nISSUE NO. 24\nJULY, 1966\n50c",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.158Z",
+  "contributor": "Rizzleroc"
 }

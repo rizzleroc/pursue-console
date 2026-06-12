@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "Surveillance-style scene with reticle",
-  "description": "Grainy grayscale image with a central measurement reticle, timestamp, redactions, and indistinct terrain or surface features.",
-  "classifiedAt": "2026-05-20T09:12:23.027Z",
-  "classifier": "chatgpt",
-  "promptSha": "7de22f386e66"
+  "description": "[illegible]\n\"15 10 5 5 10 15\"\n[illegible]\n\"12/31/99 18:11:19\"",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.199Z",
+  "contributor": "Rizzleroc"
 }

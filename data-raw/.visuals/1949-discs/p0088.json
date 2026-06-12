@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "A meteorological weather map of Japan and surrounding regions, featuring isobars",
-  "description": "Image: A meteorological weather map of Japan and surrounding regions, featuring isobars, weather station data points, and handwritten annotations including green shading and lines.",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.142Z"
+  "description": "Incl 4³\nFUKUSHIMA\nNAGANO\nTAKAYAMA\nSUWA\nIIDA\nGIFU\nLEGEND\n● - OBSERVING STATION\n— - PROBABLE PATH OF PHENOMENON\nX - PROBABLE AREA OF EXPLOSION OR\nDISAPPEARANCE\nIncl 5³\n250600Z\nIncl 6³\n251200Z",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T06:43:07.937Z",
+  "contributor": "Rizzleroc"
 }

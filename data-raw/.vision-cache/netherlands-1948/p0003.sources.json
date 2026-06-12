@@ -16,7 +16,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:27.068Z",
+    "computed_at": "2026-06-12T18:43:58.070Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
@@ -42,15 +42,15 @@
         }
       }
     },
-    "reeval_agreement": 0.968,
+    "reeval_agreement": 0.964,
     "reeval_pairs": [
       {
         "a": "gemini",
         "b": "gpt-vision",
-        "score": 0.968
+        "score": 0.964
       }
     ],
-    "reeval_delta": 0.936,
+    "reeval_delta": 0.932,
     "dispute_kind": "prompt-variance"
   }
 }

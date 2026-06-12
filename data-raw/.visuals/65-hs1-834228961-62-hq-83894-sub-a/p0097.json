@@ -1,21 +1,8 @@
 {
   "kind": "photograph",
   "title": "A newspaper clipping containing three photographs",
-  "description": "Image: A newspaper clipping containing three photographs",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of two uniformed men inspecting a vehicle or object under a structure"
-    },
-    {
-      "kind": "photograph",
-      "title": "of a damaged, spherical object with visible markings \"NX89...\""
-    },
-    {
-      "kind": "photograph",
-      "title": "of a uniformed person examining an instrument panel or dashboard"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.776Z"
+  "description": "Missing Inventor Hunted\nfor Clue to ‘Saucers’\nBy United Press\nAir Force investigators—skeptical but intrigued\n—are trying today to locate an eccentric inventor\nwho more than 10 years ago built two contraptions\nthat look like “flying saucers.”\nThe disc-type ships, battered and damaged, were\nfound yesterday in an abandoned barn near Glen\nBurnie, Md., where they had lain untended for nine\nyears.\n“It is apparent that both ships would give the appear-\nance of flying discs,” an Air Force spokesman said.\nNO REAL PROOF\nAn Air Force officer last night described the two craft\nas “definite prototypes of flying saucers,” but the service\nhedged today.\nA spokesman objected to the word “prototype,” saying\nthe Air Force has only reports of what flying saucers\nlook like and has never established that such things ac-\ntually were seen.\nThe Maryland inventor, Jonathan E. Caldwell, disap-\npeared in 1940. The only possibility of any connection\nbetween his old abandoned devices and the rumored “fly-\ning saucers” of recent years would lie in the possibility\nthat he went to some other part of the country, devel-\noped better models and flew them successfully.\nFor two years Air Force investigators have been run-\nning down clues from coast to coast on reports of flying\nsaucers. The Air Force in the main has taken a skeptical\nattitude toward the reports. Its last official report said\nit just didn’t have conclusive evidence that they either\ndid or didn’t exist.\nONE TESTED HERE\nOne of the craft found in th",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.763Z",
+  "contributor": "Rizzleroc"
 }

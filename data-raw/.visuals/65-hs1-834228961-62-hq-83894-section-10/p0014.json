@@ -1,21 +1,8 @@
 {
   "kind": "hand-drawing",
   "title": "Cartoon image of a man looking at a flying saucer",
-  "description": "Cartoon image of a man looking at a flying saucer",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "U.F.O. (T) FLASH ACROSS PRE-DAWN SKY. TIME EXPOSURE TAKEN BY MICHIGAN DEPUTY SHE"
-    },
-    {
-      "kind": "photograph",
-      "title": "NEW PLYMOUTH, TUESDAY, MAY 10, 1966. Price Fourpence."
-    },
-    {
-      "kind": "photograph",
-      "title": "BRIAN POLLOCK"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.163Z"
+  "description": "\"[illegible]\"\n\"Wednesday, March 9, 1966\"\n\"THE PITTSBURGH PRESS, MAY 10, 1966\"\n\"Page Eight-A\"",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.168Z",
+  "contributor": "Rizzleroc"
 }
