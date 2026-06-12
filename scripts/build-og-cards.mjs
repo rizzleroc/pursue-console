@@ -7,17 +7,33 @@
 // Twitter Cards crawl the static og:image URL — they don't execute JS.
 // So the per-event cards must be pre-rendered files on disk, not
 // runtime-generated. This script is the pre-render step.
+//
+// Playwright lives in the pursue-vision-mcp/node_modules nested install
+// (not the top-level package's dependencies). Resolve it explicitly so
+// `npm run build` finds it from the repo root.
 
-import { chromium } from 'playwright';
-import { mkdir, copyFile, readdir, unlink } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
-import http from 'node:http';
 import { fileURLToPath } from 'node:url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const _require = createRequire(import.meta.url);
+let chromium;
+for (const candidate of [
+  'playwright',
+  path.resolve(__dirname, '../pursue-vision-mcp/node_modules/playwright'),
+  path.resolve(__dirname, '../node_modules/playwright'),
+]) {
+  try { ({ chromium } = _require(candidate)); break; } catch (e) {}
+}
+if (!chromium) {
+  console.error('[og-cards] playwright not found in any node_modules — skipping. Run `npm i playwright` at the repo root, or hoist from pursue-vision-mcp.');
+  process.exit(0);
+}
+import { mkdir } from 'node:fs/promises';
+import http from 'node:http';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const OUT = path.join(PUBLIC, 'og');

@@ -5,7 +5,7 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 212 pages
+Source extraction: VISION · 214 pages
 
 ---
 
@@ -2045,6 +2045,12 @@ FBI
 U S DEPT OF JUSTICE
 
 
+=== Page 55 (vision) ===
+
+EMPTY
+11/29/64 #(?)
+
+
 === Page 56 (vision) ===
 
 C Form No. 10-513 (Rev 1 Aug 46)
@@ -3350,6 +3356,11 @@ FBI, Laboratory (Encl.)
 Package
 
 -3-
+
+
+=== Page 93 (vision) ===
+
+(blank)
 
 
 === Page 94 (vision) ===
