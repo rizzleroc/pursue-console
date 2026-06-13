@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T18:45:25.278Z",
+  "generatedAt": "2026-06-13T20:23:10.234Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -49,24 +49,24 @@
   "events": {
     "catalogued": 293,
     "withPdfDownloaded": 0,
-    "withAnyPages": 71,
+    "withAnyPages": 75,
     "withVisionPages": 65,
     "fullyVision": 65
   },
   "pages": {
-    "totalKnown": 6964,
-    "totalIndexed": 3530,
+    "totalKnown": 6977,
+    "totalIndexed": 3543,
     "vision": 3402,
-    "ocrOnly": 81,
+    "ocrOnly": 94,
     "visualsAnnotated": 0,
-    "totalChars": 7107664
+    "totalChars": 7135941
   },
   "bySource": {
     "gemini": 3370,
     "claude": 0,
     "gptVision": 470,
     "human": 0,
-    "ocr": 774,
+    "ocr": 787,
     "pagesWithMultipleSources": 438
   },
   "bestSource": {
@@ -74,7 +74,7 @@
     "gptVision": 453,
     "gemini": 2949,
     "claude": 0,
-    "ocr": 128
+    "ocr": 141
   },
   "contributions": {
     "total": 80,
@@ -88,13 +88,20 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-06-12T18:45:25.278Z",
+      "ts": "2026-06-13T20:23:10.234Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 2982,
+      "duration_ms": 2533,
       "note": "events=293 inventory=317 contributions=80"
     },
     "recent": [
+      {
+        "ts": "2026-06-13T20:23:10.234Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2533,
+        "note": "events=293 inventory=317 contributions=80"
+      },
       {
         "ts": "2026-06-12T18:45:25.278Z",
         "kind": "db-rebuild",
@@ -157,20 +164,13 @@
         "outcome": "ok",
         "duration_ms": 1063,
         "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:49:19.244Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1099,
-        "note": "events=121 inventory=173 contributions=54"
       }
     ]
   },
   "gap": {
     "uncataloguedRecords": 24,
-    "cataloguedButNoPages": 222,
-    "partialOcrNeedsVision": 6
+    "cataloguedButNoPages": 218,
+    "partialOcrNeedsVision": 10
   },
   "review": {
     "pagesNeedingReview": 0,
@@ -359,6 +359,15 @@
       "dominantBest": "gemini",
       "needsReview": 0
     },
+    "CIA-UAP-010": {
+      "pages": 2,
+      "chars": 7974,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
     "CIA-UAP-D001": {
       "pages": 3,
       "chars": 3485,
@@ -398,6 +407,33 @@
     "DOW-UAP-D017": {
       "pages": 116,
       "chars": 65509,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOW-UAP-D085": {
+      "pages": 7,
+      "chars": 17725,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOW-UAP-D086": {
+      "pages": 3,
+      "chars": 1807,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "FBI-UAP-D003": {
+      "pages": 1,
+      "chars": 771,
       "sources": [
         "ocr"
       ],

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T18:45:40.831Z",
+  "generatedAt": "2026-06-13T20:23:22.660Z",
   "queue": [
     {
       "eid": "CIA-UAP-003",
@@ -258,6 +258,14 @@
       "priority": 3.4458
     },
     {
+      "eid": "NASA-UAP-D023",
+      "page": 1,
+      "agency": "NASA",
+      "flag": "high",
+      "reason": "no-data",
+      "priority": 3.3756
+    },
+    {
       "eid": "CIA-UAP-016",
       "page": 1,
       "agency": "Central Intelligence Agency",
@@ -266,15 +274,15 @@
       "priority": 3.1724
     },
     {
-      "eid": "army-2026",
+      "eid": "FBI-UAP-PR004",
       "page": 1,
-      "agency": "Department of War",
+      "agency": "FBI",
       "flag": "high",
       "reason": "no-data",
-      "priority": 3
+      "priority": 3.0225
     },
     {
-      "eid": "DOW-UAP-D085",
+      "eid": "army-2026",
       "page": 1,
       "agency": "Department of War",
       "flag": "high",
@@ -314,25 +322,9 @@
       "priority": 3
     },
     {
-      "eid": "FBI-UAP-PR004",
-      "page": 1,
-      "agency": "FBI",
-      "flag": "high",
-      "reason": "no-data",
-      "priority": 3
-    },
-    {
       "eid": "japan-2023",
       "page": 1,
       "agency": "Department of War",
-      "flag": "high",
-      "reason": "no-data",
-      "priority": 3
-    },
-    {
-      "eid": "NASA-UAP-D023",
-      "page": 1,
-      "agency": "NASA",
       "flag": "high",
       "reason": "no-data",
       "priority": 3
@@ -474,12 +466,20 @@
       "priority": 2.267
     },
     {
-      "eid": "CIA-UAP-010",
+      "eid": "FBI-UAP-PR005",
       "page": 1,
-      "agency": "Central Intelligence Agency",
+      "agency": "FBI",
       "flag": "med",
       "reason": "no-data",
-      "priority": 2
+      "priority": 2.015
+    },
+    {
+      "eid": "FBI-UAP-PR006",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2.015
     },
     {
       "eid": "DOW-UAP-D004",
@@ -651,14 +651,6 @@
     },
     {
       "eid": "DOW-UAP-D065",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "DOW-UAP-D086",
       "page": 1,
       "agency": "Department of War",
       "flag": "med",
@@ -1362,22 +1354,6 @@
       "priority": 2
     },
     {
-      "eid": "FBI-UAP-PR005",
-      "page": 1,
-      "agency": "FBI",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "FBI-UAP-PR006",
-      "page": 1,
-      "agency": "FBI",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
       "eid": "NASA-UAP-D005",
       "page": 1,
       "agency": "NASA",
@@ -1739,14 +1715,6 @@
     },
     {
       "eid": "fbi-september-2023-sighting-serial-5",
-      "page": 1,
-      "agency": "FBI",
-      "flag": "low",
-      "reason": "no-data",
-      "priority": 1
-    },
-    {
-      "eid": "FBI-UAP-D003",
       "page": 1,
       "agency": "FBI",
       "flag": "low",
