@@ -522,7 +522,10 @@
     return events.filter(function(e){
       if (f.agency && f.agency !== 'ALL' && (e.agency || '') !== f.agency) return false;
       if (f.era    && f.era    !== 'ALL' && (e.era    || '') !== f.era)    return false;
-      if (f.type   && f.type   !== 'ALL' && (e.type   || '') !== f.type)   return false;
+      // Type is one of the four canonical buckets — bucket the event's
+      // free-form `type` string via MC.recordType so "Sensor Video",
+      // "Mission Report + Video", "Imagery" etc match the right option.
+      if (f.type   && f.type   !== 'ALL' && MC.recordType(e) !== f.type) return false;
       if (f.physics && !(Array.isArray(e.category) && e.category.indexOf('physics-relevant') !== -1)) return false;
       return true;
     });
@@ -547,6 +550,9 @@
     var byAgency = (MC.derive && MC.derive.byAgency) || {};
     var byEra    = (MC.derive && MC.derive.byEra)    || {};
     var typeSet  = {};
+    // (The raw `type` strings number 40+ in the corpus — we use the four
+    // canonical buckets MC.recordType() collapses to so the dropdown matches
+    // the global header filter and stays usable.)
     events.forEach(function(e){ if (e && e.type) typeSet[e.type] = true; });
 
     var selAgency = document.getElementById('filter-agency');
@@ -554,7 +560,7 @@
     var selType   = document.getElementById('filter-type');
     populateFilter(selAgency, Object.keys(byAgency));
     populateFilter(selEra,    Object.keys(byEra));
-    populateFilter(selType,   Object.keys(typeSet));
+    populateFilter(selType,   ['Document', 'Video', 'Image', 'Audio']);
 
     var inp        = document.getElementById('search-q');
     var clearBtn   = document.getElementById('search-clear');

@@ -6,6 +6,7 @@ import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib
 import { highlightQuery } from "../lib/highlightQuery.jsx";
 import useCorpusStats from "../hooks/useCorpusStats.js";
 import { useT } from "../i18n/context.js";
+import { matchesHeaderFilters } from "../App.jsx";
 
 // Fallback inventory total — only used if public/corpus-stats.json hasn't
 // loaded yet (or 404s on dev). The real number comes from the corpus DB
@@ -340,7 +341,14 @@ export default function SemanticSearchView({ onSelect, headerFilters }) {
       }
       // Filter: hide groups whose best final score is below the WEAK floor.
       // (the UI still has a toggle to surface them when the user wants noise.)
-      const allGroups = Array.from(groups.values()).sort((a, b) => b.best - a.best);
+      let allGroups = Array.from(groups.values()).sort((a, b) => b.best - a.best);
+      // RecordFilterBar header filters — agency / release / type. Drop
+      // official-event groups whose event doesn't match. Dropped-corpus
+      // groups carry no event metadata, so leave them alone.
+      allGroups = allGroups.filter(g => {
+        if (g.kind !== "official") return true;
+        return matchesHeaderFilters(g.event, headerFilters);
+      });
       setResults({
         grouped: allGroups,
         elapsedMs,

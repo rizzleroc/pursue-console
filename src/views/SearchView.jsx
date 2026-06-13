@@ -3,6 +3,7 @@ import MiniSearch from "minisearch";
 import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { useT } from "../i18n/context.js";
+import { matchesHeaderFilters } from "../App.jsx";
 
 const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 
@@ -85,6 +86,7 @@ export default function SearchView({ onSelect, headerFilters }) {
     if (!mini || !query.trim()) return null;
     const raw = mini.search(query, { combineWith: "AND" });
     let filtered = raw;
+    // In-view per-result agency/era pills (kept for the existing UX)
     if (agencyFilter) filtered = filtered.filter(r => r.agency === agencyFilter);
     if (eraFilter) {
       filtered = filtered.filter(r => {
@@ -92,8 +94,15 @@ export default function SearchView({ onSelect, headerFilters }) {
         return ev?.era === eraFilter;
       });
     }
+    // RecordFilterBar header filters — agency / release / type. Drop
+    // hits whose owning event doesn't match the header selection so a
+    // user filtering by R03 + NASA actually sees just R03 NASA hits.
+    filtered = filtered.filter(r => {
+      const ev = eventById[r.eventId];
+      return matchesHeaderFilters(ev, headerFilters);
+    });
     return filtered.slice(0, 200);
-  }, [mini, query, agencyFilter, eraFilter]);
+  }, [mini, query, agencyFilter, eraFilter, headerFilters?.filterAgency, headerFilters?.filterRelease, headerFilters?.filterType]);
 
   // Group hits by event for cleaner display
   const grouped = useMemo(() => {
