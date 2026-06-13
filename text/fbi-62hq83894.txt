@@ -5,7 +5,7 @@ Agency: FBI
 Date: 1947-06
 Location: United States (multi-site)
 Type: Document Collection
-Source extraction: MIXED · 185 pages
+Source extraction: VISION · 185 pages
 
 ---
 
@@ -3106,10 +3106,9 @@ SIDE VIEW                                                                    62-
 This page contains only an image of a circular mechanical object.
 
 
-=== Page 91 ===
+=== Page 91 (vision) ===
 
 BOTTOM VIEW
-je.
 
 
 === Page 92 (vision) ===
@@ -4050,12 +4049,23 @@ EX-67
 3 AUG 26 1947 252
 
 
-=== Page 120 ===
+=== Page 120 (vision) ===
 
-RECEIVE,
-C1593 py
-INTERNA, SECuR
-£5
+(?)
+(?)
+(?)
+(?)                                      RECEIVED
+(?)                                      AUG. 15 9 31 AM '49
+(?)                                      INTERNAL SECURITY
+(?)                                      F.B.I.
+(?)                                      DEPT. OF JUST.
+(?)
+(?)
+(?)
+(?)
+RECEIVED INTELLIGENCE UNIT
+AUG. 14 6 39 PM '47
+(?)
 
 
 === Page 121 (vision) ===

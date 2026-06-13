@@ -1,31 +1,5 @@
 {
-  "generatedAt": "2026-05-24T02:15:15.139Z",
-  "total": 1,
-  "queue": [
-    {
-      "eventId": "fbi-photos-2025",
-      "title": "FBI 2025 Photo Series — A1–A8 + B1–B24 (32 stills)",
-      "agency": "FBI",
-      "page": 1,
-      "agreement": 0.087,
-      "confidence": "low",
-      "sources": {
-        "gemini": {
-          "chars": 343
-        },
-        "gpt-vision": {
-          "chars": 119
-        }
-      },
-      "pairs": [
-        {
-          "a": "gemini",
-          "b": "gpt-vision",
-          "score": 0.087
-        }
-      ],
-      "againstHuman": null,
-      "textUrl": "review-text/fbi-photos-2025/1.json"
-    }
-  ]
+  "generatedAt": "2026-06-13T20:29:53.362Z",
+  "total": 0,
+  "queue": []
 }

@@ -1,69 +1,154 @@
 {
-  "generatedAt": "2026-05-24T02:15:11.368Z",
+  "generatedAt": "2026-06-13T20:29:50.928Z",
   "pressReleaseClaim": 162,
+  "byRelease": {
+    "Release 01": {
+      "id": "release-01",
+      "published": "2026-05-08",
+      "status": "mirrored",
+      "inventoryTotal": 162,
+      "catalogued": 128,
+      "uncatalogued": 34,
+      "files": {
+        "total": 162,
+        "pdf": 120,
+        "video": 28,
+        "image": 14
+      },
+      "mirrored": null
+    },
+    "Release 02": {
+      "id": "release-02",
+      "published": "2026-05-22",
+      "status": "partial-mirror",
+      "inventoryTotal": 64,
+      "catalogued": 92,
+      "uncatalogued": 0,
+      "files": {
+        "total": 64,
+        "pdf": 6,
+        "audio": 7,
+        "video": 51
+      },
+      "mirrored": {
+        "pdf": 6,
+        "audio": 0,
+        "video": 0
+      }
+    }
+  },
   "inventory": {
-    "total": 162,
-    "enumerated": 123,
-    "placeholders": 34,
-    "pdfs": 123,
+    "total": 317,
+    "enumerated": 217,
+    "placeholders": 0,
+    "pdfs": 201,
     "videos": 0,
-    "images": 0,
+    "images": 16,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 128,
+    "catalogued": 293,
     "withPdfDownloaded": 0,
-    "withAnyPages": 65,
+    "withAnyPages": 75,
     "withVisionPages": 65,
-    "fullyVision": 63
+    "fullyVision": 65
   },
   "pages": {
-    "totalKnown": 3394,
-    "totalIndexed": 3394,
-    "vision": 3390,
-    "ocrOnly": 4,
+    "totalKnown": 3496,
+    "totalIndexed": 3543,
+    "vision": 3402,
+    "ocrOnly": 94,
     "visualsAnnotated": 0,
-    "totalChars": 7028845
+    "totalChars": 7135941
   },
   "bySource": {
     "gemini": 3370,
     "claude": 0,
-    "gptVision": 446,
+    "gptVision": 470,
     "human": 0,
-    "ocr": 693,
-    "pagesWithMultipleSources": 426
+    "ocr": 787,
+    "pagesWithMultipleSources": 438
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 437,
-    "gemini": 2953,
+    "gptVision": 453,
+    "gemini": 2949,
     "claude": 0,
-    "ocr": 4
+    "ocr": 141
   },
   "contributions": {
-    "total": 55,
+    "total": 80,
     "contributors": [
       {
         "handle": "Rizzleroc",
-        "pages": 55,
-        "chars": 53955
+        "pages": 80,
+        "chars": 80889
       }
     ]
   },
   "runs": {
     "last": {
-      "ts": "2026-05-24T02:15:11.368Z",
+      "ts": "2026-06-13T20:29:50.928Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 3442,
-      "note": "events=128 inventory=162 contributions=55"
+      "duration_ms": 1723,
+      "note": "events=293 inventory=317 contributions=80"
     },
     "recent": [
       {
-        "ts": "2026-05-24T02:15:11.368Z",
+        "ts": "2026-06-13T20:29:50.928Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 3442,
+        "duration_ms": 1723,
+        "note": "events=293 inventory=317 contributions=80"
+      },
+      {
+        "ts": "2026-06-13T20:23:10.234Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2533,
+        "note": "events=293 inventory=317 contributions=80"
+      },
+      {
+        "ts": "2026-06-12T18:45:25.278Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2982,
+        "note": "events=293 inventory=317 contributions=80"
+      },
+      {
+        "ts": "2026-05-25T17:45:13.904Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2470,
+        "note": "events=128 inventory=162 contributions=55"
+      },
+      {
+        "ts": "2026-05-25T17:14:27.541Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2467,
+        "note": "events=128 inventory=162 contributions=55"
+      },
+      {
+        "ts": "2026-05-25T17:10:31.657Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 4760,
+        "note": "events=128 inventory=162 contributions=55"
+      },
+      {
+        "ts": "2026-05-24T16:28:00.783Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 2564,
+        "note": "events=128 inventory=162 contributions=55"
+      },
+      {
+        "ts": "2026-05-24T15:27:09.234Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 4197,
         "note": "events=128 inventory=162 contributions=55"
       },
       {
@@ -79,75 +164,21 @@
         "outcome": "ok",
         "duration_ms": 947,
         "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:50:25.393Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1063,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:49:19.244Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1099,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:47:26.197Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1141,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:25:57.384Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 2163,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:10:49.594Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1123,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T11:08:39.831Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 1079,
-        "note": "events=121 inventory=173 contributions=54"
-      },
-      {
-        "ts": "2026-05-20T10:59:27.987Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 2201,
-        "note": "events=121 inventory=173 contributions=54"
       }
     ]
   },
   "gap": {
-    "uncataloguedRecords": 34,
-    "cataloguedButNoPages": 63,
-    "partialOcrNeedsVision": 2
+    "uncataloguedRecords": 24,
+    "cataloguedButNoPages": 218,
+    "partialOcrNeedsVision": 10
   },
   "review": {
-    "pagesNeedingReview": 1,
-    "pagesHighConfidence": 389,
-    "pagesMediumConfidence": 36,
-    "pagesLowConfidence": 1,
-    "topEventsByReviewQueue": [
-      {
-        "event_id": "fbi-photos-2025",
-        "n": 1
-      }
-    ],
-    "reevaluated": 22,
+    "pagesNeedingReview": 0,
+    "pagesHighConfidence": 392,
+    "pagesMediumConfidence": 46,
+    "pagesLowConfidence": 128,
+    "topEventsByReviewQueue": [],
+    "reevaluated": 23,
     "resolvedByPromptStandard": 3,
     "pageIntrinsicDisputes": 0,
     "partialImprovementByReeval": 0
@@ -166,8 +197,8 @@
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-10": {
-      "pages": 182,
-      "chars": 704374,
+      "pages": 184,
+      "chars": 704393,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -186,8 +217,8 @@
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-3": {
-      "pages": 189,
-      "chars": 310687,
+      "pages": 190,
+      "chars": 310694,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -196,10 +227,11 @@
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-4": {
-      "pages": 212,
-      "chars": 381909,
+      "pages": 214,
+      "chars": 381935,
       "sources": [
-        "gemini"
+        "gemini",
+        "gpt-vision"
       ],
       "dominantBest": "gemini",
       "needsReview": 0
@@ -215,8 +247,8 @@
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-6": {
-      "pages": 270,
-      "chars": 405501,
+      "pages": 271,
+      "chars": 407523,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -244,10 +276,11 @@
       "needsReview": 0
     },
     "65-hs1-834228961-62-hq-83894-section-9": {
-      "pages": 288,
-      "chars": 350372,
+      "pages": 290,
+      "chars": 350409,
       "sources": [
-        "gemini"
+        "gemini",
+        "gpt-vision"
       ],
       "dominantBest": "gemini",
       "needsReview": 0
@@ -318,7 +351,7 @@
     },
     "65-hs1-834228961-62-hq-83894-sub-a": {
       "pages": 124,
-      "chars": 277385,
+      "chars": 277800,
       "sources": [
         "gemini",
         "gpt-vision"
@@ -326,11 +359,102 @@
       "dominantBest": "gemini",
       "needsReview": 0
     },
+    "CIA-UAP-010": {
+      "pages": 2,
+      "chars": 7974,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "CIA-UAP-D001": {
+      "pages": 3,
+      "chars": 3485,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOE-UAP-D001": {
+      "pages": 2,
+      "chars": 254,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOE-UAP-D002": {
+      "pages": 4,
+      "chars": 1062,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOE-UAP-D003": {
+      "pages": 1,
+      "chars": 516,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOW-UAP-D017": {
+      "pages": 116,
+      "chars": 65509,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOW-UAP-D085": {
+      "pages": 7,
+      "chars": 17725,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "DOW-UAP-D086": {
+      "pages": 3,
+      "chars": 1807,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "FBI-UAP-D003": {
+      "pages": 1,
+      "chars": 771,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
+    "ODNI-UAP-D001": {
+      "pages": 2,
+      "chars": 5150,
+      "sources": [
+        "ocr"
+      ],
+      "dominantBest": "ocr",
+      "needsReview": 0
+    },
     "africa-2025": {
       "pages": 7,
       "chars": 718,
       "sources": [
         "gemini",
+        "gpt-vision",
         "ocr"
       ],
       "dominantBest": "gemini",
@@ -436,9 +560,10 @@
     },
     "fbi-62hq83894": {
       "pages": 185,
-      "chars": 232724,
+      "chars": 233041,
       "sources": [
         "gemini",
+        "gpt-vision",
         "ocr"
       ],
       "dominantBest": "gemini",
@@ -453,7 +578,7 @@
         "ocr"
       ],
       "dominantBest": "gemini",
-      "needsReview": 1
+      "needsReview": 0
     },
     "gemini-7": {
       "pages": 4,

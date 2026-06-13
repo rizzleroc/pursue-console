@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Evidence Chains</title>
+  <meta name="description" content="DOE Pantex radar imagery ↔ DIA AAWSA superconductor research ↔ nuclear-site clustering framework. Five physics-relevant events.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Evidence — primary-source ↔ theoretical framework">
+  <meta property="og:description" content="DOE Pantex radar imagery ↔ DIA AAWSA superconductor research ↔ nuclear-site clustering framework. Five physics-relevant events.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/evidence.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Evidence — primary-source ↔ theoretical framework">
+  <meta name="twitter:description" content="DOE Pantex radar imagery ↔ DIA AAWSA superconductor research ↔ nuclear-site clustering framework. Five physics-relevant events.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .ev-hero { padding: 60px 56px 24px; position: relative; z-index: 4; }
+    .ev-hero .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--amber); letter-spacing: 0.32em; text-transform: uppercase; }
+    .ev-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 56px; font-weight: 700; line-height: 1.0; color: var(--text); letter-spacing: -0.03em; margin: 22px 0 16px; max-width: 1100px; }
+    .ev-hero h1 em { font-style: normal; background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .ev-hero p { font-size: 16px; line-height: 1.6; color: var(--text-2); max-width: 780px; margin: 0; }
+
+    .ev-shell { padding: 24px 56px 64px; display: grid; grid-template-columns: 320px minmax(0,1fr) 320px; gap: 20px; position: relative; z-index: 3; }
+    .ev-panel { background: var(--surface); border: 1px solid var(--border); padding: 22px 24px; backdrop-filter: blur(10px); }
+    .ev-panel .h { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.28em; color: var(--text-2); text-transform: uppercase; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--hairline); display: flex; justify-content: space-between; align-items: baseline; }
+    .ev-panel .h .r { font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; font-weight: 500; }
+
+    /* Left rail — Physics-Relevant cases (click to refocus) */
+    .pe-row { display: block; padding: 12px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; text-decoration: none; color: inherit; }
+    .pe-row:last-child { border-bottom: none; }
+    .pe-row .top { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.12em; margin-bottom: 4px; }
+    .pe-row .top .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+    .pe-row .top .id { color: var(--cyan); }
+    .pe-row .top .pri { margin-left: auto; padding: 1px 5px; border: 1px solid rgba(224,73,104,0.4); color: var(--rose); font-size: 8.5px; letter-spacing: 0.18em; font-weight: 700; }
+    .pe-row .top .pri.h { color: #FFB07A; border-color: rgba(255,138,46,0.4); }
+    .pe-row .title { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); line-height: 1.4; font-weight: 500; }
+    .pe-row.active { background: rgba(242,166,35,0.06); margin: 0 -10px; padding: 12px 10px; }
+    .pe-row.active .title { color: var(--amber); }
+
+    /* Center — relationship graph */
+    .graph-wrap { background: radial-gradient(ellipse at center, rgba(20,28,38,0.55), rgba(8,14,22,0.85) 75%); border: 1px solid var(--border); padding: 26px; backdrop-filter: blur(10px); position: relative; min-height: 660px; display: flex; flex-direction: column; }
+    .graph-meta { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
+    .graph-meta .eid { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--cyan); letter-spacing: 0.14em; }
+    .graph-meta .title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; color: var(--text); font-weight: 600; letter-spacing: -0.01em; }
+    .graph-meta .dossier-link { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; letter-spacing: 0.16em; }
+    .graph-meta .dossier-link:hover { color: var(--amber); border-color: var(--amber); }
+    .graph-svg { width: 100%; flex: 1; min-height: 520px; }
+    .graph-legend { display: flex; flex-wrap: wrap; gap: 16px; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.12em; }
+    .graph-legend .item { display: inline-flex; align-items: center; gap: 6px; }
+    .graph-legend .sw { width: 10px; height: 10px; border-radius: 50%; }
+    .graph-legend .sw.event     { background: var(--amber); }
+    .graph-legend .sw.report    { background: #B280FF; }
+    .graph-legend .sw.program   { background: var(--cyan); }
+    .graph-legend .sw.framework { background: #B280FF; border: 1px dashed rgba(255,255,255,0.4); }
+    .graph-legend .sw.facility  { background: #6EE7B7; }
+    .graph-legend .sw.sensor    { background: var(--cyan); border: 1px dashed rgba(255,255,255,0.4); }
+    .graph-legend .sw.focus     { background: var(--rose); }
+
+    /* Graph nodes */
+    .gnode { cursor: pointer; }
+    .gnode .ring { fill: rgba(8,14,22,0.65); stroke: var(--amber); stroke-width: 1.5; }
+    .gnode .ring.report,
+    .gnode .ring.framework { stroke: #B280FF; }
+    .gnode .ring.program,
+    .gnode .ring.sensor { stroke: var(--cyan); }
+    .gnode .ring.facility { stroke: #6EE7B7; }
+    .gnode .ring.event { stroke: var(--amber); }
+    .gnode .ring.focus { stroke: var(--rose); stroke-width: 2.5; fill: rgba(224,73,104,0.10); }
+    .gnode .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; fill: var(--text-2); letter-spacing: 0.06em; text-anchor: middle; pointer-events: none; }
+    .gnode .label.dim { fill: var(--text-3); font-size: 9px; }
+    .gnode:hover .ring { filter: drop-shadow(0 0 6px rgba(242,166,35,0.7)); }
+    .gnode.focus .label { fill: var(--text); font-weight: 600; }
+    .gedge { stroke: rgba(180,200,220,0.18); stroke-width: 1; fill: none; }
+    .gedge.framework { stroke: rgba(178,128,255,0.35); stroke-dasharray: 4 4; }
+    .gedge.facility  { stroke: rgba(110,231,183,0.30); }
+    .gedge.program   { stroke: rgba(97,215,240,0.30); }
+    .gedge.sensor    { stroke: rgba(97,215,240,0.30); stroke-dasharray: 3 3; }
+    .gedge.report    { stroke: rgba(178,128,255,0.30); }
+    .gedge.event     { stroke: rgba(242,166,35,0.30); }
+
+    /* Right rail — Selected node detail */
+    .det-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; margin-bottom: 8px; }
+    .det-title { font-family: 'Space Grotesk', sans-serif; font-size: 19px; color: var(--text); line-height: 1.3; font-weight: 600; margin: 0 0 10px; letter-spacing: -0.01em; }
+    .det-body { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6; color: var(--text-2); }
+    .det-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; padding-top: 14px; border-top: 1px solid var(--hairline); margin-top: 14px; }
+    .det-meta div { padding: 4px 0; }
+    .det-meta .k { color: var(--text-3); letter-spacing: 0.18em; text-transform: uppercase; margin-right: 8px; }
+    .det-cta { display: inline-block; margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
+    .det-cta:hover { color: var(--amber); border-color: var(--amber); }
+
+    @media (max-width: 1280px){
+      .ev-shell { grid-template-columns: 1fr; }
+    }
+
+    /* Timeline — cross-referenced reports & programs by year */
+    .ev-timeline-row { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .ev-timeline-row .ev-panel { padding: 22px 24px 18px; }
+    .tl-meta { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+    .tl-meta .legend { margin-left: auto; display: inline-flex; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.12em; }
+    .tl-meta .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+    .tl-meta .legend .sw { width: 10px; height: 10px; border-radius: 50%; }
+    .tl-meta .legend .sw.report  { background: #B280FF; }
+    .tl-meta .legend .sw.program { background: var(--cyan); }
+    .tl-svg { width: 100%; height: 160px; display: block; }
+    .tl-svg .axis { stroke: rgba(180,200,220,0.22); stroke-width: 1; }
+    .tl-svg .tick { stroke: rgba(180,200,220,0.30); stroke-width: 1; }
+    .tl-svg .tick-major { stroke: rgba(180,200,220,0.45); }
+    .tl-svg .tick-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--text-4); letter-spacing: 0.14em; text-anchor: middle; }
+    .tl-svg .marker { cursor: pointer; pointer-events: bounding-box; }
+    .tl-svg .marker.report .dot { fill: #B280FF; stroke: rgba(178,128,255,0.9); stroke-width: 1.5; }
+    .tl-svg .marker.program .bar { fill: rgba(97,215,240,0.20); stroke: var(--cyan); stroke-width: 1.5; }
+    .tl-svg .marker.program .cap { stroke: var(--cyan); stroke-width: 1.5; }
+    .tl-svg .marker .hit { fill: transparent; pointer-events: all; }
+    .tl-svg .marker:hover .dot { filter: drop-shadow(0 0 5px rgba(178,128,255,0.8)); }
+    .tl-svg .marker:hover .bar { fill: rgba(97,215,240,0.35); filter: drop-shadow(0 0 5px rgba(97,215,240,0.6)); }
+    .tl-svg .marker .lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: var(--text-3); letter-spacing: 0.08em; text-anchor: middle; pointer-events: none; }
+    .tl-empty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-4); padding: 30px 0; text-align: center; letter-spacing: 0.12em; }
+    .tl-tooltip { position: absolute; pointer-events: none; background: rgba(8,14,22,0.96); border: 1px solid var(--border); padding: 8px 12px; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text); max-width: 280px; line-height: 1.4; z-index: 50; opacity: 0; transition: opacity 0.12s ease; backdrop-filter: blur(8px); }
+    .tl-tooltip.show { opacity: 1; }
+    .tl-tooltip .tt-title { font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .tl-tooltip .tt-org { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.10em; }
+    .tl-tooltip .tt-year { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.14em; margin-top: 2px; }
+  </style>
+</head>
+<body data-view="evidence">
+
+<main>
+  <section class="ev-hero">
+    <div class="eyebrow">▣ &nbsp; SURFACE · 12 — evidence chains &amp; provenance</div>
+    <h1>From <em>primary-source sensor data</em> to associated theoretical research.</h1>
+    <p>The archive privileges primary-source material. This surface makes the chain visible — sensor data ↔ enhancement facility ↔ theoretical framework ↔ peer cases — so researchers can move between source and interpretation without relying on secondary summaries.</p>
+  </section>
+
+  <section class="ev-shell">
+
+    <aside class="ev-panel">
+      <div class="h"><span>PHYSICS-RELEVANT CASES</span><span class="r" id="pe-count">0</span></div>
+      <div id="pe-list"></div>
+      <a id="pe-search-link" href="search.html?physics=1" class="det-cta" style="margin-top: 22px">→ search all physics-relevant</a>
+    </aside>
+
+    <div class="graph-wrap">
+      <div class="graph-meta">
+        <span class="eid" id="g-eid">DOE-UAP-D001</span>
+        <span class="title" id="g-title">DOE-UAP-D001, Enhanced PANTEX Imagery</span>
+        <a class="dossier-link" id="g-dossier" href="dossier.html?eid=DOE-UAP-D001">OPEN DOSSIER →</a>
+      </div>
+      <svg class="graph-svg" id="graph" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="graph-legend">
+        <span class="item"><span class="sw focus"></span>FOCUS EVENT</span>
+        <span class="item"><span class="sw event"></span>EVENT</span>
+        <span class="item"><span class="sw report"></span>REPORT</span>
+        <span class="item"><span class="sw program"></span>PROGRAM</span>
+        <span class="item"><span class="sw framework"></span>FRAMEWORK</span>
+        <span class="item"><span class="sw facility"></span>FACILITY</span>
+        <span class="item"><span class="sw sensor"></span>SENSOR</span>
+      </div>
+    </div>
+
+    <aside class="ev-panel" id="det-panel">
+      <div class="h"><span>SELECTED NODE</span><span class="r" id="det-rel">— click a node</span></div>
+      <div class="det-eyebrow" id="det-kind">FOCUS · EVENT</div>
+      <h3 class="det-title" id="det-title">DOE-UAP-D001, Enhanced PANTEX Imagery</h3>
+      <p class="det-body" id="det-body">Click any node in the graph to read its description, organisation, and the relation it bears to the focus event.</p>
+      <div class="det-meta" id="det-meta"></div>
+      <a class="det-cta" id="det-cta" href="dossier.html?eid=DOE-UAP-D001">→ OPEN DOSSIER</a>
+    </aside>
+
+  </section>
+
+  <section class="ev-timeline-row">
+    <div class="ev-panel" id="tl-panel" style="position: relative;">
+      <div class="h">
+        <span>CROSS-REFERENCED REPORTS &amp; PROGRAMS · TIMELINE</span>
+        <span class="r" id="tl-count">0</span>
+      </div>
+      <div class="tl-meta">
+        <div class="legend">
+          <span class="item"><span class="sw report"></span>REPORT</span>
+          <span class="item"><span class="sw program"></span>PROGRAM (ACTIVE RANGE)</span>
+        </div>
+      </div>
+      <svg class="tl-svg" id="tl-svg" viewBox="0 0 1000 120" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="tl-tooltip" id="tl-tooltip" role="tooltip"></div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="share.js" defer></script>
+<script src="chrome.js" defer></script>
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // Focus eid: ?eid=… else DOE-UAP-D001 else first physics-relevant else first event.
+  function pickFocus(){
+    // Re-parse the URL on each call. MC.query is cached at module-load time,
+    // but history.replaceState (used by event-node dblclick to refocus the
+    // graph in-page) changes location.search without refreshing MC.query —
+    // so the cached value points at the original load eid forever.
+    var liveQuery = new URLSearchParams(window.location.search);
+    var q = liveQuery.get('eid') || (MC.query && MC.query.eid);
+    if (q && MC.byEid(q)) return q;
+    if (MC.byEid('DOE-UAP-D001')) return 'DOE-UAP-D001';
+    var phys = (MC.derive && MC.derive.physicsEvents) || [];
+    if (phys.length) return phys[0].id;
+    var ev = (MC.derive && MC.derive.events) || [];
+    return ev.length ? ev[0].id : null;
+  }
+
+  // Sector ranges (in radians) for each ref type, around the focus node.
+  // 0 = right, π/2 = down, π = left, 3π/2 = up. We place categories around
+  // the focus so groups don't overlap.
+  var SECTORS = {
+    report:    [-Math.PI * 0.95, -Math.PI * 0.55],   // upper-left
+    program:   [-Math.PI * 0.50, -Math.PI * 0.30],   // top
+    framework: [-Math.PI * 0.25,  Math.PI * 0.15],   // upper-right / right
+    facility:  [ Math.PI * 0.20,  Math.PI * 0.50],   // lower-right
+    sensor:    [ Math.PI * 0.55,  Math.PI * 0.80],   // bottom
+    event:     [ Math.PI * 0.85,  Math.PI * 1.30]    // lower-left → left wrap
+  };
+  var ORDER = ['report','program','framework','facility','sensor','event'];
+
+  function polarPlace(refs){
+    // Group refs by type, then fan each group across its sector.
+    var groups = {};
+    refs.forEach(function (r) {
+      var k = r.type || 'event';
+      if (!groups[k]) groups[k] = [];
+      groups[k].push(r);
+    });
+    var placed = [];
+    ORDER.forEach(function(kind){
+      var rs = groups[kind] || [];
+      if (!rs.length) return;
+      var range = SECTORS[kind];
+      // Single ref → midpoint; multiple → even fan with a small inset from the edges.
+      var n = rs.length;
+      for (var i = 0; i < n; i++){
+        var t = (n === 1) ? 0.5 : (i + 0.5) / n;
+        var angle = range[0] + (range[1] - range[0]) * t;
+        // radius: 195 default; longer (220) for events because their labels are wider
+        var radius = (kind === 'event') ? 235 : (kind === 'report' ? 205 : 195);
+        placed.push({ ref: rs[i], kind: kind, angle: angle, radius: radius });
+      }
+    });
+    return placed;
+  }
+
+  function shortLabel(node){
+    // Pick a concise label for each node type.
+    var r = node.ref;
+    var res = r.resolved || null;
+    if (r.type === 'event'){
+      if (res && res.id) return res.id;
+      return r.id;
+    }
+    if (r.type === 'program') return (res && res.name) || r.id;
+    if (r.type === 'sensor')  return (res && res.name) || r.id;
+    if (r.type === 'facility'){
+      var nm = (res && res.name) || r.id;
+      // Strip trailing "National Laboratory" / "National Labs" / "Plant"
+      return nm.replace(/\s+National (Laboratory|Labs|Lab)$/i, '').replace(/\s+Plant$/i, '');
+    }
+    if (r.type === 'framework'){
+      var t = (res && res.title) || r.id;
+      // Take first 3 words
+      return t.split(/\s+/).slice(0, 3).join(' ');
+    }
+    if (r.type === 'report'){
+      var t2 = (res && res.title) || r.id;
+      return t2.split(/\s+/).slice(0, 4).join(' ') + '…';
+    }
+    return r.id;
+  }
+
+  function buildGraph(focusEid){
+    var svg = document.getElementById('graph');
+    if (!svg) return;
+    var rec = MC.byEid(focusEid);
+    if (!rec) { svg.innerHTML = ''; return; }
+    var refs = MC.crossRefsForEvent(focusEid) || [];
+    var nodes = polarPlace(refs);
+    var cx = 400, cy = 280;
+
+    var parts = [];
+
+    // Soft concentric rings — visual anchor
+    parts.push('<circle cx="'+cx+'" cy="'+cy+'" r="120" fill="none" stroke="rgba(242,166,35,0.07)" stroke-dasharray="2 4"/>');
+    parts.push('<circle cx="'+cx+'" cy="'+cy+'" r="200" fill="none" stroke="rgba(242,166,35,0.05)" stroke-dasharray="2 4"/>');
+
+    // Edges
+    nodes.forEach(function(n){
+      var x = cx + n.radius * Math.cos(n.angle);
+      var y = cy + n.radius * Math.sin(n.angle);
+      parts.push('<path class="gedge '+esc(n.kind)+'" d="M '+cx+' '+cy+' L '+x+' '+y+'"/>');
+    });
+
+    // Focus node (rendered last so it sits above edges)
+    parts.push(
+      '<g class="gnode focus" data-kind="focus" data-id="'+esc(focusEid)+'">' +
+        '<circle class="ring focus" cx="'+cx+'" cy="'+cy+'" r="56"/>' +
+        '<text class="label" x="'+cx+'" y="'+(cy-3)+'">'+esc((rec.id||'').toUpperCase())+'</text>' +
+        '<text class="label dim" x="'+cx+'" y="'+(cy+13)+'">FOCUS</text>' +
+      '</g>'
+    );
+
+    // Other nodes
+    nodes.forEach(function(n){
+      var x = cx + n.radius * Math.cos(n.angle);
+      var y = cy + n.radius * Math.sin(n.angle);
+      var lbl = shortLabel(n);
+      parts.push(
+        '<g class="gnode" data-kind="'+esc(n.kind)+'" data-id="'+esc(n.ref.id)+'">' +
+          '<circle class="ring '+esc(n.kind)+'" cx="'+x+'" cy="'+y+'" r="32"/>' +
+          '<text class="label" x="'+x+'" y="'+(y+3)+'">'+esc(lbl)+'</text>' +
+          '<text class="label dim" x="'+x+'" y="'+(y+16)+'">'+esc((n.kind||'').toUpperCase())+'</text>' +
+        '</g>'
+      );
+    });
+
+    svg.innerHTML = parts.join('');
+
+    // Click handlers — populate the right panel; double-click event nodes refocus the graph.
+    svg.querySelectorAll('.gnode').forEach(function(g){
+      g.addEventListener('click', function(){
+        var k = g.dataset.kind, id = g.dataset.id;
+        if (k === 'focus') return showFocus(focusEid);
+        showNode(k, id, focusEid);
+      });
+      // double-click on an event node → refocus the graph there
+      if (g.dataset.kind === 'event'){
+        g.addEventListener('dblclick', function(){
+          history.replaceState(null, '', 'evidence.html?eid=' + encodeURIComponent(g.dataset.id));
+          render();
+        });
+      }
+    });
+
+    // Default detail = focus
+    showFocus(focusEid);
+  }
+
+  function showFocus(eid){
+    var rec = MC.byEid(eid); if (!rec) return;
+    document.getElementById('det-kind').textContent = 'FOCUS · EVENT' + (rec.priority ? ' · ' + String(rec.priority).toUpperCase() : '');
+    document.getElementById('det-title').textContent = rec.title || rec.id;
+    document.getElementById('det-body').textContent = rec.summary || ((rec.agency || '') + (rec.date ? ' · ' + rec.date : ''));
+    var meta = [];
+    if (rec.agency)   meta.push('<div><span class="k">AGENCY</span>'+esc(rec.agency)+'</div>');
+    if (rec.date)     meta.push('<div><span class="k">DATE</span>'+esc(rec.date)+'</div>');
+    if (rec.release)  meta.push('<div><span class="k">RELEASE</span>'+esc(rec.release)+'</div>');
+    if (Array.isArray(rec.evidenceTypes) && rec.evidenceTypes.length){
+      meta.push('<div><span class="k">EVIDENCE</span>'+esc(rec.evidenceTypes.map(function(t){return t.replace(/-/g,' ');}).join(' · '))+'</div>');
+    }
+    if (Array.isArray(rec.crossRefs)) meta.push('<div><span class="k">CROSS-REFS</span>'+rec.crossRefs.length+'</div>');
+    document.getElementById('det-meta').innerHTML = meta.join('');
+    document.getElementById('det-rel').textContent = (rec.crossRefs && rec.crossRefs.length) ? (rec.crossRefs.length + ' refs') : '0 refs';
+    var cta = document.getElementById('det-cta');
+    cta.href = 'dossier.html?eid=' + encodeURIComponent(eid);
+    cta.textContent = '→ OPEN DOSSIER';
+  }
+
+  function showNode(kind, id, focusEid){
+    // Resolve target
+    var node = (kind === 'event') ? MC.byEid(id) : MC.byRefId(id);
+    var rec = MC.byEid(focusEid);
+    var ref = (rec && rec.crossRefs) ? rec.crossRefs.find(function(r){ return r.id === id && r.type === kind; }) : null;
+    if (!node){
+      document.getElementById('det-kind').textContent = kind.toUpperCase();
+      document.getElementById('det-title').textContent = id;
+      document.getElementById('det-body').textContent = 'No metadata indexed for this reference yet — contribute via HOW-CAN-I-HELP.md.';
+      document.getElementById('det-meta').innerHTML = '';
+      document.getElementById('det-rel').textContent = ref ? (ref.relation || '') : '';
+      document.getElementById('det-cta').style.display = 'none';
+      return;
+    }
+    document.getElementById('det-cta').style.display = '';
+    document.getElementById('det-kind').textContent = kind.toUpperCase() + (ref && ref.relation ? ' · ' + ref.relation.replace(/-/g,' ').toUpperCase() : '');
+    document.getElementById('det-title').textContent = node.title || node.name || node.id;
+    document.getElementById('det-body').textContent = node.summary || node.location || '';
+    var meta = [];
+    if (node.year)         meta.push('<div><span class="k">YEAR</span>'+esc(node.year)+'</div>');
+    if (node.organization) meta.push('<div><span class="k">ORG</span>'+esc(node.organization)+'</div>');
+    if (node.operator)     meta.push('<div><span class="k">OPERATOR</span>'+esc(node.operator)+'</div>');
+    if (node.location)     meta.push('<div><span class="k">LOCATION</span>'+esc(node.location)+'</div>');
+    if (node.discipline)   meta.push('<div><span class="k">DISCIPLINE</span>'+esc(node.discipline)+'</div>');
+    if (node.kind)         meta.push('<div><span class="k">KIND</span>'+esc(node.kind)+'</div>');
+    if (node.program)      meta.push('<div><span class="k">PROGRAM</span>'+esc(node.program)+'</div>');
+    if (node.active)       meta.push('<div><span class="k">ACTIVE</span>'+esc(node.active)+'</div>');
+    if (ref && ref.note)   meta.push('<div><span class="k">NOTE</span>'+esc(ref.note)+'</div>');
+    document.getElementById('det-meta').innerHTML = meta.join('');
+    document.getElementById('det-rel').textContent = ref ? (ref.relation || '') : '';
+    var cta = document.getElementById('det-cta');
+    if (kind === 'event'){
+      cta.href = 'dossier.html?eid=' + encodeURIComponent(id);
+      cta.textContent = '→ OPEN DOSSIER · DOUBLE-CLICK NODE TO REFOCUS';
+    } else {
+      cta.href = 'search.html?q=' + encodeURIComponent(node.name || node.title || id);
+      cta.textContent = '→ FIND EVENTS REFERENCING THIS';
+    }
+  }
+
+  function renderLeftRail(focusEid){
+    var list = document.getElementById('pe-list');
+    if (!list) return;
+    var phys = (MC.derive && MC.derive.physicsEvents) || [];
+    document.getElementById('pe-count').textContent = phys.length + ' cases';
+    if (!phys.length){
+      list.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-4)">no physics-relevant cases indexed yet</div>';
+      return;
+    }
+    list.innerHTML = phys.map(function(e){
+      var active = (e.id === focusEid) ? ' active' : '';
+      var priLabel = '', priClass = '';
+      if (e.priority === 'critical') { priLabel = 'CRITICAL'; priClass = ''; }
+      else if (e.priority === 'high') { priLabel = 'PRIORITY'; priClass = ' h'; }
+      var href = 'evidence.html?eid=' + encodeURIComponent(e.id);
+      return '<a class="pe-row'+active+'" href="'+href+'">' +
+        '<div class="top">' +
+          '<span class="dot"></span>' +
+          '<span class="id">'+esc((e.id||'').toUpperCase())+'</span>' +
+          (priLabel ? '<span class="pri'+priClass+'">'+priLabel+'</span>' : '') +
+        '</div>' +
+        '<div class="title">'+esc(e.title || e.id)+'</div>' +
+      '</a>';
+    }).join('');
+  }
+
+  // ─────────── Timeline — cross-referenced reports & programs by year ───────────
+  // X mapping: year 1940 → 30, year 2030 → 970, total span 940 in a 1000-wide viewBox.
+  function tlX(year){ return ((year - 1940) / 90) * 940 + 30; }
+
+  function parseYearRange(s){
+    if (s == null) return null;
+    var str = String(s).trim();
+    var m = str.match(/(\d{4})\s*[-–—]\s*(\d{4})/);
+    if (m) return { start: +m[1], end: +m[2] };
+    var m2 = str.match(/(\d{4})\s*[-–—]\s*(present|current|now)/i);
+    if (m2) return { start: +m2[1], end: (new Date()).getFullYear() };
+    var m3 = str.match(/(\d{4})/);
+    if (m3) return { start: +m3[1], end: +m3[1] };
+    return null;
+  }
+
+  function tlTooltipHandlers(el, html){
+    var tip = document.getElementById('tl-tooltip');
+    var panel = document.getElementById('tl-panel');
+    if (!tip || !panel) return;
+    function show(e){
+      tip.innerHTML = html;
+      tip.classList.add('show');
+      var pr = panel.getBoundingClientRect();
+      var x = e.clientX - pr.left + 14;
+      var y = e.clientY - pr.top + 14;
+      // keep inside panel bounds
+      var maxX = pr.width - 300;
+      if (x > maxX) x = maxX;
+      if (x < 4) x = 4;
+      tip.style.left = x + 'px';
+      tip.style.top  = y + 'px';
+    }
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mousemove', show);
+    el.addEventListener('mouseleave', function(){ tip.classList.remove('show'); });
+  }
+
+  function buildTimeline(focusEid){
+    var svg = document.getElementById('tl-svg');
+    var countEl = document.getElementById('tl-count');
+    if (!svg) return;
+    var refs = (MC.crossRefsForEvent && MC.crossRefsForEvent(focusEid)) || [];
+
+    // Build entries (only report / program with a resolvable year or active range)
+    var entries = [];
+    refs.forEach(function(r){
+      if (r.type !== 'report' && r.type !== 'program') return;
+      var res = r.resolved || null;
+      if (!res) return;
+      var range = null;
+      if (r.type === 'program'){
+        range = parseYearRange(res.active) || (res.year ? { start: +res.year, end: +res.year } : null);
+      } else { // report
+        range = (res.year ? { start: +res.year, end: +res.year } : parseYearRange(res.active));
+      }
+      if (!range || !isFinite(range.start)) return;
+      // Clamp to [1940, 2030]
+      var s = Math.max(1940, Math.min(2030, range.start));
+      var e = Math.max(1940, Math.min(2030, range.end));
+      var label = (res.name || res.title || r.id);
+      // Compact label: "AAWSA 2008-2012" or "Superconductors… 2010"
+      var year = (s === e) ? String(s) : (s + '-' + e);
+      var shortName = label;
+      if (shortName.length > 22) shortName = shortName.split(/\s+/).slice(0, 3).join(' ') + '…';
+      entries.push({
+        ref: r,
+        type: r.type,
+        start: s,
+        end: e,
+        title: res.title || res.name || r.id,
+        organization: res.organization || res.operator || '',
+        summary: res.summary || '',
+        label: shortName + ' ' + year
+      });
+    });
+
+    if (countEl) countEl.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
+
+    var parts = [];
+    // Baseline axis at y=70
+    parts.push('<line class="axis" x1="30" y1="70" x2="970" y2="70"/>');
+    // Decade ticks
+    for (var y = 1940; y <= 2030; y += 10){
+      var xp = tlX(y);
+      var major = (y % 20 === 0);
+      parts.push('<line class="tick'+(major?' tick-major':'')+'" x1="'+xp+'" y1="64" x2="'+xp+'" y2="76"/>');
+      parts.push('<text class="tick-label" x="'+xp+'" y="92">'+y+'</text>');
+    }
+
+    if (!entries.length){
+      svg.innerHTML = parts.join('');
+      // Show empty hint via overlay text in SVG
+      var note = '<text x="500" y="40" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(180,200,220,0.55)" letter-spacing="2">NO REPORT OR PROGRAM CROSS-REFS WITH DATED METADATA</text>';
+      svg.innerHTML = parts.join('') + note;
+      return;
+    }
+
+    // Stagger labels vertically so neighbours don't collide. Keep markers on the axis.
+    // Sort by start year, assign alternating label positions above the axis.
+    entries.sort(function(a,b){ return a.start - b.start; });
+    var labelYTop = 30;   // primary above-axis label row
+    var labelYAlt = 14;   // higher row for crowded clusters
+    var lastX = -Infinity;
+    entries.forEach(function(en, i){
+      var x1 = tlX(en.start), x2 = tlX(en.end);
+      var midX = (x1 + x2) / 2;
+      // pick label row — alternate if close to previous marker
+      var ly = (midX - lastX < 90) ? labelYAlt : labelYTop;
+      lastX = midX;
+
+      var dataAttrs = ' data-type="'+esc(en.type)+'"';
+      // Hit rect — bigger than the visible mark so hover/click work reliably.
+      // Spans from a bit before the label row up through below the axis.
+      var hitTop    = Math.min(ly - 10, 8);
+      var hitBottom = 86;
+      if (en.type === 'report'){
+        var hx = midX - 18, hw = 36;
+        parts.push(
+          '<g class="marker report"'+dataAttrs+' data-idx="'+i+'">' +
+            '<rect class="hit" x="'+hx+'" y="'+hitTop+'" width="'+hw+'" height="'+(hitBottom-hitTop)+'"/>' +
+            '<circle class="dot" cx="'+midX+'" cy="70" r="6"/>' +
+            '<text class="lbl" x="'+midX+'" y="'+ly+'">'+esc(en.label)+'</text>' +
+          '</g>'
+        );
+      } else { // program — horizontal range bar
+        var w = Math.max(8, x2 - x1);
+        var hx2 = Math.min(x1, midX - 40) - 4;
+        var hw2 = Math.max(w + 8, 80);
+        parts.push(
+          '<g class="marker program"'+dataAttrs+' data-idx="'+i+'">' +
+            '<rect class="hit" x="'+hx2+'" y="'+hitTop+'" width="'+hw2+'" height="'+(hitBottom-hitTop)+'"/>' +
+            '<rect class="bar" x="'+x1+'" y="64" width="'+w+'" height="12" rx="2"/>' +
+            '<line class="cap" x1="'+x1+'" y1="60" x2="'+x1+'" y2="80"/>' +
+            '<line class="cap" x1="'+x2+'" y1="60" x2="'+x2+'" y2="80"/>' +
+            '<text class="lbl" x="'+midX+'" y="'+ly+'">'+esc(en.label)+'</text>' +
+          '</g>'
+        );
+      }
+    });
+
+    svg.innerHTML = parts.join('');
+
+    // Attach tooltip handlers
+    svg.querySelectorAll('.marker').forEach(function(g){
+      var idx = +g.dataset.idx;
+      var en = entries[idx];
+      if (!en) return;
+      var yrTxt = (en.start === en.end) ? String(en.start) : (en.start + '–' + en.end);
+      var html = '<div class="tt-title">'+esc(en.title)+'</div>' +
+                 (en.organization ? '<div class="tt-org">'+esc(en.organization)+'</div>' : '') +
+                 '<div class="tt-year">'+esc(yrTxt)+' · '+esc(en.type.toUpperCase())+'</div>';
+      tlTooltipHandlers(g, html);
+      // Click → show in right rail like graph nodes
+      g.addEventListener('click', function(){ showNode(en.type, en.ref.id, focusEid); });
+    });
+  }
+
+  function render(){
+    var eid = pickFocus();
+    if (!eid) return;
+    document.getElementById('g-eid').textContent = (eid || '').toUpperCase();
+    var rec = MC.byEid(eid);
+    if (rec){
+      document.getElementById('g-title').textContent = rec.title || eid;
+      document.getElementById('g-dossier').href = 'dossier.html?eid=' + encodeURIComponent(eid);
+    }
+    buildGraph(eid);
+    renderLeftRail(eid);
+    buildTimeline(eid);
+    // OG / Twitter Card meta — page-specific preview keyed on the focus event.
+    if (MC.setShareMeta && rec){
+      MC.setShareMeta({
+        title: 'Evidence chain · ' + rec.title,
+        description: 'Cross-references from ' + rec.id + ' to peer events, reports, programs, frameworks, facilities, and sensors. ' + ((rec.summary || '').slice(0, 160)),
+        url: window.location.href,
+        eid: eid,
+      });
+    }
+  }
+
+  MC.ready().then(render);
+  MC.onUpdate(render);
+})();
+</script>
+</body>
+</html>

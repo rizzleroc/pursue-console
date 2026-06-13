@@ -5,7 +5,7 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 288 pages
+Source extraction: VISION · 290 pages
 
 ---
 
@@ -630,6 +630,17 @@ in the St. Louis area, Kansas City is being considered
 the Office of Origin.
 
 - RUC -
+
+
+=== Page 18 (vision) ===
+
+called
+3:15
+9/27
+
+(?)
+file
+(?)
 
 
 === Page 19 (vision) ===
@@ -9872,6 +9883,11 @@ FEB 24 2:31 PM '65
 16 FEB 24 1965
 
 [illegible]
+
+
+=== Page 270 (vision) ===
+
+(blank)
 
 
 === Page 271 (vision) ===

@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Search</title>
+  <meta name="description" content="MiniSearch keyword + MiniLM semantic search over 5,665 page chunks. 18-language support.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Search — full-text + semantic over 276 docs">
+  <meta property="og:description" content="MiniSearch keyword + MiniLM semantic search over 5,665 page chunks. 18-language support.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/search.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Search — full-text + semantic over 276 docs">
+  <meta name="twitter:description" content="MiniSearch keyword + MiniLM semantic search over 5,665 page chunks. 18-language support.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .search-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .search-form { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; margin-bottom: 24px; backdrop-filter: blur(10px); }
+    .mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+    .mode { padding: 18px 22px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; transition: all .2s; text-align: left; color: inherit; text-decoration: none; }
+    .mode.active { border-color: var(--amber); background: rgba(242,166,35,0.10); box-shadow: 0 0 24px rgba(242,166,35,0.18), inset 0 0 12px rgba(242,166,35,0.06); }
+    .mode .lbl { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; }
+    .mode.active .lbl { color: var(--amber); }
+    .mode h3 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; margin: 6px 0 6px; letter-spacing: -0.02em; color: var(--text); }
+    .mode p { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); margin: 0; letter-spacing: 0.06em; }
+    .mode .badge { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--amber); background: rgba(242,166,35,0.10); border: 1px solid var(--border-strong); padding: 2px 8px; margin-left: 8px; letter-spacing: 0.16em; font-weight: 600; }
+    .search-input { display: flex; align-items: center; gap: 14px; background: var(--surface-3); border: 1px solid var(--border-strong); padding: 18px 22px; }
+    .search-input .glyph { color: var(--amber); font-size: 22px; }
+    .search-input input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 18px; letter-spacing: 0.04em; }
+    .search-input input::placeholder { color: var(--text-4); }
+    .search-input .clear { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); cursor: pointer; padding: 4px 10px; letter-spacing: 0.16em; }
+    .search-filters { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+    .stats-row { display: flex; align-items: center; gap: 18px; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); letter-spacing: 0.16em; }
+    .stats-row .v { color: var(--amber); font-weight: 600; }
+    .stats-row .right { margin-left: auto; }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .rc { background: var(--surface); border: 1px solid var(--border); padding: 18px 20px; backdrop-filter: blur(10px); transition: all .2s; cursor: pointer; position: relative; overflow: hidden; display: block; color: inherit; text-decoration: none; }
+    .rc:hover { border-color: var(--border-strong); }
+    .rc::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--amber); opacity: 0; transition: opacity .2s; }
+    .rc:hover::before { opacity: 1; box-shadow: 0 0 10px var(--amber-glow); }
+    .rc .top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
+    .rc .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+    .rc .dot.r { background: var(--rose); } .rc .dot.c { background: var(--cyan); } .rc .dot.e { background: var(--emerald); } .rc .dot.g { background: var(--text-4); }
+    .rc .eid { color: var(--cyan); }
+    .rc .score { margin-left: auto; color: var(--amber); font-weight: 600; }
+    .rc h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 600; line-height: 1.25; margin: 0 0 10px; color: var(--text); letter-spacing: -0.01em; }
+    .rc p { font-size: 13px; line-height: 1.55; color: var(--text-2); margin: 0 0 12px; }
+    .rc p mark { background: rgba(242,166,35,0.22); color: var(--amber-bright); padding: 0 4px; }
+    .rc .bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.14em; text-transform: uppercase; }
+    .rc .bottom .pg { color: var(--amber); }
+    .empty-state { display: none; border: 1px dashed var(--border-strong); padding: 40px 32px; text-align: center; font-family: 'JetBrains Mono', monospace; color: var(--text-3); letter-spacing: 0.14em; font-size: 12px; background: var(--surface); }
+    .empty-state.on { display: block; }
+    .empty-state h3 { font-family: 'Space Grotesk', sans-serif; color: var(--amber); font-size: 20px; letter-spacing: -0.01em; margin: 0 0 8px; }
+    .meaning-note { display: none; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cyan); letter-spacing: 0.10em; }
+    .meaning-note.on { display: block; }
+    .browse-hint { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; margin: 0 0 12px; }
+
+    /* Priority + Evidence badges on result cards */
+    .rc .badges { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+    .rc .b { font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; padding: 2px 6px; border: 1px solid var(--border); color: var(--text-3); text-transform: uppercase; line-height: 1.4; }
+    .rc .b.crit    { color: var(--rose);   border-color: rgba(224,73,104,0.55); background: rgba(224,73,104,0.10); font-weight: 700; }
+    .rc .b.priority{ color: #FFB07A;       border-color: rgba(255,138,46,0.45); background: rgba(255,138,46,0.08); font-weight: 700; }
+    .rc .b.primary { color: var(--amber);  border-color: rgba(242,166,35,0.45); background: rgba(242,166,35,0.06); }
+    .rc .b.sensor  { color: var(--cyan);   border-color: rgba(97,215,240,0.45); background: rgba(97,215,240,0.07); }
+    .rc .b.physics { color: #B280FF;       border-color: rgba(178,128,255,0.45); background: rgba(178,128,255,0.08); }
+    .rc .b.witness { color: #FFD93D;       border-color: rgba(255,217,61,0.40); background: rgba(255,217,61,0.06); }
+    .rc .b.imagery { color: #6EE7B7;       border-color: rgba(110,231,183,0.40); background: rgba(110,231,183,0.06); }
+
+    /* Physics-relevant toggle pill in the filter row */
+    .toggle-pill { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; padding: 6px 12px; border: 1px solid var(--border); background: var(--surface-2); }
+    .toggle-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-4); }
+    .toggle-pill.on { color: #B280FF; border-color: rgba(178,128,255,0.55); background: rgba(178,128,255,0.10); }
+    .toggle-pill.on .dot { background: #B280FF; box-shadow: 0 0 8px rgba(178,128,255,0.6); }
+
+    /* Quick-query chips */
+    .qq-wrap { margin: 0 0 16px; }
+    .qq-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.22em; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 12px; }
+    .qq-more { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-3); letter-spacing: 0.22em; cursor: pointer; padding: 2px 8px; border: 1px solid var(--border); background: var(--surface-2); }
+    .qq-more:hover { color: var(--amber); border-color: var(--amber); }
+    .qq { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); padding: 3px 10px; margin: 0 6px 6px 0; cursor: pointer; letter-spacing: 0.04em; }
+    .qq:hover { color: var(--amber); border-color: var(--amber); }
+    /* Per-kind colour hints — subtle tint on the chip background + border so
+       four kinds are visually distinguishable but still legible against the
+       dark surface. Hover still bumps to amber. */
+    .qq.qq-entity   { color: var(--cyan);        border-color: rgba(97,215,240,0.40);  background: rgba(97,215,240,0.07); }
+    .qq.qq-shape    { color: #B280FF;            border-color: rgba(178,128,255,0.40); background: rgba(178,128,255,0.08); }
+    .qq.qq-behavior { color: #FFD93D;            border-color: rgba(255,217,61,0.40);  background: rgba(255,217,61,0.07); }
+    .qq.qq-sensor   { color: #6EC1FF;            border-color: rgba(110,193,255,0.40); background: rgba(110,193,255,0.07); }
+    .qq.qq-entity:hover, .qq.qq-shape:hover, .qq.qq-behavior:hover, .qq.qq-sensor:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* Page-hit snippets nested inside a result card */
+    .rc-pages { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 10px; }
+    .rc-pages .ph { padding-left: 10px; border-left: 1px solid rgba(97,215,240,0.35); font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.5; color: var(--text-2); }
+    .rc-pages .ph .lab { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--amber); letter-spacing: 0.18em; margin-right: 8px; font-weight: 600; }
+    .rc-pages .ph mark { background: rgba(242,166,35,0.30); color: var(--amber-bright); padding: 0 3px; }
+    .rc-pages .more { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; padding-left: 10px; }
+
+    /* Index-loading inline status */
+    .idx-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; margin-left: 12px; }
+    .idx-status.ready { color: var(--emerald, #6EE7B7); }
+    .idx-status.error { color: var(--rose); }
+  </style>
+</head>
+<body data-view="search">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 03 — query the corpus</div>
+    <h1>Two retrieval modes, <em>one input.</em></h1>
+    <p class="sub">EXACT finds your phrase verbatim across 276 indexed documents in &lt;50ms. MEANING loads the 5,665-chunk semantic index (25MB, lazy) and surfaces ideas that share meaning even with different words.</p>
+  </section>
+
+  <section class="search-shell">
+    <div class="search-form">
+      <div class="mode-toggle">
+        <a class="mode active" id="mode-exact">
+          <span class="lbl">▣ &nbsp; EXACT MATCH<span class="badge">DEFAULT</span></span>
+          <h3>Lexical · MiniSearch</h3>
+          <p>276 docs · fuzzy + prefix · &lt;50ms · loaded</p>
+        </a>
+        <a class="mode" id="mode-meaning">
+          <span class="lbl">∿ &nbsp; MEANING MATCH</span>
+          <h3>Semantic · FAISS</h3>
+          <p>5,665 chunks · 25MB embeddings · loads on click</p>
+        </a>
+      </div>
+      <div class="meaning-note" id="meaning-note">∿ MEANING MATCH — loading MiniLM model (~25MB from CDN, cached in IndexedDB after first run)…</div>
+
+      <div class="search-input">
+        <span class="glyph">⌕</span>
+        <input id="search-q" value="" placeholder="QUERY · 220 events · 3,530 pages…" autocomplete="off"/>
+        <span class="clear" id="search-clear">⨯ CLEAR</span>
+      </div>
+
+      <div class="search-filters">
+        <select class="filter-select" id="filter-agency"><option value="ALL">ALL AGENCIES</option></select>
+        <select class="filter-select" id="filter-era"><option value="ALL">ALL ERAS</option></select>
+        <select class="filter-select" id="filter-type"><option value="ALL">ALL TYPES</option></select>
+        <span class="toggle-pill" id="filter-physics" title="Physics-Relevant Cases only — events with theoretical-framework cross-references"><span class="dot"></span>PHYSICS-RELEVANT</span>
+        <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em">PHYSICS toggle filters to events with theoretical-framework cross-refs</span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <span><span class="v" id="stat-count">0</span> RESULTS</span><span>·</span>
+      <span id="stat-mode">EXACT MATCH · ⏱ <span id="stat-ms">0</span>ms</span>
+      <span class="idx-status" id="idx-status">· FULL-TEXT INDEX: loading 276 docs…</span>
+      <span class="right" id="stat-sort">SORTED BY RELEVANCE</span>
+    </div>
+
+    <div class="qq-wrap" id="qq-wrap">
+      <div class="qq-label">
+        <span>TRY · QUICK QUERIES</span>
+        <span class="qq-more" id="qq-more">+ SHOW ALL</span>
+      </div>
+      <div id="qq-list" class="qq-list">
+        <!-- Hardcoded fallback chips — replaced by terms derived from
+             patterns.json once MC.data loads. Kept here for SSR / no-JS
+             and as a safety net when the patterns file is unavailable. -->
+        <span class="qq">borman</span><span class="qq">uap</span><span class="qq">cernan</span><span class="qq">centcom</span><span class="qq">swir</span><span class="qq">fvey</span><span class="qq">carol rosin</span><span class="qq">ellipsoid</span><span class="qq">bouncy ball</span><span class="qq">orb</span><span class="qq">diamond</span><span class="qq">bronze</span><span class="qq">saucer</span><span class="qq">pantex</span><span class="qq">aawsa</span><span class="qq">oak ridge</span>
+      </div>
+    </div>
+
+    <p class="browse-hint" id="browse-hint">BROWSE / SUGGESTED · top events by flag weight</p>
+    <div class="results-grid" id="results-grid"></div>
+    <div class="empty-state" id="empty-state">
+      <h3>NO MATCHES</h3>
+      <div>try MEANING MATCH for fuzzier semantic results, or relax your filters</div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script>
+(function(){
+  // Visual mode toggle — MEANING is out of scope, show note, don't flip.
+  var modeExact = document.getElementById('mode-exact');
+  var modeMeaning = document.getElementById('mode-meaning');
+  var meaningNote = document.getElementById('meaning-note');
+  var searchMode = 'exact'; // 'exact' | 'semantic'
+  var renderRef = null;
+  modeExact.addEventListener('click', function(){
+    modeExact.classList.add('active');
+    modeMeaning.classList.remove('active');
+    meaningNote.classList.remove('on');
+    searchMode = 'exact';
+    if (typeof renderRef === 'function') renderRef();
+  });
+  modeMeaning.addEventListener('click', function(){
+    modeMeaning.classList.add('active');
+    modeExact.classList.remove('active');
+    meaningNote.classList.add('on');
+    searchMode = 'semantic';
+    // Lazy-load the model + vectors on first switch; the note doubles as
+    // a progress display.
+    ensureSemantic().then(function(){
+      meaningNote.textContent = '∿ MEANING MATCH — model ready · ' + (_semanticInfo ? _semanticInfo.count + ' vectors · ' + _semanticInfo.dim + 'd' : '');
+      if (typeof renderRef === 'function') renderRef();
+    }).catch(function(err){
+      meaningNote.textContent = '∿ MEANING MATCH failed: ' + err.message + ' — falling back to EXACT';
+    });
+  });
+
+  // ─── Semantic search (MiniLM via @huggingface/transformers from CDN) ───
+  // Lazy-load on first MEANING click. Vectors come from
+  // public/embeddings.bin (Float32, L2-normalized), metadata from
+  // embeddings-meta.json, count/dim from embeddings-info.json.
+  var _semanticModel = null;
+  var _semanticVectors = null;
+  var _semanticMeta = null;
+  var _semanticInfo = null;
+  var _semanticLoading = null;
+  async function ensureSemantic(){
+    if (_semanticModel && _semanticVectors) return;
+    if (_semanticLoading) return _semanticLoading;
+    _semanticLoading = (async function(){
+      meaningNote.textContent = '∿ Fetching MiniLM model from CDN…';
+      // Pin to the same major version used by the React app's bundled
+      // transformers.js (see package.json "@huggingface/transformers": "^4.2.0").
+      // The ORT WASM artefacts shipped in /ort/ (copied via
+      // scripts/copy-ort-assets.mjs from onnxruntime-web@1.26-dev) match the
+      // transformers.js v4 ABI — pinning a v3 here triggers a WebAssembly
+      // LinkError at instantiate time ("function import requires a callable").
+      var trf = await import('https://esm.sh/@huggingface/transformers@4.2.0');
+      trf.env.allowLocalModels = false;
+      trf.env.useBrowserCache = true;
+      // Self-host of ORT WASM lives at /ort/ (scripts/copy-ort-assets.mjs).
+      // Because transformers.js is loaded from esm.sh (cross-origin), the
+      // ORT loader's internal `import.meta.url` resolves to esm.sh — any
+      // relative wasmPaths ("../ort/") it tries gets routed back to esm.sh
+      // and 404s the .mjs glue. Force a fully-qualified URL pointing at
+      // our own deployment instead. For /mc/search.html → strip "/mc/…"
+      // and append "/ort/". Works on rizzleroc.github.io/pursue-console/
+      // and on any local mirror.
+      var ortBase = window.location.origin +
+        window.location.pathname.replace(/\/mc\/[^/]*$/, '/ort/');
+      trf.env.backends.onnx.wasm.wasmPaths = ortBase;
+      trf.env.backends.onnx.wasm.numThreads = 1;
+      trf.env.backends.onnx.wasm.proxy = false;
+      meaningNote.textContent = '∿ Loading model (int8)…';
+      _semanticModel = await trf.pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+        dtype: 'int8',
+        device: 'wasm',
+        progress_callback: function(p){
+          if (p && p.status === 'progress' && typeof p.progress === 'number'){
+            meaningNote.textContent = '∿ Loading model (' + Math.round(p.progress) + '%)…';
+          }
+        }
+      });
+      meaningNote.textContent = '∿ Fetching embeddings.bin (~8.6MB)…';
+      var [buf, meta, info] = await Promise.all([
+        fetch('../embeddings.bin?t=' + Date.now()).then(function(r){ return r.arrayBuffer(); }),
+        fetch('../embeddings-meta.json?t=' + Date.now()).then(function(r){ return r.json(); }),
+        fetch('../embeddings-info.json?t=' + Date.now()).then(function(r){ return r.json(); })
+      ]);
+      _semanticVectors = new Float32Array(buf);
+      _semanticMeta = meta;
+      _semanticInfo = info;
+      meaningNote.textContent = '∿ MEANING MATCH ready · ' + info.count + ' vectors · ' + info.dim + 'd';
+    })();
+    return _semanticLoading;
+  }
+
+  // Top-K cosine search over the (already L2-normalized) vector index.
+  function semanticTopK(qVec, K){
+    var dim = _semanticInfo.dim, count = _semanticInfo.count;
+    var qNorm = 0; for (var i = 0; i < dim; i++) qNorm += qVec[i] * qVec[i];
+    qNorm = Math.sqrt(qNorm) || 1;
+    var q = new Float32Array(dim);
+    for (var i2 = 0; i2 < dim; i2++) q[i2] = qVec[i2] / qNorm;
+    var scores = new Float32Array(K).fill(-Infinity);
+    var idxs   = new Int32Array(K).fill(-1);
+    var minScore = -Infinity, minPos = 0;
+    var v = _semanticVectors;
+    for (var r = 0; r < count; r++){
+      var s = 0; var base = r * dim;
+      for (var k = 0; k < dim; k++) s += v[base + k] * q[k];
+      if (s > minScore){
+        scores[minPos] = s; idxs[minPos] = r;
+        minScore = scores[0]; minPos = 0;
+        for (var j = 1; j < K; j++) if (scores[j] < minScore){ minScore = scores[j]; minPos = j; }
+      }
+    }
+    var out = [];
+    for (var i3 = 0; i3 < K; i3++) if (idxs[i3] >= 0) out.push({ idx: idxs[i3], score: scores[i3] });
+    out.sort(function(a, b){ return b.score - a.score; });
+    return out;
+  }
+
+  // Literal-token boost — copied from src/views/SemanticSearchView.jsx.
+  function literalBoost(query, hayText){
+    if (!query || !hayText) return 0;
+    var q = String(query).toLowerCase().trim();
+    var h = String(hayText).toLowerCase();
+    var toks = q.split(/\s+/).filter(function(t){ return t.length >= 2; });
+    var boost = 0;
+    if (q.length >= 3 && h.indexOf(q) !== -1) boost += 0.50;
+    if (boost > 0) return Math.min(boost, 0.55);
+    var hits = 0;
+    for (var i = 0; i < toks.length; i++) if (h.indexOf(toks[i]) !== -1) hits++;
+    if (toks.length && hits === toks.length) boost += 0.20;
+    else if (hits > 0) boost += Math.min(0.05 * hits, 0.15);
+    return boost;
+  }
+
+  async function semanticSearch(query, allowedEids){
+    await ensureSemantic();
+    if (!_semanticModel || !_semanticVectors) throw new Error('semantic engine not ready');
+    var emb = await _semanticModel(query, { pooling: 'mean', normalize: true });
+    var qVec = emb.data; // Float32Array of size dim
+    var top = semanticTopK(qVec, 60);
+    var seenEvent = {};
+    var hits = [];
+    for (var i = 0; i < top.length; i++){
+      var m = _semanticMeta[top[i].idx];
+      if (!m) continue;
+      var eid = m.eventId;
+      if (allowedEids && !allowedEids[eid]) continue;
+      var hay = (m.title || '') + ' ' + (m.body || '') + ' ' + (m.agency || '');
+      var final = top[i].score + literalBoost(query, hay);
+      if (!seenEvent[eid]) seenEvent[eid] = { eid: eid, top: m, hits: [], best: 0 };
+      seenEvent[eid].hits.push(Object.assign({ score: final, cos: top[i].score }, m));
+      if (final > seenEvent[eid].best) seenEvent[eid].best = final;
+      if (Object.keys(seenEvent).length >= 24 && seenEvent[eid].hits.length >= 4) break;
+    }
+    return Object.values(seenEvent).sort(function(a, b){ return b.best - a.best; });
+  }
+
+  // Sync placeholder with live corpus scale (kept from original).
+  function syncSearchScale(MC){
+    var D = MC && MC.derive; if (!D) return;
+    var q = document.getElementById('search-q');
+    if (!q) return;
+    var ev = (typeof D.eventCount === 'number' && D.eventCount > 0) ? D.eventCount : 220;
+    var pg = (typeof D.pagesIndexed === 'number' && D.pagesIndexed > 0) ? D.pagesIndexed.toLocaleString() : '3,530';
+    q.placeholder = 'QUERY · ' + ev + ' events · ' + pg + ' pages…';
+  }
+
+  // Agency → dot class.
+  function dotClass(agency){
+    var a = (agency || '').toString().toUpperCase();
+    if (a === 'DOW' || a === 'DEPT OF WAR' || a === 'DEPARTMENT OF WAR') return ''; // amber default
+    if (a === 'FBI') return 'c';
+    if (a === 'NASA') return 'e';
+    if (a === 'ANCHOR') return 'r';
+    return 'g';
+  }
+
+  // Flag-weight (for default "BROWSE / SUGGESTED" listing).
+  function flagWeight(f){
+    var x = (f || '').toString().toLowerCase();
+    if (x === 'anchor') return 4;
+    if (x === 'high')   return 3;
+    if (x === 'med' || x === 'medium') return 2;
+    if (x === 'low')    return 1;
+    return 0;
+  }
+
+  // Escape for safe HTML interpolation.
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── Scoring ──
+  // title substring → 10 · id substring → 8 · agency/region/type/era substring → 4
+  // exact tag/era token match → 2 · per-token sum, top 24.
+  // Tags / cross-references (facility / program / framework / sensor ids) score
+  // at 6 each — they let researchers find a case by physics concept, facility
+  // name, or sensor type even when the title doesn't include those words.
+  function scoreEvent(ev, tokens){
+    var total = 0;
+    var title  = (ev.title  || '').toLowerCase();
+    var id     = (ev.id     || '').toLowerCase();
+    var agency = (ev.agency || '').toLowerCase();
+    var region = (ev.region || '').toLowerCase();
+    var era    = (ev.era    || '').toLowerCase();
+    var type   = (ev.type   || '').toLowerCase();
+    var tagBlob = Array.isArray(ev.tags) ? ev.tags.join(' ').toLowerCase() : '';
+    var refBlob = Array.isArray(ev.crossRefs)
+      ? ev.crossRefs.map(function(r){ return (r && r.id) || ''; }).join(' ').toLowerCase()
+      : '';
+    for (var i = 0; i < tokens.length; i++){
+      var t = tokens[i];
+      if (!t) continue;
+      if (title.indexOf(t)  !== -1) total += 10;
+      if (id.indexOf(t)     !== -1) total += 8;
+      if (tagBlob.indexOf(t)!== -1) total += 6;
+      if (refBlob.indexOf(t)!== -1) total += 6;
+      if (agency.indexOf(t) !== -1) total += 4;
+      if (region.indexOf(t) !== -1) total += 4;
+      if (type.indexOf(t)   !== -1) total += 4;
+      if (era.indexOf(t)    !== -1) total += 4;
+      if (era === t || type === t)  total += 2;
+    }
+    return total;
+  }
+
+  function tokenize(q){
+    return (q || '').toLowerCase().split(/\s+/).filter(Boolean);
+  }
+
+  // ─────────── Full-text index (MiniSearch over public/search-index.json) ───────────
+  // Module-level cache — the index is 8.6MB; load + parse once per page.
+  var _miniPromise = null;
+  function loadFullTextIndex(){
+    if (_miniPromise) return _miniPromise;
+    _miniPromise = (async () => {
+      var MiniSearch = (await import('./lib/minisearch.js')).default;
+      var t = await fetch('../search-index.json').then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      });
+      return MiniSearch.loadJSON(t, {
+        fields: ['title','body','agency'],
+        storeFields: ['eventId','page','kind','title','agency','date','flag','body'],
+        searchOptions: { boost: { title: 3, body: 1 }, prefix: true, fuzzy: 0.15 },
+        tokenize: function(s){ return s.toLowerCase().split(/[^a-z0-9']+/).filter(function(t){ return t.length >= 2 && t.length <= 30; }); }
+      });
+    })();
+    return _miniPromise;
+  }
+
+  // Pull a ~280-char snippet centered around the first token match.
+  function snippetAround(body, tokens, span){
+    if (!body) return '';
+    span = span || 140;
+    var lower = body.toLowerCase();
+    var bestPos = -1;
+    for (var i = 0; i < tokens.length; i++){
+      var p = lower.indexOf(tokens[i]);
+      if (p !== -1 && (bestPos === -1 || p < bestPos)) bestPos = p;
+    }
+    if (bestPos === -1) return body.slice(0, span * 2).replace(/\s+/g, ' ').trim();
+    var start = Math.max(0, bestPos - span);
+    var end   = Math.min(body.length, bestPos + span);
+    return (start > 0 ? '…' : '') + body.slice(start, end).replace(/\s+/g, ' ').trim() + (end < body.length ? '…' : '');
+  }
+
+  // Wrap each token in <mark>; safe-escapes the rest.
+  function highlightSnippet(text, tokens){
+    if (!text) return '';
+    if (!tokens || !tokens.length) return esc(text);
+    try {
+      var safe = tokens.map(function(t){ return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
+      var re = new RegExp('(' + safe + ')', 'ig');
+      return text.split(re).map(function(s){
+        return re.test(s) ? '<mark>' + esc(s) + '</mark>' : esc(s);
+      }).join('');
+    } catch (e) { return esc(text); }
+  }
+
+  // Evidence-type → badge spec (class, short label).
+  var BADGE_SPEC = {
+    'primary-source':  ['primary',  'PRIMARY'],
+    'sensor-derived':  ['sensor',   'SENSOR'],
+    'physics-linked':  ['physics',  'PHYSICS'],
+    'witness-account': ['witness',  'WITNESS'],
+    'imagery':         ['imagery',  'IMAGERY']
+  };
+
+  function badgesHTML(ev){
+    var out = [];
+    if (ev.priority === 'critical') out.push('<span class="b crit">CRITICAL</span>');
+    else if (ev.priority === 'high') out.push('<span class="b priority">PRIORITY</span>');
+    if (Array.isArray(ev.evidenceTypes)){
+      for (var i = 0; i < ev.evidenceTypes.length; i++){
+        var spec = BADGE_SPEC[ev.evidenceTypes[i]];
+        if (spec) out.push('<span class="b ' + spec[0] + '">' + spec[1] + '</span>');
+      }
+    }
+    if (!out.length) return '';
+    return '<div class="badges">' + out.join('') + '</div>';
+  }
+
+  // Card renderer. `pageHits` is optional — when present, each is a
+  // {page, body} object surfaced from the full-text index; we render up to
+  // 4 inline snippets with the query tokens marked.
+  function cardHTML(ev, score, MC, pageHits, tokens){
+    var href = (MC && MC.url && MC.url.dossier) ? MC.url.dossier(ev.id) : ('dossier.html?eid=' + encodeURIComponent(ev.id));
+    var dot = dotClass(ev.agency);
+    var snippet = [ev.date, ev.region, ev.agency, ev.type].filter(Boolean).join(' · ');
+    var scoreStr = (typeof score === 'number') ? score.toFixed(0) : '';
+    var pagesHTML = '';
+    if (pageHits && pageHits.length){
+      var shown = pageHits.slice(0, 4).map(function(h){
+        var snip = highlightSnippet(snippetAround(h.body || '', tokens || []), tokens || []);
+        var pg = (h.page != null) ? ('PAGE ' + String(h.page).padStart(3, '0')) : 'PAGE —';
+        return '<div class="ph"><span class="lab">' + esc(pg) + '</span>' + snip + '</div>';
+      }).join('');
+      var more = (pageHits.length > 4) ? '<div class="more">+ ' + (pageHits.length - 4) + ' more page' + (pageHits.length - 4 === 1 ? '' : 's') + '</div>' : '';
+      pagesHTML = '<div class="rc-pages">' + shown + more + '</div>';
+    }
+    return '' +
+      '<a class="rc" href="' + esc(href) + '">' +
+        '<div class="top">' +
+          '<span class="dot ' + dot + '"></span>' +
+          '<span class="eid">' + esc(ev.id) + '</span>' +
+          (scoreStr ? '<span class="score">' + esc(scoreStr) + '</span>' : '') +
+        '</div>' +
+        badgesHTML(ev) +
+        '<h3>' + esc(ev.title || ev.id) + '</h3>' +
+        '<p>' + esc(snippet) + '</p>' +
+        pagesHTML +
+        '<div class="bottom">' +
+          '<span class="pg">' + esc((ev.agency || '—').toString().toUpperCase()) + '</span>' +
+          '<span>' + esc(ev.date || ev.era || '') + '</span>' +
+        '</div>' +
+      '</a>';
+  }
+
+  function applyFilters(events, f){
+    if (!f.agency && !f.era && !f.type && !f.physics) return events;
+    return events.filter(function(e){
+      if (f.agency && f.agency !== 'ALL' && (e.agency || '') !== f.agency) return false;
+      if (f.era    && f.era    !== 'ALL' && (e.era    || '') !== f.era)    return false;
+      if (f.type   && f.type   !== 'ALL' && (e.type   || '') !== f.type)   return false;
+      if (f.physics && !(Array.isArray(e.category) && e.category.indexOf('physics-relevant') !== -1)) return false;
+      return true;
+    });
+  }
+
+  function populateFilter(sel, values, leadLabel){
+    // Keep the existing leading "ALL ..." option, append the rest.
+    while (sel.options.length > 1) sel.remove(1);
+    values.slice().sort().forEach(function(v){
+      var o = document.createElement('option');
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+
+  MC.ready().then(function(){
+    syncSearchScale(MC);
+    MC.onUpdate(function(){ syncSearchScale(MC); });
+
+    var events = (MC.derive && MC.derive.events) || [];
+    var byAgency = (MC.derive && MC.derive.byAgency) || {};
+    var byEra    = (MC.derive && MC.derive.byEra)    || {};
+    var typeSet  = {};
+    events.forEach(function(e){ if (e && e.type) typeSet[e.type] = true; });
+
+    var selAgency = document.getElementById('filter-agency');
+    var selEra    = document.getElementById('filter-era');
+    var selType   = document.getElementById('filter-type');
+    populateFilter(selAgency, Object.keys(byAgency));
+    populateFilter(selEra,    Object.keys(byEra));
+    populateFilter(selType,   Object.keys(typeSet));
+
+    var inp        = document.getElementById('search-q');
+    var clearBtn   = document.getElementById('search-clear');
+    var grid       = document.getElementById('results-grid');
+    var emptyEl    = document.getElementById('empty-state');
+    var statCount  = document.getElementById('stat-count');
+    var statMs     = document.getElementById('stat-ms');
+    var statSort   = document.getElementById('stat-sort');
+    var browseHint = document.getElementById('browse-hint');
+    var physicsPill= document.getElementById('filter-physics');
+    var idxStatus  = document.getElementById('idx-status');
+    var qqWrap     = document.getElementById('qq-wrap');
+    var qqList     = document.getElementById('qq-list');
+    var qqMore     = document.getElementById('qq-more');
+
+    // ── Quick-query chips, derived from patterns.json ────────────────────
+    // Pull the top terms per kind (entity / shape / behavior / sensor),
+    // tag each with a CSS class so the four kinds tint distinctly, then
+    // combine + shuffle. Re-derives on every MC.onUpdate so a corpus
+    // refresh (or index re-validation) keeps the chips in sync.
+    //
+    // qqMode: 'top' shows top-16 (4 per kind), 'all' shows up to 40.
+    var qqMode = 'top';
+    var QQ_KINDS = ['entity', 'shape', 'behavior', 'sensor'];
+
+    function _isUsefulTerm(t){
+      if (!t || typeof t !== 'string') return false;
+      var s = t.trim();
+      if (s.length < 3 || s.length > 25) return false;
+      if (/^[0-9]+$/.test(s)) return false; // pure numeric
+      return true;
+    }
+    // Mulberry32-ish shuffle seeded by the corpus generatedAt so the chip
+    // order is stable across reloads of the same data but changes when the
+    // corpus actually changes.
+    function _seededShuffle(arr, seed){
+      var a = arr.slice();
+      var s = (seed >>> 0) || 1;
+      for (var i = a.length - 1; i > 0; i--){
+        s = (s + 0x6D2B79F5) >>> 0;
+        var r = s;
+        r = Math.imul(r ^ (r >>> 15), r | 1);
+        r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+        var j = ((r ^ (r >>> 14)) >>> 0) % (i + 1);
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+    function _deriveChips(perKind, totalCap){
+      var pk = (MC.data && MC.data.patterns && MC.data.patterns.byKind) || {};
+      var combined = [];
+      for (var i = 0; i < QQ_KINDS.length; i++){
+        var kind = QQ_KINDS[i];
+        var bucket = (pk[kind] || [])
+          .filter(function(row){ return row && _isUsefulTerm(row.term); })
+          .slice()
+          .sort(function(a, b){
+            return (b.docCount || 0) - (a.docCount || 0) ||
+                   (b.total    || 0) - (a.total    || 0);
+          })
+          .slice(0, perKind);
+        for (var j = 0; j < bucket.length; j++){
+          combined.push({ term: bucket[j].term, kind: kind });
+        }
+      }
+      // de-dupe terms that appear in multiple kinds (rare but possible)
+      var seen = {};
+      combined = combined.filter(function(c){
+        var k = c.term.toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = true;
+        return true;
+      });
+      var ga = (MC.data && MC.data.patterns && MC.data.patterns.generatedAt) || '';
+      var seed = 0;
+      for (var s = 0; s < ga.length; s++) seed = (seed * 31 + ga.charCodeAt(s)) >>> 0;
+      combined = _seededShuffle(combined, seed || 42);
+      if (typeof totalCap === 'number') combined = combined.slice(0, totalCap);
+      return combined;
+    }
+    function renderQQ(){
+      if (!qqList) return;
+      var perKind = (qqMode === 'all') ? 10 : 4;
+      var cap     = (qqMode === 'all') ? 40 : 16;
+      var chips = _deriveChips(perKind, cap);
+      if (!chips.length) return; // keep hardcoded fallback
+      var html = chips.map(function(c){
+        // esc() is defined at outer scope — reuse it for safe interpolation.
+        return '<span class="qq qq-' + c.kind + '">' + esc(c.term) + '</span>';
+      }).join('');
+      qqList.innerHTML = html;
+      if (qqMore) qqMore.textContent = (qqMode === 'all') ? '− SHOW TOP 16' : '+ SHOW ALL';
+    }
+    if (qqMore){
+      qqMore.addEventListener('click', function(){
+        qqMode = (qqMode === 'all') ? 'top' : 'all';
+        renderQQ();
+      });
+    }
+    // Initial paint from already-loaded patterns (data.js fetches in ready()).
+    renderQQ();
+    // Survive index re-validation — re-derive whenever the data layer updates.
+    if (MC.onUpdate) MC.onUpdate(function(){ renderQQ(); });
+
+    // Module-level: the loaded MiniSearch instance (or null until ready).
+    var mini = null;
+    var eventById = {};
+    events.forEach(function(e){ eventById[e.id] = e; });
+
+    // Quick-query chips just fill the input.
+    if (qqList){
+      qqList.addEventListener('click', function(e){
+        if (e.target && e.target.classList.contains('qq')){
+          inp.value = e.target.textContent.trim();
+          render();
+          inp.focus();
+        }
+      });
+    }
+
+    // Kick the full-text index load. Render uses event-meta scoring meanwhile.
+    loadFullTextIndex().then(function(m){
+      mini = m;
+      if (idxStatus){ idxStatus.textContent = '· FULL-TEXT INDEX: 276 docs · fuzzy + prefix · ready'; idxStatus.classList.add('ready'); }
+      render();
+    }).catch(function(err){
+      if (idxStatus){ idxStatus.textContent = '· FULL-TEXT INDEX: ' + err.message + ' — falling back to event-meta search'; idxStatus.classList.add('error'); }
+    });
+
+    function currentFilters(){
+      return {
+        agency:  selAgency.value,
+        era:     selEra.value,
+        type:    selType.value,
+        physics: physicsPill && physicsPill.classList.contains('on')
+      };
+    }
+
+    // Expose render() so the MEANING-mode click can re-trigger after lazy load.
+    function render(){
+      var t0 = performance.now();
+      var q = (inp.value || '').trim();
+      var f = currentFilters();
+      var base = applyFilters(events, f);
+      var allowed = {}; base.forEach(function(e){ allowed[e.id] = true; });
+      var out, isBrowse = false, pageHitsByEid = {};
+      var tokens = tokenize(q);
+
+      // SEMANTIC MODE — fire async, paint when results land. Keep the
+      // sync render path going so the UI never blanks out.
+      if (searchMode === 'semantic' && q && _semanticModel && _semanticVectors){
+        statSort.textContent = 'SEMANTIC · COSINE + LITERAL BOOST';
+        semanticSearch(q, allowed).then(function(groups){
+          var html = '';
+          var pageCount = 0;
+          for (var g = 0; g < groups.length; g++){
+            var grp = groups[g];
+            var ev = eventById[grp.eid];
+            if (!ev) continue;
+            var hits = grp.hits.slice(0, 4).map(function(h){
+              return { page: h.page, body: h.body, score: h.cos };
+            });
+            pageCount += grp.hits.length;
+            html += cardHTML(ev, grp.best, MC, hits, tokens);
+          }
+          var t1 = performance.now();
+          statCount.textContent = groups.length + (pageCount ? (' / ' + pageCount + ' pg') : '');
+          statMs.textContent = Math.max(0, Math.round(t1 - t0));
+          browseHint.style.display = 'none';
+          if (qqWrap) qqWrap.style.display = 'none';
+          if (!html && q){
+            emptyEl.classList.add('on');
+            grid.innerHTML = '';
+            return;
+          }
+          emptyEl.classList.remove('on');
+          grid.innerHTML = html;
+        }).catch(function(err){
+          statSort.textContent = 'SEMANTIC · ERROR — using EXACT';
+          console.warn(err);
+        });
+        return;
+      }
+
+      if (!q){
+        // BROWSE / SUGGESTED — top 12 by flag weight.
+        isBrowse = true;
+        out = base.slice().sort(function(a, b){ return flagWeight(b.flag) - flagWeight(a.flag); }).slice(0, 12)
+          .map(function(ev){ return { ev: ev, score: null }; });
+      } else if (mini){
+        // FULL-TEXT — page-level hits via MiniSearch, grouped by event.
+        // boosts come from the field config (title 3, body 1), AND-combined,
+        // then we score-merge with the event-meta score so a strong title or
+        // tag/crossRef match outranks a one-page body hit on a junky event.
+        var raw = mini.search(q, { combineWith: 'AND' });
+        // Each raw hit is a page-doc; group by eventId.
+        var byEid = {};
+        var metaBoosted = {};
+        for (var i = 0; i < raw.length; i++){
+          var h = raw[i];
+          if (!allowed[h.eventId]) continue;
+          if (!byEid[h.eventId]){ byEid[h.eventId] = { ev: eventById[h.eventId], hits: [], topScore: 0 }; }
+          byEid[h.eventId].hits.push(h);
+          if (h.score > byEid[h.eventId].topScore) byEid[h.eventId].topScore = h.score;
+        }
+        out = Object.keys(byEid).map(function(eid){
+          var g = byEid[eid];
+          var metaScore = scoreEvent(g.ev, tokens);
+          // Combine: page-relevance + event-meta weight (sum), event-meta
+          // alone breaks ties from "only one fuzzy body hit" events.
+          var combined = g.topScore + (metaScore * 0.5) + (g.hits.length * 0.5);
+          metaBoosted[eid] = metaScore;
+          pageHitsByEid[eid] = g.hits;
+          return { ev: g.ev, score: combined };
+        });
+        // Add events with strong meta match but no body hits (e.g. id/tag/crossRef
+        // queries like "aawsa" — the literal string isn't in any page body).
+        for (var k = 0; k < base.length; k++){
+          var ev2 = base[k];
+          if (byEid[ev2.id]) continue;
+          var sMeta = scoreEvent(ev2, tokens);
+          if (sMeta >= 6){ out.push({ ev: ev2, score: sMeta }); }
+        }
+        out.sort(function(a, b){ return b.score - a.score; });
+        out = out.slice(0, 24);
+      } else {
+        // No index loaded yet — pure event-meta scoring (back-compat).
+        var scored = [];
+        for (var i2 = 0; i2 < base.length; i2++){
+          var s = scoreEvent(base[i2], tokens);
+          if (s > 0) scored.push({ ev: base[i2], score: s });
+        }
+        scored.sort(function(a, b){ return b.score - a.score; });
+        out = scored.slice(0, 24);
+      }
+
+      var t1 = performance.now();
+      var ms = Math.max(0, Math.round(t1 - t0));
+
+      // Stats row.
+      var pageCount = 0;
+      for (var pE in pageHitsByEid) pageCount += pageHitsByEid[pE].length;
+      statCount.textContent = out.length + (pageCount ? (' / ' + pageCount + ' pg') : '');
+      statMs.textContent = ms;
+      statSort.textContent = isBrowse
+        ? 'SORTED BY FLAG WEIGHT'
+        : (mini ? 'PAGE-LEVEL · SORTED BY RELEVANCE' : 'EVENT-META · INDEX LOADING…');
+
+      // Browse hint + quick chips visible only on no-query.
+      browseHint.style.display = isBrowse ? '' : 'none';
+      if (qqWrap) qqWrap.style.display = isBrowse ? '' : 'none';
+
+      // Empty state — only when there's a query AND no hits.
+      if (out.length === 0 && q){
+        emptyEl.classList.add('on');
+        grid.innerHTML = '';
+        return;
+      }
+      emptyEl.classList.remove('on');
+
+      // Cap render at 24.
+      var html = '';
+      for (var j = 0; j < out.length; j++){
+        var row = out[j];
+        var hits = pageHitsByEid[row.ev.id] || null;
+        html += cardHTML(row.ev, row.score, MC, hits, tokens);
+      }
+      grid.innerHTML = html;
+    }
+
+    // Debounced input (~120ms).
+    var deb;
+    function schedule(){
+      clearTimeout(deb);
+      deb = setTimeout(render, 120);
+    }
+
+    inp.addEventListener('input', schedule);
+    clearBtn.addEventListener('click', function(){
+      inp.value = '';
+      render();
+      inp.focus();
+    });
+    selAgency.addEventListener('change', render);
+    selEra.addEventListener('change', render);
+    selType.addEventListener('change', render);
+    if (physicsPill){
+      physicsPill.addEventListener('click', function(){
+        physicsPill.classList.toggle('on');
+        render();
+      });
+    }
+
+    // Deep-links: URL ?q=… ?physics=1 ?agency=… ?era=…
+    if (MC.query && MC.query.q){ inp.value = String(MC.query.q); }
+    if (MC.query && (MC.query.physics === '1' || MC.query.physics === 'true') && physicsPill){
+      physicsPill.classList.add('on');
+    }
+    if (MC.query && MC.query.agency && selAgency){
+      var av = String(MC.query.agency);
+      for (var ai = 0; ai < selAgency.options.length; ai++){
+        if (selAgency.options[ai].value === av){ selAgency.value = av; break; }
+      }
+    }
+    if (MC.query && MC.query.era && selEra){
+      var ev = String(MC.query.era);
+      for (var ei = 0; ei < selEra.options.length; ei++){
+        if (selEra.options[ei].value === ev){ selEra.value = ev; break; }
+      }
+    }
+
+    // Shared header filters (chrome.js) — pipe into the in-page filters so
+    // typing in the topbar search updates SEARCH live, just like the React Header.
+    function syncFromHeader(){
+      var HF = MC.headerFilters || {};
+      if (typeof HF.query === 'string' && HF.query && HF.query !== inp.value) inp.value = HF.query;
+      if (HF.agency && HF.agency !== 'all' && selAgency){
+        for (var i = 0; i < selAgency.options.length; i++){
+          if (selAgency.options[i].value === HF.agency){ selAgency.value = HF.agency; break; }
+        }
+      }
+      // Type filter from the header maps to the in-page type select.
+      if (HF.type && HF.type !== 'all' && selType){
+        for (var j = 0; j < selType.options.length; j++){
+          if (selType.options[j].value === HF.type){ selType.value = HF.type; break; }
+        }
+      }
+      render();
+    }
+    syncFromHeader();
+    if (MC.onHeaderFilters) MC.onHeaderFilters(syncFromHeader);
+
+    // Expose render() to the mode-toggle handler outside MC.ready.
+    renderRef = render;
+
+    // Initial paint.
+    render();
+  });
+})();
+</script>
+</body>
+</html>
