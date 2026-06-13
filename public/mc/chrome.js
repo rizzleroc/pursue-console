@@ -418,18 +418,23 @@
 
     const D = window.MC.derive;
     const byAgency = D.byAgency || {};
-    const typeSet = {};
-    (D.events || []).forEach(e => { if (e && e.type) typeSet[e.type] = true; });
 
-    // Populate options
+    // Populate agency options from the live tally so a new release's
+    // agencies show up automatically.
     Object.keys(byAgency).sort().forEach(a => {
       const o = document.createElement('option');
       o.value = a; o.textContent = a;
       agSel.appendChild(o);
     });
-    Object.keys(typeSet).sort().forEach(t => {
+    // Type dropdown uses the four canonical buckets the React app filters
+    // by — collapsing 40+ free-form `type` strings ("Sensor Video",
+    // "Mission Report + Video", "Audio Recording", "Imagery", …) into
+    // {Document, Video, Image, Audio} keeps the dropdown usable and means
+    // every event matches exactly one option. MC.recordType() lives in
+    // data.js so views applying their own filter use the same bucketing.
+    ['Document', 'Video', 'Image', 'Audio'].forEach(t => {
       const o = document.createElement('option');
-      o.value = t; o.textContent = t;
+      o.value = t; o.textContent = t.toUpperCase();
       tySel.appendChild(o);
     });
     // Restore from MC.headerFilters

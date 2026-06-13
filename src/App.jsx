@@ -37,12 +37,30 @@ const SemanticSearchView = lazy(() => import("./views/SemanticSearchView.jsx"));
 // Collapse the free-form `type` field into the four record categories
 // war.gov/UFO filters by (the "ALL TYPES" dropdown). Mirrors LiveFeedView's
 // mediaTypeOf so the taxonomy is consistent across the app.
-function recordType(e) {
+// Exported so views (SearchView, SemanticSearchView, AskView, etc.) can
+// reuse the same bucketing instead of duplicating regex.
+export function recordType(e) {
   const t = (e.type || "").toLowerCase();
   if (e.videoId || /video/.test(t)) return "Video";
   if (/audio/.test(t)) return "Audio";
   if (/image|imagery|photo/.test(t)) return "Image";
   return "Document";
+}
+
+// Apply the header filters (agency/release/type/query) against any
+// events-like array. Views that hit the EVENTS catalogue directly
+// (SearchView, SemanticSearchView results, AskView results) call this
+// instead of just filtering on `query`. The query is a substring match
+// over title + summary + loc + agency + tags; if you pass a different
+// query (e.g. a semantic-search hit body), include it in the haystack
+// via the `extraHaystack` callback.
+export function matchesHeaderFilters(e, headerFilters) {
+  if (!e) return false;
+  const { filterAgency, filterRelease, filterType } = headerFilters || {};
+  if (filterAgency && filterAgency !== "all" && e.agency !== filterAgency) return false;
+  if (filterType   && filterType   !== "all" && recordType(e) !== filterType) return false;
+  if (filterRelease && filterRelease !== "all" && (e.release || "Release 01") !== filterRelease) return false;
+  return true;
 }
 
 export default function App() {
@@ -73,13 +91,9 @@ export default function App() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const hf = { filterAgency, filterRelease, filterType };
     return EVENTS.filter(e => {
-      if (filterAgency !== "all" && e.agency !== filterAgency) return false;
-      if (filterType !== "all" && recordType(e) !== filterType) return false;
-      // Release tag lives on the event (defaulting to "Release 01" in
-      // events.js for legacy records); compare directly so Release 02
-      // / future releases actually subset the catalogue.
-      if (filterRelease !== "all" && (e.release || "Release 01") !== filterRelease) return false;
+      if (!matchesHeaderFilters(e, hf)) return false;
       if (q && !(
         e.title.toLowerCase().includes(q) ||
         e.summary.toLowerCase().includes(q) ||

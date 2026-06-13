@@ -406,6 +406,50 @@
     window.addEventListener('mc:filters', h);
     return () => window.removeEventListener('mc:filters', h);
   };
+
+  // Collapse the free-form `type` field into the four record categories
+  // war.gov/UFO filters by — same bucketing as React's src/App.jsx
+  // recordType(). 44 distinct raw type strings would make the dropdown
+  // unusable; users pick one of {Document, Video, Image, Audio} instead.
+  MC.recordType = (ev) => {
+    const t = (ev && ev.type ? String(ev.type) : '').toLowerCase();
+    if ((ev && ev.videoId) || /video/.test(t)) return 'Video';
+    if (/audio/.test(t)) return 'Audio';
+    if (/image|imagery|photo/.test(t)) return 'Image';
+    return 'Document';
+  };
+  // Single source of truth for "does this event match the current
+  // header filters?". Used by every view that wants filter compliance
+  // (search.html, media.html today; coverage.html, dossiers.html,
+  // index.html, evidence.html, etc. as they wire it up).
+  MC.matchesHeaderFilters = (ev, HF) => {
+    HF = HF || MC.headerFilters || {};
+    if (!ev) return false;
+    if (HF.agency && HF.agency !== 'all' && ev.agency !== HF.agency) return false;
+    if (HF.type && HF.type !== 'all' && MC.recordType(ev) !== HF.type) return false;
+    if (HF.query) {
+      const q = String(HF.query).toLowerCase().trim();
+      if (q) {
+        const hay = [
+          ev.title || '', ev.summary || '', ev.loc || '', ev.agency || '',
+          (ev.tags || []).join(' '), ev.era || '', ev.region || '',
+        ].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+    }
+    return true;
+  };
+  // Convenience: returns the MC.derive.events list filtered by the
+  // current header filters. Views call this in place of MC.derive.events
+  // when they want filtering applied automatically.
+  MC.filteredEvents = (HF) => {
+    const evs = (MC.derive && MC.derive.events) || [];
+    HF = HF || MC.headerFilters || {};
+    if ((!HF.query || HF.query === '') && (!HF.agency || HF.agency === 'all') && (!HF.type || HF.type === 'all')) {
+      return evs;
+    }
+    return evs.filter((e) => MC.matchesHeaderFilters(e, HF));
+  };
   // URL helpers
   MC.url = {
     dossier: (eid, extra = "") => `dossier.html?eid=${encodeURIComponent(eid)}${extra ? "&" + extra : ""}`,
