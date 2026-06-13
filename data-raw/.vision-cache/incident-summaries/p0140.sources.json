@@ -16,10 +16,10 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-06-12T18:43:57.832Z",
+    "computed_at": "2026-06-13T20:21:52.252Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
-    "canonical": "gemini",
+    "canonical": "gpt-vision",
     "agreement_score": 0.019,
     "pairs": [
       {

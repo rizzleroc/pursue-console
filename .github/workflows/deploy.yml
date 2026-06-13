@@ -71,7 +71,12 @@ jobs:
         with:
           node-version: 20
       - name: Publish to gh-pages branch
+        # gh-pages internally calls `git commit` which fails with "Author
+        # identity unknown" unless user.name/email are set on the runner.
+        # Set the github-actions[bot] identity before invoking gh-pages.
         run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           npx --yes gh-pages@6 \
             --dist dist \
             --branch gh-pages \
