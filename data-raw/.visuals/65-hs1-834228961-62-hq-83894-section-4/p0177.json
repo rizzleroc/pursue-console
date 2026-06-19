@@ -1,21 +1,8 @@
 {
   "kind": "photograph",
   "title": "Two people throwing a saucer back and forth",
-  "description": "Illustration: Two people throwing a saucer back and forth",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "Person throwing saucer, curved path"
-    },
-    {
-      "kind": "photograph",
-      "title": "Person throwing saucer into the wind, returning path"
-    },
-    {
-      "kind": "photograph",
-      "title": "Person throwing saucer at ground, skipping path"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.341Z"
+  "description": "The Amazing\n-FLYIN-SAUCER\nGREAT FUN FOR THE WHOLE FAMILY!\nFLYIN-SAUCER performs in an amazing way as you develop your skill in flying it. A novel way to play catch. You will think of many games to play. Adaptable to almost any game.\nHOW TO FLY\nLaunch your FLYIN-SAUCER straight ahead with a snap of your wrist making it spin as fast as possible. DON'T THROW TOO HARD. . . . It's the spinning that gives it lift. Begin by flying about 10 feet. When windy, throw across the wind. You will quickly learn how to bank to the left or right.\nFLIGHT INSTRUCTIONS\nFLYIN' SAUCERS have flight characteristics very similar to airplanes. The SAUCER is launched in identically the same manner as sailing your hat onto a hook--by spinning and forward motion.\nIn order to fly in a straight line, the SAUCER must leave the hand in a level position. To curve the SAUCER, it must leave the hand banked or tilted in direction of desired curve--for example: for left curve--the left side of the SAUCER must be tilted down.\nFOR BEST RESULTS -- The spinning of the SAUCER is most important and most difficult to master. Because the spin creates a gyroscopic action which controls the attitude of the SAUCER in flight, a smooth, fast spinning delivery should be developed. Do not hold the SAUCER too tight.\nAnalyze your mistakes and make corrections by tilting or banking SAUCER. The correction must be applied to the SAUCER as it leaves the hand.\nSAIL 'EM BACK AND FORTH - PLAY CATCH !\nBegin by flying your saucer about 10 ",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.624Z",
+  "contributor": "Rizzleroc"
 }

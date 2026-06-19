@@ -22,7 +22,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.392Z",
+    "computed_at": "2026-06-13T20:21:49.985Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -55,17 +55,6 @@
       "judge": "chatgpt",
       "text_length": 178
     },
-    "dispute_kind": "judged",
-    "reevaluation": {
-      "providers": {
-        "gpt-vision": {
-          "text_file": "p0008.gpt-vision.v2.txt",
-          "chars": 41,
-          "imported_at": "2026-05-26T21:46:41.371Z",
-          "contributor": "Rizzleroc",
-          "via": "volunteer-review"
-        }
-      }
-    }
+    "dispute_kind": "judged"
   }
 }

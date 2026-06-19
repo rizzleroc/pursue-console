@@ -19,6 +19,7 @@ export default {
   },
   nav: {
     live:     "LIVE",
+    coverage: "COVERAGE",
     search:   "SEARCH",
     semantic: "SEMANTIC",
     ask:      "ASK",
@@ -29,8 +30,10 @@ export default {
     atlas:    "ATLAS",
     globe:    "GLOBE",
     network:  "NETWORK",
+    evidence: "EVIDENCE",
     help:     "HELP",
     analysis: "ANALYSIS",
+    support:  "SUPPORT",
     go_to_live: "Go to LIVE",
   },
   header: {

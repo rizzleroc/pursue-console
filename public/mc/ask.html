@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Ask</title>
+  <meta name="description" content="Local intent classifier over 220 catalogued events. Agency, era, release, priority, category filters. Cited results.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Ask — natural-language Q&A over the catalogue">
+  <meta property="og:description" content="Local intent classifier over 220 catalogued events. Agency, era, release, priority, category filters. Cited results.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/ask.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Ask — natural-language Q&A over the catalogue">
+  <meta name="twitter:description" content="Local intent classifier over 220 catalogued events. Agency, era, release, priority, category filters. Cited results.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .ask-shell { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 24px; position: relative; z-index: 3; }
+    .ask-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .mode-pill-row { display: flex; gap: 10px; margin-bottom: 22px; }
+    .mp { padding: 10px 16px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; user-select: none; }
+    .mp.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
+    .mp .badge { background: rgba(74,222,128,0.10); border: 1px solid rgba(74,222,128,0.4); color: var(--emerald); padding: 1px 6px; margin-left: 8px; font-size: 9px; }
+    .mp .badge.local { background: rgba(184,168,135,0.10); border-color: var(--border); color: var(--text-3); }
+    .ask-input { display: flex; flex-direction: column; gap: 12px; background: var(--surface-3); border: 1px solid var(--border-strong); padding: 22px; }
+    .ask-input textarea { background: transparent; border: none; outline: none; color: var(--text); font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; resize: vertical; min-height: 88px; }
+    .ask-input textarea::placeholder { color: var(--text-4); }
+    .ask-input-row { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+    .ask-input-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.18em; flex: 1; }
+    .ask-input-row .meta .v { color: var(--amber); }
+    .ask-input-row .send { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); padding: 10px 22px; cursor: pointer; }
+
+    .qa { margin-top: 28px; display: flex; flex-direction: column; gap: 0; position: relative; }
+    .qa-clear { position: absolute; top: 4px; right: 0; background: transparent; border: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-4); padding: 4px 8px; text-transform: uppercase; transition: color .15s; }
+    .qa-clear:hover { color: var(--rose, #f87171); }
+    .qa-clear[hidden] { display: none; }
+    .q { display: flex; align-items: flex-start; gap: 14px; padding: 22px 0 16px; border-bottom: 1px solid var(--hairline); }
+    .q.user { cursor: pointer; transition: background .15s; }
+    .q.user:hover { background: rgba(97,215,240,0.04); }
+    .q:last-child { border-bottom: none; }
+    .q .avatar { width: 32px; height: 32px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-2); flex-shrink: 0; }
+    .q .avatar.user { background: rgba(97,215,240,0.10); border-color: rgba(97,215,240,0.4); color: var(--cyan); }
+    .q .avatar.ai { background: rgba(242,166,35,0.10); border-color: var(--border-strong); color: var(--amber); }
+    .q .body { flex: 1; min-width: 0; }
+    .q .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.14em; margin-bottom: 8px; }
+    .q .body p { font-size: 15px; line-height: 1.65; color: var(--text-2); margin: 0 0 12px; }
+    .q .body p strong { color: var(--text); font-weight: 600; }
+    .q .body p em { color: var(--amber); font-style: normal; font-weight: 500; }
+
+    /* Result rows */
+    .a-rows { display: flex; flex-direction: column; gap: 0; margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+    .a-row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--hairline); text-decoration: none; color: inherit; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .a-row:last-child { border-bottom: none; }
+    .a-row:hover { color: var(--amber); }
+    .a-row .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); align-self: center; }
+    .a-row .dot.r { background: var(--rose); }
+    .a-row .dot.c { background: var(--cyan); }
+    .a-row .dot.e { background: var(--emerald); }
+    .a-row .name { color: var(--text); }
+    .a-row .name .id { color: var(--cyan); margin-right: 8px; font-size: 11px; }
+    .a-row .pg { color: var(--text-4); font-size: 10px; letter-spacing: 0.16em; }
+    .more-row { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; padding: 8px 0; }
+
+    .smart-note { padding: 22px 26px; background: var(--surface-2); border: 1px dashed var(--border-strong); margin-bottom: 22px; }
+    .smart-note h4 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: var(--amber); margin: 0 0 8px; }
+    .smart-note p { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); line-height: 1.6; margin: 0; letter-spacing: 0.06em; }
+    .smart-note p code { color: var(--cyan); }
+
+    .suggest { padding: 0; }
+    .suggest .sg { display: block; padding: 12px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: color .15s; color: var(--text-2); text-decoration: none; }
+    .suggest .sg:hover { color: var(--text); }
+    .suggest .sg:last-child { border-bottom: none; }
+    .suggest .sg .q-text { font-size: 13px; line-height: 1.45; }
+    .suggest .sg .q-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; margin-top: 4px; }
+  </style>
+</head>
+<body data-view="ask">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 04 — natural-language Q&amp;A</div>
+    <h1>Ask the corpus a question, <em>get a structured answer.</em></h1>
+    <p class="sub">PATTERN mode is a local intent classifier — instant, free, runs over the catalogue's shape (agency / era / category / cross-refs). SMART mode runs RAG against the semantic index via your local pursue-vision-mcp daemon.</p>
+  </section>
+
+  <section class="ask-shell">
+    <div class="ask-card">
+
+      <div class="mode-pill-row">
+        <span class="mp active" data-mode="pattern">▣ PATTERN <span class="badge local">LOCAL · INSTANT</span></span>
+        <span class="mp" data-mode="smart">∿ SMART <span class="badge">RAG + LLM</span></span>
+      </div>
+
+      <div id="smart-note" class="smart-note" style="display:none">
+        <h4>SMART mode requires your local pursue-vision-mcp daemon</h4>
+        <p>SMART runs <code>scripts/build-embeddings.py</code> output through a transformers.js MiniLM (25MB) and ships top-K passages to your logged-in Claude / ChatGPT / Gemini tab via <code>pursue-vision-mcp</code>. Not bundled into the static /mc/ surface. Stick with PATTERN here, or open the live React app: <a href="../" style="color:var(--cyan);text-decoration:none">→ ../</a></p>
+      </div>
+
+      <div class="ask-input">
+        <textarea id="q-input" placeholder="Ask anything about the catalogue — &#34;NASA events&#34;, &#34;1960s&#34;, &#34;anchor events about CENTCOM&#34;, &#34;physics-relevant&#34;, &#34;release 02&#34;…">show me the physics-relevant events</textarea>
+        <div class="ask-input-row">
+          <span class="meta">CORPUS · <span class="v"><span data-mc="pagesIndexed" data-mc-format="comma">3,530</span> pages · <span data-mc="eventCount">220</span> events</span></span>
+          <button class="send" id="q-send">▶ INVESTIGATE</button>
+        </div>
+      </div>
+
+      <div class="qa" id="qa"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Suggested queries</span><span class="right">click to run</span></div>
+      <div class="suggest" id="suggest">
+        <a class="sg" data-q="physics-relevant events"><div class="q-text">Physics-relevant events</div><div class="q-meta">primary-source sensor data linked to theoretical research</div></a>
+        <a class="sg" data-q="anchor events"><div class="q-text">Anchor events</div><div class="q-meta">flagged ANCHOR — the corpus's primary cases</div></a>
+        <a class="sg" data-q="release 02"><div class="q-text">Release 02 events</div><div class="q-meta">the second war.gov declassification batch</div></a>
+        <a class="sg" data-q="NASA events"><div class="q-text">NASA events</div><div class="q-meta">orbital and astronaut accounts</div></a>
+        <a class="sg" data-q="1960s events"><div class="q-text">1960s events</div><div class="q-meta">Gemini-era era cohort</div></a>
+        <a class="sg" data-q="FBI"><div class="q-text">FBI events</div><div class="q-meta">62HQ-83894 and successors</div></a>
+        <a class="sg" data-q="oak ridge"><div class="q-text">Oak Ridge mentions</div><div class="q-meta">cross-references and matches</div></a>
+        <a class="sg" data-q="critical priority"><div class="q-text">Critical-priority events</div><div class="q-meta">tier-1 evidence chains</div></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  // ─── Pattern mode (vanilla port of src/lib/askEngine.js's intent core) ───
+  var AGENCY_ALIASES = [
+    ['nasa','NASA'], ['fbi','FBI'],
+    ['dow','Department of War'], ['dod','Department of War'], ['defense','Department of War'], ['war','Department of War'],
+    ['state','Department of State'], ['dos','Department of State'],
+    ['cia','Central Intelligence Agency'], ['intel agency','Central Intelligence Agency'],
+    ['doe','Department of Energy'], ['energy','Department of Energy'],
+    ['odni','Office of the Director of National Intelligence'], ['intelligence office','Office of the Director of National Intelligence'],
+  ];
+  var STOP = new Set('the a an what was is are were does did do about data on of in to from for by or and that which whats this these those with like just get back you so can be been has have had there its any i me tell show find list all into across records record documents document docs doc files file reports report anything everything things stuff please us event events case cases case-file dossier dossiers catalogue catalog hits matches result results'.split(' '));
+
+  function lc(s){ return (s||'').toLowerCase().trim(); }
+  function tokens(s){ return lc(s).replace(/[^a-z0-9' ]+/g, ' ').split(/\s+/).filter(Boolean).filter(function(t){ return !STOP.has(t); }); }
+
+  function detectAgency(q){
+    for (var i = 0; i < AGENCY_ALIASES.length; i++){
+      var alias = AGENCY_ALIASES[i][0];
+      if (new RegExp('\\b' + alias + '\\b').test(q)) return AGENCY_ALIASES[i][1];
+    }
+    return null;
+  }
+  function detectEra(q){
+    var m = q.match(/\b(?:19|20)?(\d0)s\b/);
+    if (m) return m[1] + 's';
+    var w = { sixties:'60s', seventies:'70s', eighties:'80s', nineties:'90s', forties:'40s', fifties:'50s' };
+    for (var k in w) if (q.indexOf(k) !== -1) return w[k];
+    return null;
+  }
+  function detectRelease(q){
+    if (/release\s*(?:0?2|two|ii)|r\s*02|rel\s*2/.test(q)) return 'Release 02';
+    if (/release\s*(?:0?1|one|i)|r\s*01|rel\s*1/.test(q))  return 'Release 01';
+    return null;
+  }
+  function detectFlag(q){
+    if (/\banchor\b/.test(q)) return 'anchor';
+    if (/\bhigh[- ]?flag\b|\bhigh[- ]?priority\b/.test(q)) return 'high';
+    return null;
+  }
+  function detectPriority(q){
+    if (/\bcritical\b/.test(q)) return 'critical';
+    return null;
+  }
+  function detectCategory(q){
+    if (/physics[- ]?relevant|physics events|theoretical/.test(q)) return 'physics-relevant';
+    if (/nuclear[- ]?site|nuclear facilit/.test(q)) return 'nuclear-site';
+    if (/primary[- ]?source/.test(q)) return 'primary-source';
+    return null;
+  }
+
+  // Score per token — same shape as search but with one extra crossRef boost.
+  function score(ev, toks){
+    var t = 0, title=(ev.title||'').toLowerCase(), id=(ev.id||'').toLowerCase();
+    var loc=(ev.loc||'').toLowerCase(), agency=(ev.agency||'').toLowerCase();
+    var tagBlob = Array.isArray(ev.tags) ? ev.tags.join(' ').toLowerCase() : '';
+    var refBlob = Array.isArray(ev.crossRefs) ? ev.crossRefs.map(function(r){return r.id||'';}).join(' ').toLowerCase() : '';
+    for (var i = 0; i < toks.length; i++){
+      var x = toks[i];
+      if (title.indexOf(x) >= 0) t += 10;
+      if (id.indexOf(x) >= 0)    t += 8;
+      if (loc.indexOf(x) >= 0)   t += 6;
+      if (tagBlob.indexOf(x) >= 0) t += 6;
+      if (refBlob.indexOf(x) >= 0) t += 6;
+      if (agency.indexOf(x) >= 0) t += 4;
+    }
+    return t;
+  }
+
+  function dotClass(rec){
+    if (!rec) return '';
+    if (rec.flag === 'anchor') return 'r';
+    var a = (rec.agency || '').toLowerCase();
+    if (a === 'fbi') return 'c';
+    if (a === 'nasa') return 'e';
+    return '';
+  }
+
+  function ask(q){
+    var events = (MC.derive && MC.derive.events) || [];
+    var ql = lc(q);
+    if (!ql) return null;
+
+    var agency  = detectAgency(ql);
+    var era     = detectEra(ql);
+    var release = detectRelease(ql);
+    var flag    = detectFlag(ql);
+    var priority= detectPriority(ql);
+    var cat     = detectCategory(ql);
+
+    var filtered = events.slice();
+    var reasons = [];
+
+    if (agency)  { filtered = filtered.filter(function(e){ return e.agency === agency; }); reasons.push(agency); }
+    if (era)     { filtered = filtered.filter(function(e){ return e.era === era; }); reasons.push(era); }
+    if (release) { filtered = filtered.filter(function(e){ return e.release === release; }); reasons.push(release); }
+    if (flag)    { filtered = filtered.filter(function(e){ return e.flag === flag; }); reasons.push('FLAG=' + flag); }
+    if (priority){ filtered = filtered.filter(function(e){ return e.priority === priority; }); reasons.push('PRIORITY=' + priority); }
+    if (cat)     { filtered = filtered.filter(function(e){ return Array.isArray(e.category) && e.category.indexOf(cat) !== -1; }); reasons.push('CATEGORY=' + cat); }
+
+    // Always score the residual against query tokens — even if a structured
+    // intent already matched, the user might also want keyword ranking
+    // ("NASA Apollo Borman" — agency NASA + keyword Borman → score).
+    var toks = tokens(ql).filter(function(t){
+      // Drop tokens we already used as structured-intent triggers.
+      if (agency && (toks_str(AGENCY_ALIASES).indexOf(t) >= 0)) return false;
+      if (era && /^\d0s$/.test(t)) return false;
+      if (release && (t === 'release' || t === 'r' || t === '01' || t === '02' || t === 'rel')) return false;
+      if (cat && (t === 'physics' || t === 'physics-relevant' || t === 'relevant' || t === 'nuclear')) return false;
+      if (priority && t === priority) return false;
+      if (flag && t === flag) return false;
+      return true;
+    });
+
+    var hasStructured = agency || era || release || flag || priority || cat;
+    if (toks.length){
+      var scored = [];
+      for (var i = 0; i < filtered.length; i++){
+        var s = score(filtered[i], toks);
+        if (s > 0) scored.push({ ev: filtered[i], score: s });
+      }
+      scored.sort(function(a, b){ return b.score - a.score; });
+      // If scoring zeroed out but the user supplied a structured intent
+      // that already matched, keep the structured set (sorted by flag).
+      if (scored.length || !hasStructured){
+        filtered = scored.map(function(r){ return r.ev; });
+      } else {
+        var fwA = { anchor: 4, high: 3, med: 2, low: 1 };
+        filtered = filtered.slice().sort(function(a, b){ return (fwA[b.flag]||0) - (fwA[a.flag]||0); });
+      }
+    } else {
+      // No keyword scoring → sort by flag weight so the prominent ones land first.
+      var fw = { anchor: 4, high: 3, med: 2, low: 1 };
+      filtered = filtered.slice().sort(function(a, b){ return (fw[b.flag]||0) - (fw[a.flag]||0); });
+    }
+
+    return {
+      total: filtered.length,
+      events: filtered.slice(0, 24),
+      intent: { agency: agency, era: era, release: release, flag: flag, priority: priority, category: cat, tokens: toks },
+      reasonLabel: reasons.length ? reasons.join(' · ') : (toks.length ? 'KEYWORD: ' + toks.join(' ') : 'EVERYTHING')
+    };
+  }
+  function toks_str(arr){ return arr.map(function(p){ return p[0]; }); }
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  function nowLabel(ts){
+    var d = ts ? new Date(ts) : new Date(), p = function(n){ return String(n).padStart(2, '0'); };
+    return p(d.getUTCMonth()+1) + '·' + p(d.getUTCDate()) + ' · ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) + ' UTC · PATTERN';
+  }
+
+  // Build a pure-data result envelope from the live ask() output (for storage).
+  function resultsForStorage(res){
+    if (!res) return [];
+    return res.events.map(function(ev){
+      return { id: ev.id, title: ev.title || '—', agency: ev.agency || '', date: ev.date || '', flag: ev.flag || null };
+    });
+  }
+
+  function ansHTML(entry){
+    // entry: { ts, q, headline (html), total, results: [{id,title,agency,date,flag}] }
+    var ts = entry.ts;
+    var rows = (entry.results || []).map(function(ev){
+      var dot = dotClass(ev);
+      return '<a class="a-row" href="' + esc(MC.url.dossier(ev.id)) + '">' +
+        '<span class="dot ' + dot + '"></span>' +
+        '<span class="name"><span class="id">' + esc((ev.id||'').toUpperCase()) + '</span>' + esc(ev.title || '—') + '</span>' +
+        '<span class="pg">' + esc(ev.agency || '') + (ev.date ? ' · ' + esc(ev.date) : '') + '</span>' +
+      '</a>';
+    }).join('');
+    var total = entry.total != null ? entry.total : (entry.results ? entry.results.length : 0);
+    var shown = entry.results ? entry.results.length : 0;
+    var more = (total > shown) ? '<div class="more-row">+ ' + (total - shown) + ' more · refine the query to narrow</div>' : '';
+    var headline = entry.headline || '';
+    return '<div class="q user" data-q="' + esc(entry.q) + '" title="Click to re-run this query"><div class="avatar user">YOU</div><div class="body"><div class="meta">' + nowLabel(ts) + '</div><p>' + esc(entry.q) + '</p></div></div>' +
+      '<div class="q ai"><div class="avatar ai">▣</div><div class="body"><div class="meta">' + nowLabel(ts) + ' · ' + total + ' RESULTS</div>' +
+      '<p>' + headline + '</p>' +
+      (shown ? '<div class="a-rows">' + rows + more + '</div>' : '') +
+      '</div></div>';
+  }
+
+  // ─── Conversation history (sessionStorage) ───
+  var HISTORY_KEY = 'mc.ask.history.v1';
+  var HISTORY_MAX = 20;
+
+  function loadHistory(){
+    try {
+      var raw = sessionStorage.getItem(HISTORY_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch(_){ return []; }
+  }
+  function saveHistory(arr){
+    try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_MAX))); } catch(_){}
+  }
+  function pushHistory(entry){
+    var arr = loadHistory();
+    arr.unshift(entry);
+    if (arr.length > HISTORY_MAX) arr = arr.slice(0, HISTORY_MAX);
+    saveHistory(arr);
+    return arr;
+  }
+  function clearHistory(){
+    try { sessionStorage.removeItem(HISTORY_KEY); } catch(_){}
+  }
+
+  // ─── DOM wiring ───
+  var qaEl    = document.getElementById('qa');
+  var inputEl = document.getElementById('q-input');
+  var sendBtn = document.getElementById('q-send');
+  var modeBar = document.querySelector('.mode-pill-row');
+  var smartNote = document.getElementById('smart-note');
+  var mode = 'pattern';
+
+  function renderHistory(){
+    var arr = loadHistory();
+    var clearBtn = '<button class="qa-clear" id="qa-clear-btn"' + (arr.length ? '' : ' hidden') + '>✕ CLEAR HISTORY</button>';
+    if (!arr.length){
+      qaEl.innerHTML = clearBtn;
+      bindQaEvents();
+      return;
+    }
+    var body = arr.map(function(entry){ return ansHTML(entry); }).join('');
+    qaEl.innerHTML = clearBtn + body;
+    bindQaEvents();
+  }
+
+  function bindQaEvents(){
+    var btn = document.getElementById('qa-clear-btn');
+    if (btn){
+      btn.addEventListener('click', function(){
+        clearHistory();
+        renderHistory();
+      });
+    }
+    qaEl.querySelectorAll('.q.user').forEach(function(card){
+      card.addEventListener('click', function(){
+        var q = card.getAttribute('data-q');
+        if (!q) return;
+        inputEl.value = q;
+        runQuery(q);
+      });
+    });
+  }
+
+  function runQuery(q){
+    if (!q) return;
+    if (mode === 'smart'){
+      smartNote.style.display = '';
+      return;
+    }
+    var res = ask(q);
+    if (!res) return;
+    var headline = res.total
+      ? 'Found <strong>' + res.total + '</strong> ' + (res.total === 1 ? 'event' : 'events') + ' matching <em>' + esc(res.reasonLabel) + '</em>.'
+      : 'No catalogue events match this query. Try <em>physics-relevant</em>, <em>NASA</em>, <em>1960s</em>, <em>release 02</em>, or a keyword like <em>Borman</em> or <em>Pantex</em>.';
+    var entry = {
+      ts: Date.now(),
+      q: q,
+      headline: headline,
+      total: res.total,
+      results: resultsForStorage(res)
+    };
+    pushHistory(entry);
+    renderHistory();
+    qaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  sendBtn.addEventListener('click', function(){ runQuery(inputEl.value.trim()); });
+  inputEl.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+      e.preventDefault();
+      runQuery(inputEl.value.trim());
+    }
+  });
+  modeBar.querySelectorAll('.mp').forEach(function(m){
+    m.addEventListener('click', function(){
+      modeBar.querySelectorAll('.mp').forEach(function(x){ x.classList.remove('active'); });
+      m.classList.add('active');
+      mode = m.dataset.mode;
+      if (mode === 'smart'){ smartNote.style.display = ''; }
+      else { smartNote.style.display = 'none'; }
+    });
+  });
+  document.querySelectorAll('#suggest .sg').forEach(function(a){
+    a.addEventListener('click', function(){
+      inputEl.value = a.dataset.q;
+      runQuery(a.dataset.q);
+    });
+  });
+
+  MC.ready().then(function(){
+    var existing = loadHistory();
+    if (existing.length){
+      // Restore prior conversation across reloads.
+      renderHistory();
+    } else {
+      // Initial run so the page lands on a real answer (default question).
+      runQuery(inputEl.value.trim());
+    }
+  });
+})();
+</script>
+</body>
+</html>

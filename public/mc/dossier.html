@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Dossier</title>
+  <meta name="description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Dossier — case file">
+  <meta property="og:description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/dossier.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Dossier — case file">
+  <meta name="twitter:description" content="Full case file for any declassified UAP event in the PURSUE corpus. Signatures, entities, neighbors, cross-references, evidence chain.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .ds-header { padding: 48px 56px 20px; position: relative; z-index: 4; }
+    .ds-header .meta-row { display: flex; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); letter-spacing: 0.20em; margin-bottom: 20px; text-transform: uppercase; }
+    .ds-header .meta-row .anchor { color: var(--rose); padding: 3px 10px; border: 1px solid rgba(224,73,104,0.5); background: rgba(224,73,104,0.08); font-size: 9px; font-weight: 700; letter-spacing: 0.24em; }
+    .ds-header .meta-row .id { color: var(--cyan); }
+    .ds-header .meta-row .stamp { color: var(--amber); }
+    .ds-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 52px; font-weight: 700; line-height: 1.05; color: var(--text); letter-spacing: -0.028em; margin: 0; max-width: 1100px; }
+    .ds-body { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; position: relative; z-index: 3; }
+    .ds-main { display: flex; flex-direction: column; gap: 26px; }
+    .ds-section { background: var(--surface); border: 1px solid var(--border); padding: 26px 30px; backdrop-filter: blur(10px); }
+    .ds-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+    .ds-h .t { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.28em; color: var(--text-2); text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+    .ds-h .t .icon { width: 6px; height: 6px; background: var(--amber); transform: rotate(45deg); display: inline-block; box-shadow: 0 0 8px var(--amber-glow); }
+    .ds-h .r { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; }
+    .ds-summary { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.7; color: var(--text-2); }
+    .ds-summary em { color: var(--text); font-style: normal; font-weight: 500; background: rgba(242,166,35,0.08); padding: 0 4px; }
+    .sig-grid { display: grid; grid-template-columns: 100px 1fr; gap: 14px 20px; font-family: 'JetBrains Mono', monospace; }
+    .sig-grid .label { font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; padding-top: 6px; }
+    .sig-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sig-chip { background: var(--surface-2); border: 1px solid var(--border); padding: 5px 11px; font-size: 11px; color: var(--text-2); }
+    .sig-chip .v { color: var(--text); font-weight: 600; margin-left: 6px; }
+    .sig-chip.shape { color: #B280FF; border-color: rgba(178,128,255,0.3); }
+    .sig-chip.behavior { color: #FFD93D; border-color: rgba(255,217,61,0.3); }
+    .sig-chip.sensor { color: var(--cyan); border-color: rgba(97,215,240,0.3); }
+    .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+    .ent-row { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+    .ent-row:last-child { border-bottom: none; }
+    .ent-row .name { color: var(--text-2); }
+    .ent-row .docs { color: var(--cyan); font-size: 9px; letter-spacing: 0.14em; }
+    .ent-row .ct { color: var(--amber); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; }
+    .date-scatter { height: 80px; position: relative; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+    .date-scatter .pt { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); bottom: 22px; box-shadow: 0 0 6px rgba(97,215,240,0.5); }
+    .date-scatter .self { width: 12px; height: 12px; background: var(--emerald); border-radius: 0; box-shadow: 0 0 10px rgba(74,222,128,0.65); }
+    .date-axis { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.16em; padding-top: 6px; }
+    .excerpt { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+    .excerpt:last-child { border-bottom: none; }
+    .excerpt .meta { display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; margin-bottom: 10px; }
+    .excerpt .pg { background: rgba(97,215,240,0.10); border: 1px solid rgba(97,215,240,0.30); color: var(--cyan); padding: 2px 8px; font-size: 9px; letter-spacing: 0.18em; font-weight: 600; }
+    .excerpt p { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.7; color: var(--text-2); margin: 0; }
+    .nb-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--hairline); align-items: center; cursor: pointer; }
+    .nb-row:last-child { border-bottom: none; }
+    .nb-row .left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .nb-row .dot { width: 7px; height: 7px; flex-shrink: 0; }
+    .nb-row .dot.r { background: var(--rose); } .nb-row .dot.a { background: var(--amber); } .nb-row .dot.c { background: var(--cyan); } .nb-row .dot.z { background: var(--text-3); }
+    .nb-row .t { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nb-row .cos { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--cyan); }
+    .vis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .vis-tile { aspect-ratio: 1; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+    .vis-tile .k { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: var(--text-3); }
+    .vis-tile .p { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); }
+    .vis-tile.photo { background: radial-gradient(circle at center, rgba(110,231,183,0.16), rgba(8,14,22,0.7)); }
+    .vis-tile.photo .k { color: #6EE7B7; }
+    .vis-tile.diagram { background: linear-gradient(135deg, rgba(178,128,255,0.14), rgba(8,14,22,0.7)); }
+    .vis-tile.diagram .k { color: #B280FF; }
+    .vis-tile.map { background: linear-gradient(135deg, rgba(244,114,182,0.14), rgba(8,14,22,0.7)); }
+    .vis-tile.map .k { color: #F472B6; }
+
+    /* Priority + Evidence-type chips in the header */
+    .ds-header .meta-row .priority { padding: 3px 10px; border: 1px solid rgba(255,138,46,0.55); background: rgba(255,138,46,0.10); color: #FFB07A; font-size: 9px; font-weight: 700; letter-spacing: 0.24em; }
+    .ds-header .meta-row .priority.critical { color: var(--rose); border-color: rgba(224,73,104,0.55); background: rgba(224,73,104,0.10); }
+    .evd-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .evd-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; padding: 3px 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2); text-transform: uppercase; }
+    .evd-badge.primary    { color: var(--amber);   border-color: rgba(242,166,35,0.45); background: rgba(242,166,35,0.08); }
+    .evd-badge.sensor     { color: var(--cyan);    border-color: rgba(97,215,240,0.45); background: rgba(97,215,240,0.08); }
+    .evd-badge.physics    { color: #B280FF;        border-color: rgba(178,128,255,0.45); background: rgba(178,128,255,0.10); }
+    .evd-badge.witness    { color: #FFD93D;        border-color: rgba(255,217,61,0.40); background: rgba(255,217,61,0.07); }
+    .evd-badge.imagery    { color: #6EE7B7;        border-color: rgba(110,231,183,0.40); background: rgba(110,231,183,0.07); }
+
+    /* Cross-References panel */
+    .xr-list { display: flex; flex-direction: column; gap: 10px; }
+    .xr-row { display: grid; grid-template-columns: 84px 1fr auto; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hairline); }
+    .xr-row:last-child { border-bottom: none; }
+    .xr-row .k { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.16em; text-transform: uppercase; }
+    .xr-row .k.report    { color: #B280FF; }
+    .xr-row .k.program   { color: var(--cyan); }
+    .xr-row .k.framework { color: #B280FF; }
+    .xr-row .k.facility  { color: #6EE7B7; }
+    .xr-row .k.sensor    { color: var(--cyan); }
+    .xr-row .k.event     { color: var(--amber); }
+    .xr-row .body { font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5; color: var(--text-2); min-width: 0; }
+    .xr-row .body a { color: inherit; text-decoration: none; border-bottom: 1px dashed var(--hairline); }
+    .xr-row .body a:hover { color: var(--amber); border-bottom-color: var(--amber); }
+    .xr-row .body .name { color: var(--text); font-weight: 500; }
+    .xr-row .body .note { display: block; color: var(--text-3); font-size: 11px; margin-top: 4px; }
+    .xr-row .rel { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
+    .xr-empty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-4); padding: 12px 0; }
+    .xr-cta { display: inline-block; margin-top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); padding-bottom: 1px; }
+    .xr-cta:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* Reading-mode toggle button (in the header) */
+    .ds-reading-toggle { margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--amber); background: rgba(242,166,35,0.06); border: 1px solid rgba(242,166,35,0.35); padding: 8px 14px; cursor: pointer; transition: all .15s; }
+    .ds-reading-toggle:hover { background: rgba(242,166,35,0.16); border-color: var(--amber); }
+
+    /* Reading-mode body styling — applied when body has .reading-mode class */
+    body.reading-mode .topbar,
+    body.reading-mode .header-filters,
+    body.reading-mode .tabs,
+    body.reading-mode .classified,
+    body.reading-mode .scanline,
+    body.reading-mode .bg-grid,
+    body.reading-mode .bg-noise,
+    body.reading-mode .vignette,
+    body.reading-mode .fc,
+    body.reading-mode .corner,
+    body.reading-mode .ds-body > aside,
+    body.reading-mode .vis-grid,
+    body.reading-mode .date-scatter,
+    body.reading-mode .date-axis,
+    body.reading-mode .sig-grid,
+    body.reading-mode .ed-grid > div:nth-child(2),
+    body.reading-mode #ds-xrefs-section,
+    body.reading-mode .evd-row { display: none !important; }
+    body.reading-mode .bg-void { background: #f5f1e8 !important; }
+    body.reading-mode { color: #1a1a1a; }
+    body.reading-mode main { background: #f5f1e8; max-width: 820px; margin: 0 auto; padding: 60px 40px 80px; }
+    body.reading-mode .ds-header { padding: 0 0 32px; }
+    body.reading-mode .ds-header h1 { color: #1a1a1a; font-family: 'Space Grotesk', sans-serif; font-size: 36px; line-height: 1.15; letter-spacing: -0.02em; }
+    body.reading-mode .ds-header .meta-row { color: #6b6b6b; }
+    body.reading-mode .ds-header .meta-row .id { color: #2a6ea8; }
+    body.reading-mode .ds-header .meta-row .stamp { color: #a05a1a; }
+    body.reading-mode .ds-body { grid-template-columns: 1fr; padding: 0; }
+    body.reading-mode .ds-section { background: transparent; border: none; padding: 24px 0; backdrop-filter: none; border-bottom: 1px solid #d0c8b8; }
+    body.reading-mode .ds-section:last-child { border-bottom: none; }
+    body.reading-mode .ds-h { border-color: #d0c8b8; }
+    body.reading-mode .ds-h .t { color: #6b6b6b; }
+    body.reading-mode .ds-h .t .icon { background: #a05a1a; box-shadow: none; }
+    body.reading-mode .ds-h .r { color: #999; }
+    body.reading-mode .ds-summary { color: #2a2a2a; font-size: 18px; line-height: 1.8; }
+    body.reading-mode .ds-summary em { background: rgba(160,90,26,0.10); color: #a05a1a; }
+    body.reading-mode .excerpt { padding: 22px 0; border-bottom: 1px solid #d0c8b8; }
+    body.reading-mode .excerpt p { color: #2a2a2a; font-size: 17px; line-height: 1.85; }
+    body.reading-mode .excerpt .meta { color: #999; }
+    body.reading-mode .excerpt .pg { background: rgba(42,110,168,0.10); border-color: rgba(42,110,168,0.35); color: #2a6ea8; }
+    body.reading-mode .ent-row { color: #2a2a2a; border-color: #d0c8b8; }
+    body.reading-mode .ent-row .name { color: #1a1a1a; }
+    body.reading-mode .ent-row .docs { color: #2a6ea8; }
+    body.reading-mode .ent-row .ct { color: #a05a1a; }
+    body.reading-mode .ds-reading-toggle { position: fixed; top: 16px; right: 16px; background: #f5f1e8; color: #a05a1a; border-color: #a05a1a; z-index: 1000; }
+    body.reading-mode .ds-reading-toggle:hover { background: rgba(160,90,26,0.10); }
+  </style>
+</head>
+<body data-view="dossier">
+
+<main>
+  <section class="ds-header">
+    <div class="meta-row">
+      <span class="anchor">ANCHOR</span>
+      <span class="priority critical" id="ds-priority" style="display:none">CRITICAL</span>
+      <span class="id">USPER-2025</span>
+      <span>·</span>
+      <span>FBI</span>
+      <span>·</span>
+      <span class="stamp">SECRET//NOFORN</span>
+      <span>·</span>
+      <span>2025-10</span>
+      <span>·</span>
+      <span style="color:var(--text-3)">helicopter encounter at US military facility</span>
+    </div>
+    <h1>USPER Statement — orb gained elevation, came within ten feet of [the helicopter].</h1>
+    <div class="evd-row" id="ds-evidence"></div>
+    <button class="ds-reading-toggle" id="ds-reading-toggle" type="button" title="Strip chrome — long-form reading mode">📖 READING MODE</button>
+    <button class="ds-reading-toggle" id="ds-share-btn" type="button" title="Share this case file" style="margin-left:10px">⎘ SHARE CASE FILE</button>
+  </section>
+
+  <section class="ds-body">
+    <div class="ds-main">
+
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>SUMMARY</span><span class="r">curated</span></div>
+        <p class="ds-summary">Late 2025, SECRET//NOFORN. An FBI 302 from a senior US intelligence official aboard a search helicopter at a US military facility logs the moment an <em>LP/OP-tracked orb</em> "gained elevation, came within ten feet of [the helicopter]" — then split, then a swarm nobody could count. Multiple LP/OP positions reported the formation independently. <em>USCENTCOM</em> directed continued tracking but the swarm dispersed beyond visibility within fourteen seconds.</p>
+      </div>
+
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>SIGNATURES</span><span class="r">patterns.json</span></div>
+        <div class="sig-grid">
+          <div class="label">SHAPE</div>
+          <div class="sig-chips">
+            <span class="sig-chip shape">orb <span class="v">23</span></span>
+            <span class="sig-chip shape">light <span class="v">11</span></span>
+            <span class="sig-chip shape">sphere <span class="v">7</span></span>
+          </div>
+          <div class="label">BEHAVIOR</div>
+          <div class="sig-chips">
+            <span class="sig-chip behavior">hover <span class="v">14</span></span>
+            <span class="sig-chip behavior">vertical <span class="v">9</span></span>
+            <span class="sig-chip behavior">split <span class="v">6</span></span>
+            <span class="sig-chip behavior">elevation <span class="v">3</span></span>
+          </div>
+          <div class="label">SENSOR</div>
+          <div class="sig-chips">
+            <span class="sig-chip sensor">visual <span class="v">8</span></span>
+            <span class="sig-chip sensor">LP/OP <span class="v">3</span></span>
+            <span class="sig-chip sensor">NVG <span class="v">2</span></span>
+            <span class="sig-chip sensor">FLIR <span class="v">1</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>ENTITIES &amp; DATES MENTIONED</span><span class="r">patterns.json · 199 ents · 67 dates</span></div>
+        <div class="ed-grid">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-4);letter-spacing:0.18em;margin-bottom:10px;text-transform:uppercase">ENTITIES (8 in event)</div>
+            <div class="ent-row"><span class="name">USCENTCOM</span><span class="docs">→ 18 docs</span><span class="ct">7</span></div>
+            <div class="ent-row"><span class="name">Air Force</span><span class="docs">→ 23 docs</span><span class="ct">4</span></div>
+            <div class="ent-row"><span class="name">FBI</span><span class="docs">→ 26 docs</span><span class="ct">3</span></div>
+            <div class="ent-row"><span class="name">Chief of Staff</span><span class="docs">→ 12 docs</span><span class="ct">3</span></div>
+            <div class="ent-row"><span class="name">AARO</span><span class="docs">→ 9 docs</span><span class="ct">2</span></div>
+            <div class="ent-row"><span class="name">Operations Center</span><span class="docs">→ 7 docs</span><span class="ct">2</span></div>
+            <div class="ent-row"><span class="name">USPER 1</span><span class="docs">→ 4 docs</span><span class="ct">2</span></div>
+            <div class="ent-row"><span class="name">USPER 2</span><span class="docs">→ 4 docs</span><span class="ct">1</span></div>
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-4);letter-spacing:0.18em;margin-bottom:10px;text-transform:uppercase">DATES (12 in event · spanning 1948–2024)</div>
+            <div class="date-scatter">
+              <span class="pt" style="left:5%;bottom:18px"></span>
+              <span class="pt" style="left:11%;bottom:26px"></span>
+              <span class="pt" style="left:18%;bottom:20px"></span>
+              <span class="pt" style="left:24%;bottom:38px"></span>
+              <span class="pt" style="left:33%;bottom:22px"></span>
+              <span class="pt" style="left:41%;bottom:30px"></span>
+              <span class="pt" style="left:52%;bottom:24px"></span>
+              <span class="pt" style="left:63%;bottom:46px"></span>
+              <span class="pt" style="left:72%;bottom:24px"></span>
+              <span class="pt" style="left:80%;bottom:36px"></span>
+              <span class="pt" style="left:86%;bottom:20px"></span>
+              <span class="pt self" style="left:93%;bottom:30px" title="this event 2025-10"></span>
+            </div>
+            <div class="date-axis"><span>1940</span><span>1960</span><span>1980</span><span>2000</span><span>2020</span></div>
+            <div style="display:flex;gap:14px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em">
+              <span style="color:var(--cyan)">● mentioned</span>
+              <span style="color:var(--emerald)">■ this event</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>EXCERPTS BY PAGE</span><span class="r">vision-cache · 12 pages</span></div>
+        <div class="excerpt">
+          <div class="meta"><span class="pg">PAGE 03</span><span>vision · q=0.94</span><span>·</span><span>LP/OP report</span></div>
+          <p>"…the orb gained elevation and came within ten feet of [the helicopter] before separating into multiple objects of indeterminate count. LP/OP-1 reported the formation continued moving westward; LP/OP-2 reported it was 'now multiple lights' approximately ten seconds later…"</p>
+        </div>
+        <div class="excerpt">
+          <div class="meta"><span class="pg">PAGE 07</span><span>vision · q=0.89</span><span>·</span><span>USCENTCOM tasking</span></div>
+          <p>"…USCENTCOM directed continued tracking but the swarm dispersed beyond LP/OP visibility within fourteen seconds. Returning aircrew reported no anomalies in radar return or onboard FLIR; the encounter was visually-confirmed only…"</p>
+        </div>
+        <div class="excerpt">
+          <div class="meta"><span class="pg">PAGE 11</span><span>vision · q=0.81</span><span>·</span><span>witness 1 statement</span></div>
+          <p>"…[WITNESS 1] reported that the lead orb was 'too close to look at directly through the canopy' and that he had 'never seen anything fly that way' in 28 years of service. The pilots concurred but declined to provide a written statement…"</p>
+        </div>
+      </div>
+    </div>
+
+    <aside class="ds-main">
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>SEMANTIC NEIGHBORS</span><span class="r">10 · event-similarity.json</span></div>
+        <div class="nb-row"><div class="left"><span class="dot r"></span><span class="t">middle-east-may-2020 range fouler debrief</span></div><span class="cos">0.94</span></div>
+        <div class="nb-row"><div class="left"><span class="dot r"></span><span class="t">southern-us-2020 targeting pod track</span></div><span class="cos">0.92</span></div>
+        <div class="nb-row"><div class="left"><span class="dot a"></span><span class="t">fbi-62hq83894 section 2 (1947)</span></div><span class="cos">0.87</span></div>
+        <div class="nb-row"><div class="left"><span class="dot a"></span><span class="t">fbi-62hq83894 section 5</span></div><span class="cos">0.82</span></div>
+        <div class="nb-row"><div class="left"><span class="dot r"></span><span class="t">dow-uap-d44 range fouler form</span></div><span class="cos">0.79</span></div>
+        <div class="nb-row"><div class="left"><span class="dot a"></span><span class="t">uae-june-2024 mission report</span></div><span class="cos">0.76</span></div>
+        <div class="nb-row"><div class="left"><span class="dot a"></span><span class="t">dow-uap-d35 greece-oct-2023</span></div><span class="cos">0.71</span></div>
+        <div class="nb-row"><div class="left"><span class="dot z"></span><span class="t">gemini-7 bogey trillions particles</span></div><span class="cos">0.64</span></div>
+        <div class="nb-row"><div class="left"><span class="dot a"></span><span class="t">dow-uap-d48 air force report 1996</span></div><span class="cos">0.58</span></div>
+        <div class="nb-row"><div class="left"><span class="dot z"></span><span class="t">1949-discs radar scope</span></div><span class="cos">0.52</span></div>
+      </div>
+
+      <div class="ds-section">
+        <div class="ds-h"><span class="t"><span class="icon"></span>VISUALS</span><span class="r">6 tiles</span></div>
+        <div class="vis-grid">
+          <div class="vis-tile photo"><span class="k">[PHOTO]</span><span class="p">p03</span></div>
+          <div class="vis-tile diagram"><span class="k">[DIAGRAM]</span><span class="p">p05</span></div>
+          <div class="vis-tile map"><span class="k">[MAP]</span><span class="p">p06</span></div>
+          <div class="vis-tile photo"><span class="k">[PHOTO]</span><span class="p">p07</span></div>
+          <div class="vis-tile diagram"><span class="k">[DIAGRAM]</span><span class="p">p08</span></div>
+          <div class="vis-tile photo"><span class="k">[PHOTO]</span><span class="p">p09</span></div>
+        </div>
+      </div>
+
+      <div class="ds-section" id="ds-xrefs-section" style="display:none">
+        <div class="ds-h"><span class="t"><span class="icon"></span>CROSS-REFERENCES</span><span class="r" id="ds-xrefs-count">0</span></div>
+        <div class="xr-list" id="ds-xrefs"></div>
+        <a id="ds-xrefs-cta" class="xr-cta" href="evidence.html">→ open evidence chain</a>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="share.js" defer></script>
+
+<script>
+// ── Dossier live-data wiring ──────────────────────────────────────────────
+// Binds the page to window.MC (data.js). Every hardcoded value in the markup
+// above stays as the fallback: we only overwrite a node once real data for it
+// exists, so a fetch failure degrades to the static mockup. The subject event
+// is determined by the ?eid=... URL param; if that resolves we render it,
+// otherwise we fall back to a preferred chain (fbi anchor → usper → first w/ neighbors).
+(function () {
+  if (!window.MC || !MC.ready) return;
+
+  // Candidate subjects in priority order after the URL param.
+  var PREFERRED = ["fbi-62hq83894", "usper-2025"];
+  var lastRenderedEid = null; // guard against onUpdate flicker
+
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+
+  // Lazy-load dossier-extracts.json once per page (~570KB). Returns a Promise
+  // that resolves to the parsed object (keyed by eid) or null on failure.
+  var _extracts = null;
+  function loadExtracts() {
+    if (_extracts) return _extracts;
+    _extracts = fetch('../dossier-extracts.json?t=' + Date.now())
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .catch(function (e) { console.warn('dossier extracts load failed:', e); return null; });
+    return _extracts;
+  }
+
+  function pickSubject() {
+    var events = (MC.derive && MC.derive.events) || [];
+    var hasN = function (id) { return MC.neighbors(id, 1).length > 0; };
+    // 1) URL ?eid=... if it resolves to a real event
+    var qEid = MC.query && MC.query.eid;
+    if (qEid && MC.byEid(qEid)) return qEid;
+    // 2) preferred ids that exist
+    for (var i = 0; i < PREFERRED.length; i++) {
+      if (MC.byEid(PREFERRED[i])) return PREFERRED[i];
+    }
+    // 3) first event with a similarity entry
+    for (var j = 0; j < events.length; j++) {
+      if (hasN(events[j].id)) return events[j].id;
+    }
+    // 4) any event at all, else the legacy default
+    return events.length ? events[0].id : "usper-2025";
+  }
+
+  // Map agency → existing .dot class. NASA gets an inline emerald color because
+  // there isn't a dedicated .dot.e class. anchor flag overrides → rose.
+  function agencyDot(rec) {
+    if (!rec) return { cls: "z", style: "" };
+    if (rec.flag === "anchor") return { cls: "r", style: "" };
+    var a = (rec.agency || "").toLowerCase();
+    if (a.indexOf("department of war") >= 0 || a === "dow") return { cls: "a", style: "" };
+    if (a === "fbi") return { cls: "c", style: "" };
+    if (a === "nasa") return { cls: "", style: "background:var(--emerald)" };
+    return { cls: "z", style: "" };
+  }
+
+  function renderChips(containerLabel, kind, rows) {
+    // find the .sig-chips that follows the matching .label
+    var labels = document.querySelectorAll(".sig-grid .label");
+    var target = null;
+    for (var i = 0; i < labels.length; i++) {
+      if (labels[i].textContent.trim().toUpperCase() === containerLabel) {
+        target = labels[i].nextElementSibling; break;
+      }
+    }
+    if (!target || !target.classList.contains("sig-chips")) return;
+    if (!rows || !rows.length) {
+      target.innerHTML = '<span style="color:var(--text-4);font-size:11px">—</span>';
+      return;
+    }
+    target.innerHTML = rows.slice(0, 5).map(function (r) {
+      return '<span class="sig-chip ' + kind + '">' + esc(r.term) +
+        ' <span class="v">' + esc(r.count) + '</span></span>';
+    }).join("");
+  }
+
+  function render() {
+    var events = (MC.derive && MC.derive.events) || [];
+    if (!events.length) return; // no data yet → keep full static fallback
+    var eid = pickSubject();
+    var rec = MC.byEid(eid);
+    if (!rec) return; // keep the static fallback content and bail
+    if (eid === lastRenderedEid) return; // no-op on re-fire with same subject
+    lastRenderedEid = eid;
+
+    // OG/Twitter Card meta updates — page-specific preview when the URL is
+    // pasted into chat clients that execute JS for OG fetches (Slack, iMessage,
+    // Facebook, Discord). Twitter Cards stay on the static defaults.
+    if (MC.setShareMeta) {
+      var quote = (rec.summary || '').slice(0, 240);
+      MC.setShareMeta({
+        title: rec.title,
+        description: quote + (rec.summary && rec.summary.length > 240 ? '…' : ''),
+        url: window.location.href,
+        eid: eid,
+      });
+    }
+    // Wire the SHARE button to the share.html permalink for THIS event.
+    var shareBtn = document.getElementById('ds-share-btn');
+    if (shareBtn && MC.url && MC.url.share) {
+      shareBtn.onclick = function () {
+        var shareUrl = MC.url.share(eid);
+        var payload = '"' + (rec.summary || rec.title).slice(0, 240) + '"\n\n— ' + (rec.agency || '') + ' · ' + (rec.date || '') + '\n\n' + shareUrl;
+        MC.share({ title: rec.title, text: payload, url: shareUrl }, shareBtn);
+      };
+    }
+
+    // 1) Header ------------------------------------------------------------
+    var metaRow = document.querySelector(".ds-header .meta-row");
+    if (metaRow) {
+      var anchorPill = metaRow.querySelector(".anchor");
+      if (anchorPill) anchorPill.style.display = (rec.flag === "anchor") ? "" : "none";
+      var idEl = metaRow.querySelector(".id");
+      if (idEl) idEl.textContent = String(rec.id || "").toUpperCase();
+      // markup: [anchor?] · id · "·" · agency · "·" · stamp · "·" · date · "·" · descriptor
+      var spans = metaRow.querySelectorAll("span");
+      var agencyEl = idEl ? idEl.nextElementSibling && idEl.nextElementSibling.nextElementSibling : null;
+      if (agencyEl && !agencyEl.classList.contains("stamp")) agencyEl.textContent = rec.agency || agencyEl.textContent;
+      var stampEl = metaRow.querySelector(".stamp");
+      if (stampEl) {
+        var afterStamp = stampEl.nextElementSibling && stampEl.nextElementSibling.nextElementSibling;
+        if (afterStamp) afterStamp.textContent = rec.date || afterStamp.textContent;
+        var lastSpan = spans[spans.length - 1];
+        if (lastSpan && lastSpan !== afterStamp) lastSpan.textContent = rec.title || lastSpan.textContent;
+      }
+    }
+    var h1 = document.querySelector(".ds-header h1");
+    if (h1 && rec.title) h1.textContent = rec.title;
+
+    // 2) Signatures --------------------------------------------------------
+    var sigs = (MC.signaturesForEvent && MC.signaturesForEvent(eid)) || { shape: [], behavior: [], sensor: [] };
+    renderChips("SHAPE", "shape", sigs.shape);
+    renderChips("BEHAVIOR", "behavior", sigs.behavior);
+    renderChips("SENSOR", "sensor", sigs.sensor);
+
+    // 3) Entities & dates --------------------------------------------------
+    var ents = MC.entitiesForEvent(eid, 8);
+    var entCol = document.querySelector(".ed-grid > div:first-child");
+    if (entCol && ents.length) {
+      var heading = entCol.querySelector("div");
+      var head = heading ? heading.outerHTML : "";
+      head = head.replace(/\(\s*\d+\s+in event\s*\)/i, "(" + ents.length + " in event)");
+      entCol.innerHTML = head + ents.map(function (e) {
+        return '<div class="ent-row"><span class="name">' + esc(e.term) +
+          '</span><span class="docs">&rarr; ' + esc(e.docs) + ' docs</span>' +
+          '<span class="ct">' + esc(e.count) + '</span></div>';
+      }).join("");
+    }
+    // header counts: "patterns.json · N ents · M dates" (data-mc already covers
+    // entityCount/dateCount where bound, but the dossier header uses literal text)
+    var entHdr = document.querySelectorAll(".ds-section .ds-h .r");
+    entHdr.forEach(function (el) {
+      if (/ents\b/.test(el.textContent) && /dates\b/.test(el.textContent)) {
+        var ec = MC.derive.entityCount, dc = MC.derive.dateCount;
+        if (ec != null && dc != null) el.textContent = "patterns.json · " + ec + " ents · " + dc + " dates";
+      }
+    });
+
+    // 3a) Summary — bind to the resolved event's real summary text.
+    // Without this every event inherits the hardcoded USPER fallback.
+    var sumEl = document.querySelector(".ds-summary");
+    if (sumEl && rec.summary) {
+      // Emphasis: bold/light proper-noun-ish tokens via simple heuristic —
+      // wrap UPPER-case multi-letter words and quoted strings in <em>.
+      var html = esc(rec.summary)
+        .replace(/&quot;([^&]{2,80}?)&quot;/g, '"<em>$1</em>"')
+        .replace(/\b([A-Z]{3,}(?:[ -][A-Z0-9]{2,}){0,3})\b/g, '<em>$1</em>');
+      sumEl.innerHTML = html;
+    }
+
+    // 3b) Priority chip + Evidence badges + Cross-references -------------
+    renderPriorityEvidence(rec);
+    renderCrossRefs(eid);
+    renderExcerpts(eid);
+    renderVisuals(eid);
+
+    // 4) Semantic neighbors ------------------------------------------------
+    var neigh = MC.neighbors(eid, 10);
+    var nbSection = null;
+    document.querySelectorAll(".ds-section").forEach(function (sec) {
+      var t = sec.querySelector(".ds-h .t");
+      if (t && /SEMANTIC NEIGHBORS/i.test(t.textContent)) nbSection = sec;
+    });
+    if (nbSection) {
+      // strip both existing rows and any prior empty-notice
+      nbSection.querySelectorAll(".nb-row, .nb-empty").forEach(function (n) { n.remove(); });
+      var rHdr = nbSection.querySelector(".ds-h .r");
+      if (!neigh.length) {
+        nbSection.insertAdjacentHTML(
+          "beforeend",
+          '<div class="nb-empty" style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-4);padding:14px 0;line-height:1.5">no semantic neighbors — outside the 75-event embedding cohort</div>'
+        );
+        if (rHdr) rHdr.textContent = "0 · event-similarity.json";
+      } else {
+        var frag = neigh.map(function (nb) {
+          var nbRec = MC.byEid(nb.eid);
+          var dot = agencyDot(nbRec);
+          var label = (nbRec && nbRec.title) || nb.eid;
+          var href = "dossier.html?eid=" + encodeURIComponent(nb.eid);
+          return '<a class="nb-row" href="' + href + '" style="text-decoration:none;color:inherit"><div class="left">' +
+            '<span class="dot ' + dot.cls + '"' + (dot.style ? ' style="' + dot.style + '"' : '') + '></span>' +
+            '<span class="t">' + esc(label) + '</span></div>' +
+            '<span class="cos">' + nb.cos.toFixed(2) + '</span></a>';
+        }).join("");
+        nbSection.insertAdjacentHTML("beforeend", frag);
+        if (rHdr) rHdr.textContent = neigh.length + " · event-similarity.json";
+      }
+    }
+  }
+
+  // ─────────── Priority + evidence badges + cross-references ───────────
+  function renderPriorityEvidence(rec) {
+    var pri = document.getElementById("ds-priority");
+    if (pri) {
+      if (rec.priority) {
+        pri.textContent = String(rec.priority).toUpperCase();
+        pri.className = "priority " + (rec.priority === "critical" ? "critical" : "");
+        pri.style.display = "";
+      } else {
+        pri.style.display = "none";
+      }
+    }
+    var row = document.getElementById("ds-evidence");
+    if (!row) return;
+    var types = Array.isArray(rec.evidenceTypes) ? rec.evidenceTypes : [];
+    if (!types.length) { row.innerHTML = ""; return; }
+    var CLS = {
+      "primary-source":  ["primary",   "PRIMARY SOURCE"],
+      "sensor-derived":  ["sensor",    "SENSOR DATA"],
+      "physics-linked":  ["physics",   "PHYSICS-LINKED"],
+      "witness-account": ["witness",   "WITNESS ACCOUNT"],
+      "imagery":         ["imagery",   "IMAGERY"]
+    };
+    row.innerHTML = types.map(function (t) {
+      var spec = CLS[t] || ["", String(t).toUpperCase()];
+      return '<span class="evd-badge ' + spec[0] + '">' + esc(spec[1]) + '</span>';
+    }).join("");
+  }
+
+  function renderCrossRefs(eid) {
+    var section = document.getElementById("ds-xrefs-section");
+    var list    = document.getElementById("ds-xrefs");
+    var counter = document.getElementById("ds-xrefs-count");
+    var cta     = document.getElementById("ds-xrefs-cta");
+    if (!section || !list) return;
+    var refs = (MC.crossRefsForEvent && MC.crossRefsForEvent(eid)) || [];
+    if (!refs.length) { section.style.display = "none"; return; }
+    section.style.display = "";
+    if (counter) counter.textContent = refs.length + " refs";
+    if (cta && MC.url && MC.url.evidence) cta.href = MC.url.evidence(eid);
+    list.innerHTML = refs.map(function (r) {
+      var kind = String(r.type || "ref");
+      var label = "";
+      if (r.type === "event") {
+        var ev = r.resolved;
+        var href = (MC.url && MC.url.dossier) ? MC.url.dossier(r.id) : ("dossier.html?eid=" + encodeURIComponent(r.id));
+        label = '<a href="' + esc(href) + '"><span class="name">' + esc((ev && ev.title) || r.id) + '</span></a>';
+      } else if (r.resolved) {
+        var t = r.resolved.title || r.resolved.name || r.id;
+        var meta = [];
+        if (r.resolved.year) meta.push(r.resolved.year);
+        if (r.resolved.organization) meta.push(r.resolved.organization);
+        if (r.resolved.operator) meta.push(r.resolved.operator);
+        if (r.resolved.location) meta.push(r.resolved.location);
+        label = '<span class="name">' + esc(t) + '</span>' + (meta.length ? ' <span style="color:var(--text-4)">· ' + esc(meta.join(" · ")) + '</span>' : '');
+      } else {
+        label = '<span class="name">' + esc(r.id) + '</span>';
+      }
+      var note = r.note ? '<span class="note">' + esc(r.note) + '</span>' : '';
+      return '<div class="xr-row">' +
+        '<span class="k ' + esc(kind) + '">' + esc(kind) + '</span>' +
+        '<div class="body">' + label + note + '</div>' +
+        '<span class="rel">' + esc(String(r.relation || "").replace(/-/g, ' ')) + '</span>' +
+      '</div>';
+    }).join("");
+  }
+
+  // ─────────── Excerpts by page (real data from dossier-extracts.json) ───────────
+  // Find the dossier section whose header text matches `title`. Used to locate
+  // EXCERPTS BY PAGE / VISUALS without relying on DOM order or extra ids.
+  function findSectionByHeader(title) {
+    var sections = document.querySelectorAll(".ds-section");
+    for (var i = 0; i < sections.length; i++) {
+      var t = sections[i].querySelector(".ds-h .t");
+      if (t && t.textContent.trim().toUpperCase().indexOf(title.toUpperCase()) >= 0) return sections[i];
+    }
+    return null;
+  }
+
+  function renderExcerpts(eid) {
+    var section = findSectionByHeader("EXCERPTS BY PAGE");
+    if (!section) return;
+    loadExtracts().then(function (ex) {
+      if (!ex || !ex[eid] || !ex[eid].excerptsByPage) return; // keep static fallback
+      var pages = ex[eid].excerptsByPage;
+      // Sort numerically and take top 3 pages with at least one extract.
+      var keys = Object.keys(pages)
+        .filter(function (k) { return pages[k] && Array.isArray(pages[k].top) && pages[k].top.length; })
+        .sort(function (a, b) { return (+a) - (+b); })
+        .slice(0, 3);
+      if (!keys.length) return;
+      var html = keys.map(function (k) {
+        var pg = pages[k];
+        var t = pg.top[0];
+        var pgLabel = "PAGE " + String(k).padStart(3, "0");
+        var src = pg.source || "vision";
+        var score = (typeof t.score === "number") ? t.score.toFixed(2) : "—";
+        var flagNames = (t.flags && typeof t.flags === "object")
+          ? Object.keys(t.flags).filter(function (f) { return t.flags[f] === true; })
+          : [];
+        var flagList = flagNames.length ? flagNames.join(", ") : "—";
+        var text = String(t.text || "").replace(/\s+/g, " ").trim();
+        return '<div class="excerpt">' +
+          '<div class="meta">' +
+          '<span class="pg">' + esc(pgLabel) + '</span>' +
+          '<span>' + esc(src) + ' · score ' + esc(score) + '</span>' +
+          '<span>·</span>' +
+          '<span>flags: ' + esc(flagList) + '</span>' +
+          '</div>' +
+          '<p>"' + esc(text) + '"</p>' +
+          '</div>';
+      }).join("");
+      // Idempotent: only write if content changed.
+      var current = section.getAttribute("data-mc-excerpts-eid");
+      if (current === eid) return;
+      // Remove existing .excerpt children, then append fresh ones.
+      section.querySelectorAll(".excerpt").forEach(function (n) { n.remove(); });
+      section.insertAdjacentHTML("beforeend", html);
+      section.setAttribute("data-mc-excerpts-eid", eid);
+      var rHdr = section.querySelector(".ds-h .r");
+      if (rHdr) rHdr.textContent = "vision-cache · " + Object.keys(pages).length + " pages";
+    });
+  }
+
+  function renderVisuals(eid) {
+    var section = findSectionByHeader("VISUALS");
+    if (!section) return;
+    var grid = section.querySelector(".vis-grid");
+    if (!grid) return;
+    var all = (MC.derive && MC.derive.mediaItems) || [];
+    var items = all.filter(function (m) { return m && m.eventId === eid; }).slice(0, 6);
+    if (!items.length) return; // keep hardcoded fallback
+    if (grid.getAttribute("data-mc-visuals-eid") === eid) return; // idempotent
+    var KIND_CLS = { photograph: "photo", photo: "photo", diagram: "diagram", map: "map" };
+    var KIND_LABEL = { photograph: "PHOTO", photo: "PHOTO", diagram: "DIAGRAM", map: "MAP" };
+    var html = items.map(function (m) {
+      var pg = (m.page != null) ? ("p" + String(m.page).padStart(2, "0")) : "";
+      if (m.imagePath) {
+        var href = "../" + m.imagePath;
+        var cls = KIND_CLS[m.kind] || "";
+        return '<a class="vis-tile ' + cls + '" href="' + esc(href) + '" target="_blank" style="position:relative;overflow:hidden;text-decoration:none">' +
+          '<img src="' + esc(href) + '" alt="' + esc(m.title || m.id || "") + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>' +
+          '<span class="p" style="position:absolute;right:6px;bottom:6px;background:rgba(8,14,22,0.72);padding:2px 6px;border-radius:2px;z-index:2">' + esc(pg) + '</span>' +
+          '</a>';
+      }
+      var kCls = KIND_CLS[m.kind] || "";
+      var kLab = KIND_LABEL[m.kind] || String(m.kind || "ITEM").toUpperCase();
+      return '<div class="vis-tile ' + kCls + '">' +
+        '<span class="k">[' + esc(kLab) + ']</span>' +
+        '<span class="p">' + esc(pg) + '</span>' +
+        '</div>';
+    }).join("");
+    grid.innerHTML = html;
+    grid.setAttribute("data-mc-visuals-eid", eid);
+    var rHdr = section.querySelector(".ds-h .r");
+    if (rHdr) rHdr.textContent = items.length + " tiles";
+  }
+
+  MC.ready().then(render);
+  MC.onUpdate(render);
+
+  // Reading-mode toggle. Persists via sessionStorage so re-navigating to
+  // dossier.html?eid=… keeps the mode you picked.
+  var RM_KEY = 'mc.readingMode.v1';
+  var rmBtn = document.getElementById('ds-reading-toggle');
+  function setReadingMode(on){
+    document.body.classList.toggle('reading-mode', on);
+    if (rmBtn) rmBtn.textContent = on ? '✕ EXIT READING MODE' : '📖 READING MODE';
+    try { sessionStorage.setItem(RM_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+  if (rmBtn) rmBtn.addEventListener('click', function(){
+    setReadingMode(!document.body.classList.contains('reading-mode'));
+  });
+  try { if (sessionStorage.getItem(RM_KEY) === '1') setReadingMode(true); } catch (e) {}
+})();
+</script>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

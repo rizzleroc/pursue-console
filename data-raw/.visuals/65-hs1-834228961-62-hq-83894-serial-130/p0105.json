@@ -1,8 +1,8 @@
 {
   "kind": "hand-drawing",
   "title": "of constellation",
-  "description": "Drawing of constellation",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.675Z"
+  "description": "RESTRICTED\nN\nPolar Star\nCourse of light\nW\nObservers.\nE\nmoon\nS\nRESTRICTED\n94\nHEADQUARTERS TACTICAL AIR COMMAND\nLANGLEY FIELD, VIRGINIA\n7 July 1947\nSUBJECT: Report of Unusual Celestial Phenomenon\n\n\nThe following report is submitted concerning an unusual occurrence observed by [illegible] Personnel at Maxwell Field, Montgomery, Ala. on the night of 23 June 1947:\n\n\nAt approximately 2120 Central time, a light, with a brilliance slightly greater than a star, appeared from the West. It was first noted above the horizon of a clear moon-light night, traveling in an easterly direction at a high rate of speed. There was no audible sound and it was impossible to determine the altitude, except that it appeared to be at great height. It traveled in a zig zag course with frequent bursts of speed, much like a water bug as it spurts and stops across the surface of water. It continued until it was directly overhead and changed course 90° into the south. After traveling in the above manner for approximately five (5) minutes, it turned southwest and was lost in the brilliancy of the moon, at 2145 Central it was no longer possible to observe it.\n\n\nAttached herewith a sketch showing approximate course of light.",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.713Z",
+  "contributor": "Rizzleroc"
 }

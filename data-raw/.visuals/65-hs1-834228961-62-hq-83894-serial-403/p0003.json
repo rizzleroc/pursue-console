@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of Gray Barker",
-  "description": "Image of Gray Barker",
-  "additional_markers": [
-    {
-      "kind": "hand-drawing",
-      "title": "Graphic: Silhouettes of men in hats and flying saucers"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.728Z"
+  "description": "$3.50\nThey Knew Too Much About\nFlying Saucers\nby GRAY BARKER\nOne by one, the leading figures among flying saucer researchers, who have challenged the government denial that saucers come from outer space, have been silenced.\nOutwardly, nothing seems to have happened to these men. They are still alive, still living where they used to. But they no longer publish saucer research material and they will not talk about saucers or why they no longer will speak of them.\nThree men in dark suits have visited these saucer researchers. Nobody knows what they said, but it was enough to reduce their hearers to silence.\nPerhaps the silenced men know who the three dark-clad visitors are, but they won’t talk about this either. And nobody else seems to know who these men are. They might be government agents, they might even be men from outer space, or they might have muscled into a situation fraught with many possibilities.\nThis is part of the true story told by an otherwise prosaic and successful Clarksburg, West Virginia, business man, Gray Barker, whose busy film booking and buying agency in Clarksburg News Building scarcely seems to be the place to give forth this story stranger than that of any of the pictures that Mr. Barker is booking.\nMr. Barker never was interested in flying saucers until 1952 when one of the most astonishing ones allegedly landed near his home in West Virginia and he investigated the story and found the shaken and fearful eye witnesses convincing enough to go on with ",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.723Z",
+  "contributor": "Rizzleroc"
 }

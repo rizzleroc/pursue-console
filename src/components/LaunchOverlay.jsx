@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/context.js";
 
 // One-time launch overlay for the 2.0 drop. Hypes the release and plays
-// the declassified DVIDS sensor footage inline via the DVIDS embed player,
-// with a "Watch on DVIDS" link as a fallback. Once dismissed it never
-// shows again (localStorage gate lives in App — this component just calls
-// onClose). Motion follows Emil Kowalski's playbook: ease-out entrances,
-// blur+scale reveals, staggered transform/opacity.
+// the declassified DVIDS sensor footage inline via the DVIDS embed player.
+// Once dismissed it never shows again (localStorage gate lives in App —
+// this component just calls onClose). Motion follows Emil Kowalski's
+// playbook: ease-out entrances, blur+scale reveals, staggered
+// transform/opacity.
 
 const SEEN_KEY = "pursue:launch-2.0-seen";
 

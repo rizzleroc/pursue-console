@@ -1,5 +1,5 @@
 {
-  "best": "gemini",
+  "best": "gpt-vision",
   "sources": {
     "gpt-vision": {
       "chars": 111,
@@ -16,7 +16,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.980Z",
+    "computed_at": "2026-06-13T20:21:52.252Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",

@@ -10,9 +10,25 @@
     },
     "gpt-vision": {
       "chars": 2288,
-      "imported_at": "2026-05-26T21:46:41.813Z",
+      "imported_at": "2026-06-13T20:21:49.874Z",
       "handle": "Rizzleroc",
       "text_file": "p0002.gpt-vision.txt"
     }
+  },
+  "comparison": {
+    "computed_at": "2026-06-13T20:21:51.184Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gemini",
+    "agreement_score": 0.885,
+    "pairs": [
+      {
+        "a": "gemini",
+        "b": "gpt-vision",
+        "score": 0.885
+      }
+    ],
+    "confidence": "high",
+    "needs_review": false
   }
 }

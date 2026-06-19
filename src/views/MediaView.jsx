@@ -75,9 +75,10 @@ const HEADER_TYPE_TO_KINDS = {
   Audio: new Set(),
 };
 
-// IR-scope poster for video tiles — reticle + scanlines + play affordance.
-// DVIDS clips can't be embedded, so this stands in for a thumbnail and the
-// whole tile/modal links out to dvidshub.net.
+// IR-scope poster for video tiles in the grid — reticle + scanlines + play
+// affordance. The full iframe player only mounts inside the modal (one at
+// a time); grid tiles stay as posters to keep scroll cheap and avoid
+// dozens of concurrent iframes.
 function VideoPoster({ label, big }) {
   // Caller provides the label so we don't need to thread `t` into a
   // purely-presentational SVG. Defaults to the English DVIDS CTA when

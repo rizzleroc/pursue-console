@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "of a person looking at a UFO in the sky",
-  "description": "Illustration of a person looking at a UFO in the sky",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.743Z"
+  "description": "© New York Herald Tribune\n4-18-66\n‘Report Them . . . Forget It—\nI Have Enough Credibility Problems As It Is’",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.732Z",
+  "contributor": "Rizzleroc"
 }

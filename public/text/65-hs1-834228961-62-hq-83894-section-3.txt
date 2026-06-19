@@ -5,7 +5,7 @@ Agency: FBI
 Date: null
 Location: Washington, DC
 Type: Document
-Source extraction: VISION · 189 pages
+Source extraction: VISION · 190 pages
 
 ---
 
@@ -3501,6 +3501,11 @@ Enc. (2)
 [Handwritten note: 42 15 92]
 
 - 2 -
+
+
+=== Page 126 (vision) ===
+
+(blank)
 
 
 === Page 127 (vision) ===

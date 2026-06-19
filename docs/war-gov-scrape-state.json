@@ -1,46 +1,133 @@
 {
   "_kind": "war-gov-scrape-state",
-  "_note": "Partial scrape of https://www.war.gov/UFO/ via whipgen MCP web tools. The page renders only 10 records per pagination step in the DOM; the underlying CSV is Akamai-gated against direct navigation. Full ingest requires either a whipgen JS-eval tool (see docs/whipgen-web-eval-request.md) or an out-of-band CSV drop by the operator.",
-  "scrapedAt": "2026-05-25T22:00:00.000Z",
-  "scrapedVia": "whipgen-mcp web_open + web_extract",
-  "totalRecordsOnPage": 222,
-  "filterCategories": {
-    "agencies": ["Central Intelligence Agency", "Department of Energy", "Department of State", "Department of War", "FBI", "NASA", "Office of the Director of National Intelligence"],
-    "releases": ["Release 01", "Release 02"],
-    "fileTypes": [".aud", ".img", ".pdf", ".vid"]
-  },
-  "bulkDownloads": {
-    "release01Videos": { "url": "https://d34w7g4gy10iej.cloudfront.net/uapvideos.zip", "sizeGB": 1.3 },
-    "release02Videos": { "url": "https://d34w7g4gy10iej.cloudfront.net/uap052226.zip", "sizeGB": 5.6 }
+  "_note": "Complete scrape of https://www.war.gov/UFO/. The full CSV is committed at data-raw/uap-data.csv. Missing-from-repo records are tracked as one-issue-per-record GitHub issues under label:cataloguing.",
+  "_supersedes": "scrape-2026-05-27 (222 records, pre-Release 03)",
+  "scrapedAt": "2026-06-12T15:55:50.000Z",
+  "scrapedVia": "whipgen-mcp whipgen_web_eval (Playwright page.evaluate inside /UFO/ origin)",
+  "evalCallDurationMs": 1862,
+  "csv": {
+    "path": "data-raw/uap-data.csv",
+    "bytes": 366386,
+    "sha256": "71d53f68c859850d6721f3bc84a7415d21de91c68d331e4ab4625112ece43515",
+    "rowCount": 294,
+    "columns": 17,
+    "namedColumns": [
+      "Featured",
+      "Redaction",
+      "Release Date",
+      "Title",
+      "Type",
+      "Video Pairing",
+      "PDF Pairing",
+      "Description Blurb",
+      "DVIDS Video ID",
+      "Video Title",
+      "Agency",
+      "Incident Date",
+      "Incident Location",
+      "PDF | Image Link",
+      "Modal Image",
+      "Image Alt Text",
+      "Image VIRIN"
+    ]
   },
   "dataSource": {
-    "csvUrl": "https://www.war.gov/Portals/1/Interactive/2026/UFO/uap-data.csv",
+    "csvUrl": "https://www.war.gov/portals/1/Interactive/2026/UFO/uap-data.csv",
     "loadedBy": "in-page JS fetch on /UFO/",
-    "directNavigationStatus": "net::ERR_ABORTED (Akamai rejects non-XHR access)"
+    "directNavigationStatus": "net::ERR_ABORTED (Akamai rejects non-XHR access)",
+    "evalExpression": "await fetch('/portals/1/Interactive/2026/UFO/uap-data.csv', { credentials: 'include' }).then(r => r.text())",
+    "caseSensitivityNote": "/portals/ (lowercase) returns the live 364KB CSV with Release 03; /Portals/ (capitalized, pre-Release-03 URL) returns the stale 297KB CSV. Distinct files at different paths \u2014 make sure to use the lowercase URL."
   },
-  "recordsFromPage1": [
-    { "id": "DOW-UAP-PR050", "title": "4 UAP Formation Iran 26 Aug 2022 over water [CALLSIGN]", "agency": "Department of War", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "2022", "location": "CENTCOM", "type": ".vid" },
-    { "id": "DOW-UAP-PR051", "title": "Syrian UAP instant acceleration", "agency": "Department of War", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "2021", "location": "CENTCOM", "type": ".vid" },
-    { "id": "DOW-UAP-D017", "title": "UAP Reported at Sandia Base, 1948-1950", "agency": "Department of War", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "1948-1950", "location": "New Mexico", "type": ".pdf" },
-    { "id": "CIA-UAP-D001", "title": "Intelligence Information Report, USSR, 1973", "agency": "Central Intelligence Agency", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "1973-12-20", "location": "USSR", "type": ".pdf" },
-    { "id": "ODNI-UAP-D001", "title": "USPER Narrative, Senior USIC Official", "agency": "Office of the Director of National Intelligence", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "2025", "location": "Western United States", "type": ".pdf" },
-    { "id": "NASA-UAP-D008", "title": "Apollo 12 Medical Debriefing - Tape 12, 1969", "agency": "NASA", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": "1969", "location": "Texas", "type": ".aud" },
-    { "id": "DOE-UAP-D001", "title": "Enhanced PANTEX Imagery", "agency": "Department of Energy", "release": "Release 02", "releaseDate": "2026-05-22", "incidentDate": null, "location": "N/A", "type": ".pdf" },
-    { "id": "DOW-R01-001", "title": "18_100754_ General 1946-7_Vol_2", "agency": "Department of War", "release": "Release 01", "releaseDate": "2026-05-08", "incidentDate": "1947-12-30", "location": "N/A", "type": ".pdf" },
-    { "id": "DOW-R01-002", "title": "18_6369445_General_1948_Vol_1", "agency": "Department of War", "release": "Release 01", "releaseDate": "2026-05-08", "incidentDate": "1948-06-15", "location": "N/A", "type": ".pdf" },
-    { "id": "NASA-R01-001", "title": "255_413270_UFO's_and_Defense_What_Should_we_Prepare_For", "agency": "NASA", "release": "Release 01", "releaseDate": "2026-05-08", "incidentDate": null, "location": "N/A", "type": ".pdf" }
-  ],
-  "additionalIdsFromSlideshow": [
-    { "id": "DOW-UAP-PR052", "thumb": "https://www.war.gov/portals/1/Interactive/2026/UFO/Slideshow-2/DOW-UAP-PR052.jpg", "type": ".vid" },
-    { "id": "DOW-UAP-PR071", "thumb": "https://www.war.gov/portals/1/Interactive/2026/UFO/Slideshow-2/DOW-UAP-PR071_USAF-ANG%20F-16C_callsign_CALLSIGN_Shoots_Down_UAP.jpg", "type": ".vid", "title": "USAF-ANG F-16C [CALLSIGN] Shoots Down UAP" },
-    { "id": "DOW-UAP-PR086", "thumb": "https://www.war.gov/portals/1/Interactive/2026/UFO/Slideshow-2/DOW-UAP-PR086-UAP_from_Dec_2019_East_Coast.jpg", "type": ".vid", "title": "UAP from Dec 2019 East Coast" }
-  ],
-  "knownRange": {
-    "videoIds": "DOW-UAP-PR050 through at least DOW-UAP-PR086 (37+ videos in Release 02, contiguous range likely)",
-    "documentIds": "varies by agency (D017 for DOW, D001 for CIA/ODNI/DOE, D008 for NASA, etc.)"
+  "byAgency": {
+    "CIA": 18,
+    "Department of War": 143,
+    "FBI": 86,
+    "Intelligence Community Agency": 1,
+    "NASA": 33,
+    "Department of State": 7,
+    "Central Intelligence Agency": 1,
+    "Department of Energy": 3,
+    "Office of the Director of National Intelligence": 1,
+    "U.S. Government": 1
   },
-  "missingFromRepo": {
-    "totalGap": "222 records on war.gov vs 16 video tiles + 6 PDFs currently catalogued",
-    "criticalGap": "~35-40 Release 02 videos (PR050-PR086 range) with no events.js entry"
-  }
+  "byType": {
+    "PDF": 169,
+    "VID": 84,
+    "IMG": 24,
+    "PDF ": 6,
+    "AUD": 11
+  },
+  "byRelease": {
+    "6/12/26": 72,
+    "5/8/26": 158,
+    "5/22/26": 64
+  },
+  "ingestState": {
+    "totalRecords": 294,
+    "catalogued": 63,
+    "missing": 231,
+    "missingTrackedBy": "GitHub issues with label:cataloguing on rizzleroc/pursue-console",
+    "matchHeuristic": "canonical AGENCY-UAP-Nnn id in RELEASE_FOR map OR CSV asset filename basename present anywhere in events.js"
+  },
+  "release03": {
+    "releaseDate": "2026-06-12",
+    "totalRecords": 72,
+    "byType": {
+      "PDF": 53,
+      "VID": 6,
+      "IMG": 10,
+      "AUD": 3
+    },
+    "byAgency": {
+      "CIA": 18,
+      "Department of War": 12,
+      "FBI": 29,
+      "Intelligence Community Agency": 1,
+      "NASA": 11,
+      "U.S. Government": 1
+    },
+    "filePathPattern": "https://www.war.gov/medialink/ufo/061226/release_03/documents/<basename>.{pdf,jpg}",
+    "newAgencyCodes": [
+      "ICA (Intelligence Community Agency)",
+      "USG (U.S. Government)"
+    ],
+    "manifest": "data-raw/war-gov/release-03-manifest.json"
+  },
+  "bulkDownloads": {
+    "release01Videos": {
+      "url": "https://d34w7g4gy10iej.cloudfront.net/uapvideos.zip",
+      "sizeGB": 1.3
+    },
+    "release02Videos": {
+      "url": "https://d34w7g4gy10iej.cloudfront.net/uap052226.zip",
+      "sizeGB": 5.6
+    }
+  },
+  "filterCategories": {
+    "agencies": [
+      "CIA",
+      "Central Intelligence Agency",
+      "Department of Energy",
+      "Department of State",
+      "Department of War",
+      "FBI",
+      "Intelligence Community Agency",
+      "NASA",
+      "Office of the Director of National Intelligence",
+      "U.S. Government"
+    ],
+    "releases": [
+      "Release 01 (2026-05-08)",
+      "Release 02 (2026-05-22)",
+      "Release 03 (2026-06-12)"
+    ],
+    "fileTypes": [
+      "AUD",
+      "IMG",
+      "PDF",
+      "PDF ",
+      "VID"
+    ]
+  },
+  "auditTrail": "docs/release-3-fetch-status.md (Release 03 staging notes)"
 }
