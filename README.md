@@ -12,7 +12,7 @@ Late 2025, SECRET//NOFORN. An FBI 302 from a senior US intelligence official abo
 
 ## What you can do here
 
-- **Browse 162 declassified records** — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
+- **Browse 293 declassified records** across three war.gov releases — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
 - **See where the AI transcriptions disagree** — every page is transcribed by up to four sources (Gemini, ChatGPT, Claude, OCR); disputes are queued worst-first. → REVIEW tab.
 - **Fix one disputed page in 30 seconds** — read the source side-by-side with each AI's guess, type the correct version, submit. Becomes the gold standard that grades every machine source forever.
 - **Read it in your own language** — full UI translated into 18 languages including right-to-left Arabic and Hebrew. The site auto-detects your browser locale on first load; switch via the picker in the nav.
@@ -76,11 +76,11 @@ Full architecture in [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md).
 ## FAQ
 
 <details>
-<summary><b>Wait, what does "Release 2" mean? I see it in two places.</b></summary>
+<summary><b>Wait, what does "Release N" mean? I see the same word in two contexts.</b></summary>
 
 Two different things share the name and they're unrelated.
 
-- **war.gov's releases** are the government's UAP document tranches under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters). **Release 01** dropped May 8 2026 (162 records); **Release 02** dropped May 22 2026 (64 records — 6 PDFs + 51 videos + 7 audio). PDFs mirrored at `public/release_2/`; the video / audio ingestion is still pending (`npm run corpus:fetch-war-gov -- --release=02`).
+- **war.gov's releases** are the government's UAP document tranches under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters). **Release 01** dropped May 8 2026 (162 records); **Release 02** dropped May 22 2026 (64 records — 6 PDFs + 51 videos + 7 audio); **Release 03** dropped June 12 2026 (72 records). R01 is fully mirrored; R02's 6 PDFs are mirrored at `public/release_2/` with audio/video pending; R03 has been staged through the WHIP pipeline (`data(R03): full pipeline`, #285).
 - **This project's "Release 2.0"** is just the console's own **software version**. It doesn't track or correspond to war.gov's release numbering.
 
 </details>
@@ -170,7 +170,7 @@ runs          append-only build/scrape/import log
 pursue-console/
 ├── src/
 │   ├── App.jsx                       view router · volunteer modal · hero gating
-│   ├── data/events.js                catalogued records (121 of 162 Release 01 + 7 Release 02 = 128 total)
+│   ├── data/events.js                catalogued records (R01 + R02 + R03 = 293 total)
 │   ├── data/entities.js              hand-curated entity graph
 │   ├── components/
 │   │   ├── Header.jsx                primary nav + analysis nav + VOLUNTEER button
@@ -307,10 +307,10 @@ When new Release tranches drop, that's where new event records come from.
 
 | | |
 |---|---|
-| **Records inventoried** | 162 Release 01 + 6 of 64 Release 02 files mirrored (all 6 Release 02 PDFs; 7 audio + 51 video pending). 128 events catalogued total (121 Release 01 + 7 Release 02) |
-| **Pages transcribed** | 3,475 across 71 events |
-| **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
-| **Per source** | 3,370 Gemini · 470 GPT-vision · 0 Claude · 774 OCR transcripts (81 pages OCR-only · 693 cross-checked against vision) · 80 contributor-submitted |
+| **Records inventoried** | 162 Release 01 (fully mirrored) + 64 Release 02 (6 PDFs mirrored at `public/release_2/`; 7 audio + 51 video pending) + 72 Release 03 (staged via the WHIP pipeline, #285). 293 events catalogued. |
+| **Pages transcribed** | 3,543 across 75 events |
+| **First-pull backlog** | 29 catalogued docs · 731 pages awaiting download + transcription |
+| **Per source** | 3,370 Gemini · 470 GPT-vision · 0 Claude · 787 OCR transcripts (94 pages OCR-only · 693 cross-checked against vision) · 80 contributor-submitted |
 | **Multi-source pages** | 438 (cross-checked for agreement) |
 | **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
