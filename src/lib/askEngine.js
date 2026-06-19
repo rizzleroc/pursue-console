@@ -321,7 +321,11 @@ function answerFilter({ events, agency, release, era, media, terms }) {
   if (media === "image") { slice = slice.filter(e => /image|imagery|photo|sketch/i.test(e.type || "")); filters.push("image"); }
   if (terms && terms.length) {
     slice = slice.filter(e => {
-      const hay = (e.title + " " + (e.summary || "") + " " + (e.tags || []).join(" ") + " " + (e.loc || "")).toLowerCase();
+      // Include the `date` field in the haystack so a year term ("1958")
+      // matches records whose year only shows up in metadata, not in the
+      // descriptive text. Without this, "FBI 1958" zeroes out detroit-1958
+      // (date: "1958-04-17") because its title is "Detroit FBI UFO Memo".
+      const hay = (e.title + " " + (e.summary || "") + " " + (e.tags || []).join(" ") + " " + (e.loc || "") + " " + (e.date || "")).toLowerCase();
       return terms.every(t => hay.includes(t));
     });
     filters.push(`matching "${terms.join(" ")}"`);
