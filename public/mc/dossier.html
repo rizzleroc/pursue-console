@@ -158,6 +158,12 @@
     body.reading-mode .ent-row .ct { color: #a05a1a; }
     body.reading-mode .ds-reading-toggle { position: fixed; top: 16px; right: 16px; background: #f5f1e8; color: #a05a1a; border-color: #a05a1a; z-index: 1000; }
     body.reading-mode .ds-reading-toggle:hover { background: rgba(160,90,26,0.10); }
+    /* In reading mode only the exit toggle stays pinned; the source-document,
+       DVIDS, and share actions are stripped with the rest of the chrome so
+       they don't stack on top of the exit control. */
+    body.reading-mode #ds-doc-btn,
+    body.reading-mode #ds-video-btn,
+    body.reading-mode #ds-share-btn { display: none !important; }
   </style>
 </head>
 <body data-view="dossier">
@@ -179,7 +185,9 @@
     </div>
     <h1>USPER Statement — orb gained elevation, came within ten feet of [the helicopter].</h1>
     <div class="evd-row" id="ds-evidence"></div>
-    <button class="ds-reading-toggle" id="ds-reading-toggle" type="button" title="Strip chrome — long-form reading mode">📖 READING MODE</button>
+    <a class="ds-reading-toggle" id="ds-doc-btn" target="_blank" rel="noopener noreferrer" title="Open the primary-source document on war.gov" style="display:none;text-decoration:none">↗ OPEN SOURCE DOCUMENT</a>
+    <a class="ds-reading-toggle" id="ds-video-btn" target="_blank" rel="noopener noreferrer" title="Watch the source clip on DVIDS" style="display:none;text-decoration:none;margin-left:10px">▶ DVIDS CLIP</a>
+    <button class="ds-reading-toggle" id="ds-reading-toggle" type="button" title="Strip chrome — long-form reading mode" style="margin-left:10px">📖 READING MODE</button>
     <button class="ds-reading-toggle" id="ds-share-btn" type="button" title="Share this case file" style="margin-left:10px">⎘ SHARE CASE FILE</button>
   </section>
 
@@ -414,6 +422,23 @@
         eid: eid,
       });
     }
+    // Source-document links — the war.gov PDF (rec.url) and the DVIDS clip
+    // (rec.videoId). These are what let a reader leave the curated dossier
+    // and reach the actual primary source; hidden when the event carries
+    // neither (e.g. uncatalogued stubs).
+    var docBtn = document.getElementById('ds-doc-btn');
+    if (docBtn) {
+      if (rec.url) { docBtn.href = rec.url; docBtn.style.display = ''; }
+      else { docBtn.removeAttribute('href'); docBtn.style.display = 'none'; }
+    }
+    var videoBtn = document.getElementById('ds-video-btn');
+    if (videoBtn) {
+      if (rec.videoId) {
+        videoBtn.href = 'https://www.dvidshub.net/video/' + encodeURIComponent(rec.videoId);
+        videoBtn.style.display = '';
+      } else { videoBtn.removeAttribute('href'); videoBtn.style.display = 'none'; }
+    }
+
     // Wire the SHARE button to the share.html permalink for THIS event.
     var shareBtn = document.getElementById('ds-share-btn');
     if (shareBtn && MC.url && MC.url.share) {
