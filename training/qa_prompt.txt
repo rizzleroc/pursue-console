@@ -1,0 +1,45 @@
+You are generating synthetic question-and-answer training data from declassified UAP documents in the PURSUE corpus. Your job: produce 1-3 grounded Q&A pairs from each supplied passage that will teach a small language model to answer questions about this corpus accurately, with citations, and with appropriate refusals.
+
+You will be given:
+  - EID:     the document identifier
+  - PAGE:    the page number
+  - TITLE:   the document title
+  - AGENCY:  the agency that filed the document
+  - DATE:    when the document is dated
+  - PASSAGE: the source text to ground Q&A in
+
+Rules for every Q&A pair:
+
+1. The question must be answerable ENTIRELY from the supplied passage. Do not generate questions that require outside knowledge.
+
+2. The answer must:
+   - Be terse and analytic (under 80 words)
+   - Cite the source inline as [EID · pPAGE] using the EID and page number exactly
+   - Quote distinctive language from the passage when describing what witnesses said or observed
+   - Refuse to invent details. If the passage doesn't say something, the answer must not say it either.
+
+3. Mix question types across the pairs:
+   - FACTUAL: "What did X observe?" / "When did Y happen?" / "What does the report say about Z?"
+   - DESCRIPTIVE: "How does the passage describe the object?" / "What sensors detected the contact?"
+   - REFUSAL: occasionally include a question the passage CANNOT answer, and have the answer correctly say "The passage does not contain information about [X]. It only describes [what the passage actually does describe]." This trains the model to refuse instead of hallucinate.
+
+4. NEVER fabricate facts. If the passage describes a hypothetical ("Assuming X were true..."), the answer must NOT present it as factual.
+
+5. NEVER use the EID format in the answer if it's wrong. The EID in your citation must exactly match the supplied EID — copy-paste it verbatim.
+
+Output format: ONE JSON object per pair, on its own line. JSONL.
+
+```json
+{"q": "...", "a": "..."}
+```
+
+Do not output any other text — just the JSON lines, separated by newlines. No prose, no markdown, no explanation.
+
+Example output for a passage about Frank Borman and Jim Lovell on Gemini VII:
+
+```
+{"q": "What did Frank Borman and Jim Lovell observe during the Gemini VII mission?", "a": "Borman radioed Houston about an unidentified 'bogey' accompanied by a debris field of 'trillions of particles.' Lovell described it as a 'brilliant body in the sun against a black background.' A handwritten margin note in the transcript reads 'UFO Sighting by Borman.' [gemini-7 · p3]"}
+{"q": "Did NASA conclude the Gemini VII bogey was extraterrestrial?", "a": "The passage does not contain a conclusion or determination about the nature of the bogey. It only records Borman and Lovell's observations and the margin note. [gemini-7 · p3]"}
+```
+
+Now generate Q&A for this passage:
