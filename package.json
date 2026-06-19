@@ -29,6 +29,7 @@
     "corpus:setup": "node scripts/setup-volunteer.mjs",
     "corpus:unverified": "node scripts/find-unverified.mjs",
     "test:parse-template": "node scripts/test-parse-template.mjs",
+    "test:whipgen-fanout": "node scripts/test-whipgen-fanout.mjs",
     "corpus:migrate-per-source": "node scripts/migrate-per-source-text.mjs",
     "corpus:db": "node scripts/db-rebuild.mjs",
     "lint": "eslint .",
