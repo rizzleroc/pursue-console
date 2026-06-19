@@ -308,10 +308,10 @@ When new Release tranches drop, that's where new event records come from.
 | | |
 |---|---|
 | **Records inventoried** | 162 Release 01 + 6 of 64 Release 02 files mirrored (all 6 Release 02 PDFs; 7 audio + 51 video pending). 128 events catalogued total (121 Release 01 + 7 Release 02) |
-| **Pages transcribed** | 3,394 across 65 events |
+| **Pages transcribed** | 3,475 across 71 events |
 | **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
-| **Per source** | 3,370 Gemini · 446 GPT-vision · 0 Claude · 693 OCR transcripts (4 pages OCR-only · 689 cross-checked against vision) · 55 contributor-submitted |
-| **Multi-source pages** | 426 (cross-checked for agreement) |
+| **Per source** | 3,370 Gemini · 470 GPT-vision · 0 Claude · 774 OCR transcripts (81 pages OCR-only · 693 cross-checked against vision) · 80 contributor-submitted |
+| **Multi-source pages** | 438 (cross-checked for agreement) |
 | **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
 
 </details>
