@@ -93,6 +93,13 @@ No. PURSUE Console is an unofficial mirror with hand-curated structure on top. E
 </details>
 
 <details>
+<summary><b>What's "Mission Control" at <code>/mission-control.html</code>?</b></summary>
+
+A second, editorial-tactical front for the same corpus. Same data, same SQLite source-of-truth, different presentation — 16 hand-tuned surfaces (`public/mc/*.html`: ask, atlas, briefing, coverage, dossier, evidence, globe, help, live, media, network, review, search, share, timeline, plus the index). The React app remains the canonical interactive console; Mission Control is the briefing-room view. Nav links cross-wire both ways (see #267).
+
+</details>
+
+<details>
 <summary><b>How do I trust the transcriptions?</b></summary>
 
 That's literally what the REVIEW queue and source-quality scoring are for. Every page sidecar records every source that transcribed it; agreement is scored pairwise (token Jaccard + length ratio); a human-typed page always wins canonical and is used as gold to grade every machine source over time. See the **Cross-source iteration loop** diagram below.
