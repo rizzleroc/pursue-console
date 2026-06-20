@@ -43,7 +43,13 @@ const STOPWORDS = new Set([
   "so","can","be","been","has","have","had","there","its","any","i","me",
   "tell","show","find","list","all","into","across","records","record",
   "documents","document","docs","doc","files","file","reports","report",
-  "anything","everything","things","stuff","please","me","us"
+  "anything","everything","things","stuff","please","me","us",
+  // Interrogatives + comparators (added by /loop iter — these words
+  // leaked into keyword AND-match and forced no-result on real questions):
+  "how","why","when","where","who","whom","whose","which",
+  "differ","different","differs","compare","compared","comparing",
+  "vs","versus","between","summarize","summary","describe","described",
+  "discussed","discusses","mean","actually","really","still"
 ]);
 
 function lc(q) { return (q || "").toLowerCase().trim(); }
@@ -97,7 +103,10 @@ function topicTerms(qLower) {
 // Stem-match prefixes (no trailing \b) so "changed", "changing", "updated",
 // "newest" all hit. The leading \b keeps "ranch" from matching "chang".
 function isChanges(q) {
-  return /\b(chang|new|added|since|latest|recently|update|fresh|just dropped|incoming|release 02|release 2|release ii|r02|rel 2)/.test(q);
+  // Bare "new" was too greedy — "Papua New Guinea" matched and routed
+  // to Release 02 deltas. Require "new" in a "what's new" / "anything
+  // new" / "what is new" context so proper nouns containing it slide by.
+  return /\b(chang|added|since|latest|recently|updated?|fresh|just dropped|incoming|release 02|release 2|release ii|r02|rel 2|whats new|what'?s new|anything new|new in|new since)/.test(q);
 }
 function isClassifiedBefore(q) {
   return /\b(classified before|classified beforehand|previously classified|was classified|still classified|still redacted|still secret|redacted|secret|withheld|blacked out|black bars|censored)\b/.test(q);
@@ -320,11 +329,34 @@ function answerFilter({ events, agency, release, era, media, terms }) {
   if (media === "audio") { slice = slice.filter(e => /audio|transcript|debrief/i.test(e.type || "")); filters.push("audio"); }
   if (media === "image") { slice = slice.filter(e => /image|imagery|photo|sketch/i.test(e.type || "")); filters.push("image"); }
   if (terms && terms.length) {
-    slice = slice.filter(e => {
-      const hay = (e.title + " " + (e.summary || "") + " " + (e.tags || []).join(" ") + " " + (e.loc || "")).toLowerCase();
-      return terms.every(t => hay.includes(t));
-    });
-    filters.push(`matching "${terms.join(" ")}"`);
+    // Include `date` so year terms hit records whose year is only in
+    // metadata. Strict AND-match by default — that's the right
+    // precision for "FBI 1958". But if AND returns nothing, fall back
+    // to ranked OR: count how many terms each record hits, keep the
+    // top-N. This rescues comparative / multi-topic questions like
+    // "How does the SWIR diamond differ from the bouncy ball Syria
+    // report?" where no single record matches every term.
+    const hayOf = (e) => (e.title + " " + (e.summary || "") + " "
+      + (e.tags || []).join(" ") + " " + (e.loc || "") + " "
+      + (e.date || "")).toLowerCase();
+    const andHit = slice.filter(e => terms.every(t => hayOf(e).includes(t)));
+    if (andHit.length > 0) {
+      slice = andHit;
+      filters.push(`matching "${terms.join(" ")}"`);
+    } else {
+      // OR-fallback: at least 2 terms (or all of them, if fewer) must hit.
+      const minHits = Math.min(terms.length, 2);
+      const scored = slice
+        .map(e => {
+          const hay = hayOf(e);
+          const hits = terms.filter(t => hay.includes(t)).length;
+          return { e, hits };
+        })
+        .filter(x => x.hits >= minHits)
+        .sort((a, b) => b.hits - a.hits);
+      slice = scored.map(x => x.e);
+      filters.push(`mentioning "${terms.join(" ")}" (any)`);
+    }
   }
   return {
     intent: "filter",
@@ -374,7 +406,7 @@ export function ask(question, opts = {}) {
   if (isClassifiedBefore(q))     answer = answerClassifiedBefore({ events });
   else if (isUnclassified(q))    answer = answerUnclassified({ events });
   else if (isChanges(q))         answer = answerChanges({ events });
-  else if (isDifferent(q))       answer = answerDifferent({ events, agency });
+  else if (isDifferent(q) && agency) answer = answerDifferent({ events, agency });
   else if (isCount(q))           answer = answerCount({ events, agency, release, era, media });
   else if (agency || release || era || media || year) {
     const terms = year ? [year] : [];
