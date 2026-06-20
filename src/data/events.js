@@ -442,6 +442,11 @@ export const AGENCY_COLORS = {
   "Central Intelligence Agency":                       "#B388FF",
   "Department of Energy":                              "#FFB86B",
   "Office of the Director of National Intelligence":   "#FF6B9D",
+  // Release 03 added two more agency strings that appear verbatim in
+  // the war.gov canonical CSV: the IC analysis (ICA-UAP-D001) and the
+  // congressional/White House correspondence collection (USG-UAP-D001).
+  "Intelligence Community":                            "#A8E6CF",
+  "U.S. Government":                                   "#D4B8FF",
 };
 
 export const FLAG_LABEL = { anchor: "PRIORITY", high: "ELEVATED", med: "ROUTINE", low: "TRIVIAL" };
