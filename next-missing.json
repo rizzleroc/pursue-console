@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T02:03:31.084Z",
+  "generatedAt": "2026-06-20T02:12:40.755Z",
   "queue": [
     {
       "eid": "CIA-UAP-003",
@@ -1725,22 +1725,6 @@
       "eid": "nasa-uap-d3-gemini-7-transcript-1965",
       "page": 1,
       "agency": "NASA",
-      "flag": "low",
-      "reason": "no-data",
-      "priority": 1
-    },
-    {
-      "eid": "nasa-uap-d5-apollo-17-crew-debriefing-for-science-1973",
-      "page": 1,
-      "agency": "Unknown",
-      "flag": "low",
-      "reason": "no-data",
-      "priority": 1
-    },
-    {
-      "eid": "nasa-uap-d6-apollo-17-technical-crew-debriefing-1973",
-      "page": 1,
-      "agency": "Unknown",
       "flag": "low",
       "reason": "no-data",
       "priority": 1

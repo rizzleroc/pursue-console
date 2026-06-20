@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T02:03:21.746Z",
+  "generatedAt": "2026-06-20T02:12:30.820Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -7,8 +7,8 @@
       "published": "2026-05-08",
       "status": "mirrored",
       "inventoryTotal": 162,
-      "catalogued": 128,
-      "uncatalogued": 34,
+      "catalogued": 126,
+      "uncatalogued": 36,
       "files": {
         "total": 162,
         "pdf": 120,
@@ -38,16 +38,16 @@
     }
   },
   "inventory": {
-    "total": 317,
-    "enumerated": 217,
+    "total": 315,
+    "enumerated": 215,
     "placeholders": 0,
-    "pdfs": 201,
+    "pdfs": 199,
     "videos": 0,
     "images": 16,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 293,
+    "catalogued": 291,
     "withPdfDownloaded": 0,
     "withAnyPages": 75,
     "withVisionPages": 65,
@@ -88,19 +88,19 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-06-20T02:03:21.746Z",
+      "ts": "2026-06-20T02:12:30.820Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1490,
-      "note": "events=293 inventory=317 contributions=80"
+      "duration_ms": 1779,
+      "note": "events=291 inventory=315 contributions=80"
     },
     "recent": [
       {
-        "ts": "2026-06-20T02:03:21.746Z",
+        "ts": "2026-06-20T02:12:30.820Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 1490,
-        "note": "events=293 inventory=317 contributions=80"
+        "duration_ms": 1779,
+        "note": "events=291 inventory=315 contributions=80"
       },
       {
         "ts": "2026-06-13T20:23:10.234Z",
@@ -169,7 +169,7 @@
   },
   "gap": {
     "uncataloguedRecords": 24,
-    "cataloguedButNoPages": 218,
+    "cataloguedButNoPages": 216,
     "partialOcrNeedsVision": 10
   },
   "review": {
