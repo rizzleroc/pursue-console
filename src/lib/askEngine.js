@@ -43,7 +43,13 @@ const STOPWORDS = new Set([
   "so","can","be","been","has","have","had","there","its","any","i","me",
   "tell","show","find","list","all","into","across","records","record",
   "documents","document","docs","doc","files","file","reports","report",
-  "anything","everything","things","stuff","please","me","us"
+  "anything","everything","things","stuff","please","me","us",
+  // Interrogatives + comparators (added by /loop iter — these words
+  // leaked into keyword AND-match and forced no-result on real questions):
+  "how","why","when","where","who","whom","whose","which",
+  "differ","different","differs","compare","compared","comparing",
+  "vs","versus","between","summarize","summary","describe","described",
+  "discussed","discusses","mean","actually","really","still"
 ]);
 
 function lc(q) { return (q || "").toLowerCase().trim(); }
@@ -320,15 +326,34 @@ function answerFilter({ events, agency, release, era, media, terms }) {
   if (media === "audio") { slice = slice.filter(e => /audio|transcript|debrief/i.test(e.type || "")); filters.push("audio"); }
   if (media === "image") { slice = slice.filter(e => /image|imagery|photo|sketch/i.test(e.type || "")); filters.push("image"); }
   if (terms && terms.length) {
-    slice = slice.filter(e => {
-      // Include the `date` field in the haystack so a year term ("1958")
-      // matches records whose year only shows up in metadata, not in the
-      // descriptive text. Without this, "FBI 1958" zeroes out detroit-1958
-      // (date: "1958-04-17") because its title is "Detroit FBI UFO Memo".
-      const hay = (e.title + " " + (e.summary || "") + " " + (e.tags || []).join(" ") + " " + (e.loc || "") + " " + (e.date || "")).toLowerCase();
-      return terms.every(t => hay.includes(t));
-    });
-    filters.push(`matching "${terms.join(" ")}"`);
+    // Include `date` so year terms hit records whose year is only in
+    // metadata. Strict AND-match by default — that's the right
+    // precision for "FBI 1958". But if AND returns nothing, fall back
+    // to ranked OR: count how many terms each record hits, keep the
+    // top-N. This rescues comparative / multi-topic questions like
+    // "How does the SWIR diamond differ from the bouncy ball Syria
+    // report?" where no single record matches every term.
+    const hayOf = (e) => (e.title + " " + (e.summary || "") + " "
+      + (e.tags || []).join(" ") + " " + (e.loc || "") + " "
+      + (e.date || "")).toLowerCase();
+    const andHit = slice.filter(e => terms.every(t => hayOf(e).includes(t)));
+    if (andHit.length > 0) {
+      slice = andHit;
+      filters.push(`matching "${terms.join(" ")}"`);
+    } else {
+      // OR-fallback: at least 2 terms (or all of them, if fewer) must hit.
+      const minHits = Math.min(terms.length, 2);
+      const scored = slice
+        .map(e => {
+          const hay = hayOf(e);
+          const hits = terms.filter(t => hay.includes(t)).length;
+          return { e, hits };
+        })
+        .filter(x => x.hits >= minHits)
+        .sort((a, b) => b.hits - a.hits);
+      slice = scored.map(x => x.e);
+      filters.push(`mentioning "${terms.join(" ")}" (any)`);
+    }
   }
   return {
     intent: "filter",
@@ -378,7 +403,7 @@ export function ask(question, opts = {}) {
   if (isClassifiedBefore(q))     answer = answerClassifiedBefore({ events });
   else if (isUnclassified(q))    answer = answerUnclassified({ events });
   else if (isChanges(q))         answer = answerChanges({ events });
-  else if (isDifferent(q))       answer = answerDifferent({ events, agency });
+  else if (isDifferent(q) && agency) answer = answerDifferent({ events, agency });
   else if (isCount(q))           answer = answerCount({ events, agency, release, era, media });
   else if (agency || release || era || media || year) {
     const terms = year ? [year] : [];
