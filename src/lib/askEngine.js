@@ -103,7 +103,10 @@ function topicTerms(qLower) {
 // Stem-match prefixes (no trailing \b) so "changed", "changing", "updated",
 // "newest" all hit. The leading \b keeps "ranch" from matching "chang".
 function isChanges(q) {
-  return /\b(chang|new|added|since|latest|recently|update|fresh|just dropped|incoming|release 02|release 2|release ii|r02|rel 2)/.test(q);
+  // Bare "new" was too greedy — "Papua New Guinea" matched and routed
+  // to Release 02 deltas. Require "new" in a "what's new" / "anything
+  // new" / "what is new" context so proper nouns containing it slide by.
+  return /\b(chang|added|since|latest|recently|updated?|fresh|just dropped|incoming|release 02|release 2|release ii|r02|rel 2|whats new|what'?s new|anything new|new in|new since)/.test(q);
 }
 function isClassifiedBefore(q) {
   return /\b(classified before|classified beforehand|previously classified|was classified|still classified|still redacted|still secret|redacted|secret|withheld|blacked out|black bars|censored)\b/.test(q);
