@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T01:45:17.791Z",
+  "generatedAt": "2026-06-20T02:03:21.746Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -88,18 +88,18 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-06-20T01:45:17.791Z",
+      "ts": "2026-06-20T02:03:21.746Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1873,
+      "duration_ms": 1490,
       "note": "events=293 inventory=317 contributions=80"
     },
     "recent": [
       {
-        "ts": "2026-06-20T01:45:17.791Z",
+        "ts": "2026-06-20T02:03:21.746Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 1873,
+        "duration_ms": 1490,
         "note": "events=293 inventory=317 contributions=80"
       },
       {
