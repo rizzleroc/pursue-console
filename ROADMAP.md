@@ -93,13 +93,15 @@ Ideas surfaced during 2.0 + 2.1 work that are worth pursuing if/when someone has
 
 ## R7 · Volunteer work leasing (claim tracking + stale reclaim)
 
-**Status:** DESIGNED + config scaffolded, **not wired**. Full design + brutal
+**Status:** Phase 1 LANDED, awaiting first live exercise. Full design + brutal
 analysis in [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md). The
-Phase-1 config artifact `config/leasing.json` is already committed
-(`default_lease_secs: 86400` + per-phase ocr/media/review windows), but nothing
-consumes it yet: `scripts/build-work-available.mjs` does not read it and no
-`public/claims/<eid>/p<NNN>.json` ledger is written. So Phase 1 is half-landed —
-the knob exists, the mechanism doesn't.
+Phase-1 config artifact `config/leasing.json` is committed
+(`default_lease_secs: 86400` + per-phase ocr/media/review windows);
+`build-work-available.mjs` now passes it through as `leasing` on
+`work-available.json`; `volunteer.mjs` + `volunteer-media.mjs` read it, write a
+claim file to `public/claims/<eid>/p<NNNN>.json` per picked page, and skip pages
+under another handle's unexpired claim. First real two-volunteer collision is the
+live test.
 
 **Request:** a live-tracking server that records who's working on which page and
 auto-reassigns a page to the next volunteer after a configurable timeout
@@ -215,7 +217,7 @@ XHR? does Range chunking work on war.gov's CDN?) is unknown until the first run.
 
 ## R10 · `volunteer.mjs --review` producer (consumer wired, producer absent)
 
-**Status:** DESIGNED by its consumers, **not built**. Surfaced in the 2.2 sweep.
+**Status:** LANDED, awaiting first live exercise (REVIEW queue is currently 0 disputes). Surfaced in the 2.2 sweep.
 
 `import-contributions.mjs` handles `<handle>/gpt-vision-review/` and
 `<handle>/gemini-review/` source folders (lands them as `p<NNN>.<base>.v2.txt` so

@@ -49,6 +49,14 @@ try {
   const cfg = JSON.parse(await readFile(path.join(ROOT, "config/releases.json"), "utf8"));
   releases = Array.isArray(cfg.releases) ? cfg.releases : [];
 } catch {}
+
+// R7 Phase 1 — volunteer leasing config (default_lease_secs + per-phase windows).
+// Surfaced in work-available.json so the volunteer scripts can read lease lengths
+// alongside the queue. Tolerate the file being absent → empty object.
+let leasing = {};
+try {
+  leasing = JSON.parse(await readFile(path.join(ROOT, "config/leasing.json"), "utf8"));
+} catch {}
 // Releases not yet in the live corpus (awaiting upstream mirror) — surfaced
 // as "incoming" on the site.
 const incomingReleases = releases.filter(r => r.status !== "mirrored");
@@ -224,6 +232,9 @@ const out = {
   // subset still awaiting an upstream mirror (surfaced as "incoming").
   releases,
   incomingReleases,
+  // R7 Phase 1 — leasing config (default_lease_secs + per-phase windows in
+  // config/leasing.json). Volunteer scripts read this to size claim TTLs.
+  leasing,
   byEvent,
   notYetPulled,
 };

@@ -1,5 +1,32 @@
 # Changelog
 
+## Volunteer leasing + `--review` producer (2026-06-18)
+
+R7 Phase 1 and R10 land together (both touch `scripts/volunteer.mjs`, so
+together-or-not).
+
+- **R7 — static claims ledger wired.** `config/leasing.json` (already committed
+  in 2.2) is now actually read. `scripts/build-work-available.mjs` passes the
+  parsed config through as a top-level `leasing` field on
+  `public/work-available.json`. `scripts/volunteer.mjs` (phase `ocr`, default
+  3600s) and `scripts/volunteer-media.mjs` (phase `media`, default 86400s) now
+  read claims from `public/claims/<eid>/p<NNNN>.json`, skip pages an active
+  claim by a different handle covers, and write their own claim per picked page.
+  Claims auto-expire at `lease_secs`; on success we do **not** delete the file
+  (advisory only). Best-effort throughout — parse errors → no-claim; write
+  errors → log + continue. See [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).
+- **R10 — `volunteer.mjs --review` producer landed.** Pulls disputed pages from
+  `public/review-queue.json` (sibling of work-available.json), re-renders +
+  re-transcribes each through `scripts/prompts/standard-transcription.txt` (same
+  prompt `reevaluate-disputed.mjs` uses), and writes to
+  `contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt` — the
+  exact path `scripts/import-contributions.mjs` already lands as the v2 for
+  `compare-sources.mjs` to re-score. Honors `--eid`, applies R7 leasing
+  (phase `review`, default 1800s), forces single-page calls (the standardized
+  prompt has no batch protocol), skips pages whose `.v2.txt` already exists
+  locally, and emits a PR with the re-OCR scope spelled out. Exits cleanly with
+  a friendly message if the REVIEW queue is empty (the current live state).
+
 ## 2.2 — Security review sweep
 
 Comprehensive security review (token-exposure audit + tooling/dependency risk assessment) run across the full working tree and all 91 commits of history. Headline: **no secrets are or ever were committed**, and `npm audit` is clean (0 vulns) in both `package.json` trees. The fixes below close the actionable hardening items the review surfaced; the residual/accepted items are tracked in [ROADMAP.md](./ROADMAP.md) §R8.
