@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T13:44:21.751Z",
+  "generatedAt": "2026-07-10T15:33:29.840Z",
   "queue": [
     {
       "eid": "CIA-UAP-003",
@@ -106,12 +106,28 @@
       "priority": 23.8172
     },
     {
+      "eid": "DOW-UAP-D097",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 22.9462
+    },
+    {
       "eid": "FBI-UAP-D012",
       "page": 1,
       "agency": "FBI",
       "flag": "high",
       "reason": "no-data",
       "priority": 21.2595
+    },
+    {
+      "eid": "DOW-UAP-D092",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 20.237
     },
     {
       "eid": "DOE-UAP-D004",
@@ -136,6 +152,22 @@
       "flag": "med",
       "reason": "no-data",
       "priority": 14.0792
+    },
+    {
+      "eid": "DOW-UAP-D094",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 11.3298
+    },
+    {
+      "eid": "DOW-UAP-D093",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 10.5592
     },
     {
       "eid": "CIA-UAP-019",
@@ -184,6 +216,14 @@
       "flag": "anchor",
       "reason": "no-data",
       "priority": 5.05
+    },
+    {
+      "eid": "DOW-UAP-D095",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 4.9704
     },
     {
       "eid": "DOW-UAP-D079",
@@ -730,47 +770,7 @@
       "priority": 2
     },
     {
-      "eid": "DOW-UAP-D092",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "DOW-UAP-D093",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "DOW-UAP-D094",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "DOW-UAP-D095",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
       "eid": "DOW-UAP-D096",
-      "page": 1,
-      "agency": "Department of War",
-      "flag": "med",
-      "reason": "no-data",
-      "priority": 2
-    },
-    {
-      "eid": "DOW-UAP-D097",
       "page": 1,
       "agency": "Department of War",
       "flag": "med",

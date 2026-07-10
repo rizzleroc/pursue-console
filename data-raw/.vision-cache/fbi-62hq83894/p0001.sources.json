@@ -10,13 +10,13 @@
     },
     "gpt-vision": {
       "chars": 586,
-      "imported_at": "2026-07-10T13:44:05.703Z",
+      "imported_at": "2026-07-10T15:32:48.637Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.gpt-vision.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-07-10T13:44:06.498Z",
+    "computed_at": "2026-07-10T15:32:50.787Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gemini",

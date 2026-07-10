@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-07-10T13:44:21.660Z",
+  "generatedAt": "2026-07-10T15:33:29.714Z",
   "events": 332,
   "aggregate": {
     "byStatus": {
-      "gap": 80,
-      "no-data": 249,
+      "gap": 85,
+      "no-data": 244,
       "complete": 3
     },
-    "totalPages": 3546,
+    "totalPages": 3834,
     "bothMachine": 438,
     "geminiOnly": 2932,
     "gptOnly": 32,
     "human": 0,
-    "gap": 50,
+    "gap": 338,
     "mismatch": 0
   },
   "byEvent": [
@@ -1448,7 +1448,7 @@
       "eventId": "DOW-UAP-D092",
       "title": "DOW-UAP-D092, Department of the Air Force Committee to Review Project Bluebook, 1966-1967",
       "agency": "Department of War",
-      "totalPages": 0,
+      "totalPages": 85,
       "pagesTouched": 0,
       "bothMachineSources": 0,
       "geminiOnly": 0,
@@ -1456,16 +1456,16 @@
       "humanPages": 0,
       "claudeOnly": 0,
       "ocrOnlyPages": 0,
-      "gapPages": null,
+      "gapPages": 85,
       "mismatchPages": 0,
       "chars": 0,
-      "status": "no-data"
+      "status": "gap"
     },
     {
       "eventId": "DOW-UAP-D093",
       "title": "DOW-UAP-D093, Analysis of Flying Object Incidents in the United States, 1948",
       "agency": "Department of War",
-      "totalPages": 0,
+      "totalPages": 67,
       "pagesTouched": 0,
       "bothMachineSources": 0,
       "geminiOnly": 0,
@@ -1473,16 +1473,16 @@
       "humanPages": 0,
       "claudeOnly": 0,
       "ocrOnlyPages": 0,
-      "gapPages": null,
+      "gapPages": 67,
       "mismatchPages": 0,
       "chars": 0,
-      "status": "no-data"
+      "status": "gap"
     },
     {
       "eventId": "DOW-UAP-D094",
       "title": "DOW-UAP-D094, Analysis of Flying Object Incidents in the United States, 1949",
       "agency": "Department of War",
-      "totalPages": 0,
+      "totalPages": 34,
       "pagesTouched": 0,
       "bothMachineSources": 0,
       "geminiOnly": 0,
@@ -1490,16 +1490,16 @@
       "humanPages": 0,
       "claudeOnly": 0,
       "ocrOnlyPages": 0,
-      "gapPages": null,
+      "gapPages": 34,
       "mismatchPages": 0,
       "chars": 0,
-      "status": "no-data"
+      "status": "gap"
     },
     {
       "eventId": "DOW-UAP-D095",
       "title": "DOW-UAP-D095, Joint U.S.-Canadian Aviation Projects and UFO Sighting Reports, 1954-1955",
       "agency": "Department of War",
-      "totalPages": 0,
+      "totalPages": 57,
       "pagesTouched": 0,
       "bothMachineSources": 0,
       "geminiOnly": 0,
@@ -1507,10 +1507,10 @@
       "humanPages": 0,
       "claudeOnly": 0,
       "ocrOnlyPages": 0,
-      "gapPages": null,
+      "gapPages": 57,
       "mismatchPages": 0,
       "chars": 0,
-      "status": "no-data"
+      "status": "gap"
     },
     {
       "eventId": "DOW-UAP-D096",
@@ -1533,7 +1533,7 @@
       "eventId": "DOW-UAP-D097",
       "title": "DOW-UAP-D097, Project Sign Progress Report, 1948",
       "agency": "Department of War",
-      "totalPages": 0,
+      "totalPages": 45,
       "pagesTouched": 0,
       "bothMachineSources": 0,
       "geminiOnly": 0,
@@ -1541,10 +1541,10 @@
       "humanPages": 0,
       "claudeOnly": 0,
       "ocrOnlyPages": 0,
-      "gapPages": null,
+      "gapPages": 45,
       "mismatchPages": 0,
       "chars": 0,
-      "status": "no-data"
+      "status": "gap"
     },
     {
       "eventId": "DOW-UAP-PR019",
