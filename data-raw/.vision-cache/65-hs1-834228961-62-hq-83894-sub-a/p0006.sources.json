@@ -10,13 +10,13 @@
     },
     "gpt-vision": {
       "chars": 1940,
-      "imported_at": "2026-07-10T13:44:05.685Z",
+      "imported_at": "2026-07-10T15:32:48.600Z",
       "handle": "Rizzleroc",
       "text_file": "p0006.gpt-vision.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-07-10T13:44:06.296Z",
+    "computed_at": "2026-07-10T15:32:50.289Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gpt-vision",
