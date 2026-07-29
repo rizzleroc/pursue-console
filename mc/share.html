@@ -203,6 +203,7 @@
     <button id="btn-share-native" type="button">↗ SHARE …</button>
     <button id="btn-copy-link" type="button">⎘ COPY LINK</button>
     <a id="btn-open-dossier" href="dossier.html">→ READ FULL CASE FILE</a>
+    <a id="btn-open-doc" href="#" target="_blank" rel="noopener noreferrer" style="display:none">↗ OPEN SOURCE DOCUMENT</a>
     <a href="index.html">← BACK TO MISSION CONTROL</a>
   </section>
 
@@ -326,6 +327,15 @@
     var dossierHref = MC.url.dossier(eid);
     document.getElementById('share-permalink').href = dossierHref;
     document.getElementById('btn-open-dossier').href = dossierHref;
+
+    // Link straight to the primary-source document (war.gov PDF) when the
+    // event carries one — so a shared link reaches the source, not just the
+    // curated case file. Hidden for events with no published url.
+    var docLink = document.getElementById('btn-open-doc');
+    if (docLink) {
+      if (rec && rec.url) { docLink.href = rec.url; docLink.style.display = ''; }
+      else { docLink.removeAttribute('href'); docLink.style.display = 'none'; }
+    }
 
     // Update OG tags so links pasted into chat clients show the case-specific preview.
     if (MC.setShareMeta){
