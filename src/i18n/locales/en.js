@@ -30,6 +30,7 @@ export default {
     atlas:    "ATLAS",
     globe:    "GLOBE",
     network:  "NETWORK",
+    map:      "MAP",
     evidence: "EVIDENCE",
     help:     "HELP",
     analysis: "ANALYSIS",

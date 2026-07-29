@@ -18,6 +18,7 @@ import TimelineView from "./views/TimelineView.jsx";
 import AtlasView from "./views/AtlasView.jsx";
 import GlobeView from "./views/GlobeView.jsx";
 import NetworkView from "./views/NetworkView.jsx";
+import VectorMapView from "./views/VectorMapView.jsx";
 import SearchView from "./views/SearchView.jsx";
 import LiveFeedView from "./views/LiveFeedView.jsx";
 import HelpView from "./views/HelpView.jsx";
@@ -182,6 +183,7 @@ export default function App() {
           {view === "atlas"    && <AtlasView    events={filtered} onSelect={handleSelect} />}
           {view === "globe"    && <GlobeView    events={filtered} onSelect={handleSelect} />}
           {view === "network"  && <NetworkView  events={filtered} onSelect={handleSelect} />}
+          {view === "map"      && <VectorMapView onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "search"   && <SearchView   onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "live"     && <LiveFeedView onSelect={handleSelect} headerFilters={headerFilters} />}
           {view === "review"   && <ReviewView   onSelect={handleSelect} headerFilters={headerFilters} />}
