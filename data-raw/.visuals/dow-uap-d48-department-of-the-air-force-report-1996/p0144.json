@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Delta Launch Summary — bar chart of Number of Delta Missions vs Launch Year (",
+  "description": "Diagram of Delta Launch Summary — bar chart of Number of Delta Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing Delta launches building from ~5/year in 1960s to 10-15/year through 1990s",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.637Z"
+}

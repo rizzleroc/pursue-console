@@ -1,0 +1,3 @@
+[Diagram of Atlas IIAS Simulation Results — Atlas IIAS Random-Attitude Failures through 280 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, multiple curves for varying A values]
+
+Figure 14. Atlas IIAS Simulation Results with B = 5,000,000

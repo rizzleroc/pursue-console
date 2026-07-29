@@ -1,0 +1,5 @@
+6.5 Shaping Constants for LLV1
+
+[Diagram of LLV1 Breakup Percentages — Breakup Percent vs Failure Time (sec), three curves for q-alpha = 5,000 / 10,000 / 20,000 deg-lb/ft², rising rapidly between 80-180 sec to ~100% then dropping]
+
+Figure 29. LLV1 Breakup Percentages

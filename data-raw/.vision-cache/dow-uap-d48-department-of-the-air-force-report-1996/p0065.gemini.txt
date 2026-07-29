@@ -1,0 +1,3 @@
+[Diagram of Atlas IIAS All-Mode Ship-Hit Contours — Crossrange vs Downrange Distance in nautical miles, concentric probability contours at 10⁻⁴, 10⁻⁵, 10⁻⁶, B = 1,000 / A = 3.45]
+
+Figure 19. Atlas IIAS All-Mode Ship-Hit Contours with A = 3.45

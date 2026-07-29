@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Thor Launch Summary — bar chart of Number of Thor Missions vs Launch Year (19",
+  "description": "Diagram of Thor Launch Summary — bar chart of Number of Thor Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing concentrated Thor launch activity ~1959-1962 of 30 missions/year declining sharply by 1970",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.640Z"
+}

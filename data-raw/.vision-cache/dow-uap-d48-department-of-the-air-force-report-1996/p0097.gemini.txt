@@ -1,0 +1,3 @@
+[Diagram of Percentage of Impacts in 5-Degree Sectors — Percent in 5-deg sector (Theta) vs Angle from Flight Path Theta (deg), Data for Atlas IIAS B = 1000, five curves for A = 1.0 / 2.0 / 3.0 / 4.0 / 6.0, showing how A controls density-function concentration]
+
+Figure 34. Percentage of Impacts in 5-Degree Sectors

@@ -1,0 +1,3 @@
+[Diagram of Atlas IIAS Simulation Results with B = 1,000 — log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, multiple curves for A values 1.90 / 2.75 / 3.20 / 3.45 against breakup q-alpha 5,000-20,000 deg-lb/ft², Atlas IIAS Random-Attitude Failures through 280 sec]
+
+Figure 9. Atlas IIAS Simulation Results with B = 1,000

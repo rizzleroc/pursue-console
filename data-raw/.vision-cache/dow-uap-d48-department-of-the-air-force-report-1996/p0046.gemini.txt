@@ -1,0 +1,7 @@
+6.2 Shaping Constants for Atlas IIAS
+
+6.2.1 Optimum Mode-5 Shaping Constants
+
+[Diagram of Atlas IIAS Breakup Percentages for Random-Attitude Turns — Breakup Percent vs Failure Time in seconds, multiple curves plotted for q-alpha = 5,000 / 10,000 / 20,000 deg-lb/ft², showing breakup rising steeply between 30-100 sec to plateau near 95%]
+
+Figure 6. Atlas IIAS Breakup Percentages for Random-Attitude Turns

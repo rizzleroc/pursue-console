@@ -1,0 +1,3 @@
+[Map of Atlas IIAS risk contours for inner-ear injury overlaid on coastal terrain — concentric probability contours labeled 10⁻⁶, 10⁻⁵, 10⁻⁴ centered on launch facility complex with surrounding waterways and roads visible, labeled "Atlas IIAS / Inner-Ear Injury / Mode-5 A = 3.5"]
+
+Figure 3. Atlas IIAS Risk Contours for Inner-Ear Injury with A = 3.5

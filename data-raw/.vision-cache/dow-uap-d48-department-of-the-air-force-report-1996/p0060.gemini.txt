@@ -1,0 +1,7 @@
+The differences in calculated Mode-5 risks for the different values of B would surely have been less.
+
+[Diagram of Mode-5 Density-Function Values at Three Miles — log-scale plot of Mode-5 Density-Function Value vs lag (days), five curves for A = 3.45/4.75/5.00/5.55/6.30 with B = 1,000 / 50,000 / 100,000 / 1,000,000 / 5,000,000]
+
+Figure 15. Mode-5 Density-Function Values at Three Miles
+
+6.2.3 Effects of Mode-5 Constants on Ship-Hit Distributions

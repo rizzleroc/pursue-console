@@ -1,0 +1,3 @@
+[Diagram of Delta Launch Summary — bar chart of Number of Delta Missions vs Launch Year (1955-1995), bars stacked with Failure/Anomaly (light) and Normal Performance (dark), showing Delta launches building from ~5/year in 1960s to 10-15/year through 1990s]
+
+Figure 38. Delta Launch Summary

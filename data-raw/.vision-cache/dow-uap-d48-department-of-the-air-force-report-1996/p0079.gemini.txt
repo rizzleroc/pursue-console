@@ -1,0 +1,3 @@
+[Diagram of LLV1 Simulation Results with B = 1,000 — LLV1 Random-Attitude Failures through 290 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, curves for A = 1.85 / 2.40 / 2.70 / 2.75 against various breakup q-alpha values]
+
+Figure 30. LLV1 Simulation Results with B = 1,000

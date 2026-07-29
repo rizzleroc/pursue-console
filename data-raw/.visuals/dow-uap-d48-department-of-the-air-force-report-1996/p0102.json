@@ -1,0 +1,8 @@
+{
+  "kind": "diagram",
+  "title": "of Exponential Weights for Fading-Memory Filters — Data Weight (F^n−1) vs Data I",
+  "description": "Diagram of Exponential Weights for Fading-Memory Filters — Data Weight (F^n−1) vs Data Index n (older→), six curves for F = 1 / 0.999 / 0.998 / 0.995 / 0.99 / 0.98 / 0.95, showing exponential decay of older data weight",
+  "additional_markers": [],
+  "classifier": "gemini-text-extract",
+  "classifiedAt": "2026-05-31T23:06:28.633Z"
+}

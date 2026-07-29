@@ -1,0 +1,3 @@
+[Diagram of LLV1 Simulation Results with Best-Fit Shaping Constants — LLV1 Random-Attitude Failures through 290 sec, log-scale plot of Percent in 5-deg sector vs Angle From Flight Path, multiple curves for varying A and B values]
+
+Figure 31. LLV1 Simulation Results with Best-Fit Shaping Constants
