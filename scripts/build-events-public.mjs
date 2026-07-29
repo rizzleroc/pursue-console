@@ -8,9 +8,16 @@
 // Output: public/events.json { generatedAt, count, events: [...] }
 // Each event carries the fields the analysis surfaces need:
 //   id, title, date, era, region, agency, flag, coords, type, release,
-//   priority, category[], evidenceTypes[], crossRefs[], tags[]
+//   priority, category[], evidenceTypes[], crossRefs[], tags[],
+//   url, videoId
 // (priority/category/evidenceTypes/crossRefs are sparse — only events that
 // have been classified carry them; everything else is null.)
+//
+// url + videoId are the primary-source links: war.gov PDF (url) and DVIDS
+// clip (videoId). Without them the static /mc/ dossier + share pages have no
+// way to send a reader to the actual document — they could show the curated
+// quotes but not "open the source." Carrying them here is what lets those
+// pages render an "OPEN SOURCE DOCUMENT" action.
 
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -63,6 +70,8 @@ const events = EVENTS.map((e) => ({
   evidenceTypes: e.evidenceTypes ?? null,
   crossRefs: e.crossRefs ?? null,
   tags: e.tags ?? null,
+  url: e.url ?? null,
+  videoId: e.videoId ?? null,
 }));
 
 const payload = {
