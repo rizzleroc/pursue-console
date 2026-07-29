@@ -1,34 +1,35 @@
 {
   "model": "sentence-transformers/all-MiniLM-L6-v2",
   "dim": 384,
-  "count": 8677,
+  "count": 8941,
   "minQuality": 0.25,
   "rejectedByQuality": {
     "ocr": 18,
-    "pdfjs": 965,
-    "vision": 0
+    "pdfjs": 59,
+    "vision": 0,
+    "unknown": 965
   },
   "bySource": {
     "curated": {
-      "count": 130,
+      "count": 131,
       "meanQuality": 1.0
     },
     "vision": {
       "count": 5535,
       "meanQuality": 0.554
     },
-    "pdfjs": {
-      "count": 2925,
+    "unknown": {
+      "count": 2929,
       "meanQuality": 0.577
     },
     "ocr": {
       "count": 83,
       "meanQuality": 0.481
     },
-    "unknown": {
-      "count": 4,
-      "meanQuality": 0.626
+    "pdfjs": {
+      "count": 263,
+      "meanQuality": 0.494
     }
   },
-  "generatedAt": "2026-06-13T20:50:31Z"
+  "generatedAt": "2026-07-10T17:04:10Z"
 }

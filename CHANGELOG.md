@@ -1,17 +1,31 @@
 # Changelog
 
-## DVIDS-via-MCP video collector (2026-05-26, `@unverified`)
+## Volunteer leasing + `--review` producer (2026-06-18)
 
-The same Akamai-style TLS-fingerprint block that makes us route war.gov traffic through a real Chrome tab also afflicts `dvidshub.net`: yt-dlp returns `ConnectionResetError(10054)` against every DVIDS video URL we tried. Rather than chase yt-dlp config flags, we retired the yt-dlp path and reused the trick the rest of the MCP already uses.
+R7 Phase 1 and R10 land together (both touch `scripts/volunteer.mjs`, so
+together-or-not).
 
-What landed:
-- **`pursue-vision-mcp/dvids-driver.mjs`** — new `DVIDSDriver` class mirroring the structure of `war-gov-driver.mjs`. `resolveVideoUrl({ videoId })` navigates a logged-in `www.dvidshub.net/` tab to `/video/<id>` and tries three strategies in order — network intercept on the player's own mp4 fetch, DOM scrape (`<video>`/`<source>`/`og:video`/JSON-LD `VideoObject.contentUrl`), and a regex pass over the page's embedded JSON (`videoUrl`/`playbackUrl`/`mp4Url`). `downloadFile({ url, destPath })` reuses the same 1-byte Range probe → one-shot for ≤50 MB / 8 MB Range chunks for larger → base64-shuttle via `page.evaluate` → `.part` rename pattern the war.gov driver uses, with the same Akamai-style block detection (403/406/429/503 status + challenge-body patterns) so we never write block HTML to disk pretending it's an mp4.
-- **Daemon endpoints `/dvids/resolve` and `/dvids/download`** — same `queues.dvids` single-slot serialization pattern as the LLM and warGov drivers; same bearer-token auth; same path-jail on per-item `destPath`. Batch capped at 32 videos. `/status` now reports the dvids driver alongside the others.
-- **`pursue-vision-mcp/start.mjs`** opens `www.dvidshub.net/` alongside the existing chatgpt + gemini + war.gov tabs. DVIDS is public DoD media so the tab shouldn't trigger a challenge — it's there only so the dvids driver can issue in-page `fetch()` calls that inherit Chrome's real TLS handshake.
-- **`scripts/transcribe-videos.mjs`** rewritten: the `yt-dlp` `execFile` is gone, replaced by a POST to `${DAEMON}/dvids/download` with a 15 min timeout. Whisper stays the default transcription path with identical output (`public/text/<eid>.txt` + `manifest.json` keyed by `whisper`). New `--analyze=gemini` flag (or `ANALYZE_VIDEO=gemini` env) ALSO posts the video to `/chat-with-files` with `provider: "gemini"` and a transcribe-and-describe prompt, saving the response as a sibling `<eid>.gemini-analysis.md` (best-effort — failures don't block Whisper). New `--daemon=` and `--dry-run` flags. Token loading mirrors `volunteer.mjs` (env → whipgen-token → pursue-vision-token).
-- **README** documents `/dvids/resolve` and `/dvids/download` in the same style as the war.gov endpoints, calls out the `@unverified` status, and notes the new dvidshub.net tab requirement.
-
-Why **`@unverified`:** the agent that wrote this couldn't exercise it. DVIDS blocks our IPs the same way war.gov does; only the maintainer's real Chrome can verify the round-trip. The DOM shape inside `https://www.dvidshub.net/video/<id>` is a best-guess — the three strategies are layered defensively in case the player's mp4 traffic doesn't fire on initial load (intercept), the page renders the mp4 server-side into `<video>`/`<source>`/`og:video`/JSON-LD (DOM scrape), or only the inline-JS player config carries the URL (regex). Whichever strategy hits first wins; the others stay as backups. `scripts/find-unverified.mjs` surfaces `pursue-vision-mcp/dvids-driver.mjs` and `scripts/transcribe-videos.mjs` in `corpus:unverified`. See ROADMAP R9 for the verification plan.
+- **R7 — static claims ledger wired.** `config/leasing.json` (already committed
+  in 2.2) is now actually read. `scripts/build-work-available.mjs` passes the
+  parsed config through as a top-level `leasing` field on
+  `public/work-available.json`. `scripts/volunteer.mjs` (phase `ocr`, default
+  3600s) and `scripts/volunteer-media.mjs` (phase `media`, default 86400s) now
+  read claims from `public/claims/<eid>/p<NNNN>.json`, skip pages an active
+  claim by a different handle covers, and write their own claim per picked page.
+  Claims auto-expire at `lease_secs`; on success we do **not** delete the file
+  (advisory only). Best-effort throughout — parse errors → no-claim; write
+  errors → log + continue. See [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).
+- **R10 — `volunteer.mjs --review` producer landed.** Pulls disputed pages from
+  `public/review-queue.json` (sibling of work-available.json), re-renders +
+  re-transcribes each through `scripts/prompts/standard-transcription.txt` (same
+  prompt `reevaluate-disputed.mjs` uses), and writes to
+  `contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt` — the
+  exact path `scripts/import-contributions.mjs` already lands as the v2 for
+  `compare-sources.mjs` to re-score. Honors `--eid`, applies R7 leasing
+  (phase `review`, default 1800s), forces single-page calls (the standardized
+  prompt has no batch protocol), skips pages whose `.v2.txt` already exists
+  locally, and emits a PR with the re-OCR scope spelled out. Exits cleanly with
+  a friendly message if the REVIEW queue is empty (the current live state).
 
 ## 2.2 — Security review sweep
 
