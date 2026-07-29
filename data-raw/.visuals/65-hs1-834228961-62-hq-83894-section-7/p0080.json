@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of Rum Carioca bottle",
-  "description": "Image of Rum Carioca bottle",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of socks"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.491Z"
+  "description": "\"Ru[illegible]\"\n\"CARI[illegible]\"\n\"Rum Carioca\"\n\"PUERTO RICAN RUM\"\n\"PUERTO RICAN RUM     GOLD OR WHITE LABEL -\"\n\"page 73, 74\"",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.689Z",
+  "contributor": "Rizzleroc"
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { sourceStyle, confidenceStyle, SourceLegend } from "../components/SourceMix.jsx";
+import { useT } from "../i18n/context.js";
 
 // REVIEW — cross-source disagreement queue.
 //
@@ -23,12 +24,114 @@ function ConfidenceBadge({ confidence, agreement }) {
   );
 }
 
-export default function ReviewView({ onSelect }) {
+// Client-side mirror of scripts/resolve-by-merge.mjs:mergeTexts. Used when
+// the disagreement isn't a real contradiction — each source caught a
+// different region of the page (stamp vs form vs bleed-through). Pick
+// longest as the base, append any line from the others that isn't
+// already a substring of the base. Excludes prior "judge" / "merged"
+// outputs so re-runs don't compound.
+const EXCLUDED_INPUT_SOURCES = new Set(["judge", "merged"]);
+function mergeSourceTexts(sources) {
+  const candidates = Object.entries(sources || {})
+    .filter(([name, text]) => !EXCLUDED_INPUT_SOURCES.has(name) && typeof text === "string" && text.trim().length >= 5)
+    .map(([name, text]) => ({ name, text: text.trim() }));
+  if (!candidates.length) return { merged: "", used: [] };
+  const sorted = [...candidates].sort((a, b) => b.text.length - a.text.length);
+  const base = sorted[0].text;
+  const baseNorm = base.toLowerCase().replace(/\s+/g, " ");
+  const extra = [];
+  const extraNorms = [];
+  for (let i = 1; i < sorted.length; i++) {
+    for (const line of sorted[i].text.split(/\r?\n/)) {
+      const t = line.trim();
+      if (t.length < 3) continue;
+      const norm = t.toLowerCase().replace(/\s+/g, " ");
+      if (baseNorm.includes(norm)) continue;
+      if (extraNorms.some(e => e.includes(norm))) continue;
+      extra.push(t);
+      extraNorms.push(norm);
+    }
+  }
+  const merged = extra.length
+    ? `${base}\n\n--- additional from other sources ---\n${extra.join("\n")}`
+    : base;
+  return { merged, used: sorted.map(c => c.name) };
+}
+
+function CombineModal({ selected, pageData, onClose }) {
+  const { merged, used } = useMemo(
+    () => mergeSourceTexts(pageData?.sources),
+    [pageData]
+  );
+  const [copied, setCopied] = useState(false);
+  const cliCmd = `node scripts/resolve-by-merge.mjs ${selected.eventId}:${selected.page}`;
+  const filename = `p${String(selected.page).padStart(4, "0")}.merged.txt`;
+
+  const copy = async (text, key) => {
+    try { await navigator.clipboard.writeText(text); setCopied(key); setTimeout(() => setCopied(false), 1500); }
+    catch {}
+  };
+  const download = () => {
+    const blob = new Blob([merged + "\n"], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-start justify-center p-4 overflow-y-auto"
+         onClick={onClose}>
+      <div className="bg-black border border-emerald-700/60 rounded-sm max-w-4xl w-full my-8"
+           onClick={e => e.stopPropagation()}>
+        <div className="px-4 py-3 border-b border-emerald-900/50 flex items-baseline justify-between gap-3">
+          <div>
+            <div className="font-mono text-[10px] text-emerald-700 tracking-widest">COMBINE SOURCES — PREVIEW</div>
+            <div className="text-emerald-300 font-mono text-sm mt-0.5">{selected.title} · p{selected.page}</div>
+            <div className="text-emerald-700 font-mono text-[10px] mt-0.5">
+              merged {used.length} sources: {used.join(", ")} · {merged.length.toLocaleString()} chars
+            </div>
+          </div>
+          <button onClick={onClose}
+                  className="font-mono text-[10px] tracking-widest text-emerald-500 hover:text-emerald-300">
+            CLOSE ✕
+          </button>
+        </div>
+        <div className="px-4 py-3 border-b border-emerald-900/50 flex flex-wrap gap-2">
+          <button onClick={() => copy(merged, "text")}
+                  className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
+            {copied === "text" ? "COPIED ✓" : "COPY MERGED TEXT"}
+          </button>
+          <button onClick={download}
+                  className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
+            DOWNLOAD {filename}
+          </button>
+          <button onClick={() => copy(cliCmd, "cli")}
+                  className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
+            {copied === "cli" ? "COPIED ✓" : "COPY RESOLVE CMD"}
+          </button>
+        </div>
+        <div className="px-4 py-2 border-b border-emerald-900/50 font-mono text-[10px] text-emerald-700 leading-relaxed">
+          To persist this merge as the canonical text + clear <span className="text-emerald-400">needs_review</span>, run the resolve cmd locally:
+          <pre className="mt-1 text-amber-300 text-[11px]">{cliCmd}</pre>
+          Then <span className="text-emerald-400">node scripts/compare-sources.mjs &amp;&amp; node scripts/db-rebuild.mjs &amp;&amp; node scripts/export-review-queue.mjs</span>.
+        </div>
+        <pre className="px-4 py-3 text-emerald-200/90 text-[12px] leading-snug whitespace-pre-wrap break-words max-h-[60vh] overflow-y-auto font-mono">
+{merged || "(no candidate sources to merge)"}
+        </pre>
+      </div>
+    </div>
+  );
+}
+
+export default function ReviewView({ onSelect, headerFilters }) {
+  const t = useT();
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [pageData, setPageData] = useState(null);
   const [loadingPage, setLoadingPage] = useState(false);
+  const [combineOpen, setCombineOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}review-queue.json?t=${Date.now()}`)
@@ -37,9 +140,32 @@ export default function ReviewView({ onSelect }) {
       .catch(e => setError(e.message));
   }, []);
 
-  const selected = queue?.queue?.[selectedIdx] || null;
+  // Subset the review queue by the Header's search + agency dropdown. The
+  // Header's filterType (Document/Video/Image/Audio) doesn't have a sensible
+  // mapping for review entries (they're always text-on-text disagreements),
+  // so we deliberately ignore it here.
+  const filteredQueue = useMemo(() => {
+    if (!queue?.queue) return null;
+    const q = (headerFilters?.query || "").trim().toLowerCase();
+    const agency = headerFilters?.filterAgency || "all";
+    const list = queue.queue.filter(r => {
+      if (agency !== "all" && (r.agency || "—") !== agency) return false;
+      if (q && !`${r.title || ""} ${r.eventId || ""} ${r.agency || ""}`.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    return { ...queue, queue: list, total: list.length };
+  }, [queue, headerFilters?.query, headerFilters?.filterAgency]);
+
+  // When the filter narrows the list, keep selectedIdx in range.
+  useEffect(() => {
+    if (!filteredQueue) return;
+    if (selectedIdx >= filteredQueue.queue.length) setSelectedIdx(0);
+  }, [filteredQueue, selectedIdx]);
+
+  const selected = filteredQueue?.queue?.[selectedIdx] || null;
   useEffect(() => {
     if (!selected) { setPageData(null); return; }
+    setCombineOpen(false);
     setLoadingPage(true);
     fetch(`${import.meta.env.BASE_URL}${selected.textUrl}?t=${Date.now()}`)
       .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
@@ -48,28 +174,37 @@ export default function ReviewView({ onSelect }) {
   }, [selectedIdx, queue]);
 
   const byAgency = useMemo(() => {
-    if (!queue?.queue) return {};
+    if (!filteredQueue?.queue) return {};
     const acc = {};
-    for (const r of queue.queue) {
+    for (const r of filteredQueue.queue) {
       const k = r.agency || "—";
       acc[k] = (acc[k] || 0) + 1;
     }
     return acc;
-  }, [queue]);
+  }, [filteredQueue]);
 
   if (error) {
-    return <div className="p-4 text-rose-400 font-mono text-xs">REVIEW unavailable: {error}</div>;
+    return <div className="p-4 text-rose-400 font-mono text-xs">{t("review.unavailable", { error })}</div>;
   }
   if (!queue) {
-    return <div className="p-4 text-emerald-700 font-mono text-xs">LOADING REVIEW QUEUE…</div>;
+    return <div className="p-4 text-emerald-700 font-mono text-xs">{t("review.loading")}</div>;
   }
   if (!queue.queue.length) {
     return (
       <div className="p-8 max-w-3xl mx-auto text-center">
-        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">REVIEW QUEUE EMPTY</div>
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">{t("review.empty_title")}</div>
         <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
-          Every page with two or more transcription sources currently agrees within tolerance.<br/>
-          New disagreements will appear here as Gemini ↔ GPT-vision ↔ human inputs continue to land.
+          {t("review.empty_body")}
+        </div>
+      </div>
+    );
+  }
+  if (filteredQueue && !filteredQueue.queue.length) {
+    return (
+      <div className="p-8 max-w-3xl mx-auto text-center">
+        <div className="text-emerald-300 font-mono text-xs tracking-widest mb-3">{t("review.no_matches_title")}</div>
+        <div className="text-emerald-700 text-[11px] font-mono leading-relaxed">
+          {t("review.no_matches_body", { total: queue.total })}
         </div>
       </div>
     );
@@ -78,7 +213,7 @@ export default function ReviewView({ onSelect }) {
   return (
     <div className="flex flex-col gap-3 p-3 min-h-[calc(100vh-200px)]">
       <div className="flex items-baseline justify-between flex-wrap gap-2 px-1">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-xl tracking-[0.2em]">⚖ REVIEW QUEUE</h2>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-xl tracking-[0.2em]">{t("review.title")}</h2>
         <SourceLegend />
       </div>
       <div className="flex flex-col lg:flex-row gap-3">
@@ -86,12 +221,15 @@ export default function ReviewView({ onSelect }) {
       <aside className="lg:w-72 shrink-0 border border-emerald-900/50 bg-black/40 rounded-sm">
         <div className="px-3 py-2 border-b border-emerald-900/50 flex items-center justify-between">
           <div className="font-mono text-[10px] tracking-widest text-emerald-400">
-            {queue.total} PAGES
+            {t("review.pages", { n: filteredQueue?.total ?? queue.total })}
+            {filteredQueue && filteredQueue.total !== queue.total && (
+              <span className="ml-1.5 text-emerald-700">{t("review.of", { n: queue.total })}</span>
+            )}
           </div>
-          <div className="font-mono text-[9px] text-emerald-700">worst first</div>
+          <div className="font-mono text-[9px] text-emerald-700">{t("review.worst_first")}</div>
         </div>
         <ul className="max-h-[60vh] lg:max-h-[calc(100vh-280px)] overflow-y-auto">
-          {queue.queue.map((r, i) => (
+          {(filteredQueue?.queue || queue.queue).map((r, i) => (
             <li key={`${r.eventId}-${r.page}`}>
               <button
                 onClick={() => setSelectedIdx(i)}
@@ -113,24 +251,24 @@ export default function ReviewView({ onSelect }) {
           ))}
         </ul>
         <div className="px-3 py-2 border-t border-emerald-900/50 font-mono text-[9px] text-emerald-700">
-          by agency: {Object.entries(byAgency).slice(0, 4).map(([a, n]) => `${a}=${n}`).join("  ")}
+          {t("review.by_agency")} {Object.entries(byAgency).slice(0, 4).map(([a, n]) => `${a}=${n}`).join("  ")}
         </div>
       </aside>
 
       {/* Right pane — sources side by side */}
       <main className="flex-1 min-w-0">
         {!selected ? (
-          <div className="text-emerald-700 font-mono text-xs p-4">Select a page from the queue.</div>
+          <div className="text-emerald-700 font-mono text-xs p-4">{t("review.select_a_page")}</div>
         ) : (
           <>
             <div className="border border-emerald-900/50 bg-black/40 rounded-sm px-3 py-2 mb-3">
               <div className="flex items-baseline justify-between flex-wrap gap-2">
                 <div>
-                  <div className="font-mono text-[10px] text-emerald-700 tracking-widest">FLAGGED FOR REVIEW</div>
+                  <div className="font-mono text-[10px] text-emerald-700 tracking-widest">{t("review.flagged")}</div>
                   <div className="text-emerald-300 font-mono text-sm mt-0.5">{selected.title}</div>
                   <div className="text-emerald-700 font-mono text-[10px] mt-0.5">
-                    {selected.agency || "—"} · page {selected.page} ·
-                    {" "}canonical: <span className="text-amber-300">{pageData?.best || selected.confidence}</span>
+                    {selected.agency || "—"} · {t("review.page_n", { n: selected.page })} ·
+                    {" "}{t("review.canonical_label")} <span className="text-amber-300">{pageData?.best || selected.confidence}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -142,21 +280,28 @@ export default function ReviewView({ onSelect }) {
                         { page: selected.page }
                       )}
                       className="font-mono text-[10px] tracking-widest border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900/30 px-2 py-1 rounded-sm">
-                      OPEN DOSSIER →
+                      {t("review.open_dossier")}
                     </button>
                   )}
+                  <button
+                    onClick={() => setCombineOpen(true)}
+                    disabled={!pageData || Object.keys(pageData?.sources || {}).filter(n => !EXCLUDED_INPUT_SOURCES.has(n)).length < 2}
+                    title="Merge complementary sources when the low agreement is because each source caught a different region of the page, not because they contradict."
+                    className="font-mono text-[10px] tracking-widest border border-cyan-700/60 text-cyan-300 hover:bg-cyan-900/30 disabled:opacity-40 disabled:cursor-not-allowed px-2 py-1 rounded-sm">
+                    ⊕ COMBINE
+                  </button>
                   <a
                     href={`https://github.com/rizzleroc/pursue-console/blob/main/HOW-CAN-I-HELP.md`}
                     target="_blank" rel="noreferrer"
                     className="font-mono text-[10px] tracking-widest border border-amber-700/60 text-amber-300 hover:bg-amber-900/30 px-2 py-1 rounded-sm">
-                    FIX IT →
+                    {t("review.fix_it")}
                   </a>
                 </div>
               </div>
               {/* Pairwise scores summary */}
               {selected.pairs?.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] text-emerald-700">
-                  <span className="text-emerald-700/70">pairwise:</span>
+                  <span className="text-emerald-700/70">{t("review.pairwise")}</span>
                   {selected.pairs.map(p => (
                     <span key={`${p.a}-${p.b}`}>
                       <span className={sourceStyle(p.a).text}>{sourceStyle(p.a).label}</span>
@@ -169,7 +314,7 @@ export default function ReviewView({ onSelect }) {
               )}
               {selected.againstHuman && (
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px]">
-                  <span className="text-amber-500/80">vs human (gold):</span>
+                  <span className="text-amber-500/80">{t("review.vs_human")}</span>
                   {Object.entries(selected.againstHuman).map(([n, s]) => (
                     <span key={n} className={sourceStyle(n).text}>{sourceStyle(n).label} {s.toFixed(2)}</span>
                   ))}
@@ -178,7 +323,7 @@ export default function ReviewView({ onSelect }) {
             </div>
 
             {loadingPage && (
-              <div className="text-emerald-700 font-mono text-xs p-4">LOADING PAGE SOURCES…</div>
+              <div className="text-emerald-700 font-mono text-xs p-4">{t("review.loading_sources")}</div>
             )}
             {pageData && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -192,9 +337,9 @@ export default function ReviewView({ onSelect }) {
                         <div className="flex items-center gap-2">
                           <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
                           <span className={`font-mono text-[10px] tracking-widest ${meta.text}`}>{meta.label}</span>
-                          {isBest && <span className="font-mono text-[9px] text-amber-300 tracking-widest">· CANONICAL</span>}
+                          {isBest && <span className="font-mono text-[9px] text-amber-300 tracking-widest">{t("review.canonical_tag")}</span>}
                         </div>
-                        <span className="font-mono text-[10px] text-emerald-700">{text.length.toLocaleString()} chars</span>
+                        <span className="font-mono text-[10px] text-emerald-700">{t("review.chars", { n: text.length.toLocaleString() })}</span>
                       </div>
                       <pre className="px-3 py-2 text-emerald-200/90 text-[12px] leading-snug whitespace-pre-wrap break-words max-h-[55vh] overflow-y-auto font-mono">
 {text}
@@ -208,6 +353,9 @@ export default function ReviewView({ onSelect }) {
         )}
       </main>
       </div>
+      {combineOpen && selected && pageData && (
+        <CombineModal selected={selected} pageData={pageData} onClose={() => setCombineOpen(false)} />
+      )}
     </div>
   );
 }

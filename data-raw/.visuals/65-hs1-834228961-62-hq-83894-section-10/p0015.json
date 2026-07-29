@@ -1,37 +1,8 @@
 {
   "kind": "newspaper-clipping",
   "title": "Top Left Clipping",
-  "description": "Top Left Clipping",
-  "additional_markers": [
-    {
-      "kind": "hand-drawing",
-      "title": "Cartoon Caption"
-    },
-    {
-      "kind": "photograph",
-      "title": "Caption"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "Top Center Clipping"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "Top Right Clipping"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "Bottom Left Clipping"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "Bottom Center Clipping"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "Bottom Right Clipping"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.164Z"
+  "description": "World Flying Saucer\nBelievers Convene\n2-6-66\nMINNEAPOLIS TRIBUNE\nGreen, who regularly runs for president as a “space age candidate,” says he cannot practice telepathy but insists he has met spacemen on at least six occasions. The last of his visitors, he said, was four feet tall and came from the Alpha Centauri solar system.\n“These people are contactee-oriented,” explained Gabriel Green, a serious young man who served as president of the Amalgamated Flying Saucer Clubs of America\n4-12-66\nHead Saucerer Believes\nMartians Are Watching Us\nWho’s in All\nThose Saucers?\nBy Harold Scarlett\n“Flying between my ball and the green—I’ll hardly call THAT intelligent life from another planet.”\nGABRIEL GREEN\nHead Saucerer\nHis Uncle Martie on “My Favorite Martian.”\nTHE SWAMP GAS IS\nRESTLESS TONIGHT.\nFrom R. C., the Post, May [illegible], 1966\nFLYING SAUCERS ARE REAL!\nREAD\n“AFSCA WORLD REPORT”\n12 ISSUES $3.00\nAMALGAMATED FLYING SAUCER CLUBS of AMERICA\nGabriel Green, Pres., 2034 N. Hoover St., Los Angeles, Calif.",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.170Z",
+  "contributor": "Rizzleroc"
 }

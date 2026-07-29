@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import MiniSearch from "minisearch";
 import { EVENTS, AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
+import { useT } from "../i18n/context.js";
+import { matchesHeaderFilters } from "../App.jsx";
 
 const eventById = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 
@@ -55,8 +57,16 @@ const QUICK_QUERIES = [
   "ellipsoid", "bouncy ball", "orb", "diamond", "bronze", "saucer",
 ];
 
-export default function SearchView({ onSelect }) {
-  const [query, setQuery] = useState("");
+export default function SearchView({ onSelect, headerFilters }) {
+  const t = useT();
+  // Pre-seed from the Header's search box so typing "fbi" up there and
+  // clicking SEARCH lands you on the results immediately. Header changes
+  // push through; editing the in-page input doesn't push back.
+  const [query, setQuery] = useState(headerFilters?.query || "");
+  useEffect(() => {
+    if ((headerFilters?.query ?? "") !== query) setQuery(headerFilters?.query || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headerFilters?.query]);
   const [mini, setMini] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -76,6 +86,7 @@ export default function SearchView({ onSelect }) {
     if (!mini || !query.trim()) return null;
     const raw = mini.search(query, { combineWith: "AND" });
     let filtered = raw;
+    // In-view per-result agency/era pills (kept for the existing UX)
     if (agencyFilter) filtered = filtered.filter(r => r.agency === agencyFilter);
     if (eraFilter) {
       filtered = filtered.filter(r => {
@@ -83,8 +94,15 @@ export default function SearchView({ onSelect }) {
         return ev?.era === eraFilter;
       });
     }
+    // RecordFilterBar header filters — agency / release / type. Drop
+    // hits whose owning event doesn't match the header selection so a
+    // user filtering by R03 + NASA actually sees just R03 NASA hits.
+    filtered = filtered.filter(r => {
+      const ev = eventById[r.eventId];
+      return matchesHeaderFilters(ev, headerFilters);
+    });
     return filtered.slice(0, 200);
-  }, [mini, query, agencyFilter, eraFilter]);
+  }, [mini, query, agencyFilter, eraFilter, headerFilters?.filterAgency, headerFilters?.filterRelease, headerFilters?.filterType]);
 
   // Group hits by event for cleaner display
   const grouped = useMemo(() => {
@@ -101,22 +119,22 @@ export default function SearchView({ onSelect }) {
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ SEARCH</GlitchText></h2>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>{t("search.title")}</GlitchText></h2>
         <div className="font-mono text-[10px] text-emerald-700">
-          {loading ? "LOADING INDEX…" : error ? "INDEX UNAVAILABLE" : `FULL-TEXT CORPUS · BM25 · PER-PAGE GRANULARITY`}
+          {loading ? t("search.loading_index") : error ? t("search.index_unavailable") : t("search.sub")}
         </div>
       </div>
 
       <div className="mb-3">
         <input value={query} onChange={e => setQuery(e.target.value)} autoFocus
-          placeholder="› search every word across every extracted page…"
+          placeholder={t("search.placeholder")}
           className="w-full bg-black/60 border border-emerald-700/50 rounded-sm px-3 py-2 text-emerald-200 placeholder-emerald-700 font-mono text-sm focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
       </div>
 
       {/* Quick queries */}
       {!query && (
         <div className="mb-4">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TRY</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("search.try_heading")}</div>
           <div className="flex flex-wrap gap-1.5">
             {QUICK_QUERIES.map(q => (
               <button key={q} onClick={() => setQuery(q)}
@@ -131,7 +149,7 @@ export default function SearchView({ onSelect }) {
       {/* Filters */}
       {results && results.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 mb-3 text-[10px] font-mono">
-          <span className="text-emerald-700 tracking-widest">FILTER:</span>
+          <span className="text-emerald-700 tracking-widest">{t("search.filter")}</span>
           {["Department of War", "FBI", "NASA", "Department of State"].map(a => (
             <button key={a} onClick={() => setAgencyFilter(agencyFilter === a ? null : a)}
               className={`px-2 py-0.5 rounded-sm border tracking-wider ${agencyFilter === a ? "border-current" : "border-emerald-900/50 opacity-60"}`}
@@ -147,25 +165,28 @@ export default function SearchView({ onSelect }) {
             </button>
           ))}
           {(agencyFilter || eraFilter) && (
-            <button onClick={() => { setAgencyFilter(null); setEraFilter(null); }} className="text-rose-400 ml-2">clear</button>
+            <button onClick={() => { setAgencyFilter(null); setEraFilter(null); }} className="text-rose-400 ml-2">{t("search.clear")}</button>
           )}
         </div>
       )}
 
       {error && (
         <div className="border border-rose-400/40 bg-rose-400/5 rounded-sm p-3 font-mono text-[12px] text-rose-300">
-          ⊘ Search index could not be loaded: {error}. Run <code className="text-amber-300">node scripts/build-search-index.mjs</code>.
+          ⊘ {t("search.index_error", { error })}
         </div>
       )}
 
       {grouped && grouped.length === 0 && !loading && (
-        <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">No matches for "{query}" in the extracted corpus.</div>
+        <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">{t("search.no_matches", { query })}</div>
       )}
 
       {grouped && grouped.length > 0 && (
         <div>
           <div className="font-mono text-[10px] text-emerald-700 tracking-widest mb-3">
-            ▌ {grouped.length} RECORD{grouped.length === 1 ? "" : "S"} · {results.length} HIT{results.length === 1 ? "" : "S"}
+            {t("search.summary", {
+              records: grouped.length === 1 ? t("search.records_one") : t("search.records_n", { n: grouped.length }),
+              hits: results.length === 1 ? t("search.hits_one") : t("search.hits_n", { n: results.length }),
+            })}
           </div>
           <div className="space-y-3">
             {grouped.map(({ event, hits }) => {
@@ -195,12 +216,14 @@ export default function SearchView({ onSelect }) {
                     <div className="mt-2 space-y-1.5">
                       {pageHits.slice(0, 4).map((h, i) => (
                         <div key={i} className="border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed">
-                          <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">PAGE {h.page || "?"}</span>
+                          <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">{t("search.page_label", { n: h.page || "?" })}</span>
                           {highlight(snippetAround(h.body || "", tokens), tokens)}
                         </div>
                       ))}
                       {pageHits.length > 4 && (
-                        <div className="font-mono text-[10px] text-emerald-700 pl-2.5">…+{pageHits.length - 4} more page{pageHits.length - 4 === 1 ? "" : "s"}</div>
+                        <div className="font-mono text-[10px] text-emerald-700 pl-2.5">
+                          {pageHits.length - 4 === 1 ? t("search.more_page") : t("search.more_pages", { n: pageHits.length - 4 })}
+                        </div>
                       )}
                     </div>
                   )}

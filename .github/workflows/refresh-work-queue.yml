@@ -1,0 +1,59 @@
+name: Refresh work queue after contribution merge
+
+# When a contribution PR merges, `data-raw/.vision-cache/` and
+# `public/work-available.json` are stale in the repo until the maintainer
+# locally re-runs the build pipeline and commits the result. Volunteers
+# (volunteer.mjs and monitor.mjs) prefer the in-repo queue when present,
+# so a stale repo file makes the dashboard say "12 pages need OCR" while
+# `publishedOcrSet()` immediately marks all 12 as already on main — and
+# every Loop OCR run is an instant no-op.
+#
+# This workflow runs the two queue-rebuild scripts and commits the
+# refreshed cache + queue back to main, with [skip ci] so deploy.yml
+# isn't re-fired in a loop (the deploy.yml run that the merge already
+# triggered will pick this commit up on its next merge instead).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'contributions/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-work-queue
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need write access via the default GITHUB_TOKEN; the default
+          # checkout sets up the remote so subsequent `git push` works.
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      # Just the two steps required to refresh the queue — the full
+      # `npm run build` would also rebuild search, dossier, similarity,
+      # etc. (none of which we need committed for volunteer flow).
+      - run: node scripts/import-contributions.mjs
+      - run: node scripts/build-work-available.mjs
+      - name: Commit refreshed queue
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/work-available.json data-raw/.vision-cache data-raw/.contributions-manifest.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "no queue changes to commit"
+            exit 0
+          fi
+          git commit -m "chore(queue): auto-refresh work-available.json after contribution merge [skip ci]"
+          git push

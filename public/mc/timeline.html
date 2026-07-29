@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Timeline</title>
+  <meta name="description" content="220 events plotted by decade with agency colour-coding and density bars. Click any card to open the dossier.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Timeline — declassified UAP events 1940s–2020s">
+  <meta property="og:description" content="220 events plotted by decade with agency colour-coding and density bars. Click any card to open the dossier.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/timeline.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Timeline — declassified UAP events 1940s–2020s">
+  <meta name="twitter:description" content="220 events plotted by decade with agency colour-coding and density bars. Click any card to open the dossier.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .tl-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .tl-band { background: var(--surface); border: 1px solid var(--border); padding: 22px 26px; backdrop-filter: blur(10px); margin-bottom: 26px; }
+    .tl-band h2 { display: flex; align-items: baseline; gap: 18px; margin: 0 0 6px; font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+    .tl-band h2 .era { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 0.24em; padding: 4px 10px; border: 1px solid var(--border-strong); background: rgba(242,166,35,0.08); font-weight: 600; }
+    .tl-band h2 .ct { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3); letter-spacing: 0.16em; font-weight: 400; }
+    .tl-band .ct .v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; }
+    .tl-density { height: 4px; background: var(--hairline); margin: 16px 0 20px; }
+    .tl-density .fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--amber-bright)); box-shadow: 0 0 8px var(--amber-glow); }
+    .tl-overview { background: var(--surface); border: 1px solid var(--border); padding: 18px 22px 14px; margin-bottom: 26px; }
+    .tl-overview .ovh { display:flex; align-items:baseline; gap:14px; font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--text-3); letter-spacing:0.18em; text-transform:uppercase; margin-bottom:12px; }
+    .tl-overview .ovh .v { color: var(--text); font-family:'Space Grotesk', sans-serif; font-size:18px; letter-spacing:-0.01em; }
+    .tl-decadebars { display:flex; align-items:flex-end; gap:8px; height:88px; }
+    .tl-decadebars .col { flex:1; display:flex; flex-direction:column; align-items:stretch; gap:6px; height:100%; }
+    .tl-decadebars .bar-wrap { flex:1; display:flex; align-items:flex-end; }
+    .tl-decadebars .bar { width:100%; background: linear-gradient(180deg, var(--amber-bright), var(--amber)); box-shadow: 0 0 8px var(--amber-glow); min-height:2px; transition: filter .15s; }
+    .tl-decadebars .col:hover .bar { filter: brightness(1.3); }
+    .tl-decadebars .lbl { font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--text-3); letter-spacing:0.12em; text-align:center; }
+    .tl-decadebars .lbl .n { display:block; color: var(--text); font-size:11px; margin-bottom:2px; font-weight:600; }
+    .tl-band h2 { position: sticky; top: 0; background: var(--surface); z-index: 2; padding: 4px 0; }
+    .tl-events { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .evt { background: var(--surface-2); border: 1px solid var(--hairline); border-left: 3px solid var(--text-3); padding: 12px 14px; transition: all .15s; cursor: pointer; }
+    .evt:hover { border-color: var(--amber); border-left-color: var(--amber); transform: translateY(-2px); }
+    .evt[data-ag="dow"]    { border-left-color: var(--amber); }
+    .evt[data-ag="fbi"]    { border-left-color: var(--cyan); }
+    .evt[data-ag="nasa"]   { border-left-color: #7CFFB2; }
+    .evt[data-ag="cia"]    { border-left-color: #94A3B8; }
+    .evt[data-ag="odni"]   { border-left-color: var(--rose); }
+    .evt[data-ag="energy"] { border-left-color: #B280FF; }
+    .evt[data-ag="state"]  { border-left-color: #7FB6FF; }
+    .evt a, a.evt { color: inherit; text-decoration: none; display: block; height: 100%; }
+    .evt .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.12em; text-transform: uppercase; }
+    .evt .dot { width: 7px; height: 7px; }
+    .evt .dot.dow { background: var(--amber); }
+    .evt .dot.fbi { background: var(--cyan); }
+    .evt .dot.nasa { background: var(--emerald); }
+    .evt .dot.state { background: var(--rose); }
+    .evt .dot.cia { background: #B280FF; }
+    .evt .dot.odni { background: #FFD93D; }
+    .evt .dot.energy { background: #F472B6; }
+    .evt .date { color: var(--amber); }
+    .evt .ttl { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); line-height: 1.35; }
+    .evt .agn { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-3); margin-top: 4px; letter-spacing: 0.08em; }
+    .legend-row { display: flex; flex-wrap: wrap; gap: 14px; padding: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; }
+    .legend-row .a { display: inline-flex; align-items: center; gap: 7px; }
+    .legend-row .a .d { width: 8px; height: 8px; display: inline-block; }
+  </style>
+</head>
+<body data-view="timeline">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 08 — chronological strip</div>
+    <h1>220 events by decade, <em>1940s through 2020s.</em></h1>
+    <p class="sub">Each band is one decade. Event density per band shown as the gold fill. Color of the dot encodes the originating agency.</p>
+  </section>
+
+  <section class="tl-shell">
+    <div class="legend-row">
+      <span class="a"><span class="d" style="background:var(--amber)"></span>DEPT OF WAR · <span class="lg-ct" data-ag="Department of War">158</span></span>
+      <span class="a"><span class="d" style="background:var(--cyan)"></span>FBI · <span class="lg-ct" data-ag="FBI">26</span></span>
+      <span class="a"><span class="d" style="background:var(--emerald)"></span>NASA · <span class="lg-ct" data-ag="NASA">22</span></span>
+      <span class="a"><span class="d" style="background:var(--rose)"></span>STATE · <span class="lg-ct" data-ag="Department of State">7</span></span>
+      <span class="a"><span class="d" style="background:#F472B6"></span>ENERGY · <span class="lg-ct" data-ag="Department of Energy">3</span></span>
+      <span class="a"><span class="d" style="background:#B280FF"></span>CIA · <span class="lg-ct" data-ag="Central Intelligence Agency">1</span></span>
+      <span class="a"><span class="d" style="background:#FFD93D"></span>ODNI · <span class="lg-ct" data-ag="Office of the Director of National Intelligence">1</span></span>
+    </div>
+
+    <div id="tl-overview" class="tl-overview" hidden>
+      <div class="ovh">Events per decade<span class="v" id="tl-overview-total"></span><span style="margin-left:auto;font-family:'JetBrains Mono', monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;">DENSITY · 40S → 20S</span></div>
+      <div class="tl-decadebars" id="tl-decadebars"></div>
+    </div>
+
+    <div id="tl-bands">
+    <div class="tl-band">
+      <h2><span class="era">2020s</span>Modern military encounters<span class="ct"><span class="v">86</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:100%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">2025-10</span></div><div class="ttl">USPER Statement · helicopter encounter</div><div class="agn">FBI · SECRET//NOFORN</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2024-06</span></div><div class="ttl">UAE June 2024 mission report</div><div class="agn">DoW · USCENTCOM · MISREP</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2023-10</span></div><div class="ttl">Greece mission report</div><div class="agn">DoW · 56 SOIS</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2023</span></div><div class="ttl">Western US — orange orb · USPER witnesses</div><div class="agn">DoW · 3 USPERs</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2022-05</span></div><div class="ttl">Iraq mission report (D12)</div><div class="agn">DoW · 27 SOW</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-05</span></div><div class="ttl">Middle East erratic white object</div><div class="agn">DoW · Range Fouler (PR-36)</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-03</span></div><div class="ttl">Southern US Air Force sighting (PR-45)</div><div class="agn">DoW · targeting pod</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2020-07</span></div><div class="ttl">Persian Gulf July 2020 (D65)</div><div class="agn">DoW · MISREP</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">2000s</span>Vandenberg, Apollo follow-up<span class="ct"><span class="v">8</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:18%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2000-02</span></div><div class="ttl">Vandenberg Launch Summary 1958–2000</div><div class="agn">DoW · D49 · 113pp</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">2004-11</span></div><div class="ttl">Tic-Tac · Nimitz fleet</div><div class="agn">DoW · F/A-18 IR</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1990s</span>Air Force technical analysis<span class="ct"><span class="v">2</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:6%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1996-09</span></div><div class="ttl">Air Force Report · Modeling Booster Failures</div><div class="agn">DoW · D48 · RTI · 181pp</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1970s</span>Apollo crew debriefings<span class="ct"><span class="v">8</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:14%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1973-12</span></div><div class="ttl">Apollo 17 crew debriefing for science</div><div class="agn">NASA · 5pp</div></div>
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1973-12</span></div><div class="ttl">Apollo 17 technical crew debriefing</div><div class="agn">NASA · 2pp</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1960s</span>Gemini · Apollo · Project Blue Book<span class="ct"><span class="v">15</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:24%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot nasa"></span><span class="date">1965-12-05</span></div><div class="ttl">Gemini VII · Borman &amp; Lovell "Bogey"</div><div class="agn">NASA · debris field of trillions</div></div>
+      </div>
+    </div>
+
+    <div class="tl-band">
+      <h2><span class="era">1940s</span>Foundational case files<span class="ct"><span class="v">7</span> events</span></h2>
+      <div class="tl-density"><div class="fill" style="width:12%"></div></div>
+      <div class="tl-events">
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">1947</span></div><div class="ttl">FBI Flying Discs Case File · 62HQ-83894 · §2</div><div class="agn">FBI · Roswell-era reports</div></div>
+        <div class="evt"><div class="top"><span class="dot fbi"></span><span class="date">1947</span></div><div class="ttl">FBI Flying Discs Case File · §5</div><div class="agn">FBI · regional sightings</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1948-11</span></div><div class="ttl">Netherlands USAFE TT-1524 dispatch</div><div class="agn">DoW · USAFE · To Gen Cabell</div></div>
+        <div class="evt"><div class="top"><span class="dot dow"></span><span class="date">1949</span></div><div class="ttl">Project Sign · "1949 discs"</div><div class="agn">DoW · radar scope</div></div>
+      </div>
+    </div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+
+<script>
+(function () {
+  if (!window.MC || !MC.ready) return;
+
+  // agency full-name → existing .dot class
+  var AGENCY_DOT = {
+    "Department of War": "dow",
+    "FBI": "fbi",
+    "NASA": "nasa",
+    "Department of State": "state",
+    "Central Intelligence Agency": "cia",
+    "Office of the Director of National Intelligence": "odni",
+    "Department of Energy": "energy"
+  };
+  // short agency tag for the .agn line
+  var AGENCY_SHORT = {
+    "Department of War": "DoW",
+    "FBI": "FBI",
+    "NASA": "NASA",
+    "Department of State": "STATE",
+    "Central Intelligence Agency": "CIA",
+    "Office of the Director of National Intelligence": "ODNI",
+    "Department of Energy": "ENERGY"
+  };
+  // era key → human decade label + descriptor; newest → oldest, Unknown last.
+  var ERA_ORDER = ["20s", "modern", "10s", "00s", "90s", "80s", "70s", "60s", "50s", "40s", "Unknown"];
+  var ERA_LABEL = {
+    "20s": ["2020s", "Modern military encounters"],
+    "modern": ["MODERN", "Recent undated encounters"],
+    "10s": ["2010s", "Fleet & sensor reports"],
+    "00s": ["2000s", "Vandenberg, Apollo follow-up"],
+    "90s": ["1990s", "Air Force technical analysis"],
+    "80s": ["1980s", "Cold War case files"],
+    "70s": ["1970s", "Apollo crew debriefings"],
+    "60s": ["1960s", "Gemini · Apollo · Project Blue Book"],
+    "50s": ["1950s", "Early atomic-era sightings"],
+    "40s": ["1940s", "Foundational case files"],
+    "Unknown": ["UNDATED", "Unclassified by era"]
+  };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function dotClass(agency) { return AGENCY_DOT[agency] || ""; }
+
+  function agnLine(ev) {
+    var tag = AGENCY_SHORT[ev.agency] || ev.agency || "—";
+    var extra = ev.flag || ev.type;
+    return extra ? esc(tag) + " · " + esc(extra) : esc(tag);
+  }
+
+  function cardHTML(ev) {
+    var eid = ev.id || "";
+    var href = (MC.url && MC.url.dossier) ? MC.url.dossier(eid) : ("dossier.html?eid=" + encodeURIComponent(eid));
+    var ag = dotClass(ev.agency);
+    return '<a class="evt" href="' + esc(href) + '" data-eid="' + esc(eid) + '" data-ag="' + esc(ag) + '" style="text-decoration:none;color:inherit"><div class="top">' +
+      '<span class="dot ' + ag + '"></span>' +
+      '<span class="date">' + esc(ev.date || "—") + '</span></div>' +
+      '<div class="ttl">' + esc(ev.title || "Untitled") + '</div>' +
+      '<div class="agn">' + agnLine(ev) + '</div></a>';
+  }
+
+  function bandHTML(eraKey, events, maxCount) {
+    var label = ERA_LABEL[eraKey] || [eraKey, ""];
+    var count = events.length;
+    var width = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+    var cards = events.map(cardHTML).join("");
+    return '<div class="tl-band">' +
+      '<h2><span class="era">' + esc(label[0]) + '</span>' + esc(label[1]) +
+      '<span class="ct"><span class="v">' + count + '</span> events</span></h2>' +
+      '<div class="tl-density"><div class="fill" style="width:' + width + '%"></div></div>' +
+      '<div class="tl-events">' + cards + '</div></div>';
+  }
+
+  // Decades to chart in chronological order (40s → 20s)
+  // Include UNDATED + MODERN buckets so the density-bar overview accurately
+  // represents the corpus — previously the chart only covered 9 decades
+  // and silently dropped ~86 events sitting in MODERN / UNDATED.
+  var DECADE_CHRON = ["40s", "50s", "60s", "70s", "80s", "90s", "00s", "10s", "20s", "modern", "Unknown"];
+  var DECADE_LABEL = { "40s":"40s","50s":"50s","60s":"60s","70s":"70s","80s":"80s","90s":"90s","00s":"00s","10s":"10s","20s":"20s","modern":"MOD","Unknown":"UNK" };
+
+  function renderOverview(groups) {
+    var host = document.getElementById("tl-overview");
+    var bars = document.getElementById("tl-decadebars");
+    var totalEl = document.getElementById("tl-overview-total");
+    if (!host || !bars) return;
+    var counts = DECADE_CHRON.map(function (k) { return (groups[k] || []).length; });
+    var max = counts.reduce(function (a, b) { return Math.max(a, b); }, 0);
+    if (max === 0) return;
+    var total = counts.reduce(function (a, b) { return a + b; }, 0);
+    var html = DECADE_CHRON.map(function (k, i) {
+      var c = counts[i];
+      var pct = max > 0 ? (c / max) * 100 : 0;
+      return '<div class="col" title="' + DECADE_LABEL[k] + ' · ' + c + ' events">' +
+        '<div class="bar-wrap"><div class="bar" style="height:' + pct.toFixed(1) + '%"></div></div>' +
+        '<div class="lbl"><span class="n">' + c + '</span>' + esc(DECADE_LABEL[k]) + '</div></div>';
+    }).join("");
+    bars.innerHTML = html;
+    if (totalEl) totalEl.textContent = total + " events";
+    host.hidden = false;
+  }
+
+  function renderBands() {
+    var host = document.getElementById("tl-bands");
+    if (!host) return;
+    var events = (MC.derive && MC.derive.events) || [];
+    if (!events.length) return; // keep static fallback
+
+    var groups = {};
+    events.forEach(function (ev) {
+      var k = ev.era || "Unknown";
+      (groups[k] || (groups[k] = [])).push(ev);
+    });
+
+    var maxCount = 0;
+    ERA_ORDER.forEach(function (k) {
+      if (k !== "Unknown" && groups[k]) maxCount = Math.max(maxCount, groups[k].length);
+    });
+    if (maxCount === 0) maxCount = 1;
+
+    var html = "";
+    ERA_ORDER.forEach(function (k) {
+      if (groups[k] && groups[k].length) html += bandHTML(k, groups[k], maxCount);
+    });
+    if (html) host.innerHTML = html;
+
+    renderOverview(groups);
+  }
+
+  function renderLegend() {
+    var by = (MC.derive && MC.derive.byAgency) || {};
+    document.querySelectorAll(".lg-ct[data-ag]").forEach(function (el) {
+      var v = by[el.getAttribute("data-ag")];
+      if (typeof v === "number") el.textContent = v;
+    });
+  }
+
+  function paint() { renderLegend(); renderBands(); }
+
+  MC.ready().then(paint);
+  MC.onUpdate(paint);
+})();
+</script>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

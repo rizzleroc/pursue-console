@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "of a disc-shaped object",
-  "description": "Image of a disc-shaped object",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.769Z"
+  "description": "Message delivery timed out. Please try again.Retry",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.756Z",
+  "contributor": "Rizzleroc"
 }

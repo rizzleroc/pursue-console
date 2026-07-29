@@ -88,7 +88,9 @@ const PDF_ROOT = path.resolve(args["pdf-root"] || path.join(ROOT, "data-raw/volu
 // adds a second source to the same page rather than overwriting it.
 const PROVIDER = (args.provider || "chatgpt").toLowerCase();
 const PROVIDER_TO_SOURCE = { chatgpt: "gpt-vision", gemini: "gemini", claude: "claude" };
-const CONTRIB_SOURCE = PROVIDER_TO_SOURCE[PROVIDER];
+// Review mode targets the review source so it doesn't overwrite the original
+// OCR — the judge sees both sources and resolves the dispute.
+const CONTRIB_SOURCE = REVIEW ? "gpt-vision-review" : PROVIDER_TO_SOURCE[PROVIDER];
 if (!CONTRIB_SOURCE) {
   console.error(`error: --provider must be 'chatgpt', 'gemini', or 'claude' (got '${PROVIDER}')`);
   process.exit(1);
@@ -119,7 +121,7 @@ async function checkGhAuth() {
   if (NO_PR || DRY) return;
   const { spawn } = await import("node:child_process");
   await new Promise(resolve => {
-    const p = spawn("gh", ["auth", "status"], { stdio: "ignore", shell: process.platform === "win32" });
+    const p = spawn("gh", ["auth", "status"], { stdio: "ignore" });
     p.on("close", code => {
       if (code !== 0) {
         console.error("error: GitHub CLI is not authenticated. Run `gh auth login` (or pass --no-pr to skip the PR step).");
@@ -180,7 +182,16 @@ if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
 } else {
   queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
 }
-console.log(`[volunteer] queue gen ${queue.generatedAt} · ${queue.totalDocsRemaining} docs · ${queue.totalPagesNeeded} pages need vision OCR`);
+const _qSources = [await _loadQueue(QUEUE_URL)];
+if (QUEUE_URL !== REMOTE_QUEUE) _qSources.push(await _loadQueue(REMOTE_QUEUE));
+const _qLoaded = _qSources.filter(Boolean).sort((a, b) => b.ts - a.ts);
+if (!_qLoaded.length) { console.error("error: could not load any work queue"); process.exit(1); }
+const queue = _qLoaded[0].q;
+console.log(`[volunteer] using ${_qLoaded[0].kind} queue (gen ${queue.generatedAt})`);
+const _qLabel = REVIEW
+  ? `${queue.totalPagesNeedingReview || 0} pages need review`
+  : `${queue.totalDocsRemaining || 0} docs · ${queue.totalPagesNeeded || 0} pages need vision OCR`;
+console.log(`[volunteer] ${_qLabel}`);
 
 // Lease windows come from leasing.json (passed through work-available.json's
 // `leasing` field). OCR phase default: 3600s. Review phase default: 1800s.
@@ -374,8 +385,12 @@ await mkdir(PDF_ROOT, { recursive: true });
 for (const c of claims) {
   const dest = path.join(PDF_ROOT, `${c.eid}.pdf`);
   if (existsSync(dest)) { console.log(`  ⊖ ${c.eid}.pdf already present`); continue; }
-  console.log(`  ↓ ${c.eid}.pdf  ${c.doc.pdfUrl}`);
-  const r = await fetch(c.doc.pdfUrl);
+  // Release-02 PDFs ship as site-relative paths (e.g. "release_2/X.pdf")
+  // because they're mirrored under public/release_2/ — resolve against the
+  // deployed site so Node's fetch() (which rejects relative URLs) works.
+  const absUrl = /^https?:\/\//i.test(c.doc.pdfUrl) ? c.doc.pdfUrl : new URL(c.doc.pdfUrl, "https://rizzleroc.github.io/pursue-console/").href;
+  console.log(`  ↓ ${c.eid}.pdf  ${absUrl}`);
+  const r = await fetch(absUrl);
   if (!r.ok) { console.error(`    HTTP ${r.status} — skipping doc`); c.skip = true; continue; }
   await writeFile(dest, Buffer.from(await r.arrayBuffer()));
 }
@@ -387,7 +402,7 @@ const live = claims.filter(c => !c.skip);
 globalThis.Path2D = Path2D;
 globalThis.DOMMatrix = DOMMatrix;
 const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL } = await getPdfjsAssetUrls();
+const { wasmUrl: PDFJS_WASM_URL, standardFontDataUrl: PDFJS_FONTS_URL, server: PDFJS_SERVER } = await getPdfjsAssetUrls();
 class NCF {
   create(w, h) { const c = createCanvas(w, h); return { canvas: c, context: c.getContext("2d") }; }
   reset(cv, w, h) { cv.canvas.width = w; cv.canvas.height = h; }
@@ -475,6 +490,16 @@ async function callDaemon(filePaths) {
       raw = j.text ?? j.result?.text ?? j.output ?? "";
       break;
     } catch (e) {
+      // If the daemon itself has gone away (process died, Chrome crashed,
+      // network drop), retrying is pointless — the same fetch will fail
+      // identically. Probe /health once; on the first confirmed-dead probe
+      // bail with a non-retriable error so the volunteer surfaces it instead
+      // of grinding through retries + single-page fallback per page.
+      if (/fetch failed|ECONNREFUSED|ECONNRESET|UND_ERR/i.test(e.message) && !(await daemonAlive(1500))) {
+        const dead = new Error(`OCR daemon at ${DAEMON} stopped responding mid-run — restart it (cd pursue-vision-mcp && npm start)`);
+        dead.daemonDown = true;
+        throw dead;
+      }
       if (n >= 3) throw e;
       console.log(`    ↻ upload retry ${n}/2 — ${e.message.slice(0, 70)}`);
       await new Promise(res => setTimeout(res, 2000 * n));
@@ -500,7 +525,7 @@ await mkdir(PNG_STAGE, { recursive: true });
 // against the per-base v2 contributions.
 async function publishedOcrSet() {
   const cap = (argv) => new Promise((res) => {
-    const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000, shell: process.platform === "win32" });
+    const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000 });
     let out = ""; p.stdout.on("data", c => out += c);
     p.on("exit", code => res(code === 0 ? out : "")); p.on("error", () => res(""));
   });
@@ -645,6 +670,13 @@ await reportProgress({
 const elapsed = ((Date.now() - tAll) / 60_000).toFixed(1);
 console.log(`\n[volunteer] done. ok=${pagesOK} err=${pagesErr}  [${elapsed} min]`);
 console.log(`[volunteer] files at: ${CONTRIB_ROOT}`);
+
+// Drain the pdfjs assets server before exit — on Windows, calling process.exit()
+// while a TCP listener is still in the event loop can trip a libuv assertion
+// (UV_HANDLE_CLOSING in src\win\async.c) and the process dies with exit code
+// 3221226505 instead of the intended 0/2. The monitor then misclassifies the
+// clean "no new work" result as a crash and re-loops.
+await new Promise(r => PDFJS_SERVER.close(() => r()));
 
 if (pagesOK === 0) { console.log("[volunteer] nothing to commit, exiting."); process.exit(2); }
 

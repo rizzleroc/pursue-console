@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { pipeline, env } from "@huggingface/transformers";
-import { EVENTS, AGENCY_COLORS } from "../data/events.js";
+import { EVENTS, AGENCY_COLORS, RELEASES_LABEL } from "../data/events.js";
 import { GlitchText, DocTypeBadge, flagBg } from "../components/Primitives.jsx";
 import { ingestFile, listDocs, deleteDoc, clearAll, loadAllChunks } from "../lib/dropCorpus.js";
 import { highlightQuery } from "../lib/highlightQuery.jsx";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
+import { matchesHeaderFilters } from "../App.jsx";
 
 // Fallback inventory total — only used if public/corpus-stats.json hasn't
 // loaded yet (or 404s on dev). The real number comes from the corpus DB
@@ -182,8 +184,16 @@ const SAMPLE_QUERIES = [
   "operator unable to positively identify the contact",
 ];
 
-export default function SemanticSearchView({ onSelect }) {
-  const [query, setQuery] = useState("");
+export default function SemanticSearchView({ onSelect, headerFilters }) {
+  const t = useT();
+  // Pre-seed from the Header's search box. SEMANTIC needs the user to
+  // click Search (it's an expensive vector search), so we only update
+  // the input — we don't auto-trigger a query.
+  const [query, setQuery] = useState(headerFilters?.query || "");
+  useEffect(() => {
+    if ((headerFilters?.query ?? "") !== query) setQuery(headerFilters?.query || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headerFilters?.query]);
   const [committed, setCommitted] = useState("");      // query that triggered last search
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
@@ -331,7 +341,14 @@ export default function SemanticSearchView({ onSelect }) {
       }
       // Filter: hide groups whose best final score is below the WEAK floor.
       // (the UI still has a toggle to surface them when the user wants noise.)
-      const allGroups = Array.from(groups.values()).sort((a, b) => b.best - a.best);
+      let allGroups = Array.from(groups.values()).sort((a, b) => b.best - a.best);
+      // RecordFilterBar header filters — agency / release / type. Drop
+      // official-event groups whose event doesn't match. Dropped-corpus
+      // groups carry no event metadata, so leave them alone.
+      allGroups = allGroups.filter(g => {
+        if (g.kind !== "official") return true;
+        return matchesHeaderFilters(g.event, headerFilters);
+      });
       setResults({
         grouped: allGroups,
         elapsedMs,
@@ -393,7 +410,7 @@ export default function SemanticSearchView({ onSelect }) {
     await refreshDropped();
   }
   async function onClearAllDropped() {
-    if (!confirm("Remove all dropped documents from your browser?")) return;
+    if (!confirm(t("semantic.confirm_clear"))) return;
     await clearAll();
     await refreshDropped();
   }
@@ -418,13 +435,16 @@ export default function SemanticSearchView({ onSelect }) {
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ SEMANTIC</GlitchText></h2>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>{t("semantic.title")}</GlitchText></h2>
         <div className="font-mono text-[10px] text-emerald-700 flex items-center gap-3 flex-wrap">
           {vecState ? (
             <>
-              <span>DENSE VECTORS · {(vecState.info.count + droppedVecs.meta.length).toLocaleString()} CHUNKS · {vecState.info.dim}D · MINI-LM</span>
+              <span>{t("semantic.meta", {
+                chunks: (vecState.info.count + droppedVecs.meta.length).toLocaleString(),
+                dim: vecState.info.dim,
+              })}</span>
               {vecState.info.generatedAt && (
-                <span className="text-emerald-600">INDEX GEN {vecState.info.generatedAt.slice(0, 16).replace("T", " ")}</span>
+                <span className="text-emerald-600">{t("semantic.index_gen", { at: vecState.info.generatedAt.slice(0, 16).replace("T", " ") })}</span>
               )}
               <button onClick={async () => {
                 setVecLoaded(false); setVecState(null);
@@ -436,10 +456,10 @@ export default function SemanticSearchView({ onSelect }) {
               }}
                 style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)" }}
                 className="px-2 py-0.5 rounded-sm border border-emerald-700/50 text-emerald-400 hover:border-amber-400 hover:text-amber-300 tracking-widest active:scale-[0.97]">
-                ↻ REFRESH INDEX
+                {t("semantic.refresh_index")}
               </button>
             </>
-          ) : "LOADING…"}
+          ) : t("semantic.loading")}
         </div>
       </div>
 
@@ -448,38 +468,38 @@ export default function SemanticSearchView({ onSelect }) {
         {/* REPO SCOPE */}
         <div className="border border-emerald-700/40 bg-black/40 rounded-sm p-3 font-mono text-[11px]">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
-            <div className="text-emerald-700 tracking-widest text-[9px]">▌ REPOSITORY SCOPE — RELEASE 01</div>
+            <div className="text-emerald-700 tracking-widest text-[9px]">{t("semantic.repo_scope", { releases: RELEASES_LABEL.toUpperCase() })}</div>
             {coverage.droppedDocs > 0 && (
-              <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">CLEAR DROPPED ({coverage.droppedDocs})</button>
+              <button onClick={onClearAllDropped} className="text-[9px] text-rose-400 hover:text-rose-200 tracking-widest">{t("semantic.clear_dropped", { n: coverage.droppedDocs })}</button>
             )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-emerald-200">
             <div>
-              <div className="text-[9px] text-emerald-700 tracking-widest">INVENTORY</div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">{t("semantic.cov_inventory")}</div>
               <div className="text-amber-300 text-base">{coverage.inventoryTotal}</div>
-              <div className="text-[9px] text-emerald-600">records on war.gov</div>
+              <div className="text-[9px] text-emerald-600">{t("semantic.cov_inventory_sub")}</div>
             </div>
             <div>
-              <div className="text-[9px] text-emerald-700 tracking-widest">CATALOGUED</div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">{t("semantic.cov_catalogued")}</div>
               <div className="text-emerald-200 text-base">{coverage.catalogued}</div>
-              <div className="text-[9px] text-emerald-600">events in this repo</div>
+              <div className="text-[9px] text-emerald-600">{t("semantic.cov_catalogued_sub")}</div>
             </div>
             <div>
-              <div className="text-[9px] text-emerald-700 tracking-widest">INDEXED</div>
-              <div className="text-emerald-200 text-base">{coverage.withText} <span className="text-[9px] text-emerald-700">events</span></div>
-              <div className="text-[9px] text-emerald-600">have searchable text</div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">{t("semantic.cov_indexed")}</div>
+              <div className="text-emerald-200 text-base">{coverage.withText} <span className="text-[9px] text-emerald-700">{t("semantic.cov_indexed_unit")}</span></div>
+              <div className="text-[9px] text-emerald-600">{t("semantic.cov_indexed_sub")}</div>
             </div>
             <div>
-              <div className="text-[9px] text-emerald-700 tracking-widest">YOU ADDED</div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">{t("semantic.cov_you_added")}</div>
               <div className={coverage.droppedDocs > 0 ? "text-amber-300 text-base" : "text-emerald-700 text-base"}>
-                {coverage.droppedDocs} <span className="text-[9px] text-emerald-700">→ {coverage.droppedChunks.toLocaleString()} chunks</span>
+                {coverage.droppedDocs} <span className="text-[9px] text-emerald-700">{t("semantic.cov_you_added_chunks", { n: coverage.droppedChunks.toLocaleString() })}</span>
               </div>
-              <div className="text-[9px] text-emerald-600">local-only, this browser</div>
+              <div className="text-[9px] text-emerald-600">{t("semantic.cov_you_added_sub")}</div>
             </div>
             <div>
-              <div className="text-[9px] text-emerald-700 tracking-widest">AWAITING</div>
+              <div className="text-[9px] text-emerald-700 tracking-widest">{t("semantic.cov_awaiting")}</div>
               <div className="text-rose-300 text-base">{Math.max(0, coverage.inventoryTotal - coverage.catalogued)}</div>
-              <div className="text-[9px] text-emerald-600">records to catalogue</div>
+              <div className="text-[9px] text-emerald-600">{t("semantic.cov_awaiting_sub")}</div>
             </div>
           </div>
         </div>
@@ -492,22 +512,22 @@ export default function SemanticSearchView({ onSelect }) {
           const gen = vecState.info.generatedAt ? new Date(vecState.info.generatedAt) : null;
           const ago = gen ? Math.max(0, (Date.now() - gen.getTime()) / 1000) : null;
           const agoStr = ago == null ? "—"
-            : ago < 60 ? `${Math.round(ago)}s ago`
-            : ago < 3600 ? `${Math.round(ago/60)}m ago`
-            : ago < 86400 ? `${Math.round(ago/3600)}h ago`
-            : `${Math.round(ago/86400)}d ago`;
+            : ago < 60 ? t("semantic.ago_seconds", { n: Math.round(ago) })
+            : ago < 3600 ? t("semantic.ago_minutes", { n: Math.round(ago/60) })
+            : ago < 86400 ? t("semantic.ago_hours", { n: Math.round(ago/3600) })
+            : t("semantic.ago_days", { n: Math.round(ago/86400) });
           // Build the per-source bar visualization
           const bars = [
-            { key: "vision",  label: "VISION",     color: "#82B6FF", note: "GPT-transcribed" },
-            { key: "pdfjs",   label: "TEXT-LAYER", color: "#7CFFB2", note: "pdfjs clean" },
-            { key: "ocr",     label: "TESSERACT",  color: "#FFD93D", note: "noisier, queued for vision" },
-            { key: "curated", label: "CURATED",    color: "#B794F4", note: "hand-written summaries" },
+            { key: "vision",  label: t("semantic.src_vision"),    color: "#82B6FF", note: t("semantic.src_vision_note") },
+            { key: "pdfjs",   label: t("semantic.src_textlayer"), color: "#7CFFB2", note: t("semantic.src_textlayer_note") },
+            { key: "ocr",     label: t("semantic.src_tesseract"), color: "#FFD93D", note: t("semantic.src_tesseract_note") },
+            { key: "curated", label: t("semantic.src_curated"),   color: "#B794F4", note: t("semantic.src_curated_note") },
           ].map(b => ({ ...b, count: bs[b.key]?.count || 0, q: bs[b.key]?.meanQuality }));
           const sumChunks = bars.reduce((s, b) => s + b.count, 0) || 1;
           return (
             <div className="border border-cyan-700/40 bg-cyan-950/10 rounded-sm p-3 font-mono text-[11px]">
               <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
-                <div className="text-cyan-400/80 tracking-widest text-[9px]">▌ FAISS INDEX · {total.toLocaleString()} chunks · {vecState.info.dim}D Mini-LM</div>
+                <div className="text-cyan-400/80 tracking-widest text-[9px]">{t("semantic.faiss_index", { chunks: total.toLocaleString(), dim: vecState.info.dim })}</div>
                 <div className="flex items-center gap-3">
                   <span className="text-emerald-700 text-[9px] tracking-widest">{agoStr}</span>
                   <button onClick={async () => {
@@ -518,7 +538,7 @@ export default function SemanticSearchView({ onSelect }) {
                   }}
                     style={{ transition: "all 150ms cubic-bezier(0.23,1,0.32,1)" }}
                     className="px-2 py-0.5 rounded-sm border border-cyan-700/50 text-cyan-300 hover:border-amber-400 hover:text-amber-300 tracking-widest text-[10px] active:scale-[0.97]">
-                    ↻ REFRESH FAISS
+                    {t("semantic.refresh_faiss")}
                   </button>
                 </div>
               </div>
@@ -527,7 +547,7 @@ export default function SemanticSearchView({ onSelect }) {
               <div className="h-2 flex rounded-sm overflow-hidden mb-3 bg-emerald-950">
                 {bars.map(b => b.count > 0 && (
                   <div key={b.key}
-                    title={`${b.label} · ${b.count} chunks · ${Math.round(b.count/sumChunks*100)}%`}
+                    title={t("semantic.src_bar_title", { label: b.label, n: b.count, pct: Math.round(b.count/sumChunks*100) })}
                     style={{ width: `${(b.count / sumChunks) * 100}%`, backgroundColor: b.color }} />
                 ))}
               </div>
@@ -551,8 +571,8 @@ export default function SemanticSearchView({ onSelect }) {
 
               {rejected > 0 && (
                 <div className="mt-3 pt-2 border-t border-emerald-700/20 text-[10px] text-emerald-600">
-                  <span className="text-rose-400 tracking-widest text-[9px] mr-2">QUALITY-FILTERED</span>
-                  {rejected} chunks dropped below q≥{vecState.info.minQuality} (the tesseract noise band) before reaching the index.
+                  <span className="text-rose-400 tracking-widest text-[9px] mr-2">{t("semantic.quality_filtered")}</span>
+                  {t("semantic.quality_filtered_body", { n: rejected, min: vecState.info.minQuality })}
                 </div>
               )}
             </div>
@@ -568,13 +588,13 @@ export default function SemanticSearchView({ onSelect }) {
           : "border-emerald-700/40 bg-emerald-950/30 hover:border-emerald-500/60"}`}>
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <div className="font-mono text-[11px] text-emerald-300 tracking-widest">▤ DROP PDFs OR .TXT FILES HERE</div>
+            <div className="font-mono text-[11px] text-emerald-300 tracking-widest">{t("semantic.drop_files")}</div>
             <div className="font-mono text-[10px] text-emerald-600 mt-0.5">
-              Files stay in your browser — extracted with pdfjs, embedded with the same Mini-LM model, persisted to IndexedDB. Nothing leaves your machine.
+              {t("semantic.drop_sub")}
             </div>
           </div>
           <label className="cursor-pointer font-mono text-[10px] text-amber-300 hover:text-amber-100 px-3 py-1.5 border border-amber-400/50 rounded-sm tracking-widest">
-            CHOOSE FILES
+            {t("semantic.choose_files")}
             <input type="file" multiple accept=".pdf,.txt,.md" className="hidden"
               onChange={e => e.target.files && handleFiles(e.target.files)} />
           </label>
@@ -593,11 +613,11 @@ export default function SemanticSearchView({ onSelect }) {
                 </span>
                 <span className="text-emerald-600 text-right text-[9px]">
                   {r.status === "running" && ingestProgress?.idx === i ? (
-                    ingestProgress.phase === "embedding" ? `embed ${ingestProgress.done}/${ingestProgress.total}` :
-                    ingestProgress.phase === "extracting" ? "extracting…" :
-                    ingestProgress.phase === "storing" ? "writing…" : ingestProgress.phase
-                  ) : r.status === "done" ? `${r.chunks} chunks indexed` :
-                     r.status === "exists" ? "already indexed" :
+                    ingestProgress.phase === "embedding" ? t("semantic.embed_progress", { done: ingestProgress.done, total: ingestProgress.total }) :
+                    ingestProgress.phase === "extracting" ? t("semantic.extracting") :
+                    ingestProgress.phase === "storing" ? t("semantic.storing") : ingestProgress.phase
+                  ) : r.status === "done" ? t("semantic.chunks_indexed", { n: r.chunks }) :
+                     r.status === "exists" ? t("semantic.already_indexed") :
                      r.status === "error" ? r.error : ""}
                 </span>
               </div>
@@ -608,12 +628,12 @@ export default function SemanticSearchView({ onSelect }) {
         {/* Already-ingested docs */}
         {droppedDocs.length > 0 && (
           <div className="mt-3 pt-2 border-t border-emerald-700/20">
-            <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-1">▌ YOUR LIBRARY (PERSISTED, THIS BROWSER ONLY)</div>
+            <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-1">{t("semantic.your_library")}</div>
             <div className="flex flex-wrap gap-1.5">
               {droppedDocs.map(d => (
                 <div key={d.id} className="group flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 bg-emerald-950/60 border border-emerald-700/30 rounded-sm">
                   <span className="text-emerald-300 truncate max-w-[260px]">{d.name}</span>
-                  <span className="text-emerald-700">{d.pages}p · {d.chunkCount}c</span>
+                  <span className="text-emerald-700">{t("semantic.library_unit", { pages: d.pages, chunks: d.chunkCount })}</span>
                   <button onClick={() => onRemoveDropped(d.id)} className="text-rose-400/60 hover:text-rose-300 text-[10px] ml-0.5">×</button>
                 </div>
               ))}
@@ -624,17 +644,17 @@ export default function SemanticSearchView({ onSelect }) {
 
       <form onSubmit={onSubmit} className="mb-3">
         <input value={query} onChange={e => setQuery(e.target.value)} autoFocus
-          placeholder="› describe the pattern you're looking for, not just keywords…"
+          placeholder={t("semantic.placeholder")}
           className="w-full bg-black/60 border border-emerald-700/50 rounded-sm px-3 py-2 text-emerald-200 placeholder-emerald-700 font-mono text-sm focus:outline-none focus:border-amber-400 focus:shadow-[0_0_8px_rgba(255,217,61,0.4)]" />
         <div className="font-mono text-[10px] text-emerald-700 mt-1.5">
-          Press <span className="text-amber-300">Enter</span> to search. First query downloads a ~25MB model once.
+          {t("semantic.press_enter_pre")} <span className="text-amber-300">{t("semantic.press_enter_key")}</span> {t("semantic.press_enter_post")}
         </div>
       </form>
 
       {/* Sample queries */}
       {!results && !modelLoading && (
         <div className="mb-4">
-          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">▌ TRY A CONCEPTUAL QUERY</div>
+          <div className="font-mono text-[9px] text-emerald-700 tracking-widest mb-2">{t("semantic.try")}</div>
           <div className="flex flex-wrap gap-1.5">
             {SAMPLE_QUERIES.map(q => (
               <button key={q} onClick={() => { setQuery(q); runSearch(q); }}
@@ -649,7 +669,7 @@ export default function SemanticSearchView({ onSelect }) {
       {/* Model load progress */}
       {(modelLoading || (searching && !modelLoaded)) && (
         <div className="mb-4 border border-amber-400/50 bg-amber-400/5 rounded-sm p-3 font-mono text-[11px] text-amber-200">
-          <div className="text-amber-400 tracking-widest mb-1">▌ DOWNLOADING MODEL (one-time, cached afterwards)</div>
+          <div className="text-amber-400 tracking-widest mb-1">{t("semantic.downloading_model")}</div>
           <div className="text-emerald-400">{progress?.file || MODEL}</div>
           {progress?.progress != null && (
             <div className="mt-2 h-1.5 bg-emerald-950 rounded-full overflow-hidden">
@@ -662,19 +682,19 @@ export default function SemanticSearchView({ onSelect }) {
 
       {error && (
         <div className="border border-rose-400/40 bg-rose-400/5 rounded-sm p-3 font-mono text-[11px] text-rose-300 mb-4 space-y-1">
-          <div className="text-rose-200 tracking-widest">⊘ SEMANTIC SEARCH FAILED</div>
+          <div className="text-rose-200 tracking-widest">{t("semantic.failed")}</div>
           <div className="break-words">{typeof error === "string" ? error : error.msg}</div>
           {error?.stack && (
             <pre className="text-[10px] text-rose-400/80 mt-2 whitespace-pre-wrap leading-tight">{error.stack}</pre>
           )}
           <div className="text-[10px] text-emerald-700 pt-2">
-            Open the browser console for the full stack trace. If this is the first time you tried semantic search and the model download timed out, retry — files are cached after success.
+            {t("semantic.failed_hint")}
           </div>
         </div>
       )}
 
       {searching && modelLoaded && (
-        <div className="font-mono text-[11px] text-emerald-500 mb-3">⏳ embedding query and ranking {(vecState?.info?.count ?? 0).toLocaleString()} chunks…</div>
+        <div className="font-mono text-[11px] text-emerald-500 mb-3">{t("semantic.embedding", { n: (vecState?.info?.count ?? 0).toLocaleString() })}</div>
       )}
 
       {results && (() => {
@@ -684,17 +704,20 @@ export default function SemanticSearchView({ onSelect }) {
         const visible = showWeak ? [...strong, ...weak] : strong;
 
         if (results.grouped.length === 0) {
-          return <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">No semantically similar passages found.</div>;
+          return <div className="font-mono text-[12px] text-emerald-700 py-8 text-center">{t("semantic.none_found")}</div>;
         }
         if (visible.length === 0) {
           return (
             <div className="font-mono text-[11px] text-emerald-700 py-8 text-center space-y-2">
-              <div>No high-confidence matches.</div>
-              <div className="text-[10px]">Best score was <span className="text-amber-400">{results.grouped[0].best.toFixed(3)}</span> ({strengthBand(results.grouped[0].best).label}) — below the relevance floor.</div>
+              <div>{t("semantic.no_high_conf")}</div>
+              <div className="text-[10px]">{t("semantic.best_score", {
+                score: results.grouped[0].best.toFixed(3),
+                label: strengthBand(results.grouped[0].best).label,
+              })}</div>
               {weak.length > 0 && (
                 <button onClick={() => setShowWeak(true)}
                   className="mt-2 px-3 py-1 rounded-sm border border-purple-400/50 text-purple-300 hover:bg-purple-400/10 tracking-widest text-[10px]">
-                  show {weak.length} weak match{weak.length === 1 ? "" : "es"}
+                  {weak.length === 1 ? t("semantic.show_weak_one") : t("semantic.show_weak_n", { n: weak.length })}
                 </button>
               )}
             </div>
@@ -703,14 +726,22 @@ export default function SemanticSearchView({ onSelect }) {
         return (
         <div>
           <div className="font-mono text-[10px] text-emerald-700 tracking-widest mb-3 flex items-center gap-3 flex-wrap">
-            <span>▌ {visible.length} RECORDS · TOP {strengthBand(results.grouped[0].best).label} = {results.grouped[0].best.toFixed(3)} · {results.elapsedMs.toFixed(1)} MS</span>
-            <span className="text-emerald-600">scored against {results.staticChunks.toLocaleString()} official + {results.droppedChunks.toLocaleString()} dropped chunks</span>
+            <span>{t("semantic.summary_count", {
+              n: visible.length,
+              label: strengthBand(results.grouped[0].best).label,
+              score: results.grouped[0].best.toFixed(3),
+              ms: results.elapsedMs.toFixed(1),
+            })}</span>
+            <span className="text-emerald-600">{t("semantic.summary_against", {
+              static: results.staticChunks.toLocaleString(),
+              dropped: results.droppedChunks.toLocaleString(),
+            })}</span>
             {weak.length > 0 && (
               <button onClick={() => setShowWeak(v => !v)}
                 className={`ml-auto px-2 py-0.5 rounded-sm border tracking-widest transition-all ${
                   showWeak ? "border-purple-400/70 text-purple-200 bg-purple-400/10"
                   : "border-emerald-700/50 text-emerald-500 hover:border-purple-400/50 hover:text-purple-300"}`}>
-                {showWeak ? `▼ HIDING NOISE` : `▸ SHOW ${weak.length} WEAK`}
+                {showWeak ? t("semantic.hide_noise") : t("semantic.show_weak_btn", { n: weak.length })}
               </button>
             )}
           </div>
@@ -727,8 +758,8 @@ export default function SemanticSearchView({ onSelect }) {
                     style={{ borderLeftColor: "#FFD93D" }}>
                     <div className="flex items-baseline justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] tracking-wider text-amber-300">YOUR LIBRARY</span>
-                        <span className="font-mono text-[9px] text-emerald-700 tracking-widest">LOCAL · NOT IN OFFICIAL CATALOG</span>
+                        <span className="font-mono text-[10px] tracking-wider text-amber-300">{t("semantic.your_library_tag")}</span>
+                        <span className="font-mono text-[9px] text-emerald-700 tracking-widest">{t("semantic.local_not_in_catalog")}</span>
                       </div>
                       <div className="flex items-center gap-3 font-mono text-[10px]">
                         <span style={{ color: band.color }} className="tracking-widest" title={`final ${g.best.toFixed(3)} (cos ${g.bestCos.toFixed(3)})`}>
@@ -744,7 +775,7 @@ export default function SemanticSearchView({ onSelect }) {
                         {pageHits.map((h, i) => (
                           <div key={i} className="border-l border-amber-400/30 pl-2.5 font-mono text-[11px] text-amber-100/90 leading-relaxed">
                             <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
-                              PAGE {h.page}
+                              {t("semantic.page_label", { n: h.page })}
                               <span className="ml-2 text-emerald-700">
                                 cos {h.cos.toFixed(3)}{h.boost > 0 ? ` +${h.boost.toFixed(2)} match` : ""}
                               </span>
@@ -794,10 +825,10 @@ export default function SemanticSearchView({ onSelect }) {
                           : h.chunkSource === "pdfjs" ? "text-emerald-400"
                           : (h.chunkQuality ?? 1) >= 0.55 ? "text-amber-300"
                           : "text-amber-600";
-                        const qLabel = h.chunkKind === "meta" ? "CURATED"
-                          : h.chunkSource === "vision" ? "VISION"
-                          : h.chunkSource === "pdfjs" ? "TEXT-LAYER"
-                          : h.chunkSource === "ocr" ? `OCR q${(h.chunkQuality ?? 0).toFixed(2)}`
+                        const qLabel = h.chunkKind === "meta" ? t("semantic.chunk_curated")
+                          : h.chunkSource === "vision" ? t("semantic.chunk_vision")
+                          : h.chunkSource === "pdfjs" ? t("semantic.chunk_textlayer")
+                          : h.chunkSource === "ocr" ? t("semantic.chunk_ocr", { q: (h.chunkQuality ?? 0).toFixed(2) })
                           : "";
                         const clickable = h.chunkKind !== "meta" && h.page;
                         return (
@@ -820,7 +851,7 @@ export default function SemanticSearchView({ onSelect }) {
                             className={`block w-full text-left border-l border-emerald-700/30 pl-2.5 font-mono text-[11px] text-emerald-300/90 leading-relaxed rounded-sm ${clickable ? "hover:bg-emerald-900/30 hover:border-amber-400 active:scale-[0.995]" : ""}`}
                             style={{ transition: "background-color 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms cubic-bezier(0.23,1,0.32,1)" }}>
                             <span className="text-amber-400/80 text-[9px] tracking-widest mr-2">
-                              {clickable ? `→ PAGE ${h.page}` : "SUMMARY"}
+                              {clickable ? t("semantic.arrow_page", { n: h.page }) : t("semantic.summary_only")}
                               <span className="ml-2 text-emerald-700">
                                 cos {h.cos.toFixed(3)}{h.boost > 0 ? ` +${h.boost.toFixed(2)} match` : ""}
                               </span>

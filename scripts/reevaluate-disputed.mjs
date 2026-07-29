@@ -34,6 +34,7 @@ import { createCanvas } from "pdfjs-dist/node_modules/@napi-rs/canvas/index.js";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import os from "node:os";
+import { fanoutWithFallback, createFailureBudget } from "./lib/whipgen-fanout.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -162,29 +163,16 @@ async function renderPng(eid, pageNum) {
   return buf;
 }
 
-// ---- /fanout call ----
-async function fanout(filePath) {
-  const startedAt = Date.now();
-  const r = await fetch(`${DAEMON}/fanout`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${TOKEN}` },
-    body: JSON.stringify({
-      providers: PROVIDERS,
-      filePaths: [filePath],
-      prompt: PROMPT,
-      perProviderTimeoutMs: 180_000,
-      freshChat: true,
-      label: "pursue-reeval",
-    }),
-  });
-  if (!r.ok) throw new Error(`/fanout HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
-  const body = await r.json();
-  // sync response: body.results = [{provider, ok, text, durationMs, error?}, …]
-  const byProvider = Object.fromEntries((body.results || []).map(rr => [rr.provider, rr]));
-  return { byProvider, totalMs: Date.now() - startedAt };
-}
-
 // ---- main loop ----
+//
+// /fanout itself can stall when a browser tab gets stuck (#258); the
+// wrapper bounds that with a wall-clock deadline, retries transient
+// transport errors with backoff, and fills any missing provider via
+// serial /chat-with-files. A shared failure budget drops a stuck
+// provider after two failures so the rest of the queue isn't burned
+// hitting the same timeout per page.
+const FAILURE_BUDGET = createFailureBudget();
+
 let ok = 0, partial = 0, failed = 0;
 for (let i = 0; i < queue.length; i++) {
   const { eid, page, sidecarPath, sidecar } = queue[i];
@@ -198,26 +186,23 @@ for (let i = 0; i < queue.length; i++) {
   const stagedPath = path.join(STAGE, `${eid}-p${pad4}.png`);
   await writeFile(stagedPath, png);
 
-  // Retry the whole fanout once if it errored OR if any provider partial-
-  // succeeded — the most common failure mode is one provider hitting the
-  // 180s timeout while the other was fine. Cheaper to retry than to leave
-  // the page partially settled.
-  let res = null;
-  for (let attempt = 0; attempt < 2 && !res; attempt++) {
-    try {
-      const r = await fanout(stagedPath);
-      const anyOk = (r.byProvider ? Object.values(r.byProvider) : []).filter(p => p?.ok && p.text?.trim().length >= 20).length;
-      if (anyOk === PROVIDERS.length) { res = r; break; }
-      if (attempt === 0) { process.stdout.write(`retry... `); continue; }
-      res = r;  // accept partial on second attempt
-    } catch (e) {
-      if (attempt === 0) { process.stdout.write(`retry... `); continue; }
-      console.log(`FAIL (fanout): ${e.message}`);
-      failed++;
-      res = null;
-    }
+  let res;
+  try {
+    res = await fanoutWithFallback({
+      daemonBaseUrl: DAEMON,
+      token: TOKEN,
+      providers: PROVIDERS,
+      filePaths: [stagedPath],
+      prompt: PROMPT,
+      label: "pursue-reeval",
+      freshChat: true,
+      failureBudget: FAILURE_BUDGET,
+    });
+  } catch (e) {
+    console.log(`FAIL (${e.code || "fanout"}): ${e.message}`);
+    failed++;
+    continue;
   }
-  if (!res) continue;
 
   const dstDir = path.join(VIS, eid);
   await mkdir(dstDir, { recursive: true });
@@ -246,9 +231,9 @@ for (let i = 0; i < queue.length; i++) {
   sidecar.comparison.reevaluation = reevaluation;
   await writeFile(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n", "utf8");
 
-  if (anyOk === PROVIDERS.length) { console.log(`OK (${res.totalMs}ms)`); ok++; }
-  else if (anyOk > 0)             { console.log(`PARTIAL (${anyOk}/${PROVIDERS.length}, ${res.totalMs}ms)`); partial++; }
-  else                            { console.log(`FAIL (both providers errored)`); failed++; }
+  if (anyOk === PROVIDERS.length) { console.log(`OK [${res.path}] (${res.totalMs}ms)`); ok++; }
+  else if (anyOk > 0)             { console.log(`PARTIAL [${res.path}] (${anyOk}/${PROVIDERS.length}, ${res.totalMs}ms)`); partial++; }
+  else                            { console.log(`FAIL [${res.path}] (no provider returned text, ${res.totalMs}ms)`); failed++; }
 }
 
 console.log(`\n[reeval] done. ok=${ok}  partial=${partial}  failed=${failed}`);

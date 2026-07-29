@@ -21,7 +21,16 @@ const CONTRIB = path.join(ROOT, "contributions");
 const VIS_CACHE = path.join(ROOT, "data-raw", ".vision-cache");
 const MANIFEST = path.join(ROOT, "data-raw", ".contributions-manifest.json");
 
-const MIN_CHARS = 40;  // anything shorter we treat as effectively empty
+// Minimum non-whitespace chars to count a contribution as a real OCR result.
+// Was 40 — but that silently dropped legitimate short pages ("BOTTOM VIEW",
+// "(blank)", page numbers, classification stamps, "1.4(a)") so they never
+// reached .vision-cache, and build-work-available.mjs kept asking volunteers
+// to re-OCR them. Every "stuck" page in the dashboard's OCR queue turned out
+// to be a real contribution shorter than 40 chars. Matches the convention in
+// monitor.mjs isStub(): 0-byte/whitespace-only = empty, anything else = real.
+// The canonical-merge guard ("longer wins, human always wins") still prevents
+// a 1-byte garbage commit from clobbering a real canonical further down.
+const MIN_CHARS = 1;
 
 async function exists(p) { try { await stat(p); return true; } catch { return false; } }
 

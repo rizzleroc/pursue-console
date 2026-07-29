@@ -1,13 +1,8 @@
 {
   "kind": "hand-drawing",
   "title": "Hand-drawn sketch of a long, tapered object",
-  "description": "Hand-drawn sketch of a long, tapered object",
-  "additional_markers": [
-    {
-      "kind": "hand-drawing",
-      "title": "Hand-drawn sketch of an oval"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.151Z"
+  "description": "RESTRICTED\n10ft\n60ft\n10ft\nRear View\nINCL 2\nRESTRICTED\nRECEIVED\n11 JAN 1949\nREGISTERED\nUNIT\nMATS\nJAN 13 1949\nRECEIVED\nAIR TRANSPORT COMMAND\nA3\nSECRET\nDETACHMENT, 1701ST AIR TRANSPORT WING\nCONTINENTAL DIVISION, MATS\nEDMONTON ALBERTA CANADA\nGPB/md\n19 Nov 48\nSUBJECT:  Observation of an Object in the Atmosphere\nTO:  Commanding General\nAir Materiel Command\nWright-Patterson Air Force Base\nDayton, Ohio\nATTENTION:  MCIAXO-3\n\n\nThe following report of an object observed by 1st Lt. James\nToomey is submitted in compliance with Secret Letter dtd 20 Oct 48 from\nMATS Headquarters, subject:  Reporting of Information on \"Flying Discs\".\n\n\nd.  Photographs of objects, if available. No photographs available.\ne.\nf.  Object sighted:\n(1) Number - One\n(2) Shape - Egg shaped with a tail\n(3) Size  - Approximately 50' in height tapering to a point\nat the tail.\n(4) Color - Bright flaming orange\n(5) Speed - Unknown\n(6) Heading- South West",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T06:43:07.955Z",
+  "contributor": "Rizzleroc"
 }

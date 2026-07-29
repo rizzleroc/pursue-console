@@ -17,6 +17,7 @@ import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadImage, createCanvas } from "@napi-rs/canvas";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -111,6 +112,40 @@ function curate(sc) {
   return { kind: k, reason: null };
 }
 
+// Pixel-variance check for blank renders. Some pages (hand-drawn sketches
+// on ruled paper from the 50s-era reports) render through pdf.js as a
+// near-white PNG — the source ink lives in an embedded image layer that
+// pdf.js can't reach. The file exists on disk but the tile is a visually-
+// empty box. Detect those here and surface them as "missing render"
+// instead of pretending we have an image.
+//
+// Method: downsample to 200x200, count pixels whose mean brightness is
+// below 200 (i.e. anything appreciably darker than light grey). If <1%
+// of pixels qualify as "ink", treat the render as blank.
+const blankRenderCache = new Map();   // absPath -> boolean
+async function isBlankRender(absPath) {
+  if (blankRenderCache.has(absPath)) return blankRenderCache.get(absPath);
+  let blank = false;
+  try {
+    const img = await loadImage(absPath);
+    const w = Math.min(img.width, 200);
+    const h = Math.min(img.height, 200);
+    const cv = createCanvas(w, h);
+    const ctx = cv.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+    const { data } = ctx.getImageData(0, 0, w, h);
+    const total = data.length / 4;
+    let ink = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      if (brightness < 200) ink++;
+    }
+    blank = ink / total < 0.01;
+  } catch { /* leave blank=false if we can't decode */ }
+  blankRenderCache.set(absPath, blank);
+  return blank;
+}
+
 await mkdir(path.dirname(OUT), { recursive: true });
 
 let eventsMap = {};
@@ -118,6 +153,22 @@ try {
   const { EVENTS } = await import(`../src/data/events.js?cb=${Date.now()}`);
   eventsMap = Object.fromEntries(EVENTS.map(e => [e.id, e]));
 } catch {}
+
+// Optional sidecar: a sibling task ("scripts/fetch-video-stats.mjs" et al.)
+// produces src/data/video-stats.json keyed by DVIDS videoId. We bake the
+// view counts straight into media.json so the MediaView can sort/badge
+// without a second runtime fetch. If the file isn't there yet we leave
+// `views: null` on every video tile — MediaView treats null as "unknown"
+// and parks those items at the end of the popularity sort.
+const VIDEO_STATS_PATH = path.join(ROOT, "src", "data", "video-stats.json");
+let videoStats = {};
+try {
+  const raw = JSON.parse(await readFile(VIDEO_STATS_PATH, "utf8"));
+  videoStats = raw?.stats || {};
+  console.log(`[media-index] loaded ${Object.keys(videoStats).length} video stat(s) from src/data/video-stats.json`);
+} catch {
+  console.log(`[media-index] no src/data/video-stats.json yet — every video tile will report views:null`);
+}
 
 async function existsDir(p) { try { return (await stat(p)).isDirectory(); } catch { return false; } }
 async function listDirs(p) {
@@ -160,8 +211,14 @@ for (const eid of await listDirs(VISUALS_DIR)) {
     // Denis's Gemini bracket markers where we have rich text metadata
     // but no local PDF to render. The UI shows a placeholder tile +
     // the description.
-    const ext = imageAbsPath ? path.extname(imageAbsPath) : null;
-    const imagePath = imageAbsPath ? `media/${eid}/p${pad4}${ext}` : null;
+    //
+    // A second null path: the file exists but the render is blank
+    // (see isBlankRender above). We null imagePath and set
+    // missingRender:true so the UI can group these separately from
+    // "no PDF available" placeholders.
+    const blank = imageAbsPath ? await isBlankRender(imageAbsPath) : false;
+    const ext = (imageAbsPath && !blank) ? path.extname(imageAbsPath) : null;
+    const imagePath = (imageAbsPath && !blank) ? `media/${eid}/p${pad4}${ext}` : null;
     items.push({
       id: `${eid}-p${pad4}`,
       eventId: eid,
@@ -180,6 +237,11 @@ for (const eid of await listDirs(VISUALS_DIR)) {
       classifiedAt: sc.classifiedAt || null,
       imagePath,
       thumbnailPath: imagePath,   // same file for now; reserved for future smaller thumbs
+      // True when a PNG/JPG exists on disk but is visually empty (pdf.js
+      // produced a near-white render for a page whose visual content
+      // lives in an embedded layer it can't reach). Distinguishes the
+      // tile from "no PDF available at all" placeholders.
+      missingRender: blank || undefined,
     });
   }
 }
@@ -217,6 +279,7 @@ items.push(...deduped);
 let videoCount = 0;
 for (const ev of Object.values(eventsMap)) {
   if (!ev.videoId) continue;
+  const stat = videoStats[ev.videoId];
   items.push({
     id: `${ev.id}-video`,
     eventId: ev.id,
@@ -233,10 +296,103 @@ for (const ev of Object.values(eventsMap)) {
     classifiedAt: "2026-05-08",
     imagePath: null,
     thumbnailPath: null,
+    // Baked-in stats from src/data/video-stats.json (sibling fetch task).
+    // Null when the stats file is absent or doesn't cover this videoId —
+    // MediaView's POPULAR sort parks nulls at the end.
+    views: stat?.views ?? null,
+    viewsFetchedAt: stat?.fetchedAt ?? null,
   });
   videoCount++;
 }
 console.log(`[media-index] + ${videoCount} release videos (DVIDS sensor footage)`);
+
+// Additional release videos from data-raw/uap-data.csv — the canonical
+// war.gov release inventory. The events.js loop above only surfaces
+// videos that are wired to a curated EVENT; the CSV holds the rest of
+// the release-wide video catalog (28 R01 + R02 entries). Dedupe by
+// DVIDS Video ID against the items already added, then by record
+// Title for rows whose DVIDS ID isn't known yet.
+const CSV_PATH = path.join(ROOT, "data-raw", "uap-data.csv");
+let csvVideoCount = 0;
+try {
+  const csvText = await readFile(CSV_PATH, "utf8");
+  // Tokenise into logical rows (fields may contain quoted newlines).
+  const rawRows = [];
+  let cur = "", inQ = false;
+  for (const ch of csvText) {
+    if (ch === '"') inQ = !inQ;
+    if (ch === "\n" && !inQ) { rawRows.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  if (cur) rawRows.push(cur);
+  function splitCsv(row) {
+    const cells = [];
+    let c = "", q = false;
+    for (let j = 0; j < row.length; j++) {
+      const ch = row[j];
+      if (q) {
+        if (ch === '"' && row[j + 1] === '"') { c += '"'; j++; }
+        else if (ch === '"') q = false;
+        else c += ch;
+      } else {
+        if (ch === ",") { cells.push(c); c = ""; }
+        else if (ch === '"') q = true;
+        else c += ch;
+      }
+    }
+    cells.push(c);
+    return cells;
+  }
+  const header = splitCsv(rawRows[0]).map(s => s.trim());
+  const ix = name => header.findIndex(h => h === name);
+  const I = {
+    Type: ix("Type"), Title: ix("Title"), DVID: ix("DVIDS Video ID"),
+    VideoTitle: ix("Video Title"), Agency: ix("Agency"),
+    IncidentDate: ix("Incident Date"), IncidentLocation: ix("Incident Location"),
+    DescriptionBlurb: ix("Description Blurb"), ModalImage: ix("Modal Image"),
+    ReleaseDate: ix("Release Date"),
+  };
+  const seenVid = new Set(items.filter(i => i.videoId).map(i => String(i.videoId)));
+  const seenTitle = new Set(items.filter(i => i.kind === "video" && i.title)
+    .map(i => i.title.toLowerCase()));
+  for (let i = 1; i < rawRows.length; i++) {
+    const f = splitCsv(rawRows[i]);
+    const t = (f[I.Type] || "").trim().toLowerCase();
+    if (t !== "vid" && t !== "video") continue;
+    const recordId = (f[I.Title] || "").replace(/\s+/g, " ").trim();
+    const dvid = (f[I.DVID] || "").trim();
+    if (dvid && seenVid.has(dvid)) continue;
+    const title = (f[I.VideoTitle] || "").replace(/\s+/g, " ").trim() || recordId;
+    if (!dvid && seenTitle.has(title.toLowerCase())) continue;
+    const releaseDate = (f[I.ReleaseDate] || "").trim();
+    const classifiedAt = releaseDate === "5/22/26" ? "2026-05-22" : "2026-05-08";
+    items.push({
+      id: `${recordId.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-video`,
+      eventId: recordId || null,
+      eventTitle: title,
+      agency: (f[I.Agency] || "").trim() || null,
+      era: null,
+      page: null,
+      kind: "video",
+      title,
+      description: (f[I.DescriptionBlurb] || "").replace(/\s+/g, " ").trim() || "",
+      videoId: dvid || null,
+      dvidsUrl: dvid ? `https://www.dvidshub.net/video/${dvid}` : null,
+      classifier: "release-video",
+      classifiedAt,
+      imagePath: null,
+      thumbnailPath: (f[I.ModalImage] || "").trim() || null,
+      incidentDate: (f[I.IncidentDate] || "").trim() || null,
+      incidentLocation: (f[I.IncidentLocation] || "").trim() || null,
+    });
+    if (dvid) seenVid.add(dvid);
+    seenTitle.add(title.toLowerCase());
+    csvVideoCount++;
+  }
+} catch (e) {
+  console.warn(`[media-index] skipping CSV video pass: ${e.message}`);
+}
+console.log(`[media-index] + ${csvVideoCount} release videos from data-raw/uap-data.csv`);
 
 // Default sort: most recent classification first
 items.sort((a, b) => (b.classifiedAt || "").localeCompare(a.classifiedAt || ""));
@@ -245,14 +401,30 @@ const byKind = items.reduce((acc, it) => { acc[it.kind] = (acc[it.kind] || 0) + 
 const byEvent = items.reduce((acc, it) => { acc[it.eventId] = (acc[it.eventId] || 0) + 1; return acc; }, {});
 const byAgency = items.reduce((acc, it) => { acc[it.agency || "—"] = (acc[it.agency || "—"] || 0) + 1; return acc; }, {});
 
-await writeFile(OUT, JSON.stringify({
+const nextBody = {
   generatedAt: new Date().toISOString(),
   total: items.length,
   byKind, byAgency, eventCount: Object.keys(byEvent).length,
   items,
-}, null, 2) + "\n", "utf8");
+};
 
+// Skip rewriting media.json if only generatedAt would change. The
+// hourly loop re-runs this every pass; without this guard, every pass
+// produces a no-op diff that pollutes git history.
+let skipWrite = false;
+try {
+  const prev = JSON.parse(await readFile(OUT, "utf8"));
+  const { generatedAt: _a, ...prevRest } = prev;
+  const { generatedAt: _b, ...nextRest } = nextBody;
+  skipWrite = JSON.stringify(prevRest) === JSON.stringify(nextRest);
+} catch {}
+if (!skipWrite) {
+  await writeFile(OUT, JSON.stringify(nextBody, null, 2) + "\n", "utf8");
+}
+
+const missingRenderCount = items.filter(it => it.missingRender).length;
 console.log(`[media-index] ${items.length} media items across ${Object.keys(byEvent).length} events`);
+if (missingRenderCount) console.log(`[media-index] detected ${missingRenderCount} blank render(s) — tagged missingRender:true (PDF page produced a near-white image; surfaced separately in MEDIA)`);
 if (droppedDuplicates) console.log(`[media-index] dropped ${droppedDuplicates} duplicate image(s) (same content under a different page)`);
 console.log(`[media-index] by kind:`);
 for (const [k, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {

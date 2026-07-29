@@ -179,6 +179,17 @@ function buildVolunteerArgs(opts) {
     const args = ["scripts/volunteer-media.mjs", `--my-handle=${handle}`, "--commit"];
     return { script: "volunteer-media.mjs", args };
   }
+  if (opts.mode === "commit-all") {
+    // Unified commit: drives scripts/commit-all.mjs which scans every
+    // contribution source (gpt-vision OCR, gpt-vision-review, media visuals)
+    // and opens a per-source PR for anything pending. This is what the
+    // dashboard's single COMMIT button calls regardless of which job ran
+    // — previously COMMIT was hard-wired to visuals only, so OCR/review
+    // contributions piled up on disk with no obvious way to publish.
+    const args = ["scripts/commit-all.mjs", `--my-handle=${handle}`];
+    if (opts.sources) args.push(`--sources=${opts.sources}`);
+    return { script: "commit-all.mjs", args };
+  }
 
   const args = [
     "scripts/volunteer.mjs",
@@ -201,17 +212,25 @@ let lastRun = null;
 
 function summarizeLog(allLines, exitCode) {
   const text = allLines.join("\n");
-  const skipCount = (text.match(/⊖.*already submitted/g) || []).length;
+  // volunteer.mjs prints "⊖ <eid> p<N> already done (local or merged to main)"
+  // — the older "already submitted" pattern never matched, so skipCount was
+  // always 0 and the dashboard headline collapsed to a generic "NO NEW WORK"
+  // instead of "NO NEW WORK · N pages already submitted".
+  const skipCount = (text.match(/⊖.*already (?:submitted|done)/g) || []).length;
   const okMatch   = text.match(/done\.\s*ok=(\d+)\s*err=(\d+)/);
   const okCount   = okMatch ? Number(okMatch[1]) : 0;
   const errCount  = okMatch ? Number(okMatch[2]) : 0;
   const noCommit  = /nothing to commit/.test(text);
   const queueGen  = (text.match(/queue gen ([^\s·]+)/) || [])[1] || null;
 
-  const econnRefused = /ECONNREFUSED.*9223|ECONNREFUSED 127\.0\.0\.1:9223/.test(text);
+  const econnRefused = /ECONNREFUSED.*9223|ECONNREFUSED 127\.0\.0\.1:9223|OCR daemon at .* (?:is unreachable|stopped responding)/.test(text);
   const cdpTimeout   = /connectOverCDP.*Timeout|CDP.*timeout/i.test(text);
   const tokenError   = /unauthorized.*bearer|HTTP 401/i.test(text);
-  const pdfRenderFails = (text.match(/render failed \(Value is none of these types/g) || []).length;
+  // Count ANY pdfjs render failure, not just the old napi-canvas "Value is none
+  // of these types" string. A relative pdfUrl that fetch() rejects produces
+  // "Failed to parse URL from ..." which used to slip past this regex and let
+  // the classifier headline a doomed claim as STAGED.
+  const pdfRenderFails = (text.match(/render failed \(/g) || []).length;
   const claimedFromMedia = /\[claim\]/.test(text);
   // Visuals claim phase: "[claim] claiming N page(s)" then "templates written to".
   const mediaClaimMatch = text.match(/\[claim\] claiming (\d+) page/);
@@ -415,7 +434,10 @@ async function spawnVolunteer(opts) {
     // pages every few seconds (staged pages aren't marked submitted), causing
     // unbounded staging growth and the constant running↔idle flipping in the
     // UI. Only OCR/review/doc — which submit their own work — may loop.
-    if (loop && !String(startedMeta?.mode || "").startsWith("visuals") && code !== null && code !== 1 && lastRun.kind !== "noop") {
+    // commit-all is a one-shot publish step — looping it would just re-scan
+    // an empty staging area forever and rate-limit `gh pr create`.
+    const startedMode = String(startedMeta?.mode || "");
+    if (loop && !startedMode.startsWith("visuals") && startedMode !== "commit-all" && code !== null && code !== 1 && lastRun.kind !== "noop") {
       await new Promise(r => setTimeout(r, 3000));
       try { await spawnVolunteer({ ...opts }); } catch {}
     }
@@ -561,7 +583,7 @@ async function findFreshWork(handle, dir, byEvent, field) {
 // ----- run external command, return stdout (rejects on non-zero exit) -----
 function runCmd(cmd, args, opts = {}) {
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"], shell: process.platform === "win32", ...opts });
+    const p = spawn(cmd, args, { stdio: ["ignore", "pipe", "pipe"], ...opts });
     let out = "", err = "";
     p.stdout.on("data", c => { out += c; });
     p.stderr.on("data", c => { err += c; });
@@ -642,15 +664,16 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "POST" && req.url === "/run") {
       const body = await readBody(req);
-      if (!["ocr", "review", "visuals", "visuals-commit", "doc"].includes(body.mode)) {
-        return sendJson(res, 400, { error: "mode must be ocr | review | visuals | visuals-commit | doc" });
+      if (!["ocr", "review", "visuals", "visuals-commit", "commit-all", "doc"].includes(body.mode)) {
+        return sendJson(res, 400, { error: "mode must be ocr | review | visuals | visuals-commit | commit-all | doc" });
       }
       if (body.mode === "doc" && !body.eid) {
         return sendJson(res, 400, { error: "eid required for doc mode" });
       }
-      // Everything that does vision work needs the daemon. visuals-commit only
-      // validates already-staged templates locally, so it doesn't.
-      if (body.mode !== "visuals-commit") {
+      // Everything that does vision work needs the daemon. visuals-commit and
+      // commit-all only validate/publish already-staged files locally, so they
+      // don't.
+      if (body.mode !== "visuals-commit" && body.mode !== "commit-all") {
         const alive = await daemonAlive();
         if (!alive) return sendJson(res, 503, {
           error: "MCP daemon at http://127.0.0.1:9223 is offline. Start it: cd pursue-vision-mcp && npm start",
@@ -676,6 +699,42 @@ const server = http.createServer(async (req, res) => {
       const alive = await daemonAlive();
       return sendJson(res, 200, { alive, port: state.daemonPort });
     }
+
+    // Fresh-work counts for the dashboard's quick-launch buttons. The raw
+    // queue's totalPagesNeeded counts pages whose ORIGINAL OCR is incomplete
+    // — but if every one of them has already been submitted/merged to main by
+    // this handle (the common case after the auto-refresh workflow hasn't
+    // re-run yet), clicking TAKE OCR / LOOP OCR is an instant no-op. This
+    // endpoint runs the same findFreshWork() check /run-any does and returns
+    // per-queue counts of pages this handle still has fresh work for. The
+    // dashboard uses these (not the raw queue totals) to drive button
+    // enablement so users don't see "12 available" while it's actually zero.
+    if (req.method === "GET" && req.url.startsWith("/queue-counts")) {
+      const u = new URL(req.url, "http://localhost");
+      const handle = u.searchParams.get("handle") || state.handle || "Rizzleroc";
+      try {
+        const queue = await fetchQueue();
+        const buckets = [
+          { mode: "ocr",     dir: "gpt-vision",        field: "queue" },
+          { mode: "review",  dir: "gpt-vision-review", field: "reviewQueue" },
+          { mode: "visuals", dir: "media-staging",     field: "visualsNeedingContext" },
+        ];
+        const counts = { ocr: 0, review: 0, visuals: 0 };
+        const raw    = {
+          ocr:     queue.totalPagesNeeded ?? 0,
+          review:  queue.totalPagesNeedingReview ?? 0,
+          visuals: queue.totalPagesNeedingVisualContext ?? 0,
+        };
+        for (const b of buckets) {
+          const { totalFresh } = await findFreshWork(handle, b.dir, queue.byEvent || {}, b.field);
+          counts[b.mode] = totalFresh;
+        }
+        return sendJson(res, 200, { counts, raw, handle, checkedAt: Date.now() });
+      } catch (e) {
+        return sendJson(res, 500, { error: e.message });
+      }
+    }
+
 
     // Visuals staging state — so the COMMIT VISUALS button reflects reality
     // instead of always looking "ready". `committable` = filled templates that
@@ -709,6 +768,56 @@ const server = http.createServer(async (req, res) => {
         }
       } catch { /* no staging dir yet */ }
       return sendJson(res, 200, { total, committable, incomplete: total - committable });
+    }
+
+    // Per-source pending counts feed the unified COMMIT button's sublabel:
+    // it reports OCR/review/visuals separately so the volunteer can see what
+    // they're about to publish before clicking. Walks contributions/<handle>/
+    // for OCR + review (any .txt/.json files), and the staging dir for visuals
+    // (committable ones only — incomplete templates aren't ready to PR).
+    if (req.method === "GET" && req.url === "/pending") {
+      const handle = state.handle || "Rizzleroc";
+      const counts = { ocr: 0, review: 0, visuals: 0 };
+      // OCR + Review: count contribution output files on disk.
+      for (const [key, dir] of [["ocr", "gpt-vision"], ["review", "gpt-vision-review"]]) {
+        const root = path.resolve(SCRIPTS_ROOT, "contributions", handle, dir);
+        if (!existsSync(root)) continue;
+        try {
+          for (const eid of await readdir(root)) {
+            let files; try { files = await readdir(path.join(root, eid)); } catch { continue; }
+            for (const f of files) {
+              if (/^p0*\d+\.(txt|json)$/i.test(f)) counts[key]++;
+            }
+          }
+        } catch {}
+      }
+      // Visuals: only count templates that are actually committable (image +
+      // title ≥ 4 + context ≥ 20). Half-filled drafts shouldn't inflate the
+      // "ready to commit" badge.
+      const base = path.join(HELPER_DIR, "media-staging", handle);
+      const sectionText = (t, name) => {
+        const m = t.match(new RegExp(`^#\\s+${name}\\s*$`, "m"));
+        if (!m) return "";
+        const rest = t.slice(m.index + m[0].length);
+        const nx = rest.search(/^#\s+/m);
+        return (nx >= 0 ? rest.slice(0, nx) : rest).replace(/<!--[\s\S]*?-->/g, "").trim();
+      };
+      try {
+        for (const eid of await readdir(base)) {
+          let files; try { files = await readdir(path.join(base, eid)); } catch { continue; }
+          for (const f of files) {
+            if (!/^p\d+\.md$/i.test(f)) continue;
+            try {
+              const t = await readFile(path.join(base, eid, f), "utf8");
+              const img = existsSync(path.join(base, eid, f.replace(/\.md$/i, ".png")))
+                       || existsSync(path.join(base, eid, f.replace(/\.md$/i, ".jpg")));
+              if (img && sectionText(t, "Title").length >= 4 && sectionText(t, "Context").length >= 20) counts.visuals++;
+            } catch {}
+          }
+        }
+      } catch {}
+      const total = counts.ocr + counts.review + counts.visuals;
+      return sendJson(res, 200, { total, ...counts });
     }
 
     // Delete TRULY-empty stub contributions (0-byte / whitespace-only) so

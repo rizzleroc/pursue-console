@@ -513,10 +513,10 @@
       <span class="qb-sub qb-count">render + auto-draft context · one slice</span>
       <span class="qb-cmd">volunteer-media.mjs --auto-context</span>
     </button>
-    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('visuals-commit', false)" title="Commit filled templates as a media contribution PR">
-      <span class="qb-title">✓ COMMIT VISUALS</span>
-      <span class="qb-sub" id="qb-commit-sub">stage reviewed templates → contribution</span>
-      <span class="qb-cmd">volunteer-media.mjs --commit</span>
+    <button id="qb-visuals-commit" class="quick-btn visuals" onclick="quickRun('commit-all', false)" title="Commit whatever's pending — OCR, review, and visuals — as per-source PRs">
+      <span class="qb-title">✓ COMMIT</span>
+      <span class="qb-sub" id="qb-commit-sub">publish all pending work → per-source PRs</span>
+      <span class="qb-cmd">commit-all.mjs</span>
     </button>
     <button id="qb-ocr-loop" class="quick-btn ocr loop" data-needs="ocr" onclick="quickRun('ocr', true)" title="Loop OCR until queue empty">
       <span class="qb-title">↻ LOOP OCR</span>
@@ -862,7 +862,7 @@
     });
   }
 
-  function populateQueuePanel(data) {
+  async function populateQueuePanel(data) {
     const events = Object.entries(data.byEvent || {});
     const totalOCR    = data.totalPagesNeeded ?? 0;
     const totalReview = data.totalPagesNeedingReview ?? 0;
@@ -885,9 +885,20 @@
     renderQueueDocs("q-rev-docs",  events, "reviewQueue",           "var(--amber)");
     renderQueueDocs("q-vis-docs",  events, "visualsNeedingContext", "var(--cyan)");
 
-    // Disable quick-launch buttons whose queue has nothing to do — saves
-    // the user from clicking a button that just no-ops with "0 pages claimed".
-    syncQuickBtnEnablement({ ocr: totalOCR, review: totalReview, visuals: totalVisual });
+    // Disable quick-launch buttons whose queue has nothing FRESH to do
+    // (queue ∩ not-already-merged-to-main). The raw totals from
+    // work-available.json count pages that may already be merged via this
+    // handle's previous PRs — clicking TAKE OCR then would no-op instantly.
+    // The /queue-counts endpoint runs the same findFreshWork() check as
+    // /run-any. Fall back to raw totals if the endpoint fails.
+    const rawCounts = { ocr: totalOCR, review: totalReview, visuals: totalVisual };
+    let freshCounts = null;
+    try {
+      const handle = $("ctrl-handle")?.value || "";
+      const r = await fetch("/queue-counts" + (handle ? "?handle=" + encodeURIComponent(handle) : ""));
+      if (r.ok) freshCounts = (await r.json()).counts;
+    } catch {}
+    syncQuickBtnEnablement(freshCounts || rawCounts);
 
     const gen = data.generatedAt ? new Date(data.generatedAt).toISOString().replace("T"," ").slice(0,19) + " UTC" : "";
     $("q-ts").textContent = "queue generated " + gen + " · refreshes every 5 min";
@@ -907,8 +918,8 @@
       if (remaining === 0) {
         btn.dataset.queueEmpty = "1";
         if (sub) sub.textContent = need === "any"
-          ? "all queues empty — nothing left to do · refresh in 5 min"
-          : `${need.toUpperCase()} queue empty — nothing to do`;
+          ? "all queues already submitted by you — wait for the queue to refresh"
+          : `${need.toUpperCase()} queue empty for you — all listed pages already submitted/merged`;
       } else {
         delete btn.dataset.queueEmpty;
         if (sub) {
@@ -1256,22 +1267,27 @@
   pollDaemonHealth();
   setInterval(pollDaemonHealth, 15_000);
 
-  // ---- COMMIT VISUALS readiness ----
-  // Make the commit button reflect actual staging state instead of always
-  // looking ready: enabled + "N ready to commit" only when there are filled
-  // templates, disabled otherwise (so it stops inviting a pointless resubmit).
+  // ---- COMMIT readiness (unified across OCR, review, visuals) ----
+  // The commit button is no longer visuals-only. It calls commit-all.mjs
+  // which scans every contribution source and opens per-source PRs. The
+  // sublabel breaks down what's about to publish so the volunteer knows
+  // before clicking; button stays disabled when nothing is pending.
   async function pollStaging() {
     const btn = $("qb-visuals-commit"), sub = $("qb-commit-sub");
     if (!btn) return;
     if (btn.dataset.runDisabled === "1") return; // a run is active — pollRunner owns the lock
     try {
-      const s = await fetch("/staging", { cache: "no-store" }).then(r => r.json());
-      if (s.committable > 0) {
+      const p = await fetch("/pending", { cache: "no-store" }).then(r => r.json());
+      const parts = [];
+      if (p.ocr)     parts.push(`${p.ocr} OCR`);
+      if (p.review)  parts.push(`${p.review} review`);
+      if (p.visuals) parts.push(`${p.visuals} visuals`);
+      if (p.total > 0) {
         btn.disabled = false;
-        if (sub) sub.textContent = `${s.committable} ready to commit` + (s.incomplete ? ` · ${s.incomplete} still need drafting` : "");
+        if (sub) sub.textContent = `${parts.join(" · ")} ready to publish`;
       } else {
         btn.disabled = true;
-        if (sub) sub.textContent = s.total ? `nothing ready — ${s.total} staged still need drafting` : "no staged visuals to commit";
+        if (sub) sub.textContent = "nothing pending to commit";
       }
     } catch {}
   }

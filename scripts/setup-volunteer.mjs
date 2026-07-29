@@ -99,7 +99,7 @@ console.log("\n[gh CLI]");
 async function exec(cmd, argv) {
   return new Promise(resolve => {
     let stdout = "", stderr = "";
-    const p = spawn(cmd, argv, { shell: process.platform === "win32" });
+    const p = spawn(cmd, argv);
     p.stdout.on("data", d => stdout += d);
     p.stderr.on("data", d => stderr += d);
     p.on("close", code => resolve({ code, stdout: stdout.trim(), stderr: stderr.trim() }));

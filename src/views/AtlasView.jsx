@@ -3,6 +3,7 @@ import { AGENCY_COLORS } from "../data/events.js";
 import { GlitchText, MiniChip } from "../components/Primitives.jsx";
 import SourceMix from "../components/SourceMix.jsx";
 import useCorpusStats from "../hooks/useCorpusStats.js";
+import { useT } from "../i18n/context.js";
 
 const ERAS = [
   { id: "40s", label: "1944—49" }, { id: "50s", label: "1950—59" },
@@ -13,7 +14,22 @@ const ERAS = [
 ];
 const AGENCIES = ["Department of War", "FBI", "NASA", "Department of State"];
 
+// Stats-strip configs — `key` resolves under atlas.stats.* so the labels
+// localize while the predicate (count) stays the same. Color is the
+// visual signal, not the text.
+const STAT_CARDS = [
+  { key: "mission_reports",   color: "#7CFFB2", filter: e => e.type.includes("Mission Report") },
+  { key: "range_foulers",     color: "#7CFFB2", filter: e => e.type.includes("Range Fouler") },
+  { key: "witness_302",       color: "#FF8C42", filter: e => e.type.includes("302") || e.type.includes("Witness") },
+  { key: "diplomatic_cables", color: "#FFD93D", filter: e => e.type.includes("Diplomatic") },
+  { key: "nasa_crew",         color: "#82B6FF", filter: e => e.agency === "NASA" },
+  { key: "historical_memos",  color: "#7CFFB2", filter: e => e.type.includes("Memo") || e.type.includes("Memorandum") },
+  { key: "redacted",          color: "#FB7185", filter: e => e.redacted },
+  { key: "priority",          color: "#FFD93D", filter: e => e.flag === "anchor" },
+];
+
 export default function AtlasView({ events, onSelect }) {
+  const t = useT();
   const [activeCell, setActiveCell] = useState(null);
   const { stats } = useCorpusStats();
   const byEvent = stats?.byEvent || null;
@@ -24,13 +40,13 @@ export default function AtlasView({ events, onSelect }) {
   return (
     <div className="px-3 sm:px-8 py-6">
       <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>┃ ATLAS</GlitchText></h2>
-        <div className="font-mono text-[10px] text-emerald-700">AGENCY × DECADE / TAP A CELL</div>
+        <h2 className="font-mono text-emerald-300 text-lg sm:text-2xl tracking-[0.2em]"><GlitchText>{t("atlas.title")}</GlitchText></h2>
+        <div className="font-mono text-[10px] text-emerald-700">{t("atlas.sub")}</div>
       </div>
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full border border-emerald-700/40 bg-black/40 rounded-sm">
           <div className="grid" style={{ gridTemplateColumns: `minmax(140px, 1fr) repeat(${ERAS.length}, minmax(56px, 1fr))` }}>
-            <div className="p-2 font-mono text-[9px] text-emerald-700 border-r border-b border-emerald-700/30">AGENCY ↓ / DECADE →</div>
+            <div className="p-2 font-mono text-[9px] text-emerald-700 border-r border-b border-emerald-700/30">{t("atlas.row_label")}</div>
             {ERAS.map(era => <div key={era.id} className="p-2 font-mono text-[9px] text-amber-400 text-center border-b border-emerald-700/30">{era.label}</div>)}
             {AGENCIES.map(agency => (
               <React.Fragment key={agency}>
@@ -63,8 +79,11 @@ export default function AtlasView({ events, onSelect }) {
       {activeCell && (
         <div className="mt-4 border border-amber-400/50 bg-amber-400/5 rounded-sm p-4 animate-fadein">
           <div className="font-mono text-[10px] text-amber-400 mb-3 tracking-wider">
-            ▌ CELL: {activeCell.agency.toUpperCase()} × {ERAS.find(e=>e.id===activeCell.era)?.label}
-            <span className="text-emerald-700 ml-2">— {cellEvents.length} record{cellEvents.length !== 1 && "s"}</span>
+            {t("atlas.cell_heading", {
+              agency: activeCell.agency.toUpperCase(),
+              era: ERAS.find(e=>e.id===activeCell.era)?.label,
+            })}
+            <span className="text-emerald-700 ml-2">{cellEvents.length === 1 ? t("atlas.cell_count_one") : t("atlas.cell_count_n", { n: cellEvents.length })}</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {cellEvents.map(e => {
@@ -83,21 +102,16 @@ export default function AtlasView({ events, onSelect }) {
         </div>
       )}
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { label: "Mission Reports", count: events.filter(e => e.type.includes("Mission Report")).length, color: "#7CFFB2" },
-          { label: "Range Foulers", count: events.filter(e => e.type.includes("Range Fouler")).length, color: "#7CFFB2" },
-          { label: "Witness/302s", count: events.filter(e => e.type.includes("302") || e.type.includes("Witness")).length, color: "#FF8C42" },
-          { label: "Diplomatic Cables", count: events.filter(e => e.type.includes("Diplomatic")).length, color: "#FFD93D" },
-          { label: "NASA Crew", count: events.filter(e => e.agency==="NASA").length, color: "#82B6FF" },
-          { label: "Historical Memos", count: events.filter(e => e.type.includes("Memo") || e.type.includes("Memorandum")).length, color: "#7CFFB2" },
-          { label: "REDACTED", count: events.filter(e => e.redacted).length, color: "#FB7185" },
-          { label: "PRIORITY", count: events.filter(e => e.flag==="anchor").length, color: "#FFD93D" },
-        ].map(s => (
-          <div key={s.label} className="border border-emerald-700/30 bg-black/40 p-3 rounded-sm">
-            <div className="font-mono text-[9px] tracking-wider opacity-70" style={{color: s.color}}>{s.label}</div>
-            <div className="font-mono text-3xl mt-1" style={{color: s.color}}>{s.count}</div>
-          </div>
-        ))}
+        {STAT_CARDS.map(s => {
+          const count = events.filter(s.filter).length;
+          const label = t(`atlas.stats.${s.key}`);
+          return (
+            <div key={s.key} className="border border-emerald-700/30 bg-black/40 p-3 rounded-sm">
+              <div className="font-mono text-[9px] tracking-wider opacity-70" style={{color: s.color}}>{label}</div>
+              <div className="font-mono text-3xl mt-1" style={{color: s.color}}>{count}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

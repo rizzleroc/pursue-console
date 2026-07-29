@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "Photograph of three men",
-  "description": "Image: Photograph of three men",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "Photograph of a man pointing"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.757Z"
+  "description": "Flying Saucers\nAir Force Hushes Up Saucer Probe\nBy ROBERT CRATER\nScripps-Howard Staff Writer\nAir Force leaders have slammed down a “brass” curtain at the Dayton (O.) Air Technical Intelligence Center (ATIC), where flying saucer reports are investigated.\n“The Air Force will be unable to honor visits (including the press) to the ATIC because the volume of requests for information has seriously interfered with investigations,” an Air Force spokesman here said today.\nHe said the original official policy had been to exclude visits by newspapermen, however this policy had been relaxed in recent months.\nMost of the mail received at the Dayton office is from persons over the nation who are curious about flying saucers.\n“The mail has become so heavy that the two or three persons detailed to investigating unidentified flying objects—called UFO’s—are not getting anything else done,” the Air Force official said.\n“Actually, UFO’s are supposed to be only a small part of the investigative work done at the ATIC.”\nThe flood of mail from the public was attributed to newspaper and magazine articles about flying saucers. Singled out were two current books, “Flying Saucers Have Landed” and “Flying Saucers From Outer Space.”\nJust how banning the press was expected to ease the situation was not explained—unless the Air Force figures this will reduce the number of flying saucer stories.\n'THAT WAS NO AIRPLANE'\nAre They Hiding Those\nLights Under a Bushel?\nBy EVERT CLARK\nMysterious red lights which hav",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.746Z",
+  "contributor": "Rizzleroc"
 }

@@ -22,7 +22,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.443Z",
+    "computed_at": "2026-07-10T15:32:48.941Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -36,12 +36,12 @@
       {
         "a": "gpt-vision",
         "b": "judge",
-        "score": 0.974
+        "score": 1
       },
       {
         "a": "gemini",
         "b": "judge",
-        "score": 0.422
+        "score": 0.409
       }
     ],
     "confidence": "high",

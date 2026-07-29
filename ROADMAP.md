@@ -206,7 +206,15 @@ XHR? does Range chunking work on war.gov's CDN?) is unknown until the first run.
 3. Audio + video files use the existing Whisper transcription path:
    `npm run corpus:transcribe-videos`. The 7 audio + 51 video files in Release 02
    flow through `scripts/transcribe-videos.mjs` (which already exists for the
-   release-01 DVIDS clips).
+   release-01 DVIDS clips). **As of 2026-05-26 the DVIDS download step in that
+   script no longer shells out to yt-dlp** (which was returning
+   `ConnectionResetError(10054)` from dvidshub.net — same TLS-fingerprint flavor
+   as Akamai); it POSTs to the daemon's new `/dvids/download` endpoint, which
+   uses an in-page `fetch()` on a logged-in `www.dvidshub.net/` tab. Whisper
+   stays the default analysis path; `--analyze=gemini` (or `ANALYZE_VIDEO=gemini`)
+   also sends each clip to `gemini` via `/chat-with-files` and writes a
+   `<eid>.gemini-analysis.md` sibling with timestamped visual segments + a UAP-
+   notes section. Both new code paths are `@unverified` end-to-end (R2).
 4. Flip `release-02` to `status: "mirrored"` in `config/releases.json` once ingested.
 5. Denis's mirror, if it materializes, becomes a redundant cross-check rather than
    the critical path.
@@ -249,6 +257,7 @@ re-OCR compute rather than hand-typing.
 
 ---
 
+_Updated 2026-05-26: R9 — DVIDS video collection pivoted off yt-dlp (`ConnectionResetError(10054)` from dvidshub.net) onto the same MCP-via-real-Chrome trick the war.gov collector uses. New `pursue-vision-mcp/dvids-driver.mjs` + daemon `/dvids/resolve` and `/dvids/download` endpoints; `scripts/transcribe-videos.mjs` now downloads via the daemon, then runs Whisper (default) plus optional Gemini multimodal analysis (`--analyze=gemini`) producing a separate `<eid>.gemini-analysis.md`. All `@unverified` pending maintainer's live Chrome test._
 _Updated 2026-05-22 (later): R9 — MCP-based war.gov collector landed (`pursue-vision-mcp/war-gov-driver.mjs`, daemon endpoints, `scripts/sync-war-gov.mjs`, `npm run corpus:fetch-war-gov`). Marked `@unverified` pending the maintainer's first live run against their real Chrome; Akamai blocks our IPs so neither the agent nor CI can test it._
 _Updated 2026-05-22: added R9 (Release 02 published on war.gov; scaffolded as "incoming", ingest blocked on the DenisSergeevitch/UFO-USA mirror — watch loop polls the upstream manifest)._
 _Updated 2026-05-22: added R8 (security review residuals) after the 2.2 sweep; the volunteer `--review` producer item previously filed as R8 in the punchlist sweep is now R10 (was R9 before R9 was claimed by Release 02 ingestion)._

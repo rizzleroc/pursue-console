@@ -21,7 +21,7 @@
 //     under the directory you started the daemon from. No reading /etc.
 
 import http from "node:http";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, unlink } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -31,6 +31,7 @@ import { ChatGPTDriver } from "./chatgpt-driver.mjs";
 import { GeminiDriver }  from "./gemini-driver.mjs";
 import { ClaudeDriver } from "./claude-driver.mjs";
 import { WarGovDriver }  from "./war-gov-driver.mjs";
+import { DVIDSDriver }   from "./dvids-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PURSUE_VISION_PORT || 9223);
@@ -80,12 +81,14 @@ const drivers = {
   gemini:  new GeminiDriver({  cdpPort: CDP_PORT }),
   claude:  new ClaudeDriver({  cdpPort: CDP_PORT }),
   warGov:  new WarGovDriver({  cdpPort: CDP_PORT }),
+  dvids:   new DVIDSDriver({   cdpPort: CDP_PORT }),
 };
 const queues = {
   chatgpt: Promise.resolve(),
   gemini:  Promise.resolve(),
   claude:  Promise.resolve(),
   warGov:  Promise.resolve(),
+  dvids:   Promise.resolve(),
 };
 function enqueue(provider, fn) {
   const cur = queues[provider] ?? Promise.resolve();
@@ -101,6 +104,46 @@ function normalizeProvider(p) {
   throw new Error(`unknown provider: ${p}`);
 }
 
+// CORS — the pursue-console static site (deployed at rizzleroc.github.io
+// or run locally on vite's dev port) is HTTPS / cross-origin to this
+// localhost daemon. Without these headers, the browser blocks the response.
+//
+// Allowlist: github.io deploys + any localhost:* / 127.0.0.1:* during dev.
+// Any other origin: no ACAO sent → request blocked. Safer than "*".
+//
+// Private-Network-Access: Chrome 113+ requires Access-Control-Allow-
+// Private-Network on the preflight when a public-origin page (https GH
+// Pages) fetches a private-IP target (127.0.0.1). Without it the fetch
+// fails before the actual request even leaves the browser.
+function allowedOrigin(origin) {
+  if (!origin) return null;
+  if (origin === "https://rizzleroc.github.io") return origin;
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return origin;
+  return null;
+}
+function setCors(req, res) {
+  const origin = allowedOrigin(req.headers["origin"]);
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Credentials", "false");
+  }
+}
+function handlePreflight(req, res) {
+  setCors(req, res);
+  // Echo back the headers the browser said it wants to send, so any custom
+  // header (X-Pursue-Trace, etc.) works without us hard-coding a list.
+  const reqHeaders = req.headers["access-control-request-headers"];
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", reqHeaders || "Authorization, Content-Type");
+  res.setHeader("Access-Control-Max-Age", "600");
+  // Chrome PNA: explicitly opt in to being fetched from a public site.
+  if (req.headers["access-control-request-private-network"] === "true") {
+    res.setHeader("Access-Control-Allow-Private-Network", "true");
+  }
+  res.writeHead(204);
+  res.end();
+}
 function sendJson(res, status, body) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(body));
@@ -121,6 +164,10 @@ function authOk(req) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    // CORS preflight runs without auth (the browser strips Authorization
+    // from preflight by design). Real requests still go through authOk.
+    if (req.method === "OPTIONS") return handlePreflight(req, res);
+    setCors(req, res);
     if (req.method === "GET" && req.url === "/health") {
       return sendJson(res, 200, { ok: true });
     }
@@ -143,6 +190,7 @@ const server = http.createServer(async (req, res) => {
           gemini:  { connected: drivers.gemini.isConnected(),  history: drivers.gemini.callCount },
           claude:  { connected: drivers.claude.isConnected(),  history: drivers.claude.callCount },
           warGov:  { connected: drivers.warGov.isConnected(),  history: drivers.warGov.callCount },
+          dvids:   { connected: drivers.dvids.isConnected(),   history: drivers.dvids.callCount },
         },
       });
     }
@@ -166,6 +214,84 @@ const server = http.createServer(async (req, res) => {
         } catch (e) {
           console.error(`[/chat-with-files ${provider}] ${e.message}`);
           sendJson(res, 500, { provider, error: e.message });
+        }
+      });
+      return;
+    }
+
+    // /ask — RAG-style endpoint for the browser ASK view. The browser does
+    // FAISS-style cosine over public/embeddings.bin locally, picks the top
+    // K passages, and POSTs them here with the user's question. We bundle
+    // them into a single .txt context file, hand it to the chosen driver
+    // (which uploads it to its logged-in browser tab the same way
+    // /chat-with-files does), and stream back the model's reply.
+    //
+    // Body: {
+    //   question:  string,                                  // user query
+    //   contexts:  [{ eid, page, title?, agency?, text }],  // top-K snippets
+    //   provider:  "chatgpt" | "claude" | "gemini" (default "claude"),
+    //   timeoutMs: number?,
+    //   freshChat: boolean? (default true)
+    // }
+    if (req.method === "POST" && req.url === "/ask") {
+      const body = await readBody(req);
+      const { question, contexts, timeoutMs, freshChat = true } = body;
+      if (!question || typeof question !== "string") {
+        return sendJson(res, 400, { error: "question (string) required" });
+      }
+      if (!Array.isArray(contexts) || contexts.length === 0) {
+        return sendJson(res, 400, { error: "contexts[] (non-empty) required" });
+      }
+      let provider;
+      try { provider = normalizeProvider(body.provider || "claude"); }
+      catch (e) { return sendJson(res, 400, { error: e.message }); }
+
+      // Build a single prompt containing the retrieved passages + the
+      // question + answer instructions. The text-only context goes to a
+      // tmpfile so we can reuse the existing chat-with-files upload flow
+      // (no driver changes needed).
+      const lines = [];
+      lines.push("CONTEXT — these are the top retrieved passages from the");
+      lines.push("PURSUE corpus (war.gov/UFO declassified documents). Each");
+      lines.push("passage shows EID, page, and a snippet of the source text.");
+      lines.push("");
+      for (const c of contexts.slice(0, 32)) {
+        lines.push(`--- ${c.eid || "?"}${c.page != null ? ` · p${c.page}` : ""}${c.title ? ` · ${c.title}` : ""} ---`);
+        lines.push(String(c.text || c.snippet || "").trim());
+        lines.push("");
+      }
+      const contextBlob = lines.join("\n");
+      const tmpPath = path.join(os.tmpdir(), `pursue-ask-${randomBytes(8).toString("hex")}.txt`);
+      await writeFile(tmpPath, contextBlob, "utf8");
+
+      const prompt = [
+        `Question from the user: "${question}"`,
+        "",
+        `Answer the question using ONLY the attached context file (top retrieved`,
+        `passages from the PURSUE corpus). When you reference a passage, cite it`,
+        `inline as [eid · page] using the EID exactly as it appears in the file.`,
+        `If the context doesn't contain enough to answer, say so plainly — do not`,
+        `invent facts. Keep it under 300 words, terse and analytic.`,
+      ].join("\n");
+
+      const t0 = Date.now();
+      enqueue(provider, async () => {
+        try {
+          const { text } = await drivers[provider].chatWithFiles({
+            filePaths: [tmpPath], prompt, timeoutMs, freshChat,
+          });
+          sendJson(res, 200, {
+            provider, text,
+            durationMs: Date.now() - t0,
+            contextCount: contexts.length,
+          });
+        } catch (e) {
+          console.error(`[/ask ${provider}] ${e.message}`);
+          sendJson(res, 500, { provider, error: e.message });
+        } finally {
+          // Best-effort cleanup. If unlink races with the driver still
+          // holding the upload open, we'd see EBUSY on Windows — ignore.
+          unlink(tmpPath).catch(() => {});
         }
       });
       return;
@@ -269,6 +395,97 @@ const server = http.createServer(async (req, res) => {
         }
         sendJson(res, 200, {
           destDir: safeDestDir,
+          totalDurationMs: Date.now() - t0,
+          results,
+        });
+      });
+      return;
+    }
+
+    // /dvids/resolve — given a numeric DVIDS asset ID, return the direct
+    // mp4 URL (plus title + best-effort duration/size). The driver this
+    // delegates to is annotated 'unverified' (see dvids-driver.mjs
+    // header) — Akamai-style TLS-fingerprint block at dvidshub.net means
+    // only the maintainer's real Chrome can verify the round-trip.
+    if (req.method === "GET" && req.url.startsWith("/dvids/resolve")) {
+      const u = new URL(req.url, "http://x");
+      const videoId = u.searchParams.get("videoId") || "";
+      if (!/^\d+$/.test(videoId)) {
+        return sendJson(res, 400, { error: "videoId (numeric DVIDS asset id) required" });
+      }
+      enqueue("dvids", async () => {
+        try {
+          const info = await drivers.dvids.resolveVideoUrl({ videoId });
+          sendJson(res, 200, info);
+        } catch (e) {
+          console.error(`[/dvids/resolve] ${e.message}`);
+          sendJson(res, 500, { error: e.message });
+        }
+      });
+      return;
+    }
+
+    // /dvids/download — resolve + download a batch of DVIDS videos into
+    // per-item destPath. Long-running: holds the connection open until
+    // every video either lands or fails. Per-item destPath is path-jailed
+    // (under home or cwd) just like /war-gov/download's destDir.
+    if (req.method === "POST" && req.url === "/dvids/download") {
+      const body = await readBody(req);
+      const { videos } = body;
+      if (!Array.isArray(videos) || !videos.length) {
+        return sendJson(res, 400, { error: "videos[] (non-empty) required" });
+      }
+      // Sanity-cap; the maintainer's realistic batch is the ~51 video
+      // count of Release 02. 32 is below that on purpose so we serialize
+      // smaller chunks — if a batch dies mid-way the user can resume.
+      if (videos.length > 32) {
+        return sendJson(res, 400, { error: `too many videos (${videos.length}); split into batches ≤ 32` });
+      }
+      // Validate each item up front so we don't start a long-running
+      // download and then realize item 17 has a bogus destPath.
+      const items = [];
+      for (const v of videos) {
+        const vid = v?.videoId != null ? String(v.videoId).trim() : "";
+        const dest = v?.destPath || "";
+        if (!/^\d+$/.test(vid)) {
+          return sendJson(res, 400, { error: `each video needs a numeric videoId (got '${vid}')` });
+        }
+        if (!dest || typeof dest !== "string") {
+          return sendJson(res, 400, { error: `each video needs a destPath (videoId=${vid})` });
+        }
+        let safeDest;
+        try { safeDest = jailDestDir(path.dirname(dest)); }
+        catch (e) { return sendJson(res, 403, { error: `${e.message} (for videoId=${vid})` }); }
+        const absDest = path.join(safeDest, path.basename(dest));
+        items.push({ videoId: vid, destPath: absDest });
+      }
+      const t0 = Date.now();
+      enqueue("dvids", async () => {
+        const results = [];
+        for (const { videoId, destPath } of items) {
+          const pt0 = Date.now();
+          try {
+            const info = await drivers.dvids.resolveVideoUrl({ videoId });
+            await drivers.dvids.downloadFile({ url: info.mp4Url, destPath });
+            const { statSync } = await import("node:fs");
+            let bytes = null;
+            try { bytes = statSync(destPath).size; } catch {}
+            results.push({
+              videoId, ok: true, bytes, mp4Url: info.mp4Url, title: info.title,
+              destPath, durationMs: Date.now() - pt0,
+            });
+          } catch (e) {
+            console.error(`[/dvids/download] videoId=${videoId} → ${e.message}`);
+            results.push({ videoId, ok: false, error: e.message, durationMs: Date.now() - pt0 });
+            // CDN blocks tend to be sticky once they fire; bail the
+            // batch rather than burn the rest on the same block.
+            if (/\bblock\b/i.test(e.message)) {
+              results.push({ videoId: "__abort__", ok: false, error: "aborting batch on CDN block" });
+              break;
+            }
+          }
+        }
+        sendJson(res, 200, {
           totalDurationMs: Date.now() - t0,
           results,
         });

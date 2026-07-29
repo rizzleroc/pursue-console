@@ -36,9 +36,26 @@ async function probeMcp(port) {
   } catch { return false; }
 }
 if (!NO_PRIMARY && await probeMcp(PRIMARY_MCP_PORT)) {
+  // Some primary MCPs (e.g. whipgen) don't ship the /war-gov/* routes
+  // pursue-vision-mcp adds. If the user's plan is to run the war.gov
+  // collector, deferring to that primary leaves them with a misleading
+  // 404 later. Probe the route explicitly and warn loudly if it's
+  // missing so the maintainer can switch to `--no-primary` upfront.
+  let warGovSupported = false;
+  try {
+    const r = await fetch(`http://127.0.0.1:${PRIMARY_MCP_PORT}/war-gov/index?release=2`, { signal: AbortSignal.timeout(2000) });
+    warGovSupported = r.status !== 404;
+  } catch {}
   console.log(`[start] primary MCP already running on :${PRIMARY_MCP_PORT} — skipping Chrome + daemon startup`);
   console.log(`[start] use DAEMON=http://127.0.0.1:${PRIMARY_MCP_PORT} in your scripts`);
   console.log(`[start] for the dashboard, run:   npm run monitor`);
+  if (!warGovSupported) {
+    console.log("");
+    console.log(`[start] WARNING: primary MCP on :${PRIMARY_MCP_PORT} doesn't implement /war-gov/*.`);
+    console.log("[start]   For Release-02 ingest (corpus:fetch-war-gov), stop the primary and re-run with --no-primary,");
+    console.log("[start]   OR run pursue-vision-mcp on a side port:");
+    console.log("[start]     $env:PURSUE_VISION_PORT='9233'; npm start --prefix pursue-vision-mcp -- --no-primary");
+  }
   process.exit(0);
 }
 
@@ -107,9 +124,15 @@ async function ensureChrome() {
     // may have to solve a one-time Akamai challenge in this tab — that
     // gives the rest of the session a cookie that unblocks fetches.
     "https://www.war.gov/UFO/",
+    // And dvidshub.net, used by the dvids driver to download DVIDS
+    // video assets. DVIDS is a public DoD media site so this tab
+    // shouldn't trigger a challenge — but yt-dlp gets blocked at the
+    // TLS-fingerprint level, so we still need an in-page fetch().
+    "https://www.dvidshub.net/",
   ], { detached: true, stdio: "ignore" }).unref();
-  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, claude.ai/new, www.war.gov/UFO/");
+  console.log("[start] opened tabs: chatgpt.com, gemini.google.com/app, claude.ai/new, www.war.gov/UFO/, www.dvidshub.net/");
   console.log("[start] note — the war.gov tab may show a one-time Akamai challenge; solve it once in your browser before running the war.gov collector.");
+  console.log("[start] note — dvidshub.net is public and shouldn't show a challenge; the tab is just there so the dvids driver can fetch from a real browser TLS handshake.");
   // Give Chrome a moment to bind the port
   for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 500));

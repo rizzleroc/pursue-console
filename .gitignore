@@ -22,6 +22,14 @@ data-raw/*
 !data-raw/.visuals/
 !data-raw/.contributions-manifest.json
 !data-raw/corpus.sqlite
+# Canonical source-of-truth CSV from war.gov/UFO — pulled via whipgen_web_eval.
+# Committed so volunteers can ingest without rerunning the scrape.
+!data-raw/uap-data.csv
+# Per-release manifests — JSON snapshots of the CSV rows in each rolling
+# tranche. Cheap to commit, lets downstream pipelines work off the
+# release-bounded subset without re-parsing the master CSV.
+!data-raw/war-gov/
+!data-raw/war-gov/*.json
 # upstream-gemini is a clone of DenisSergeevitch/UFO-USA — the imported
 # transcripts live in .vision-cache/, so the upstream clone itself only
 # needs to exist on the maintainer's box for refreshes.
@@ -30,6 +38,24 @@ data-raw/upstream-gemini/
 # tesseract.js downloads the trained data on first run
 eng.traineddata
 *.traineddata
+
+# Claude Code harness scratch — sub-agent worktrees are isolated copies of
+# the repo and don't belong in version control.
+.claude/worktrees/
+
+# Release-01 PDFs are served at runtime from war.gov directly (see
+# src/data/events.js URL_BASE), so the committed copies were pure
+# processing-pipeline scratch — kept on disk locally for FAISS/dossier/
+# visuals extraction but not needed in the deploy or in git. Release-02
+# PDFs stay committed because the deploy serves them from public/release_2/.
+public/release_1/*.pdf
+# Same logic for any video/audio assets — they're processed locally for
+# frames/transcripts but don't ship in the bundle.
+public/**/*.mp4
+public/**/*.mov
+public/**/*.webm
+public/**/*.avi
+public/**/*.mkv
 
 # Editor directories and files
 .vscode/*

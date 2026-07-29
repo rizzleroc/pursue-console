@@ -1,71 +1,108 @@
-# PURSUE Console · Release 2.0
+# PURSUE Console
 
-![PURSUE Console](./public/og-card.png)
+Three AIs read every declassified war.gov UAP page; the console shows you where they disagree — and lets you be the tiebreaker.
 
-> **An open, community-built investigation desk for the [war.gov/UFO](https://www.war.gov/UFO) disclosure.**
-> *Department of War — Release 01: May 8 2026 (173 records) · Release 02: May 22 2026 (second tranche). All cases UNRESOLVED.*
+![PURSUE Console — network view of declassified UAP records cross-linked to entities and patterns](./public/readme-hero.png)
 
-> [!NOTE]
-> **Two different things are called "Release 2" — they are unrelated.**
-> - **war.gov's releases** are the government's UAP document tranches, published on [war.gov/UFO](https://www.war.gov/UFO) under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters) on a rolling basis: **Release 01** dropped **May 8 2026** (173 records); the **Second Release (Release 02)** dropped **May 22 2026** — 40+ videos, NASA mission audio, and D-series military encounter reports.
-> - **This project's "Release 2.0"** is just the console's own **software version**. It does not track, mirror, or correspond to war.gov's release numbering. The app version and the government document tranches are wholly separate.
+[Live site](https://rizzleroc.github.io/pursue-console/) · [Browse cases](https://rizzleroc.github.io/pursue-console/) · [See AI disagreements](https://rizzleroc.github.io/pursue-console/)
 
-[![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml)
-[![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Live site](https://img.shields.io/badge/live-rizzleroc.github.io%2Fpursue--console-FFD93D)](https://rizzleroc.github.io/pursue-console/)
-[![Changelog](https://img.shields.io/badge/changelog-2.2-7CFFB2)](./CHANGELOG.md)
-[![Roadmap](https://img.shields.io/badge/roadmap-open-82B6FF)](./ROADMAP.md)
+## A senior intel official, on the record
 
-**Live:** https://rizzleroc.github.io/pursue-console/
+Late 2025, SECRET//NOFORN. An FBI 302 from a senior US intelligence official aboard a search helicopter at a US military facility logs the moment an LP/OP-tracked orb *"gained elevation, came within ten feet of [the helicopter]"* — then split, then a swarm nobody could count. [Read it on the live console](https://rizzleroc.github.io/pursue-console/) (DOSSIER → USPER) · [source on war.gov](https://www.war.gov/medialink/ufo/release_1/usper-statement-redacted.pdf).
 
----
+## What you can do here
 
-## What this is
+- **Browse 293 declassified records** across three war.gov releases — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
+- **See where the AI transcriptions disagree** — every page is transcribed by up to four sources (Gemini, ChatGPT, Claude, OCR); disputes are queued worst-first. → REVIEW tab.
+- **Fix one disputed page in 30 seconds** — read the source side-by-side with each AI's guess, type the correct version, submit. Becomes the gold standard that grades every machine source forever.
+- **Read it in your own language** — full UI translated into 18 languages including right-to-left Arabic and Hebrew. The site auto-detects your browser locale on first load; switch via the picker in the nav.
 
-The war.gov inventory is a flat list of PDFs and videos. Reading them one by one tells you each case. Reading them as a system tells you what the corpus is *actually* saying. The console adds the connective tissue, surfaces the gaps, and lets anyone improve the data.
+## Why this exists, relative to other projects
 
-**Release 2.0 reframes the console as a blended-data investigation desk.** Every page is transcribed by 1–4 machine and human sources; the system tells you what they agree on, surfaces what they don't, and routes disputes to humans.
+Other teams have built archives around the [war.gov/UFO](https://www.war.gov/UFO) PURSUE releases:
 
-### Current corpus (live from `public/corpus-stats.json`)
+- [DenisSergeevitch/UFO-USA](https://github.com/DenisSergeevitch/UFO-USA) — upstream that scrapes war.gov directly and publishes the full corpus as markdown. **PURSUE Console consumes Denis's manifest as its source of truth** — without it, this repo has no data.
+- [wretcher207/the-ufo-files](https://github.com/wretcher207/the-ufo-files) — hand-written, narrative per-case writeups.
+- [pursue-uap-project/pursueproject](https://github.com/pursue-uap-project/pursueproject) — bilingual searchable web archive.
+- [vfp2/pursue-ufo-files](https://github.com/vfp2/pursue-ufo-files) — downloader / indexer / analyzer.
 
-| | |
-|---|---|
-| **Records inventoried** | 162 (121 catalogued · 41 awaiting enumeration) |
-| **Pages transcribed** | 3,394 across 65 events |
-| **First-pull backlog** | 52 catalogued docs · 754 pages awaiting download + transcription |
-| **Per source** | 3,370 Gemini · 427 GPT-vision · 0 Claude · 4 OCR · 18 contributor-submitted |
-| **Multi-source pages** | 425 (cross-checked for agreement) |
-| **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
+PURSUE Console adds what none of them do: **a cross-source disagreement queue.** When the three AIs disagree about a page, a non-developer settles it, and the human-typed version becomes gold to grade every machine source after.
 
----
+## Contribute
 
-## Features (2.0)
+**Three paths, easiest to hardest. Pick the highest you can do.**
 
-### LIVE — what the corpus is doing right now
-Pages streaming in from machine OCR + volunteer submissions. Per-event progress strip. Source-mix dot for every event (which engines have transcribed it).
+<details open>
+<summary><b>30 seconds, no install</b> — settle a disputed page in the browser</summary>
 
-### SEARCH + SEMANTIC
-Hybrid lexical (MiniSearch) + dense semantic (sentence-transformers + FAISS). All embeddings run in the browser; nothing leaves the page. FAISS index auto-rebuilds every 4 hours when input data changes (skip-on-unchanged hash check, no commit pollution).
+Open the [REVIEW tab](https://rizzleroc.github.io/pursue-console/), pick a disputed page, click "Fix this page," type the corrected text in the modal, hit submit. A GitHub issue opens pre-filled with your correction; a bot converts it to a PR; a maintainer merges. You never touch a terminal.
 
-### REVIEW · cross-source disagreement queue
-The site's most consequential surface. Pages where Gemini ↔ ChatGPT ↔ Claude ↔ (future) human disagree appear here worst-first. Click any item to see every source's text side-by-side with pairwise agreement scores. A "FIX IT" button points at the volunteer flow. When a human resolves a page, it becomes canonical, and we learn how each machine source scored vs. that gold for that page.
+</details>
 
-### MEDIA library
-Every page classified as containing visual content — photographs, hand-drawings, photocopied negatives, newspaper clippings, maps, diagrams. Grid view, filter by kind / agency / event. Click → modal with description + deep-link straight to that page in DOSSIER.
+<details>
+<summary><b>5 minutes, GitHub account</b> — drop a .txt and open a PR</summary>
 
-### DOSSIER per record
-Cross-linked entities, threads, co-occurring records ranked by shared-entity overlap. Direct deep-link from REVIEW and MEDIA.
+Drop a `.txt` file at `contributions/<your-handle>/human/<eid>/p<NNNN>.txt`, open a PR. File format and CI gates in [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md).
 
-### ANALYSIS row · TIMELINE, ATLAS, GLOBE, NETWORK
-- TIMELINE — chronology by decade
-- ATLAS — agency × decade heatmap
-- GLOBE — drag-rotate orthographic projection
-- NETWORK — force-directed graph of events ↔ hand-curated entities ↔ text-mined patterns (shape/behavior/sensor). Event node color = dominant best transcription source. Size = log(chars). Amber dashed ring = pages need review.
+</details>
 
----
+<details>
+<summary><b>Power user, MCP fanout</b> — your own Chrome runs ChatGPT + Gemini + Claude vision OCR in parallel</summary>
 
-## Cross-source iteration loop (2.0 architecture)
+One-command sparse install (~10 MB, not the full ~1 GB):
+
+```bash
+# macOS / Linux
+curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash
+
+# Windows PowerShell
+iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex
+```
+
+Then:
+
+```bash
+cd pursue-helper
+npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini + claude.ai tabs
+npm run volunteer -- --my-handle=YOU --slice=20                   # ChatGPT
+npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini # Gemini
+npm run volunteer -- --my-handle=YOU --slice=20 --provider=claude # Claude
+```
+
+Full architecture in [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md).
+
+</details>
+
+## FAQ
+
+<details>
+<summary><b>Wait, what does "Release N" mean? I see the same word in two contexts.</b></summary>
+
+Two different things share the name and they're unrelated.
+
+- **war.gov's releases** are the government's UAP document tranches under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters). **Release 01** dropped May 8 2026 (162 records); **Release 02** dropped May 22 2026 (64 records — 6 PDFs + 51 videos + 7 audio); **Release 03** dropped June 12 2026 (72 records). R01 is fully mirrored; R02's 6 PDFs are mirrored at `public/release_2/` with audio/video pending; R03 has been staged through the WHIP pipeline (`data(R03): full pipeline`, #285).
+- **This project's "Release 2.0"** is just the console's own **software version**. It doesn't track or correspond to war.gov's release numbering.
+
+</details>
+
+<details>
+<summary><b>Is this affiliated with the Department of War or AARO?</b></summary>
+
+No. PURSUE Console is an unofficial mirror with hand-curated structure on top. Every catalogued record cites back to `https://www.war.gov/medialink/ufo/release_1/...`. **All cases are marked UNRESOLVED by the originating agencies.**
+
+</details>
+
+<details>
+<summary><b>How do I trust the transcriptions?</b></summary>
+
+That's literally what the REVIEW queue and source-quality scoring are for. Every page sidecar records every source that transcribed it; agreement is scored pairwise (token Jaccard + length ratio); a human-typed page always wins canonical and is used as gold to grade every machine source over time. See the **Cross-source iteration loop** diagram below.
+
+</details>
+
+## More
+
+<details>
+<summary><b>Cross-source iteration loop</b> (architecture)</summary>
 
 Every page sidecar (`data-raw/.vision-cache/<eid>/p<NNN>.sources.json`) tracks every source that has transcribed that page. The pipeline:
 
@@ -106,9 +143,10 @@ A page is fully settled when:
 
 When a human-typed page lands, it becomes the gold against which every machine source is scored — `data-raw/.source-quality.json` aggregates per-model mean accuracy over time.
 
----
+</details>
 
-## Single source of truth: `data-raw/corpus.sqlite`
+<details>
+<summary><b>Single source of truth: <code>data-raw/corpus.sqlite</code></b></summary>
 
 Every dashboard number derives from one SQL query against a single SQLite file:
 
@@ -123,57 +161,16 @@ runs          append-only build/scrape/import log
 
 `scripts/db-rebuild.mjs` regenerates it from on-disk truth (sidecars, caches, contributions) on every build. The browser reads derived `public/*.json` artifacts — same data, view-side-friendly format.
 
----
+</details>
 
-## 📡 How can I help — priority ladder
-
-**Three open priorities. Please pick the highest open one.**
-
-### 1. Settle the review queue
-Pages where machine sources disagree. Type the correct version from the source PDF. **One disputed page resolved = canonical text settled forever, used as gold to grade every machine source.** No tooling required — drop a `.txt` at `contributions/<handle>/human/<eid>/p<NNNN>.txt`, open a PR.
-
-→ Open the **REVIEW** tab on the live console (count badge in the nav).
-
-### 2. Transcribe new pages
-Run the volunteer script. Your own logged-in browser does OCR via ChatGPT, Gemini, *or* Claude. The MCP daemon now supports all three providers in parallel (`POST /fanout`).
-
-```bash
-# Setup once (~10 MB sparse clone, not the full ~1 GB repo):
-curl -fsSL https://rizzleroc.github.io/pursue-console/install-helper.sh | bash    # macOS / Linux
-iwr https://rizzleroc.github.io/pursue-console/install-helper.ps1 | iex            # Windows
-
-# Then:
-cd pursue-helper
-npm start --prefix pursue-vision-mcp                              # opens chatgpt + gemini + claude.ai tabs
-npm run volunteer -- --my-handle=YOU --slice=20                   # ChatGPT
-npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini # Gemini
-npm run volunteer -- --my-handle=YOU --slice=20 --provider=claude # Claude
-```
-
-### 3. Image + context capture
-Pages classified as containing visuals (photographs, hand-drawings, newspaper clippings, maps, diagrams) need page screenshots + the **verbatim documentary context** from the surrounding pages (what introduces this image? what's the caption? what comes after?). For newspaper clippings, also the article body so it becomes its own searchable doc.
-
-Two-phase volunteer flow (the script renders the pages so you can read them while typing context, no in-terminal pain):
-
-```bash
-node scripts/volunteer-media.mjs --my-handle=YOU --slice=5     # claim + render
-# (fill in the markdown templates at ~/.pursue-helper/media-staging/)
-node scripts/volunteer-media.mjs --my-handle=YOU --commit      # commit + PR
-```
-
-Full spec: [VISUAL-EXTRACTION-PROCESS.md](./VISUAL-EXTRACTION-PROCESS.md).
-
-→ Full architecture + per-path docs: [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md)
-
----
-
-## Repo structure
+<details>
+<summary><b>Repo structure</b></summary>
 
 ```
 pursue-console/
 ├── src/
 │   ├── App.jsx                       view router · volunteer modal · hero gating
-│   ├── data/events.js                catalogued records (121 of 173)
+│   ├── data/events.js                catalogued records (R01 + R02 + R03 = 293 total)
 │   ├── data/entities.js              hand-curated entity graph
 │   ├── components/
 │   │   ├── Header.jsx                primary nav + analysis nav + VOLUNTEER button
@@ -182,6 +179,7 @@ pursue-console/
 │   │   └── VolunteerModal.jsx        priority ladder + setup snippets
 │   └── views/
 │       ├── LiveView, SearchView, SemanticSearchView, DossierView
+│       ├── AskView                   natural-language Q&A (PATTERN + SMART RAG)
 │       ├── ReviewView                cross-source disagreement queue
 │       ├── MediaView                 visual library
 │       ├── TimelineView, AtlasView, GlobeView, NetworkView
@@ -244,9 +242,10 @@ pursue-console/
     └── backup.yml                    6h corpus snapshot to GitHub Release
 ```
 
----
+</details>
 
-## Run locally
+<details>
+<summary><b>Run locally</b></summary>
 
 ```bash
 git clone https://github.com/rizzleroc/pursue-console
@@ -266,7 +265,10 @@ build-dossier-extracts · build-patterns · build-work-available ·
 build-media-index · build-corpus-version · vite build
 ```
 
-### Maintainer batches (manual, not on every deploy)
+</details>
+
+<details>
+<summary><b>Maintainer batches</b> (manual, not on every deploy)</summary>
 
 ```bash
 npm run corpus:vision             # ChatGPT vision OCR via the daemon
@@ -280,23 +282,43 @@ npm run corpus:sync-check         # diff every count between local build + live 
 
 Stack: Vite + React 19 + Tailwind v3 + better-sqlite3. No chart libraries; the network view is a hand-rolled force-directed layout, the globe is an orthographic projection, the heatmap is CSS grid. FAISS runs in browser via `@huggingface/transformers` + ORT WASM (~25 MB INT8 model, cached in IndexedDB after first download).
 
----
+</details>
 
-## Backups + freshness
+<details>
+<summary><b>Backups + freshness</b></summary>
 
 - **6-hour corpus snapshot** → GitHub Release with timestamped tag (`.github/workflows/backup.yml`)
 - **FAISS re-index** every 4 h if inputs changed (`.github/workflows/faiss-rebuild.yml`, skip-on-unchanged hash)
 - **CorpusFreshness strip** at the top of every non-LIVE view, polls every 60 s, shows last-build age
 
----
+</details>
 
-## Source posture
+<details>
+<summary><b>Source posture</b></summary>
 
 Every catalogued record cites back to `https://www.war.gov/medialink/ufo/release_1/...`. PDF inventory reconciles against [DenisSergeevitch/UFO-USA](https://github.com/DenisSergeevitch/UFO-USA) (the upstream maintainer scraped war.gov directly via Gemini; war.gov blocks our IPs via Akamai). As of 2.2, `scripts/sync-inventory.mjs` and `scripts/import-gemini-corpus.mjs` apply URL normalization so that Denis's hyphenated manifest URLs are matched correctly against the raw-space war.gov URLs stored in `events.js`; this improved Denis manifest-to-event matching from 68/120 → 112/120 PDFs. The remaining 8 PDFs have genuine filename discrepancies that require manual reconciliation. **All cases marked UNRESOLVED by the originating agencies.** This console is an unofficial mirror with hand-curated structure on top; nothing here adds claims beyond the primary documents.
 
 When new Release tranches drop, that's where new event records come from.
 
+</details>
+
+<details>
+<summary><b>Corpus stats</b> (live from <code>public/corpus-stats.json</code>)</summary>
+
+| | |
+|---|---|
+| **Records inventoried** | 162 Release 01 (fully mirrored) + 64 Release 02 (6 PDFs mirrored at `public/release_2/`; 7 audio + 51 video pending) + 72 Release 03 (staged via the WHIP pipeline, #285). 293 events catalogued. |
+| **Pages transcribed** | 3,543 across 75 events |
+| **First-pull backlog** | 29 catalogued docs · 731 pages awaiting download + transcription |
+| **Per source** | 3,370 Gemini · 470 GPT-vision · 0 Claude · 787 OCR transcripts (94 pages OCR-only · 693 cross-checked against vision) · 80 contributor-submitted |
+| **Multi-source pages** | 438 (cross-checked for agreement) |
+| **Review queue** | 0 pages flagged — corpus is essentially fully vision-covered (22 reevaluated, 3 settled by standardized prompt) |
+
+</details>
+
 ---
+
+[![Deploy](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/deploy.yml) [![FAISS](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml/badge.svg)](https://github.com/rizzleroc/pursue-console/actions/workflows/faiss-rebuild.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE) [![Live site](https://img.shields.io/badge/live-rizzleroc.github.io%2Fpursue--console-FFD93D)](https://rizzleroc.github.io/pursue-console/) [![Changelog](https://img.shields.io/badge/changelog-2.2-7CFFB2)](./CHANGELOG.md) [![Roadmap](https://img.shields.io/badge/roadmap-open-82B6FF)](./ROADMAP.md)
 
 ## License
 

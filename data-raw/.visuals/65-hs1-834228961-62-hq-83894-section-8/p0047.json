@@ -1,8 +1,8 @@
 {
   "kind": "diagram",
   "title": "Five semi-circles labeled 1 through 5, with 'S' at the top and 'N' at the bottom",
-  "description": "Diagram: Five semi-circles labeled 1 through 5, with 'S' at the top and 'N' at the bottom of each. A horizontal arrow spans the middle with the text '1081 MILES'.",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.534Z"
+  "description": "Message delivery timed out. Please try again.Retry",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.695Z",
+  "contributor": "Rizzleroc"
 }

@@ -15,11 +15,12 @@
       "id": "release-02",
       "label": "Release 02",
       "published": "2026-05-22",
-      "status": "pending-mirror",
-      "files": { "total": 64, "pdf": 6, "audio": 7, "video": 51 },
+      "status": "partial-mirror",
+      "files":    { "total": 64, "pdf": 6, "audio": 7, "video": 51 },
+      "mirrored": { "pdf": 6, "audio": 0, "video": 0 },
       "source": "https://www.war.gov/News/Releases/Release/Article/4499305/department-of-war-publishes-second-release-of-unidentified-anomalous-phenomena/",
-      "paths": { "localDir": "data-raw/war-gov/release_2" },
-      "note": "Second PURSUE release. Video/audio-heavy (only 6 PDFs). MCP-based war.gov collector landed (corpus:fetch-war-gov, @unverified); still awaiting first live run + DenisSergeevitch/UFO-USA mirror as a parallel path."
+      "paths": { "localDir": "data-raw/war-gov/release_2", "publicDir": "public/release_2" },
+      "note": "All 6 PDFs are committed at public/release_2/ and catalogued in src/data/events.js (CIA-UAP-D001, DOE-UAP-D001..D003, DOW-UAP-D017, ODNI-UAP-D001). The 7 audio + 51 video files still need ingestion via `npm run corpus:fetch-war-gov -- --release=02 --prefer-mcp` (requires the maintainer's logged-in Chrome on port 9222 with the war.gov Akamai challenge already cleared)."
     }
   ]
 }

@@ -1,25 +1,8 @@
 {
   "kind": "photograph",
   "title": "A tripod-like machine",
-  "description": "Image: A tripod-like machine",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "A saucer opening"
-    },
-    {
-      "kind": "photograph",
-      "title": "A saucer in flight"
-    },
-    {
-      "kind": "photograph",
-      "title": "A man with a model"
-    },
-    {
-      "kind": "photograph",
-      "title": "A bug-eyed alien"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.372Z"
+  "description": "U. S. News & World Report\nFACT: THESE DESIGNS, AND LATER ONES ARE REAL\nDISK-LIKE NAVY FLOUNDER PROJECT WAS 'DROPPED'\nMOCK-UP OF EARLY MODEL IS TESTED IN WIND TUNNEL\n. . . latest models are circular, faster, more maneuverable\nWhat it all adds up to is this: Flying\nsaucers being observed in many parts\nof the U. S. are not mysterious visitors\nfrom Mars. They are actual planes, sound-\nly engineered on principles developed by\nU.S. in wartime. By using this new design,\nthey can do things that no conventional\naircraft can be expected to approach.\nWho's building the saucers now\nbeing observed in test flights over U.S.\no    U. S. NEWS & WORLD REPORT\nU. S. News & World Report\nFANCY: SPACE SHIPS, MONSTERS, MARTIANS, MAYHEM\nNOCTURNAL 'INVASION'\nThe real thing is strictly a one-planet proposition\nAPRIL 7, 1950\n15\nSERVICE UNIT\nSEARCH SLIP\n4-22a\nSupervisor [illegible] Room 3708\nSubj: Miguel Angel [illegible]\nMacias\nExact Spelling\nAll References\nSubversive Ref.\nMail File\nRestricted to Locality of\nSearchers\nInitial [illegible]\nDate 3-16-50\nFILE NUMBER\nSERIALS\n62-83894-220\nfile 5 EH\nInitialed",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.634Z",
+  "contributor": "Rizzleroc"
 }

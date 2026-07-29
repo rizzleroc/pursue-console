@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Review</title>
+  <meta name="description" content="Side-by-side gemini-vision vs tesseract OCR for disputed pages. Merge and submit to a pre-filled GitHub issue.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Review — multi-source page reconciliation">
+  <meta property="og:description" content="Side-by-side gemini-vision vs tesseract OCR for disputed pages. Merge and submit to a pre-filled GitHub issue.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/review.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Review — multi-source page reconciliation">
+  <meta name="twitter:description" content="Side-by-side gemini-vision vs tesseract OCR for disputed pages. Merge and submit to a pre-filled GitHub issue.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .rv-shell { padding: 0 56px 64px; display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 22px; position: relative; z-index: 3; }
+    .rv-queue { background: var(--surface); border: 1px solid var(--border); padding: 22px; backdrop-filter: blur(10px); max-height: 1200px; overflow-y: auto; }
+    .rv-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--hairline); cursor: pointer; transition: padding-left .2s; }
+    .rv-row:hover { padding-left: 6px; }
+    .rv-row.active { padding-left: 8px; border-left: 2px solid var(--amber); background: rgba(242,166,35,0.05); margin: 0 -22px; padding: 14px 22px 14px 26px; }
+    .rv-row-link { text-decoration: none; color: inherit; display: block; }
+    .rv-row .top { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
+    .rv-row .top .agree { margin-left: auto; color: var(--rose); font-weight: 700; }
+    .rv-row .top .agree.high { color: var(--amber); }
+    .rv-row .eid { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; }
+    .rv-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.08em; }
+    .rv-pane { background: var(--surface); border: 1px solid var(--border); padding: 24px 28px; backdrop-filter: blur(10px); }
+    .rv-head { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid var(--hairline); }
+    .rv-head h2 { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 600; margin: 0; letter-spacing: -0.015em; color: var(--text); }
+    .rv-head .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.16em; }
+    .rv-head .meta .score { color: var(--rose); font-weight: 700; font-size: 14px; padding: 4px 10px; border: 1px solid rgba(224,73,104,0.4); background: rgba(224,73,104,0.10); margin-left: 8px; }
+    .diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+    .diff-col { background: var(--surface-3); border: 1px solid var(--hairline); padding: 16px 18px; }
+    .diff-col h4 { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--text-3); text-transform: uppercase; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+    .diff-col h4 .src-tag { font-size: 9px; padding: 1px 6px; border: 1px solid; }
+    .diff-col h4 .src-tag.g { color: var(--cyan); border-color: rgba(97,215,240,0.4); background: rgba(97,215,240,0.08); }
+    .diff-col h4 .src-tag.o { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.08); }
+    .diff-col .conf { margin-left: auto; color: var(--text); font-weight: 600; }
+    .diff-col p { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.65; color: var(--text-2); margin: 0; }
+    .diff-col p .add { background: rgba(74,222,128,0.16); color: var(--emerald); padding: 0 3px; }
+    .diff-col p .del { background: rgba(224,73,104,0.16); color: var(--rose); padding: 0 3px; text-decoration: line-through; }
+    .merge-pane { border: 1px solid var(--border-strong); background: rgba(242,166,35,0.04); padding: 18px 22px; }
+    .merge-pane h4 { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--amber); text-transform: uppercase; margin: 0 0 12px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline); }
+    .merge-pane textarea { width: 100%; background: transparent; border: none; outline: none; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; resize: vertical; min-height: 120px; }
+    .actions-bar { display: flex; align-items: center; gap: 12px; margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--hairline); }
+    .actions-bar .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; margin-right: auto; }
+    .ab-btn { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; padding: 11px 18px; cursor: pointer; }
+    .ab-btn.primary { color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border: 1px solid var(--amber); box-shadow: 0 12px 28px -10px rgba(242,166,35,0.55); }
+    .ab-btn.ghost { color: var(--text-2); background: var(--surface); border: 1px solid var(--border); }
+    .ab-btn.ghost:hover { color: var(--text); border-color: var(--border-strong); }
+    .source-mix-wrap { margin: 0 0 18px; }
+    .source-mix { display: flex; height: 8px; width: 100%; background: var(--surface-3); border: 1px solid var(--hairline); overflow: hidden; }
+    .source-mix .seg { display: block; height: 100%; transition: width .25s ease; }
+    .source-mix .seg.vision { background: linear-gradient(180deg, rgba(74,222,128,0.85), rgba(74,222,128,0.6)); }
+    .source-mix .seg.ocr    { background: linear-gradient(180deg, rgba(97,215,240,0.85), rgba(97,215,240,0.6)); }
+    .source-mix .seg.human  { background: linear-gradient(180deg, rgba(242,166,35,0.85), rgba(242,166,35,0.6)); }
+    .source-mix-labels { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--text-3); margin-top: 8px; text-transform: uppercase; display: flex; gap: 14px; flex-wrap: wrap; }
+    .source-mix-labels .lbl-vision { color: var(--emerald); }
+    .source-mix-labels .lbl-ocr    { color: var(--cyan); }
+    .source-mix-labels .lbl-human  { color: var(--amber); }
+    .source-mix-labels .lbl-total  { color: var(--text-2); margin-left: auto; }
+</style>
+</head>
+<body data-view="review">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 05 — disputed-page review</div>
+    <h1 id="rv-title">3 pages where the engines disagree. <em>Pick the truth.</em></h1>
+    <p class="sub">Each row in the queue is a page where machine OCR sources (Gemini-vision, GPT-vision, Tesseract, PDF.js) produced conflicting transcripts. The reviewer's job is to merge to a canonical version; one click opens a pre-filled GitHub PR.</p>
+  </section>
+
+  <section class="rv-shell">
+    <div class="rv-queue">
+      <div id="rv-queue-head" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--text-3);text-transform:uppercase;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--hairline);display:flex;justify-content:space-between"><span id="rv-queue-label">QUEUE · WORST AGREEMENT</span><span id="rv-queue-count" style="color:var(--amber)">3</span></div>
+      <div id="rv-queue-list">
+      <a class="rv-row-link" href="dossier.html?eid=usper-2025"><div class="rv-row active">
+        <div class="top"><span>FBI</span><span>·</span><span>2025-10</span><span class="agree">0.21</span></div>
+        <div class="eid">usper-2025 · p 03</div>
+        <div class="meta">vision · ocr · gemini · 4 sources disagree</div>
+      </div></a>
+      <a class="rv-row-link" href="dossier.html?eid=dow-uap-d48"><div class="rv-row">
+        <div class="top"><span>DEPT/War</span><span>·</span><span>1996</span><span class="agree">0.34</span></div>
+        <div class="eid">dow-uap-d48 · p 087</div>
+        <div class="meta">vision · pdfjs · 2 sources disagree</div>
+      </div></a>
+      <a class="rv-row-link" href="dossier.html?eid=dow-uap-d038"><div class="rv-row">
+        <div class="top"><span>DEPT/War</span><span>·</span><span>2020-05</span><span class="agree high">0.48</span></div>
+        <div class="eid">dow-uap-d038 · p 12</div>
+        <div class="meta">vision · ocr · minor</div>
+      </div></a>
+      </div>
+
+      <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.22em;font-weight:700;margin-bottom:10px">MULTI-SOURCE PAGES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Real side-by-side · gemini vision vs tesseract OCR.</div>
+        <select id="rv-multi" class="md-select" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;cursor:pointer">
+          <option value="">— pick a page —</option>
+        </select>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline)">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.22em;font-weight:700;margin-bottom:10px">GRADED EXAMPLES</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.10em;margin-bottom:8px;line-height:1.5">Top-scored extracts only.</div>
+        <select id="rv-graded" class="md-select" style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-2);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;cursor:pointer">
+          <option value="">— pick an event —</option>
+        </select>
+      </div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--hairline);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.14em">
+        <div style="margin-bottom:6px">FILTER · all agencies</div>
+        <div style="margin-bottom:6px">SORT · worst agreement first</div>
+        <div style="color:var(--text-3);margin-top:12px;line-height:1.55">Pages graded ≥0.85 are auto-accepted as canonical and never enter this queue. Threshold tunable in <span style="color:var(--amber)">corpus-stats.json</span>.</div>
+      </div>
+    </div>
+
+    <div class="rv-pane">
+      <div class="rv-head">
+        <div>
+          <h2 id="rv-pane-title">usper-2025 · page 03</h2>
+          <div id="rv-pane-sub" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-3);letter-spacing:0.14em;margin-top:6px">FBI · 2025-10 · SECRET//NOFORN · 4 SOURCES</div>
+        </div>
+        <div class="meta">EXTRACTS <span class="score" id="rv-score" style="background:rgba(97,215,240,0.10);color:var(--cyan);border-color:rgba(97,215,240,0.4)">live</span></div>
+      </div>
+
+      <div class="source-mix-wrap" id="rv-source-mix-wrap" hidden>
+        <div class="source-mix" id="rv-source-mix">
+          <span class="seg vision" style="width:0%"></span>
+          <span class="seg ocr" style="width:0%"></span>
+          <span class="seg human" style="width:0%"></span>
+        </div>
+        <div class="source-mix-labels" id="rv-source-mix-labels">
+          <span class="lbl-vision">VISION 0p</span>
+          <span class="lbl-ocr">OCR 0p</span>
+          <span class="lbl-human">HUMAN 0p</span>
+          <span class="lbl-total">TOTAL 0p</span>
+        </div>
+      </div>
+
+      <div class="diff-grid" id="rv-diff">
+        <div class="diff-col">
+          <h4><span class="src-tag g">VISION</span><span>loading extracts…</span></h4>
+          <p style="color:var(--text-4)">Pick a row in the queue to see the page's top-scoring extracts.</p>
+        </div>
+        <div class="diff-col">
+          <h4><span class="src-tag o">CONTEXT</span><span>event metadata</span></h4>
+          <p style="color:var(--text-4)">The event summary and provenance will appear here once the queue row is selected.</p>
+        </div>
+      </div>
+
+      <div class="merge-pane">
+        <h4><span>▣ MERGED TEXT — REVIEWER PROPOSAL</span><span style="margin-left:auto;color:var(--text-3);font-weight:400">edit freely · saved to the GitHub issue on submit</span></h4>
+        <textarea id="rv-merge" placeholder="Top extracts auto-seed here when you pick a queue row. Edit freely before opening the prefilled GitHub issue."></textarea>
+      </div>
+
+      <div class="actions-bar">
+        <span class="meta">SUBMISSION · opens pre-filled GitHub issue · reviewer credit: anonymous OK</span>
+        <button class="ab-btn ghost" style="cursor:default">SKIP — next page</button>
+        <a id="rv-submit-btn" class="ab-btn primary" href="#" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">▣ SUBMIT MERGED TEXT →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+
+<script src="chrome.js" defer></script>
+<script>
+  // ── Live data layer ──
+  function esc(v){ const d=document.createElement('div'); d.textContent=(v==null?'':String(v)); return d.innerHTML; }
+
+  // Lazy-loaded once: public/dossier-extracts.json (~570KB) — per-event
+  // per-page top extracts with flag annotations + source. We use it to
+  // populate the diff pane when a queue row is clicked.
+  let _extracts = null;
+  function loadExtracts(){
+    if (_extracts) return _extracts;
+    _extracts = fetch('../dossier-extracts.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .catch(e => { console.warn('extracts load failed:', e); return null; });
+    return _extracts;
+  }
+
+  // Multi-source side-by-side: real per-source page texts (gemini vision
+  // vs tesseract OCR). Built by scripts/build-multi-source-review.mjs.
+  let _multi = null;
+  function loadMulti(){
+    if (_multi) return _multi;
+    _multi = fetch('../multi-source-review.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .catch(e => { console.warn('multi-source load failed:', e); return null; });
+    return _multi;
+  }
+
+  // Render the SourceMix horizontal bar for the given eid. Counts pages in
+  // MC.data.multiSource.pages[eid] (loaded by loadMulti) by source: vision
+  // (gemini), ocr (tesseract), human (none yet; placeholder for reviewer
+  // canon). Hides the bar entirely when the event has no multi-source data.
+  async function renderSourceMix(eid){
+    const wrap = document.getElementById('rv-source-mix-wrap');
+    if (!wrap) return;
+    const ms = await loadMulti();
+    const pages = (ms && ms.pages && eid && ms.pages[eid]) || null;
+    if (!pages){ wrap.hidden = true; return; }
+    let visionCount = 0, ocrCount = 0, humanCount = 0, totalPages = 0;
+    Object.keys(pages).forEach(function(pg){
+      const entry = pages[pg] || {};
+      totalPages++;
+      if (entry.gemini) visionCount++;
+      if (entry.ocr)    ocrCount++;
+      if (entry.human)  humanCount++;
+    });
+    if (!totalPages){ wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const sumSources = Math.max(visionCount + ocrCount + humanCount, 1);
+    const vPct = (visionCount / sumSources) * 100;
+    const oPct = (ocrCount    / sumSources) * 100;
+    const hPct = (humanCount  / sumSources) * 100;
+    const bar = document.getElementById('rv-source-mix');
+    if (bar){
+      const segs = bar.querySelectorAll('.seg');
+      if (segs[0]) segs[0].style.width = vPct.toFixed(2) + '%';
+      if (segs[1]) segs[1].style.width = oPct.toFixed(2) + '%';
+      if (segs[2]) segs[2].style.width = hPct.toFixed(2) + '%';
+    }
+    const labels = document.getElementById('rv-source-mix-labels');
+    if (labels){
+      labels.innerHTML =
+        '<span class="lbl-vision">VISION ' + visionCount + 'p</span>' +
+        '<span class="lbl-ocr">OCR '       + ocrCount    + 'p</span>' +
+        '<span class="lbl-human">HUMAN '   + humanCount  + 'p</span>' +
+        '<span class="lbl-total">TOTAL '   + totalPages  + 'p</span>';
+    }
+  }
+
+  // Render the diff pane with REAL data for {eid, page}. Uses the
+  // top extracts from dossier-extracts.json on the left ("raw") and the
+  // page's text concatenated as a starting merged proposal on the right.
+  async function renderDetail(item){
+    if (!item) return;
+    const pane = document.getElementById('rv-pane-title');
+    const eid = item.eid, page = item.page;
+    if (pane) pane.textContent = (eid || '—') + (page != null ? ' · page ' + page : '');
+
+    const rec = MC.byEid(eid);
+    document.getElementById('rv-pane-sub').innerHTML = rec
+      ? esc(rec.agency || '—') + ' · ' + esc(rec.date || '—') + ' · ' + esc((rec.type || '').toUpperCase())
+      : esc(eid);
+
+    // Bind SUBMIT MERGED TEXT — pre-fill GitHub issue for THIS item.
+    const submitBtn = document.getElementById('rv-submit-btn');
+    if (submitBtn && MC.url && MC.url.claim) submitBtn.href = MC.url.claim(eid, page);
+
+    // SourceMix bar — fire-and-forget; reflects this event's per-source page mix.
+    renderSourceMix(eid);
+
+    const grid = document.getElementById('rv-diff');
+    const merge = document.getElementById('rv-merge');
+
+    // Prefer real multi-source side-by-side when both gemini + ocr exist.
+    const ms = await loadMulti();
+    if (ms && ms.pages && ms.pages[eid] && ms.pages[eid][String(page)]){
+      const entry = ms.pages[eid][String(page)];
+      const hasBoth = entry.gemini && entry.ocr;
+      const agree = (typeof entry.agreement === 'number') ? entry.agreement.toFixed(2) : '—';
+      const scoreEl = document.getElementById('rv-score');
+      if (scoreEl){
+        scoreEl.textContent = hasBoth ? ('agreement ' + agree) : (entry.gemini ? 'VISION ONLY' : 'OCR ONLY');
+        scoreEl.style.color = hasBoth && entry.agreement < 0.5 ? 'var(--rose)' : 'var(--cyan)';
+        scoreEl.style.borderColor = hasBoth && entry.agreement < 0.5 ? 'rgba(224,73,104,0.4)' : 'rgba(97,215,240,0.4)';
+        scoreEl.style.background = hasBoth && entry.agreement < 0.5 ? 'rgba(224,73,104,0.10)' : 'rgba(97,215,240,0.10)';
+      }
+      const visBody = entry.gemini || '(no vision output)';
+      const ocrBody = entry.ocr    || '(no OCR output)';
+      grid.innerHTML =
+        '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>Gemini 2.0</span><span class="conf">' + visBody.length + ' chars</span></h4>' +
+          '<p style="white-space:pre-wrap;font-size:11px;line-height:1.55;max-height:520px;overflow:auto">' + esc(visBody) + '</p>' +
+        '</div>' +
+        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>Tesseract 5.x</span><span class="conf">' + ocrBody.length + ' chars</span></h4>' +
+          '<p style="white-space:pre-wrap;font-size:11px;line-height:1.55;max-height:520px;overflow:auto">' + esc(ocrBody) + '</p>' +
+        '</div>';
+      // Seed merge textarea with the LONGER source — usually the cleaner one.
+      merge.value = (entry.gemini && (!entry.ocr || entry.gemini.length >= entry.ocr.length))
+        ? entry.gemini
+        : (entry.ocr || '');
+      return;
+    }
+
+    const ex = await loadExtracts();
+    if (!ex || !ex[eid] || !ex[eid].excerptsByPage){
+      // Friendly empty-state: instead of two walls of "no data" engineering
+      // jargon, show the event's summary + clear CTAs (claim for transcription,
+      // or browse the multi-source picker for a graded example).
+      const claimHref = MC.url.claim(eid, page);
+      const dossierHref = MC.url.dossier(eid);
+      const evSummary = (rec && rec.summary) ? rec.summary : 'No summary recorded for this event yet.';
+      const evMeta = [rec && rec.agency, rec && rec.date, rec && rec.type].filter(Boolean).join(' · ') || 'metadata pending';
+      grid.innerHTML =
+        '<div class="diff-col" style="grid-column:1 / -1">' +
+          '<h4><span class="src-tag g" style="border-color:rgba(74,222,128,0.4);color:var(--emerald,#6EE7B7);background:rgba(74,222,128,0.08)">NEEDS TRANSCRIPTION</span><span>' + esc(eid) + ' · page ' + esc(page) + '</span><span class="conf" style="color:var(--cyan)">' + esc(evMeta) + '</span></h4>' +
+          '<p style="font-family:\'Inter\',sans-serif;font-size:14px;line-height:1.65;color:var(--text-2);margin:6px 0 14px">' + esc(evSummary) + '</p>' +
+          '<p style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--text-3);line-height:1.55;letter-spacing:0.06em;margin:0 0 16px">This event has no graded extracts yet — no engine has produced a canonical transcript for page ' + esc(page) + '. Be the first.</p>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+            '<a class="ab-btn primary" href="' + esc(claimHref) + '" target="_blank" rel="noopener" style="text-decoration:none;display:inline-block">▣ CLAIM THIS PAGE →</a>' +
+            '<a class="ab-btn ghost" href="' + esc(dossierHref) + '" style="text-decoration:none;display:inline-block">→ OPEN DOSSIER</a>' +
+            '<span style="margin-left:auto;font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;align-self:center">OR pick a multi-source page from the picker ↓</span>' +
+          '</div>' +
+        '</div>';
+      merge.value = '';
+      return;
+    }
+    const pgKey = String(page);
+    const pageEntry = ex[eid].excerptsByPage[pgKey];
+    if (!pageEntry){
+      // Pick the closest page that DOES have extracts.
+      const available = Object.keys(ex[eid].excerptsByPage || {}).sort(function(a,b){ return Math.abs(+a - +page) - Math.abs(+b - +page); });
+      grid.innerHTML = '<div class="diff-col"><h4><span class="src-tag g">VISION</span><span>page ' + esc(page) + ' has no graded excerpts</span></h4>' +
+        '<p style="color:var(--text-4)">' + (available.length ? 'Nearest graded pages: ' + available.slice(0, 6).join(', ') + '.' : 'No graded pages for this event.') + '</p></div>' +
+        '<div class="diff-col"><h4><span class="src-tag o">OCR</span><span>raw text not bundled</span></h4>' +
+        '<p style="color:var(--text-4)">The transcription queue surfaces pages waiting for ANY engine to land. When vision or OCR completes this page, it shows up here.</p></div>';
+      merge.value = '';
+      return;
+    }
+    const top = (pageEntry.top || []).slice(0, 6);
+    const source = pageEntry.source || 'vision';
+    // Left column — raw top sentences with flag chips
+    grid.innerHTML = '<div class="diff-col">' +
+      '<h4><span class="src-tag ' + (source === 'vision' ? 'g' : 'o') + '">' + esc(source.toUpperCase()) + '</span><span>top extracts</span><span class="conf">' + top.length + ' sentences</span></h4>' +
+      top.map(function(s){
+        var flags = [];
+        Object.keys(s.flags || {}).forEach(function(f){
+          if (s.flags[f] === true) flags.push(f);
+        });
+        var flagsHTML = flags.length ? '<span style="font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--cyan);letter-spacing:0.12em;margin-right:8px">[' + flags.map(esc).join(' · ') + ']</span>' : '';
+        return '<p style="margin-bottom:10px">' + flagsHTML + esc(s.text) + ' <span style="color:var(--text-4);font-size:10px;margin-left:6px">· score ' + (s.score || 0).toFixed(1) + '</span></p>';
+      }).join('') +
+      '</div>' +
+      '<div class="diff-col">' +
+      '<h4><span class="src-tag o">CONTEXT</span><span>event metadata</span></h4>' +
+      '<p>' + esc((rec && rec.summary) || 'No summary recorded for this event.') + '</p>' +
+      '<p style="margin-top:14px;color:var(--text-4);font-size:11px">Source-of-truth raw page text is in the per-source corpus DB; only top-scoring sentences are bundled to /mc/. The reviewer task is to merge the engines\' page transcripts elsewhere; this surface routes contributors to the prefilled GitHub issue.</p>' +
+      '</div>';
+    // Seed the merge textarea with the concatenated top sentences.
+    merge.value = top.map(function(s){ return s.text; }).join('\n\n');
+  }
+
+  function renderReview(MC){
+    const D = MC && MC.derive; if (!D) return;
+    const q = Array.isArray(D.queue) ? D.queue : [];
+
+    const reviewActive = (typeof D.reviewCount === 'number' && D.reviewCount > 0);
+    const title = document.getElementById('rv-title');
+    const sub   = document.querySelector('.page-title .sub');
+    const shell = document.querySelector('.rv-shell');
+
+    // Empty-state: when there are no disputed pages, the Review surface is
+    // single-purpose and has nothing to show. Hide the queue + diff scaffold
+    // entirely and route users to /mc/help for transcription work. The
+    // previous "show the transcription queue here too" UX confused users
+    // because the queue eids are non-disputes — they're untranscribed pages,
+    // not engine-disagreements.
+    if (!reviewActive){
+      if (title) title.innerHTML = '0 disputed pages right now. <em>Quiet on the western front.</em>';
+      if (sub)   sub.innerHTML = 'No engine disagreements in the current corpus build — every catalogued page either agrees across sources or hasn\'t been touched yet. Looking for work? The <a href="help.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px dashed var(--cyan);padding-bottom:1px">transcription queue lives on the Help surface</a>.';
+      if (shell){
+        shell.style.display = 'none';
+        // Inject a single empty-state panel so the body isn\'t blank.
+        if (!document.getElementById('rv-empty')){
+          const empty = document.createElement('section');
+          empty.id = 'rv-empty';
+          empty.style.cssText = 'padding:24px 56px 80px;position:relative;z-index:3';
+          empty.innerHTML =
+            '<div style="background:var(--surface);border:1px solid var(--border);padding:48px 56px;text-align:center;backdrop-filter:blur(10px)">' +
+              '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:80px;color:var(--emerald,#6EE7B7);line-height:1;margin-bottom:18px">✓</div>' +
+              '<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:32px;color:var(--text);font-weight:600;margin:0 0 12px;letter-spacing:-0.02em">All engines agree.</h2>' +
+              '<p style="font-family:\'Inter\',sans-serif;font-size:15px;color:var(--text-2);line-height:1.6;margin:0 0 28px;max-width:580px;margin-left:auto;margin-right:auto">' +
+                'When two or more transcription engines (vision · OCR · gemini · tesseract) produce conflicting text for the same page, it lands here. Today the corpus has none — every multi-engine page is consensus.' +
+              '</p>' +
+              '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+                '<a href="help.html" class="ab-btn primary" style="text-decoration:none;display:inline-block">▣ TRANSCRIBE A PAGE INSTEAD →</a>' +
+                '<a href="coverage.html" class="ab-btn ghost" style="text-decoration:none;display:inline-block">→ BROWSE COVERAGE</a>' +
+              '</div>' +
+              '<div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--text-4);letter-spacing:0.18em;margin-top:32px;padding-top:20px;border-top:1px solid var(--hairline)">' +
+                'review-queue.json revalidates every 60s · disputes will surface here when an engine disagrees' +
+              '</div>' +
+            '</div>';
+          shell.parentNode.insertBefore(empty, shell);
+        }
+      }
+      return;
+    }
+    // Re-show on transition back to disputed pages.
+    if (shell) shell.style.display = '';
+    const evp = document.getElementById('rv-empty');
+    if (evp) evp.remove();
+
+    if (!q.length) return;
+    const n = q.length;
+    const plural = n === 1 ? 'page' : 'pages';
+
+    if (title){
+      const rc = D.reviewCount;
+      title.innerHTML = rc + ' ' + (rc === 1 ? 'page' : 'pages')
+        + ' where the engines disagree. <em>Pick the truth.</em>';
+    }
+    const label = document.getElementById('rv-queue-label');
+    if (label) label.textContent = 'QUEUE · WORST AGREEMENT';
+    const count = document.getElementById('rv-queue-count');
+    if (count) count.textContent = n;
+
+    // Queue rows — click handler routes to renderDetail(item) instead of
+    // hard-navigating to dossier. The anchor click is preventDefault'd in JS;
+    // ⌘/Ctrl-click still opens dossier in a new tab via the href.
+    const list = document.getElementById('rv-queue-list');
+    if (list){
+      list.innerHTML = q.slice(0, 12).map((item, i) => {
+        const eid = item.eid || '';
+        const pg = item.page != null ? 'p ' + item.page : '';
+        const agency = item.agency || '';
+        const flag = (item.flag || '').toString().toUpperCase();
+        const reason = (item.reason || '').toString();
+        const meta = [reason, 'priority ' + (item.priority ?? '—')].filter(Boolean).join(' · ');
+        const href = MC.url && MC.url.dossier ? MC.url.dossier(eid) : '#';
+        return '<a class="rv-row-link" href="' + esc(href) + '" data-idx="' + i + '">'
+          + '<div class="rv-row' + (i === 0 ? ' active' : '') + '">'
+          + '<div class="top"><span>' + esc(agency) + '</span><span>·</span>'
+          + '<span class="agree high">' + esc(flag || '—') + '</span></div>'
+          + '<div class="eid">' + esc(eid) + (pg ? ' · ' + esc(pg) : '') + '</div>'
+          + '<div class="meta">' + esc(meta) + '</div>'
+          + '</div></a>';
+      }).join('');
+      list.querySelectorAll('a.rv-row-link').forEach(function(a){
+        a.addEventListener('click', function(e){
+          if (e.metaKey || e.ctrlKey || e.shiftKey) return; // let modifier-click open dossier
+          e.preventDefault();
+          list.querySelectorAll('.rv-row').forEach(function(x){ x.classList.remove('active'); });
+          a.querySelector('.rv-row').classList.add('active');
+          renderDetail(q[parseInt(a.dataset.idx, 10)]);
+        });
+      });
+    }
+
+    // Initial detail = top of queue
+    renderDetail(q[0]);
+  }
+
+  if (window.MC && typeof window.MC.ready === 'function'){
+    window.MC.ready().then(() => renderReview(window.MC));
+    window.MC.onUpdate(() => renderReview(window.MC));
+  }
+
+  // Populate the GRADED EXAMPLES picker from dossier-extracts.json once it lands.
+  (async function(){
+    const ex = await loadExtracts();
+    if (!ex) return;
+    const sel = document.getElementById('rv-graded');
+    if (!sel) return;
+    const opts = Object.keys(ex).map(function(eid){
+      const rec = MC.byEid ? MC.byEid(eid) : null;
+      const label = rec && rec.title ? (eid + ' · ' + rec.title) : eid;
+      return { eid, label };
+    }).sort(function(a, b){ return a.label.localeCompare(b.label); });
+    opts.forEach(function(o){
+      const opt = document.createElement('option');
+      opt.value = o.eid;
+      opt.textContent = o.label.length > 60 ? o.label.slice(0, 60) + '…' : o.label;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function(){
+      const eid = sel.value;
+      if (!eid) return;
+      // Pick the first graded page for this event.
+      const firstPg = Object.keys(ex[eid].excerptsByPage || {})[0];
+      renderDetail({ eid, page: firstPg ? parseInt(firstPg, 10) : 1 });
+    });
+  })();
+
+  // Populate the MULTI-SOURCE picker. Each option is "<eid> p<N> · agree X" —
+  // sorted by agreement ascending so the most-divergent pages float to the top.
+  (async function(){
+    const ms = await loadMulti();
+    if (!ms || !ms.pages) return;
+    const sel = document.getElementById('rv-multi');
+    if (!sel) return;
+    const items = [];
+    Object.keys(ms.pages).forEach(function(eid){
+      Object.keys(ms.pages[eid]).forEach(function(page){
+        const entry = ms.pages[eid][page];
+        const hasBoth = entry.gemini && entry.ocr;
+        const ag = typeof entry.agreement === 'number' ? entry.agreement : (hasBoth ? 1 : 2);
+        items.push({ eid, page: parseInt(page, 10), agreement: ag, hasBoth });
+      });
+    });
+    // Both-source pages first (sorted by agreement asc), then single-source.
+    items.sort(function(a, b){
+      if (a.hasBoth !== b.hasBoth) return a.hasBoth ? -1 : 1;
+      return a.agreement - b.agreement;
+    });
+    items.slice(0, 80).forEach(function(it){
+      const rec = MC.byEid ? MC.byEid(it.eid) : null;
+      const title = (rec && rec.title) || it.eid;
+      const tag = it.hasBoth ? ('agree ' + it.agreement.toFixed(2)) : 'vision only';
+      const opt = document.createElement('option');
+      opt.value = it.eid + '|' + it.page;
+      const label = it.eid + ' · p' + it.page + ' · ' + tag + ' — ' + title;
+      opt.textContent = label.length > 70 ? label.slice(0, 70) + '…' : label;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', function(){
+      const v = sel.value;
+      if (!v) return;
+      const [eid, page] = v.split('|');
+      renderDetail({ eid, page: parseInt(page, 10) });
+    });
+  })();
+</script>
+</body>
+</html>

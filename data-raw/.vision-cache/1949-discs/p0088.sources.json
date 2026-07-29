@@ -27,11 +27,11 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.435Z",
+    "computed_at": "2026-07-10T15:32:48.914Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
-    "agreement_score": 0.149,
+    "agreement_score": 0.159,
     "pairs": [
       {
         "a": "gpt-vision",
@@ -41,12 +41,12 @@
       {
         "a": "gpt-vision",
         "b": "merged",
-        "score": 0.149
+        "score": 0.159
       },
       {
         "a": "gemini",
         "b": "merged",
-        "score": 0.667
+        "score": 0.673
       }
     ],
     "confidence": "high",

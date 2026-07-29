@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "A photograph of various debris fragments, including a circular object, coils, an",
-  "description": "Image: A photograph of various debris fragments, including a circular object, coils, and a small box-like component.",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.297Z"
+  "description": "ENCLOSURE\nENCLOSURE\n62-83894 -123\n\"FLYING SAUCER\", ALLEGED SPECIMENS,\n\n\n\n233138\nCONFIDENTIAL\n76\n[illegible] OFFICIAL PHOTO\nWRIGHT FIELD\nOHIO\n[illegible] T-2 [illegible]\n[illegible] PHOTO [illegible]\nCONFIDENTIAL",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.622Z",
+  "contributor": "Rizzleroc"
 }

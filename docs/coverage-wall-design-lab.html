@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coverage Wall Design Lab</title>
+  <!-- Static design lab — open in browser, no build needed. Generated as part of the Coverage Wall implementation plan. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #020806;
+      color: #e4e4e4;
+    }
+    .display-font {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .mono-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .scanlines {
+      pointer-events: none;
+      background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+      mix-blend-mode: multiply;
+    }
+    .glow-text {
+      text-shadow: 0 0 1px #7CFFB2, 0.5px 0 0 rgba(255,140,66,0.5), -0.5px 0 0 rgba(130,182,255,0.5);
+    }
+    .grid-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      border: 1px solid rgba(124, 255, 178, 0.3);
+      background: rgba(124, 255, 178, 0.04);
+      font-size: 11px;
+      font-weight: 600;
+      color: #7cffb2;
+    }
+    .grid-cell.complete {
+      background: rgba(124, 255, 178, 0.15);
+      border-color: rgba(124, 255, 178, 0.6);
+      box-shadow: inset 0 0 8px rgba(124, 255, 178, 0.2);
+    }
+    .grid-cell.partial {
+      background: rgba(82, 182, 255, 0.08);
+      border-color: rgba(82, 182, 255, 0.4);
+      color: #52b6ff;
+    }
+    .grid-cell.gap {
+      background: rgba(255, 107, 157, 0.05);
+      border-color: rgba(255, 107, 157, 0.3);
+      color: #ff6b9d;
+    }
+    .panel-frame {
+      background: #0d0f0d;
+      border: 1px solid rgba(124, 255, 178, 0.2);
+      margin: 40px auto;
+      max-width: 1600px;
+      box-shadow: 0 0 20px rgba(124, 255, 178, 0.05);
+    }
+    .panel-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #52b6ff;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(124, 255, 178, 0.15);
+      background: rgba(0, 0, 0, 0.3);
+      text-transform: uppercase;
+    }
+    .hero-container {
+      background: linear-gradient(135deg, rgba(124, 255, 178, 0.05) 0%, rgba(82, 182, 255, 0.03) 100%);
+      padding: 80px 40px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #52b6ff;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      margin: 0 0 30px 0;
+      line-height: 1.2;
+      color: #e4e4e4;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: #a8a8a8;
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .stat-box {
+      text-align: center;
+      padding: 20px;
+    }
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: #7cffb2;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #7a7a7a;
+      letter-spacing: 1px;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 14px 40px;
+      margin-top: 30px;
+      background: transparent;
+      border: 1px solid #7cffb2;
+      color: #7cffb2;
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .cta-button:hover {
+      background: rgba(124, 255, 178, 0.1);
+      box-shadow: 0 0 20px rgba(124, 255, 178, 0.3);
+    }
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(11, 1fr);
+      gap: 8px;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(13, 15, 13, 1) 0%, rgba(20, 25, 20, 1) 100%);
+    }
+    .grid-header {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #52b6ff;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+    .status-line {
+      padding: 30px 40px;
+      background: rgba(124, 255, 178, 0.02);
+      border-top: 1px solid rgba(124, 255, 178, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      opacity: 0.8;
+    }
+    .status-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #a8a8a8;
+    }
+    .status-value {
+      color: #7cffb2;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines fixed inset-0 z-10"></div>
+  
+  <div class="relative z-0 pt-20 pb-20">
+    <!-- Panel 1: Hero -->
+    <div class="panel-frame">
+      <div class="panel-label">1. Hero on Desktop (1600px)</div>
+      <div class="hero-container">
+        <div class="hero-eyebrow">Media Coverage Intelligence Platform</div>
+        <h1 class="hero-title">Coverage Wall</h1>
+        <p class="hero-subtitle">
+          Comprehensive audit of UFO/UAP media coverage from Government Release 01. 
+          Track completeness, identify gaps, and explore the narrative landscape.
+        </p>
+        
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-value">121 / 162</div>
+            <div class="stat-label">CATALOGUED</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">1</div>
+            <div class="stat-label">COMPLETE</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">46%</div>
+            <div class="stat-label">GAP</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">199</div>
+            <div class="stat-label">ENTITIES</div>
+          </div>
+        </div>
+        
+        <button class="cta-button">Explore Coverage</button>
+      </div>
+    </div>
+
+    <!-- Panel 2: CoverageGrid Component -->
+    <div class="panel-frame">
+      <div class="panel-label">2. CoverageGrid component (in isolation)</div>
+      <div class="coverage-grid">
+        <!-- Row 1 -->
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        
+        <!-- Row 2 -->
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        
+        <!-- Row 3 -->
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        
+        <!-- Row 4 -->
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        
+        <!-- Row 5 -->
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        
+        <!-- Row 6 -->
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        
+        <!-- Row 7 -->
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        
+        <!-- Row 8 -->
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        
+        <!-- Row 9 -->
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        
+        <!-- Row 10 -->
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        
+        <!-- Row 11 -->
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+        <div class="grid-cell partial">◐</div>
+        <div class="grid-cell gap">✕</div>
+        <div class="grid-cell complete">✓</div>
+      </div>
+    </div>
+
+    <!-- Panel 3: CoverageStatusLine Component -->
+    <div class="panel-frame">
+      <div class="panel-label">3. CoverageStatusLine component (in isolation)</div>
+      <div class="status-line">
+        <div class="status-item">
+          <div class="status-indicator" style="background: #7cffb2;"></div>
+          <span class="status-text"><span class="status-value">121 / 162</span> catalogued</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator" style="background: #52b6ff;"></div>
+          <span class="status-text"><span class="status-value">1</span> complete</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator" style="background: #ff6b9d;"></div>
+          <span class="status-text"><span class="status-value">46%</span> gap</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator" style="background: #ffd93d;"></div>
+          <span class="status-text"><span class="status-value">199</span> entities</span>
+        </div>
+        <div class="status-item">
+          <div class="status-indicator" style="background: #b794f4;"></div>
+          <span class="status-text"><span class="status-value">67</span> dates</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

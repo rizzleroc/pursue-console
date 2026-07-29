@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Briefing — this week's mission update</title>
+  <meta name="description" content="What changed in the PURSUE corpus this build: new pages catalogued, cross-references resolved, events promoted, top mined entities.">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Briefing — this week's mission update">
+  <meta property="og:description" content="What changed in the PURSUE corpus this build: new pages, resolved cross-references, promoted events.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/briefing.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Briefing — this week's mission update">
+  <meta name="twitter:description" content="What changed in the PURSUE corpus this build.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .br-hero { padding: 64px 56px 30px; position: relative; z-index: 4; }
+    .br-eye { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 22px; display:flex; align-items:center; gap:12px; }
+    .br-eye .dot { display:inline-block; width:8px; height:8px; background: var(--amber); transform: rotate(45deg); box-shadow: 0 0 10px var(--amber-glow); }
+    .br-hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 72px; font-weight: 700; line-height: 1.0; color: var(--text); letter-spacing: -0.035em; margin: 0 0 18px; max-width: 1000px; }
+    .br-hero h1 em { font-style: normal; background: linear-gradient(95deg, var(--amber-bright), var(--amber)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .br-hero .sub { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-3); letter-spacing: 0.06em; }
+    .br-hero .sub .v { color: var(--amber); }
+
+    .br-grid { padding: 24px 56px 36px; display: grid; grid-template-columns: minmax(0,1.4fr) 1fr; gap: 26px; position: relative; z-index: 3; }
+    .br-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .br-card h2 { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.28em; color: var(--text-2); text-transform: uppercase; margin: 0 0 18px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); display:flex; align-items:baseline; justify-content:space-between; }
+    .br-card h2 .r { font-size:10px; color: var(--text-4); letter-spacing:0.16em; font-weight:500; }
+
+    .br-stat { display: grid; grid-template-columns: 1fr auto; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.10em; color: var(--text-2); }
+    .br-stat:last-child { border-bottom: none; }
+    .br-stat .lab { text-transform: uppercase; color: var(--text-3); letter-spacing:0.18em; }
+    .br-stat .v { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .br-stat .v.amber { color: var(--amber); }
+    .br-stat .v.rose  { color: var(--rose); }
+    .br-stat .v.cyan  { color: var(--cyan); }
+    .br-stat .v.emerald { color: var(--emerald,#6EE7B7); }
+    .br-stat .v.delta { font-size: 14px; color: var(--text-3); margin-left: 8px; font-weight: 500; }
+
+    .br-list { display:flex; flex-direction:column; gap:0; }
+    .br-list .row { display:grid; grid-template-columns: 1fr auto; gap:14px; padding:10px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-2); }
+    .br-list .row:last-child { border-bottom: none; }
+    .br-list .row a { color: inherit; text-decoration: none; }
+    .br-list .row a:hover { color: var(--amber); }
+    .br-list .row .v { color: var(--amber); font-weight: 600; }
+
+    .br-cta-row { padding: 12px 56px 64px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .br-cta-row a, .br-cta-row button { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; padding: 12px 18px; border: 1px solid var(--border-strong); color: var(--text-2); background: var(--surface); text-decoration: none; cursor: pointer; }
+    .br-cta-row a:hover, .br-cta-row button:hover { color: var(--amber); border-color: var(--amber); }
+    .br-cta-row .primary { color: var(--void); background: linear-gradient(180deg, var(--amber-bright), var(--gold)); border-color: var(--amber); box-shadow: 0 14px 32px -10px rgba(242,166,35,0.55); }
+  </style>
+</head>
+<body data-view="briefing">
+
+<main>
+  <section class="br-hero mc-rise" data-delay="1">
+    <div class="br-eye"><span class="dot"></span>MISSION BRIEFING · <span id="br-week-stamp">WEEK PENDING</span></div>
+    <h1 class="mc-scan">Where the corpus moved <em>this week.</em></h1>
+    <p class="sub">CORPUS BUILT <span id="br-built-stamp" class="v">recently</span> · <span id="br-events-now" class="v">220</span> events · <span id="br-pages-now" class="v">3,530</span> pages · auto-revalidates every 60s</p>
+  </section>
+
+  <section class="br-grid mc-rise" data-delay="2">
+    <article class="br-card">
+      <h2>WHAT CHANGED <span class="r">since your last visit</span></h2>
+      <div class="br-stat"><span class="lab">+ NEW EVENTS</span><span class="v amber" id="br-events-delta">+0</span></div>
+      <div class="br-stat"><span class="lab">+ NEW PAGES TRANSCRIBED</span><span class="v amber" id="br-pages-delta">+0</span></div>
+      <div class="br-stat"><span class="lab">+ NEW CROSS-REFERENCES</span><span class="v cyan" id="br-xref-delta">+0</span></div>
+      <div class="br-stat"><span class="lab">+ NEW ENTITIES INDEXED</span><span class="v emerald" id="br-ent-delta">+0</span></div>
+      <div class="br-stat"><span class="lab">EVENTS REMAINING (UNCATALOGUED)</span><span class="v rose" id="br-remaining">0</span></div>
+    </article>
+
+    <article class="br-card">
+      <h2>SHARE THIS WEEK <span class="r">copy + paste</span></h2>
+      <p style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:var(--text-2);margin:0 0 16px">A pre-formatted text block, ready for X / Mastodon / your group chat. Updates with every build.</p>
+      <pre id="br-tweet" style="background:#0b0f16;border:1px solid var(--border-strong);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:var(--text);white-space:pre-wrap;margin:0 0 14px"></pre>
+      <button class="br-tweet-copy" id="br-tweet-copy" type="button" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.18em;padding:10px 16px;border:1px solid var(--amber);background:rgba(242,166,35,0.10);color:var(--amber);cursor:pointer">⎘ COPY POST</button>
+    </article>
+  </section>
+
+  <section class="br-grid mc-rise" data-delay="3">
+    <article class="br-card">
+      <h2>TOP MINED ENTITIES THIS BUILD <span class="r">patterns.json</span></h2>
+      <div class="br-list" id="br-top-entities"></div>
+    </article>
+    <article class="br-card">
+      <h2>HIGHEST-PRIORITY UNCATALOGUED <span class="r">work-available.json</span></h2>
+      <div class="br-list" id="br-top-work"></div>
+    </article>
+  </section>
+
+  <section class="br-cta-row">
+    <a class="primary" href="help.html">＋ HELP CATALOGUE THE NEXT EVENT</a>
+    <a href="search.html">⌕ SEARCH 3,530 PAGES</a>
+    <a href="evidence.html?eid=DOE-UAP-D001">▣ EVIDENCE CHAINS</a>
+    <a href="index.html">← BACK TO MISSION CONTROL</a>
+  </section>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script src="share.js" defer></script>
+
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  function fmt(n){ return (typeof n === 'number' ? n : 0).toLocaleString(); }
+
+  function isoWeek(d){
+    var date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+    var dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    var wk = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    return { y: date.getUTCFullYear(), w: wk };
+  }
+
+  function render(){
+    var D = (MC && MC.derive) || {};
+    var iso = isoWeek(new Date());
+    document.getElementById('br-week-stamp').textContent =
+      iso.y + ' · W' + String(iso.w).padStart(2, '0');
+    var built = MC.lastBuildAt ? MC.lastBuildAt() : '';
+    document.getElementById('br-built-stamp').textContent = built
+      ? (MC.humanAgo ? MC.humanAgo(built) : new Date(built).toISOString().slice(0, 16) + 'Z')
+      : 'recently';
+    document.getElementById('br-events-now').textContent = fmt(D.eventCount);
+    document.getElementById('br-pages-now').textContent  = fmt(D.pagesIndexed);
+
+    // sessionStorage delta — what's new since your last visit.
+    var prevKey = 'mc.briefing.lastSeen.v1';
+    var prev = (function(){ try { return JSON.parse(sessionStorage.getItem(prevKey) || 'null'); } catch (e) { return null; } })();
+    var cur = {
+      events: D.eventCount || 0,
+      pages:  D.pagesIndexed || 0,
+      xref:   D.crossRefCount || 0,
+      ent:    (D.entityCount != null ? D.entityCount : (D.entityCatalogueCount || 0)),
+    };
+    var dEv = prev ? cur.events - prev.events : 0;
+    var dPg = prev ? cur.pages  - prev.pages  : 0;
+    var dXr = prev ? cur.xref   - prev.xref   : 0;
+    var dEn = prev ? cur.ent    - prev.ent    : 0;
+    document.getElementById('br-events-delta').textContent = (dEv >= 0 ? '+' : '') + dEv;
+    document.getElementById('br-pages-delta').textContent  = (dPg >= 0 ? '+' : '') + dPg;
+    document.getElementById('br-xref-delta').textContent   = (dXr >= 0 ? '+' : '') + dXr;
+    document.getElementById('br-ent-delta').textContent    = (dEn >= 0 ? '+' : '') + dEn;
+    try { sessionStorage.setItem(prevKey, JSON.stringify(cur)); } catch (e) {}
+
+    // Remaining work — events without imagePath/url, count of queue.
+    var queue = D.queue || [];
+    document.getElementById('br-remaining').textContent = queue.length;
+
+    // Top mined entities — by docCount (proxy for how many events mention them).
+    var pk = (MC.data && MC.data.patterns && MC.data.patterns.byKind) || {};
+    var topEnts = (pk.entity || []).slice().sort(function(a,b){ return (b.docCount||0) - (a.docCount||0); }).slice(0, 6);
+    document.getElementById('br-top-entities').innerHTML = topEnts.map(function(t){
+      return '<div class="row"><a href="search.html?q=' + encodeURIComponent(t.term) + '">' + t.term + '</a><span class="v">' + (t.docCount||0) + ' docs</span></div>';
+    }).join('') || '<div style="color:var(--text-4);font-family:\'JetBrains Mono\',monospace;font-size:11px;padding:10px 0">patterns.json not loaded yet</div>';
+
+    // Highest-priority uncatalogued — first 6 queue items.
+    document.getElementById('br-top-work').innerHTML = queue.slice(0, 6).map(function(it){
+      var rec = MC.byEid && MC.byEid(it.eid);
+      var title = (rec && rec.title) || it.eid;
+      return '<div class="row"><a href="dossier.html?eid=' + encodeURIComponent(it.eid) + '">' + title + '</a><span class="v">p' + (it.page||1) + '</span></div>';
+    }).join('') || '<div style="color:var(--text-4);font-family:\'JetBrains Mono\',monospace;font-size:11px;padding:10px 0">queue empty</div>';
+
+    // The pre-formatted post.
+    var tweetUrl = window.location.origin + window.location.pathname.replace(/briefing\.html$/, '');
+    var post =
+      '🗂️ PURSUE corpus · week ' + iso.y + '-W' + String(iso.w).padStart(2, '0') + '\n\n' +
+      '• ' + fmt(cur.events) + ' events catalogued (' + (dEv >= 0 ? '+' : '') + dEv + ' since last visit)\n' +
+      '• ' + fmt(cur.pages)  + ' pages transcribed (' + (dPg >= 0 ? '+' : '') + dPg + ' new)\n' +
+      '• ' + fmt(cur.xref)   + ' cross-references (' + (dXr >= 0 ? '+' : '') + dXr + ')\n' +
+      '• ' + fmt(cur.ent)    + ' entities curated (' + (dEn >= 0 ? '+' : '') + dEn + ')\n\n' +
+      'Open civic-tech UAP archive. Static site, 0 backend.\n' +
+      tweetUrl;
+    document.getElementById('br-tweet').textContent = post;
+
+    var copyBtn = document.getElementById('br-tweet-copy');
+    copyBtn.onclick = function(){ MC.copyToClipboard(post, copyBtn); };
+
+    if (MC.setShareMeta){
+      MC.setShareMeta({
+        title: 'PURSUE corpus · week ' + iso.y + '-W' + String(iso.w).padStart(2, '0'),
+        description: fmt(cur.events) + ' events · ' + fmt(cur.pages) + ' pages · ' + fmt(cur.xref) + ' cross-refs · ' + fmt(cur.ent) + ' entities.',
+        url: window.location.href,
+      });
+    }
+  }
+
+  MC.ready().then(render);
+  MC.onUpdate(render);
+})();
+</script>
+</body>
+</html>

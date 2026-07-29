@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Coverage</title>
+  <meta name="description" content="220 declassified UAP events as a clickable cell grid. Complete · partial · empty. Click any cell to open the dossier.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Coverage — every UAP event by status">
+  <meta property="og:description" content="220 declassified UAP events as a clickable cell grid. Complete · partial · empty. Click any cell to open the dossier.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/coverage.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Coverage — every UAP event by status">
+  <meta name="twitter:description" content="220 declassified UAP events as a clickable cell grid. Complete · partial · empty. Click any cell to open the dossier.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .body2 { padding: 0 56px 64px; display: grid; grid-template-columns: minmax(0,1fr) 380px; gap: 24px; position: relative; z-index: 3; }
+    .cov-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .cov-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 6px; max-width: 760px; margin: 22px auto; }
+    .cov-cell { aspect-ratio: 1; background: #0A1018; border: 1px solid #182232; opacity: 0; animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards; transition: transform .15s; cursor: pointer; display: block; text-decoration: none; color: inherit; position: relative; }
+    .cov-cell:hover { transform: scale(1.35); border-color: var(--amber); z-index: 5; }
+    .cov-cell:hover::after {
+      content: attr(data-title);
+      position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      background: rgba(6,11,18,0.95); border: 1px solid var(--border-strong);
+      color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 0.06em; padding: 6px 9px; white-space: nowrap; z-index: 10;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.55);
+    }
+    a.cov-cell { display: block; text-decoration: none; color: inherit; }
+    .cov-mode-rail { display: flex; gap: 8px; align-items: center; }
+    .cov-mode {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--text-3); background: var(--surface-2); border: 1px solid var(--border);
+      padding: 5px 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer; user-select: none; transition: color .15s, background .15s, border-color .15s;
+    }
+    .cov-mode:hover { color: var(--text); border-color: var(--border-strong); }
+    .cov-mode.active { color: var(--amber); background: rgba(242,166,35,0.10); border-color: rgba(242,166,35,0.55); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
+    .queue-row.linked { text-decoration: none; color: inherit; cursor: pointer; transition: background .15s; }
+    .queue-row.linked:hover { background: rgba(242,166,35,0.04); }
+    .queue-row .right-actions { display: flex; align-items: center; gap: 10px; }
+    .claim-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); border: 1px solid rgba(242,166,35,0.45); padding: 4px 8px; text-decoration: none; transition: background .15s, border-color .15s; font-weight: 600; }
+    .claim-pill:hover { background: rgba(242,166,35,0.12); border-color: var(--amber); }
+    @keyframes cov-in { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: scale(1); } }
+    .cov-cell.partial { background: rgba(242,166,35,0.18); border-color: rgba(242,166,35,0.55); }
+    .cov-cell.complete { background: rgba(74,222,128,0.25); border-color: var(--emerald); box-shadow: 0 0 14px rgba(74,222,128,0.55); animation: cov-in 0.5s cubic-bezier(.2,.7,.2,1) forwards, cp 2.6s ease-in-out 1.5s infinite; }
+    /* `.empty` cells are no-data — distinct from "no class assigned" so
+       the headline counts (coverageNoData=149) match what's painted. */
+    .cov-cell.empty { background: rgba(224,73,104,0.05); border-color: rgba(224,73,104,0.20); border-style: dashed; }
+    @keyframes cp { 0%,100%{box-shadow:0 0 14px rgba(74,222,128,0.55)} 50%{box-shadow:0 0 26px rgba(74,222,128,0.9)} }
+    .cov-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--hairline); }
+    .cov-summary .s { padding: 6px 18px; border-left: 1px solid var(--hairline); }
+    .cov-summary .s:first-child { border-left: none; padding-left: 0; }
+    .cov-summary .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; }
+    .cov-summary .v { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; color: var(--text); margin: 8px 0 2px; letter-spacing: -0.025em; }
+    .cov-summary .v.emerald { color: var(--emerald); text-shadow: 0 0 14px rgba(74,222,128,0.4); }
+    .cov-summary .v.amber { color: var(--amber); text-shadow: 0 0 14px var(--amber-glow); }
+    .cov-summary .v.rose { color: var(--rose); }
+    .cov-summary .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; }
+    .queue-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; align-items: center; }
+    .queue-row:last-child { border-bottom: none; }
+    .queue-row .left { display: flex; flex-direction: column; gap: 3px; }
+    .queue-row .eid { font-size: 12px; color: var(--text); font-weight: 500; }
+    .queue-row .meta { font-size: 10px; color: var(--text-4); letter-spacing: 0.10em; }
+    .queue-row .meta .anchor { color: var(--rose); font-weight: 600; }
+    .queue-row .meta .high { color: var(--amber); font-weight: 600; }
+    .queue-row .meta .med { color: var(--text-2); font-weight: 600; }
+    .queue-row .pri { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: var(--text); }
+    .queue-row .pri.amber { color: var(--amber); }
+    .legend-rail { display: flex; gap: 22px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; }
+    .legend-rail .sw { width: 9px; height: 9px; display: inline-block; margin-right: 7px; vertical-align: middle; transform: translateY(-1px); }
+    .legend-rail .lbl { color: var(--text-3); }
+    .legend-rail .v { color: var(--text); margin-left: 5px; font-weight: 700; }
+  </style>
+</head>
+<body data-view="coverage">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 02 — corpus coverage</div>
+    <h1><span data-mc="coverageTotal">121</span> events. <em><span data-mc="coverageComplete">1</span> complete.</em> The rest is the work.</h1>
+    <p class="sub">Each cell is one catalogued event coloured by <span class="mono" style="color:var(--amber)">coverage.json</span> status. Hover for the eid; click to open the dossier. Priority queue on the right ranks the highest-impact pages awaiting a transcriber.</p>
+  </section>
+
+  <section class="body2">
+    <div class="cov-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px">
+        <span class="mono" style="font-size:11px;letter-spacing:0.26em;color:var(--text-2);font-weight:700">▣ &nbsp; COVERAGE MATRIX · RELEASE 01</span>
+        <div class="cov-mode-rail" id="cov-mode-rail" role="tablist" aria-label="Sort coverage cells">
+          <span class="cov-mode active" data-mode="status" role="tab" tabindex="0">SORT BY STATUS</span>
+          <span class="cov-mode" data-mode="priority" role="tab" tabindex="0">BY PRIORITY</span>
+          <span class="cov-mode" data-mode="region" role="tab" tabindex="0">BY REGION</span>
+        </div>
+      </div>
+      <div class="legend-rail" style="margin-bottom:10px">
+        <span><span class="sw" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v" data-mc="coverageComplete">1</span></span>
+        <span><span class="sw" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v" data-mc="coveragePartial">63</span></span>
+        <span><span class="sw" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v" data-mc="coverageNoData">57</span></span>
+      </div>
+      <div class="cov-grid" id="cg"></div>
+      <div class="cov-summary">
+        <div class="s"><div class="k">Total catalogued</div><div class="v" data-count="121" data-mc-count="coverageTotal">0</div><div class="sub">of 162 R01 inventory</div></div>
+        <div class="s"><div class="k">Complete</div><div class="v emerald" data-count="1" data-mc-count="coverageComplete">0</div><div class="sub">all pages OCR'd · 2.3%</div></div>
+        <div class="s"><div class="k">Partial</div><div class="v amber" data-count="63" data-mc-count="coveragePartial">0</div><div class="sub">gap pages remain · 53%</div></div>
+        <div class="s"><div class="k">No data</div><div class="v rose" data-count="57" data-mc-count="coverageNoData">0</div><div class="sub">no body text · 45%</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Priority queue</span><span class="right">next-missing.json</span></div>
+      <p style="font-size:11px;color:var(--text-3);line-height:1.6;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em;margin:0 0 16px">Scored: flag-weight × (1 + gapPages/10) × (1 + chars/10000). Top of this list is the deep-link target for the LIVE-view CTA "Open the next missing page →".</p>
+      <div id="queue-list">
+      <div class="queue-row"><div class="left"><span class="eid">indopacom-2024</span><span class="meta"><span class="anchor">ANCHOR</span> · 24pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">pursue-release-01</span><span class="meta"><span class="anchor">ANCHOR</span> · 12pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">pursue-release-02</span><span class="meta"><span class="anchor">ANCHOR</span> · 8pp · 0%</span></div><span class="pri amber">4.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">army-2026</span><span class="meta"><span class="high">HIGH</span> · 14pp · 0%</span></div><span class="pri">3.00</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d62</span><span class="meta"><span class="med">MED</span> · 9pp · 0%</span></div><span class="pri">2.20</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d65</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d63</span><span class="meta"><span class="med">MED</span> · 8pp · 0%</span></div><span class="pri">2.16</span></div>
+      <div class="queue-row"><div class="left"><span class="eid">dow-uap-d54</span><span class="meta"><span class="med">MED</span> · 7pp · 23%</span></div><span class="pri">2.14</span></div>
+      </div>
+      <a class="primary-cta" id="queue-head-cta" href="review.html" style="margin-top:24px;width:100%;justify-content:center">Open queue head <span>→</span></a>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+
+<script src="chrome.js" defer></script>
+<script>
+  (function () {
+    const grid = document.getElementById('cg');
+    const PRIORITY_RANK = { critical: 0, high: 1, medium: 2, low: 3 };
+    let currentMode = 'status';
+    let cellData = []; // [{ eid, status, title, agency, region, priority, date, complete, total }]
+
+    // Build a unified cell descriptor list. Drives every render + every sort.
+    // Source-of-truth ordering:
+    //   - MC.derive.coverageCells (status string per coverage.byEvent row)
+    //   - MC.data.coverage.byEvent (richer metadata: complete/total/eventId)
+    //   - MC.derive.events       (220 events with priority/region/date/agency)
+    //
+    // Strategy: produce one cell per event in MC.derive.events (220 if loaded),
+    // joining the matching coverage row when present. Events with no coverage
+    // row default to status='empty'. If events aren't loaded yet (or there
+    // are fewer events than coverage rows) we fall back to a coverage-only
+    // build so the page still renders ~128 cells.
+    function buildCellData() {
+      const D = (window.MC && window.MC.derive) || {};
+      const byEvent = (window.MC && typeof window.MC.get === 'function')
+        ? window.MC.get('coverage.byEvent', []) : [];
+      const events = Array.isArray(D.events) ? D.events : [];
+      const cells = Array.isArray(D.coverageCells) ? D.coverageCells : [];
+
+      const covByEid = {};
+      byEvent.forEach((row, i) => {
+        const eid = row && (row.eventId || row.eid);
+        if (!eid) return;
+        const status = cells[i] || (row.status === 'complete' ? 'complete'
+          : row.status === 'no-data' ? 'empty' : 'partial');
+        covByEid[eid] = {
+          status,
+          complete: row.bothMachineSources || row.humanPages || 0,
+          total: row.totalPages || 0,
+          rawStatus: row.status,
+        };
+      });
+
+      const out = [];
+      const seen = {};
+
+      if (events.length) {
+        events.forEach((ev) => {
+          const eid = ev.id || ev.eid;
+          if (!eid) return;
+          const cov = covByEid[eid];
+          const status = (cov && cov.status) || 'empty';
+          const agency = ev.agency || '—';
+          const date = ev.date || '—';
+          out.push({
+            eid,
+            status,
+            agency,
+            date,
+            region: ev.region || 'Unknown',
+            priority: ev.priority || null,
+            title: agency + ' · ' + date,
+            displayTitle: ev.title || eid,
+            complete: cov ? cov.complete : 0,
+            total: cov ? cov.total : 0,
+          });
+          seen[eid] = true;
+        });
+      }
+
+      // Coverage rows that aren't in events.json — keep them so we never
+      // drop cells when joining (e.g. interim corpus rebuild).
+      byEvent.forEach((row, i) => {
+        const eid = row && (row.eventId || row.eid);
+        if (!eid || seen[eid]) return;
+        const status = cells[i] || (row.status === 'complete' ? 'complete'
+          : row.status === 'no-data' ? 'empty' : 'partial');
+        out.push({
+          eid,
+          status,
+          agency: row.agency || '—',
+          date: '—',
+          region: 'Unknown',
+          priority: null,
+          title: (row.agency || '—') + ' · —',
+          displayTitle: row.title || eid,
+          complete: row.bothMachineSources || row.humanPages || 0,
+          total: row.totalPages || 0,
+        });
+      });
+
+      return out;
+    }
+
+    const STATUS_RANK = { complete: 0, partial: 1, empty: 2 };
+    function sortCells(data, mode) {
+      const cp = data.slice();
+      if (mode === 'priority') {
+        // critical first, then high/medium/low, then unprioritised.
+        // Tie-break on coverage status (complete > partial > empty) so
+        // critical-and-complete bubbles up.
+        cp.sort((a, b) => {
+          const pa = a.priority ? (PRIORITY_RANK[a.priority] ?? 4) : 5;
+          const pb = b.priority ? (PRIORITY_RANK[b.priority] ?? 4) : 5;
+          if (pa !== pb) return pa - pb;
+          const sa = STATUS_RANK[a.status] ?? 9;
+          const sb = STATUS_RANK[b.status] ?? 9;
+          if (sa !== sb) return sa - sb;
+          return a.eid.localeCompare(b.eid);
+        });
+      } else if (mode === 'region') {
+        cp.sort((a, b) => {
+          const ra = (a.region || 'Unknown').toLowerCase();
+          const rb = (b.region || 'Unknown').toLowerCase();
+          if (ra !== rb) return ra < rb ? -1 : 1;
+          return a.eid.localeCompare(b.eid);
+        });
+      } else {
+        // status (default): complete → partial → empty, eid alpha within group.
+        cp.sort((a, b) => {
+          const sa = STATUS_RANK[a.status] ?? 9;
+          const sb = STATUS_RANK[b.status] ?? 9;
+          if (sa !== sb) return sa - sb;
+          return a.eid.localeCompare(b.eid);
+        });
+      }
+      return cp;
+    }
+
+    function statusClass(status) {
+      return status === 'complete' ? ' complete'
+        : status === 'partial' ? ' partial'
+        : status === 'empty' || status === 'no-data' ? ' empty'
+        : '';
+    }
+
+    function renderGrid(data) {
+      grid.innerHTML = '';
+      const hasUrl = window.MC && window.MC.url && typeof window.MC.url.dossier === 'function';
+      data.forEach((c, i) => {
+        let cell;
+        if (c.eid && hasUrl) {
+          cell = document.createElement('a');
+          cell.href = window.MC.url.dossier(c.eid);
+        } else {
+          cell = document.createElement('div');
+        }
+        cell.className = 'cov-cell' + statusClass(c.status);
+        cell.style.animationDelay = (160 + i * 3) + 'ms';
+        if (c.eid) cell.dataset.eid = c.eid;
+        cell.dataset.status = c.status;
+        cell.dataset.region = c.region || '';
+        cell.dataset.priority = c.priority || '';
+        // title= attribute (native tooltip) holds the agency · date pair
+        // requested by the spec; data-title (CSS ::after) carries the
+        // richer hover label with the event title for the floating chip.
+        cell.title = c.title;
+        cell.setAttribute('data-title', c.displayTitle + ' — ' + c.title);
+        cell.setAttribute('aria-label', c.displayTitle + ' (' + c.status + ')');
+        grid.appendChild(cell);
+      });
+      updateLegend(data);
+    }
+
+    function updateLegend(data) {
+      let complete = 0, partial = 0, empty = 0;
+      data.forEach((c) => {
+        if (c.status === 'complete') complete++;
+        else if (c.status === 'partial') partial++;
+        else empty++;
+      });
+      const total = data.length;
+      // Override [data-mc] legend nodes to reflect cell counts.
+      document.querySelectorAll('[data-mc="coverageComplete"]').forEach((el) => { el.textContent = complete; });
+      document.querySelectorAll('[data-mc="coveragePartial"]').forEach((el) => { el.textContent = partial; });
+      document.querySelectorAll('[data-mc="coverageNoData"]').forEach((el) => { el.textContent = empty; });
+      document.querySelectorAll('[data-mc="coverageTotal"]').forEach((el) => { el.textContent = total; });
+      // Summary cards (count-up via chrome.js' data-count/data-mc-count). Set
+      // both the static fallback (data-count) AND the rendered text so they
+      // line up immediately — and clear the _mcAnimated flag so subsequent
+      // MC revalidations re-snap to the new numbers.
+      const setCount = (selector, value) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          el.dataset.count = String(value);
+          el.textContent = value.toLocaleString();
+          el._mcAnimated = true; // skip future easing animations
+        });
+      };
+      const cardTargets = [
+        ['.cov-summary [data-mc-count="coverageTotal"]', total],
+        ['.cov-summary [data-mc-count="coverageComplete"]', complete],
+        ['.cov-summary [data-mc-count="coveragePartial"]', partial],
+        ['.cov-summary [data-mc-count="coverageNoData"]', empty],
+      ];
+      cardTargets.forEach(([sel, v]) => setCount(sel, v));
+      // chrome.js' count-up may have a still-running step() closure that
+      // overwrites text after we settle. Re-stamp once its 1.5s easing has
+      // finished so the final numbers reflect *our* legend, not the stale
+      // MC.derive snapshot the animation was targeting.
+      clearTimeout(updateLegend._t);
+      updateLegend._t = setTimeout(() => {
+        cardTargets.forEach(([sel, v]) => {
+          document.querySelectorAll(sel).forEach((el) => { el.textContent = v.toLocaleString(); });
+        });
+      }, 1700);
+      // Summary card percentages — keep them in lockstep with the legend.
+      const pct = (n) => total ? Math.round((n / total) * 1000) / 10 + '%' : '0%';
+      const set = (sel, txt) => { const el = document.querySelector(sel); if (el) el.textContent = txt; };
+      set('.cov-summary .s:nth-child(1) .sub', 'of ' + total + ' events');
+      set('.cov-summary .s:nth-child(2) .sub', "all pages OCR'd · " + pct(complete));
+      set('.cov-summary .s:nth-child(3) .sub', 'gap pages remain · ' + pct(partial));
+      set('.cov-summary .s:nth-child(4) .sub', 'no body text · ' + pct(empty));
+    }
+
+    function rerender() {
+      renderGrid(sortCells(cellData, currentMode));
+    }
+
+    // Toggle wiring — pure DOM, no framework. Re-renders the grid on change.
+    function wireModeToggle() {
+      const rail = document.getElementById('cov-mode-rail');
+      if (!rail || rail.dataset.wired === '1') return;
+      rail.dataset.wired = '1';
+      rail.querySelectorAll('.cov-mode').forEach((btn) => {
+        const activate = () => {
+          const mode = btn.dataset.mode;
+          if (!mode || mode === currentMode) return;
+          currentMode = mode;
+          rail.querySelectorAll('.cov-mode').forEach((b) => b.classList.toggle('active', b === btn));
+          rerender();
+        };
+        btn.addEventListener('click', activate);
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        });
+      });
+    }
+
+    // Baked-in fallback: deterministic shuffle of the static 1/63/57 split.
+    function randomFill() {
+      const cls = []; cls.push('complete'); for (let i=0;i<63;i++) cls.push('partial'); for (let i=0;i<57;i++) cls.push('');
+      let s = 17; const rng = () => (s = (s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+      for (let i = cls.length-1; i>0; i--) { const j = Math.floor(rng()*(i+1)); [cls[i],cls[j]]=[cls[j],cls[i]]; }
+      const ci = cls.indexOf('complete'); cls.splice(ci,1); cls.splice(28,0,'complete');
+      cellData = cls.map((c, i) => ({
+        eid: '',
+        status: c === 'complete' ? 'complete' : c === 'partial' ? 'partial' : 'empty',
+        agency: '—', date: '—', region: 'Unknown', priority: null,
+        title: '—', displayTitle: 'cell ' + (i + 1),
+        complete: 0, total: 0,
+      }));
+      rerender();
+    }
+
+    // Priority queue → render from MC.derive.queueTop8.
+    const FLAG_CLASS = { anchor: 'anchor', high: 'high', med: 'med', medium: 'med', low: 'med' };
+    function renderQueue(rows) {
+      const list = document.getElementById('queue-list');
+      if (!list || !Array.isArray(rows) || !rows.length) return;
+      list.innerHTML = '';
+      rows.forEach((q) => {
+        const flag = String(q.flag || '').toLowerCase();
+        const flagCls = FLAG_CLASS[flag] || 'med';
+        const pri = (typeof q.priority === 'number' ? q.priority : parseFloat(q.priority) || 0);
+        const hasUrl = window.MC && window.MC.url;
+
+        const row = document.createElement(q.eid && hasUrl ? 'a' : 'div');
+        row.className = 'queue-row' + (q.eid && hasUrl ? ' linked' : '');
+        if (q.eid && hasUrl) {
+          row.href = 'dossier.html?eid=' + encodeURIComponent(q.eid);
+        }
+
+        const left = document.createElement('div');
+        left.className = 'left';
+        const eid = document.createElement('span');
+        eid.className = 'eid';
+        eid.textContent = q.eid || '—';
+        const meta = document.createElement('span');
+        meta.className = 'meta';
+        const fl = document.createElement('span');
+        fl.className = flagCls;
+        fl.textContent = (q.flag || '').toUpperCase();
+        meta.appendChild(fl);
+        meta.appendChild(document.createTextNode(' · ' + (q.page != null ? q.page : 1) + 'pp · ' + (q.reason || '')));
+        left.appendChild(eid);
+        left.appendChild(meta);
+
+        const rightActions = document.createElement('span');
+        rightActions.className = 'right-actions';
+
+        const priEl = document.createElement('span');
+        priEl.className = 'pri' + (flag === 'anchor' ? ' amber' : '');
+        priEl.textContent = pri.toFixed(2);
+        rightActions.appendChild(priEl);
+
+        if (q.eid && hasUrl && typeof window.MC.url.claim === 'function') {
+          const claim = document.createElement('a');
+          claim.className = 'claim-pill';
+          claim.href = window.MC.url.claim(q.eid, q.page);
+          claim.target = '_blank';
+          claim.rel = 'noopener';
+          claim.textContent = 'CLAIM →';
+          claim.addEventListener('click', (e) => { e.stopPropagation(); });
+          rightActions.appendChild(claim);
+        }
+
+        row.appendChild(left);
+        row.appendChild(rightActions);
+        list.appendChild(row);
+      });
+    }
+
+    function renderFromMC() {
+      const D = window.MC && window.MC.derive;
+      if (!D) return false;
+      const next = buildCellData();
+      if (next.length) {
+        cellData = next;
+        rerender();
+      }
+      renderQueue(D.queueTop8);
+      // Update bottom CTA → deep-link into queue head dossier.
+      const cta = document.getElementById('queue-head-cta');
+      if (cta) {
+        const queue = Array.isArray(D.queue) ? D.queue : (Array.isArray(D.queueTop8) ? D.queueTop8 : []);
+        const head = queue[0];
+        if (head && head.eid && window.MC.url && typeof window.MC.url.dossier === 'function') {
+          cta.href = window.MC.url.dossier(head.eid);
+        } else {
+          cta.href = 'review.html';
+        }
+      }
+      return true;
+    }
+
+    wireModeToggle();
+
+    if (window.MC && typeof window.MC.ready === 'function') {
+      window.MC.ready().then(() => { if (!renderFromMC()) randomFill(); });
+      window.MC.onUpdate(() => { renderFromMC(); });
+      // If MC never resolves, fall back to the baked-in fill.
+      setTimeout(() => { if (!window.MC._loaded && !grid.children.length) randomFill(); }, 1200);
+    } else {
+      randomFill();
+    }
+  })();
+</script>
+</body>
+</html>

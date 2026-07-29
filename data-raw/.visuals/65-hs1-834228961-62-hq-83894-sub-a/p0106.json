@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of David Atamian",
-  "description": "Photo of David Atamian",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of a Vought V-173 \"Flying Pancake\" aircraft"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.780Z"
+  "description": "Soviet Still\nWants Answer\nTo ‘Saucers’\nBy DAVID SENTNER\nN. Y. Journal-American Washington Bureau\nWASHINGTON, Aug. 14.—Soviet agents in the United States have been ordered to solve the mystery of the “Flying Saucers,” it was learned today.\nWhile the guessing game in this country has burned itself out, the Soviet Union continues to be acutely interested in the phenomena, according to American investigative agencies.\nInstructions to Soviet espionage agents in the United States indicate the Kremlin believes the saucers may be connected with Army experiments in devices to decommission enemy radar during bombing raids.\nSoviet Espionage Agents in U.S. Interested in \"Saucers\"\nGander for Saucers\nVFW Chief Awaiting Message\nFrom Capital on Flying Discs\nSome of the mystery missiles\nmay have passed over Washington\nFriday night at about midnight.\nDavid Atamian, 5160 Shoemaker\nlane, Friendship Heights, Md., re-\nported that he had seen three\nor four of the flying saucers trav-\neling northward at a rapid rate of\nspeed at about that time. He said\nthey were at an altitude of between\n100 and 2000 feet and appeared\nto be of a bright, bluish hue.\nPost Staff Photo\nDAVID ATAMIAN,\nof 5160 Shoemaker la., Friend-\nship Heights, Md., said he saw\nthree or four flying discs Fri-\nday about midnight\nThe flying saucers produced a\nseries of speculations and at-\nSee SAUCERS, Page 3, Column 2.\ntempted explanations throughout\nthe country yesterday.\nA Los Angeles newspaper\nquoted an unidentified scientist\nin nucle",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.773Z",
+  "contributor": "Rizzleroc"
 }

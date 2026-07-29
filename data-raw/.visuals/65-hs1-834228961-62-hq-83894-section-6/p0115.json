@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of King Blended Whisky bottle",
-  "description": "Image of King Blended Whisky bottle",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of a group of people sitting in a bus, with various labels pointing to them"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.432Z"
+  "description": "Looks Lighter!\nTastes Lighter!\nToday’s KING is Really LIGHT!\nIf you prefer finer, lighter mixed drinks—today’s King is your whisky! Actually case-engineered by Brown-Forman to be far lighter-looking, far lighter-tasting. And today’s King is priced right, too! Enjoy America’s best-tasting blend today!\nNew Light Formula\nNew Light Package\nNew Lower Price\nBlended Whisky. 37½% Straight Whiskies. 62½% Grain Neutral Spirits. The Straight Whiskies in this Product are 4 Years or More Old. 86 Proof.\nBROWN-FORMAN DISTILLERS CORPORATION\nAt Louisville in Kentucky\nKING\nA Preference for Quality\nBrown-Forman’s\nKING\nBLENDED WHISKY\n[illegible]\nBOTTLED BY BROWN-FORMAN DISTILLERS CORPORATION AT LOUISVILLE IN KENTUCKY\n62",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.660Z",
+  "contributor": "Rizzleroc"
 }

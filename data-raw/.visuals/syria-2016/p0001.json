@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619,",
-  "description": "Image: Map showing flight path, KCTG, and various Russian vessels: (RUS) UDALOY DD-619, (RUS) KUZNETSOV CV-063 (RUS) CHILIKIN AOR, (RUS) KALININGRADNET AD, (RUS) KIROV CON 099, (RUS) INGUL ARS",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "Sensor footage showing \"U/I OBJ\", \"(RUS) INGUL ARS\", and \"U/I VESSEL\""
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:34.273Z"
+  "description": "[page before not provided]\nSECRET//REL TO USA, NATO\n67.1 P-8A OBSERVES UNIDENTIFIED LOW-FLYING OBJECT 55 NM NORTHWEST OF LATAKIA, SYRIA\n18 NOV 2016\nDeclassified by MG Richard A. Harrison\nUSCENTCOM Chief of Staff\nDeclassified on: 20 March 2026\nFLIGHT PATH\n(RUS) UDALOY DD-619\n[illegible]\n(RUS) INGUL ARS\n[illegible]\nK T G\n1310Z:\n1.4a\n26 NM\n~1312Z:\n1.4a\nUS P-8A Location\n1310Z:\n1.4a\nN\nBLUF: While monitoring KCTG activity in the Eastern Mediterranean, P-8A, observed an unidentified low-flying object 55 nm northwest of Latakia from an unknown origin, traveling at approx 500KTS on a southeasterly heading outbound from KCTG, for ~2 minutes.\nTimeline (Z):\n18/1310Z: P-8 observed a possible missile launch IVO 1.4a from an origin unknown detected via the EO/IR sensor. The possible missile appeared to be in sea skim mode traveling at approximately 500KTS on a southeasterly heading outbound from KCTG. P-8 position was 26NM S of object detection at 16121 FT 1.4a\n18/1312Z: - P-8 lost visual of the object IVO 1.4a approx. 40 NM northwest of Latakia. The missile was observed to pass between (RUS) INGUL ARS and 1x U/I vessel.\nWeather:\n(U) P-8 aircrew characterized visibility as clear, no range limitations.\nU/I OBJ\n(RUS) INGUL ARS\nU/I VESSEL\nCTG 67.1 Comments: The mission commander for P-8 characterized the interaction as safe. While this was the first observed occurrence of possible missile activity by P-8 aircraft in the Eastern Mediterranean it is assessed to be standard activity consistent wi",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T19:11:40.825Z",
+  "contributor": "Rizzleroc"
 }

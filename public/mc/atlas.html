@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Atlas</title>
+  <meta name="description" content="Where the declassified UAP records cluster across U.S. agencies and decades. Click any cell to drill in.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Atlas — agency × era heatmap">
+  <meta property="og:description" content="Where the declassified UAP records cluster across U.S. agencies and decades. Click any cell to drill in.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/atlas.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Atlas — agency × era heatmap">
+  <meta name="twitter:description" content="Where the declassified UAP records cluster across U.S. agencies and decades. Click any cell to drill in.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .at-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .at-card { background: var(--surface); border: 1px solid var(--border); padding: 28px 32px; backdrop-filter: blur(10px); }
+    .at-grid { display: grid; grid-template-columns: 160px repeat(8, 1fr) 92px; gap: 4px; }
+    .at-grid .corner-cell, .at-grid .col-h, .at-grid .row-h, .at-grid .cell { padding: 14px 10px; }
+    .at-grid .col-h { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; text-align: center; padding-bottom: 8px; }
+    .at-grid .row-h { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); letter-spacing: 0.14em; text-transform: uppercase; padding-right: 14px; text-align: right; align-self: center; }
+    .at-grid .cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all .15s; cursor: pointer; position: relative; border: 1px solid #1A2638; }
+    .at-grid .cell:hover { transform: scale(1.05); z-index: 2; border-color: var(--amber); }
+    .at-grid .cell .v { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); line-height: 1; }
+    .at-grid .cell .pct { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-4); letter-spacing: 0.08em; }
+    .at-grid .cell .count-badge { position: absolute; top: 3px; right: 4px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--text-3); letter-spacing: 0.04em; line-height: 1; pointer-events: none; opacity: 0.85; }
+    .at-grid .cell.h4 .count-badge, .at-grid .cell.h5 .count-badge { color: var(--void); opacity: 0.7; }
+    .at-grid .total-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 14px 10px; border: 1px solid var(--hairline); background: rgba(255,255,255,0.02); font-family: 'JetBrains Mono', monospace; }
+    .at-grid .total-cell .tv { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: var(--amber); letter-spacing: -0.01em; line-height: 1; }
+    .at-grid .total-cell .tl { font-size: 8px; color: var(--text-4); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 2px; }
+    .at-grid .total-cell.zero .tv { color: var(--text-4); }
+    .at-grid .total-corner { background: transparent; border: none; }
+    .at-tooltip { position: absolute; z-index: 1000; pointer-events: none; background: var(--void, #050810); border: 1px solid var(--amber, #F2A623); padding: 10px 12px; min-width: 180px; max-width: 260px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-2, #cfd6df); letter-spacing: 0.06em; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 14px rgba(242,166,35,0.25); opacity: 0; transition: opacity .12s; }
+    .at-tooltip.show { opacity: 1; }
+    .at-tooltip .tt-h { font-size: 9px; color: var(--amber, #F2A623); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+    .at-tooltip .tt-id { display: block; color: var(--text, #e6ebf2); font-size: 10px; padding: 2px 0; letter-spacing: 0.04em; }
+    .at-tooltip .tt-more { display: block; color: var(--text-4, #6b7180); font-size: 9px; padding-top: 4px; margin-top: 4px; border-top: 1px solid var(--hairline, rgba(255,255,255,0.08)); letter-spacing: 0.08em; }
+    .at-grid .cell.h0 { background: #0A1018; }
+    .at-grid .cell.h1 { background: rgba(242,166,35,0.08); border-color: rgba(242,166,35,0.18); }
+    .at-grid .cell.h2 { background: rgba(242,166,35,0.18); border-color: rgba(242,166,35,0.30); }
+    .at-grid .cell.h3 { background: rgba(242,166,35,0.35); border-color: rgba(242,166,35,0.55); }
+    .at-grid .cell.h4 { background: rgba(242,166,35,0.55); border-color: var(--amber); box-shadow: 0 0 16px rgba(242,166,35,0.4); }
+    .at-grid .cell.h5 { background: rgba(242,166,35,0.75); border-color: var(--amber-bright); box-shadow: 0 0 22px rgba(242,166,35,0.55); }
+    .at-grid .cell.h5 .v { color: var(--void); }
+    .at-grid .cell.h4 .v { color: var(--void); }
+    .at-grid .cell .v.zero { color: var(--text-4); }
+    .at-grid a.cell { color: inherit; text-decoration: none; }
+    .at-summary { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--hairline); display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .at-summary .s { padding-left: 18px; border-left: 1px solid var(--hairline); }
+    .at-summary .s:first-child { padding-left: 0; border-left: none; }
+    .at-summary .k { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; }
+    .at-summary .v { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--text); margin: 6px 0 2px; letter-spacing: -0.025em; }
+    .at-summary .v.amber { color: var(--amber); text-shadow: 0 0 16px var(--amber-glow); }
+    .at-summary .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.08em; }
+    .at-legend { display: flex; align-items: center; gap: 12px; padding: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.14em; text-transform: uppercase; }
+    .at-legend .swatch { width: 22px; height: 12px; display: inline-block; }
+  </style>
+</head>
+<body data-view="atlas">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 09 — agency × era heatmap</div>
+    <h1>Where the corpus lives. <em>And where it doesn't.</em></h1>
+    <p class="sub">Eight agencies, eight eras. The hot cells dominate the corpus story; the cold cells are where contributors are most needed. Click any cell to drill into the events that anchor that cohort.</p>
+  </section>
+
+  <section class="at-shell">
+    <div class="at-card">
+      <div class="at-legend">
+        <span>DENSITY</span>
+        <span class="swatch" style="background:#0A1018;border:1px solid #1A2638"></span><span>0</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.08);border:1px solid rgba(242,166,35,0.18)"></span><span>1–2</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.18)"></span><span>3–8</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.35)"></span><span>9–20</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.55)"></span><span>21–50</span>
+        <span class="swatch" style="background:rgba(242,166,35,0.75)"></span><span>51+</span>
+        <span style="margin-left:auto">220 EVENTS · 8 AGENCIES · 8 ERAS</span>
+      </div>
+
+      <div class="at-grid" id="at-grid">
+        <div class="corner-cell"></div>
+        <div class="col-h">1940s</div>
+        <div class="col-h">1950s</div>
+        <div class="col-h">1960s</div>
+        <div class="col-h">1970s</div>
+        <div class="col-h">1980s</div>
+        <div class="col-h">1990s</div>
+        <div class="col-h">2000s</div>
+        <div class="col-h">2020s</div>
+        <div class="col-h">TOTAL</div>
+
+        <div class="row-h">DEPT/WAR</div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">14%</span></div>
+        <div class="cell h2"><span class="v">2</span><span class="pct">9%</span></div>
+        <div class="cell h2"><span class="v">4</span><span class="pct">18%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">2</span><span class="pct">9%</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">14%</span></div>
+        <div class="cell h5"><span class="v">144</span><span class="pct">91%</span></div>
+
+        <div class="row-h">FBI</div>
+        <div class="cell h3"><span class="v">11</span><span class="pct">42%</span></div>
+        <div class="cell h2"><span class="v">5</span><span class="pct">19%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">8%</span></div>
+        <div class="cell h2"><span class="v">8</span><span class="pct">31%</span></div>
+
+        <div class="row-h">NASA</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h3"><span class="v">12</span><span class="pct">55%</span></div>
+        <div class="cell h2"><span class="v">8</span><span class="pct">36%</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">5%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">5%</span></div>
+
+        <div class="row-h">STATE</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">29%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">2</span><span class="pct">29%</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">43%</span></div>
+
+        <div class="row-h">ENERGY</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">3</span><span class="pct">100%</span></div>
+
+        <div class="row-h">CIA</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">100%</span></div>
+
+        <div class="row-h">ODNI</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h1"><span class="v">1</span><span class="pct">100%</span></div>
+
+        <div class="row-h">UNKNOWN</div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h0"><span class="v zero">·</span></div>
+        <div class="cell h2"><span class="v">12</span><span class="pct">100%</span></div>
+      </div>
+
+      <div class="at-summary" id="at-summary">
+        <div class="s"><div class="k">Dominant cohort</div><div class="v amber">DoW · 2020s</div><div class="sub">144 events · 65% of corpus</div></div>
+        <div class="s"><div class="k">Secondary cluster</div><div class="v">FBI · 1940s</div><div class="sub">11 events · 5% of corpus</div></div>
+        <div class="s"><div class="k">Cold cells</div><div class="v">42</div><div class="sub">of 64 grid positions empty</div></div>
+        <div class="s"><div class="k">Cross-era agencies</div><div class="v">3</div><div class="sub">DoW · NASA · FBI</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="data.js"></script>
+
+<script>
+/* Atlas heatmap — data-driven from MC.derive.events.
+   Rebuilds the agency × era grid and the summary row from live data.
+   If MC is unavailable or errors, the hardcoded markup above stays as fallback. */
+(function () {
+  if (!window.MC || typeof MC.ready !== "function") return;
+
+  // Row order (full agency names) + short labels matching the static row headers.
+  var AGENCIES = [
+    ["Department of War", "DEPT/WAR"],
+    ["FBI", "FBI"],
+    ["NASA", "NASA"],
+    ["Department of State", "STATE"],
+    ["Department of Energy", "ENERGY"],
+    ["Central Intelligence Agency", "CIA"],
+    ["Office of the Director of National Intelligence", "ODNI"],
+    ["Unknown", "UNKNOWN"]
+  ];
+  // 8 era columns. col[0] = era key(s) folded into it, col[1] = column label.
+  var ERAS = [
+    ["40s", "1940s"],
+    ["50s", "1950s"],
+    ["60s", "1960s"],
+    ["70s", "1970s"],
+    ["80s", "1980s"],
+    ["90s", "1990s"],
+    ["00s", "2000s"],
+    ["20s", "2020s"]
+  ];
+  var ERA_KEYS = ERAS.map(function (e) { return e[0]; });
+
+  // Map a raw era key to its display column. 'modern' folds into 20s; '10s'
+  // folds into 00s (no 2010s column); any unknown/'?' folds into 20s so no
+  // event is dropped and counts reconcile to the corpus total.
+  function eraCol(raw) {
+    var k = raw || "?";
+    if (k === "modern") return "20s";
+    if (k === "10s") return "00s";
+    if (ERA_KEYS.indexOf(k) === -1) return "20s";
+    return k;
+  }
+
+  // count -> density class
+  function densityClass(n) {
+    if (n === 0) return "h0";
+    if (n <= 2) return "h1";
+    if (n <= 8) return "h2";
+    if (n <= 20) return "h3";
+    if (n <= 50) return "h4";
+    return "h5";
+  }
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  function render(mc) {
+    var events = (mc.derive && mc.derive.events) || [];
+    if (!events.length) return; // nothing live → keep fallback markup
+
+    var grid = document.getElementById("at-grid");
+    var summary = document.getElementById("at-summary");
+    if (!grid) return;
+
+    // Build matrix M[agency][eraKey] = count.
+    var M = {};
+    AGENCIES.forEach(function (a) {
+      M[a[0]] = {};
+      ERA_KEYS.forEach(function (c) { M[a[0]][c] = 0; });
+    });
+    events.forEach(function (e) {
+      var ag = (M[e.agency] != null) ? e.agency : "Unknown";
+      var col = eraCol(e.era);
+      if (M[ag] && col in M[ag]) M[ag][col]++;
+    });
+
+    // Row totals + corpus total + summary aggregates.
+    var rowTotals = {}, corpus = 0, cold = 0;
+    var maxA = null, maxC = null, maxN = -1;
+    var secA = null, secC = null, secN = -1;
+    var crossEra = [];
+
+    AGENCIES.forEach(function (a) {
+      var name = a[0], rt = 0, erasPresent = 0;
+      ERA_KEYS.forEach(function (c) {
+        var n = M[name][c];
+        rt += n; corpus += n;
+        if (n === 0) cold++;
+        if (n > 0) erasPresent++;
+        if (n > maxN) { secN = maxN; secA = maxA; secC = maxC; maxN = n; maxA = name; maxC = c; }
+        else if (n > secN) { secN = n; secA = name; secC = c; }
+      });
+      rowTotals[name] = rt;
+      if (erasPresent >= 3) crossEra.push(a[1]);
+    });
+
+    // Bucket event IDs by {agency, era} for tooltips.
+    var bucketIds = {};
+    AGENCIES.forEach(function (a) {
+      bucketIds[a[0]] = {};
+      ERA_KEYS.forEach(function (c) { bucketIds[a[0]][c] = []; });
+    });
+    events.forEach(function (e) {
+      var ag = (bucketIds[e.agency] != null) ? e.agency : "Unknown";
+      var col = eraCol(e.era);
+      if (bucketIds[ag] && col in bucketIds[ag] && e.id) bucketIds[ag][col].push(e.id);
+    });
+
+    // Column totals (per era).
+    var colTotals = {};
+    ERA_KEYS.forEach(function (c) {
+      var t = 0;
+      AGENCIES.forEach(function (a) { t += M[a[0]][c]; });
+      colTotals[c] = t;
+    });
+
+    // Ensure a single tooltip element exists, attached to body.
+    var tooltip = document.getElementById("at-tooltip");
+    if (!tooltip) {
+      tooltip = document.createElement("div");
+      tooltip.id = "at-tooltip";
+      tooltip.className = "at-tooltip";
+      document.body.appendChild(tooltip);
+    }
+    function showTooltip(ev, ids, agencyShort, eraLabel) {
+      var head = '<div class="tt-h">' + agencyShort + ' &middot; ' + eraLabel + ' &middot; ' + ids.length + (ids.length === 1 ? ' event' : ' events') + '</div>';
+      var body = ids.slice(0, 3).map(function (id) {
+        return '<span class="tt-id">' + id + '</span>';
+      }).join("");
+      var more = ids.length > 3 ? '<span class="tt-more">+' + (ids.length - 3) + ' more</span>' : "";
+      tooltip.innerHTML = head + body + more;
+      tooltip.classList.add("show");
+      positionTooltip(ev);
+    }
+    function hideTooltip() { tooltip.classList.remove("show"); }
+    function positionTooltip(ev) {
+      var pad = 14;
+      var x = ev.clientX + window.scrollX + pad;
+      var y = ev.clientY + window.scrollY + pad;
+      // Keep within viewport horizontally.
+      var maxX = window.scrollX + document.documentElement.clientWidth - tooltip.offsetWidth - 8;
+      if (x > maxX) x = maxX;
+      tooltip.style.left = x + "px";
+      tooltip.style.top  = y + "px";
+    }
+
+    // ── Render grid ────────────────────────────────────────────────────────
+    grid.textContent = "";
+    grid.appendChild(el("div", "corner-cell"));
+    ERAS.forEach(function (c) { grid.appendChild(el("div", "col-h", c[1])); });
+    grid.appendChild(el("div", "col-h", "TOTAL"));
+
+    AGENCIES.forEach(function (a) {
+      grid.appendChild(el("div", "row-h", a[1]));
+      var rt = rowTotals[a[0]];
+      ERA_KEYS.forEach(function (c) {
+        var n = M[a[0]][c];
+        var ids = bucketIds[a[0]][c];
+        var cell;
+        if (n === 0) {
+          cell = el("div", "cell " + densityClass(n));
+          cell.appendChild(el("span", "v zero", "&middot;"));
+        } else {
+          cell = el("a", "cell " + densityClass(n));
+          cell.setAttribute("href", "search.html?agency=" + encodeURIComponent(a[0]) + "&era=" + encodeURIComponent(c));
+          cell.style.textDecoration = "none";
+          cell.style.color = "inherit";
+          cell.appendChild(el("span", "v", String(n)));
+          var pct = rt ? Math.round((n / rt) * 100) : 0;
+          cell.appendChild(el("span", "pct", pct + "%"));
+          // (Removed: `.count-badge` was duplicating `.v` — readers saw "5" + "5"
+          // for the same cell. The main `.v` already carries the count.)
+
+          // Tooltip wiring.
+          (function (ids, agencyShort, eraLabelStr) {
+            cell.addEventListener("mouseenter", function (ev) {
+              showTooltip(ev, ids, agencyShort, eraLabelStr);
+            });
+            cell.addEventListener("mousemove", function (ev) { positionTooltip(ev); });
+            cell.addEventListener("mouseleave", hideTooltip);
+          })(ids, a[1], (function () {
+            for (var i = 0; i < ERAS.length; i++) if (ERAS[i][0] === c) return ERAS[i][1];
+            return c;
+          })());
+        }
+        grid.appendChild(cell);
+      });
+      // Row total cell.
+      var rTotal = el("div", "total-cell" + (rt === 0 ? " zero" : ""));
+      rTotal.appendChild(el("span", "tv", String(rt)));
+      rTotal.appendChild(el("span", "tl", "ROW"));
+      grid.appendChild(rTotal);
+    });
+
+    // Column totals row at the bottom.
+    grid.appendChild(el("div", "row-h", "TOTAL"));
+    ERA_KEYS.forEach(function (c) {
+      var ct = colTotals[c];
+      var t = el("div", "total-cell" + (ct === 0 ? " zero" : ""));
+      t.appendChild(el("span", "tv", String(ct)));
+      t.appendChild(el("span", "tl", "COL"));
+      grid.appendChild(t);
+    });
+    // Grand total in the corner.
+    var grand = el("div", "total-cell");
+    grand.appendChild(el("span", "tv", String(corpus)));
+    grand.appendChild(el("span", "tl", "ALL"));
+    grid.appendChild(grand);
+
+    // ── Render summary ─────────────────────────────────────────────────────
+    if (summary) {
+      function shortName(full) {
+        for (var i = 0; i < AGENCIES.length; i++) {
+          if (AGENCIES[i][0] === full) {
+            // friendlier dominant/secondary labels
+            if (full === "Department of War") return "DoW";
+            if (full === "Department of State") return "State";
+            if (full === "Department of Energy") return "Energy";
+            return AGENCIES[i][1];
+          }
+        }
+        return full;
+      }
+      function eraLabel(key) {
+        for (var i = 0; i < ERAS.length; i++) if (ERAS[i][0] === key) return ERAS[i][1];
+        return key;
+      }
+      function pctCorpus(n) { return corpus ? Math.round((n / corpus) * 100) : 0; }
+
+      var cells = summary.querySelectorAll(".s");
+      if (cells.length >= 4) {
+        // Dominant cohort
+        cells[0].querySelector(".v").textContent = shortName(maxA) + " · " + eraLabel(maxC);
+        cells[0].querySelector(".sub").textContent = maxN + " events · " + pctCorpus(maxN) + "% of corpus";
+        // Secondary cluster
+        cells[1].querySelector(".v").textContent = shortName(secA) + " · " + eraLabel(secC);
+        cells[1].querySelector(".sub").textContent = secN + " events · " + pctCorpus(secN) + "% of corpus";
+        // Cold cells
+        var totalCells = AGENCIES.length * ERAS.length;
+        cells[2].querySelector(".v").textContent = String(cold);
+        cells[2].querySelector(".sub").textContent = "of " + totalCells + " grid positions empty";
+        // Cross-era agencies (present in >= 3 eras)
+        cells[3].querySelector(".v").textContent = String(crossEra.length);
+        cells[3].querySelector(".sub").textContent = crossEra.join(" · ");
+      }
+    }
+  }
+
+  MC.ready().then(function (mc) {
+    try { render(mc); } catch (e) { console.warn("atlas render failed, keeping static fallback", e); }
+  });
+  MC.onUpdate(function (mc) {
+    try { render(mc); } catch (e) { console.warn("atlas re-render failed", e); }
+  });
+})();
+</script>
+
+<script src="chrome.js" defer></script>
+</body>
+</html>

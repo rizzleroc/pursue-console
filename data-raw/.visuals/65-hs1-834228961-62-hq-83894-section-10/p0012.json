@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "Caption",
-  "description": "Photo Caption",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.163Z"
+  "description": "Tracked by Radar\nUFOs Sighted Over Wide Section of District\nWould You Believe—'Saucer' Visits Wichita?\nBy FRAN BENNING\nBeacon Staff Writer\nThe Wichita Beacon\nSaturday, March 26, 1966\n[illegible] Photo by Robert [illegible]\nMrs. Thomas and Johnny examined \"flying saucer damage.\"\n[illegible] was broken, and cords.",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.166Z",
+  "contributor": "Rizzleroc"
 }
