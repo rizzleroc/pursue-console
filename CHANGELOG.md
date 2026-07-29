@@ -1,68 +1,31 @@
 # Changelog
 
-## Catalog cleanup sweep (2026-06-20)
+## Volunteer leasing + `--review` producer (2026-06-18)
 
-Six small surgical PRs against `src/data/events.js` + `src/data/events-auto.js` to fix field-level bugs accumulated across the R02 + R03 ingestions. Net effect: timeline, atlas, globe, and facet dropdowns all subset correctly where they previously over- or under-counted. Catalog count drops 293 → 291 (2 duplicate Apollo 17 auto-stubs removed). No content changes, no schema changes.
+R7 Phase 1 and R10 land together (both touch `scripts/volunteer.mjs`, so
+together-or-not).
 
-### Wrong sort dates + placeholder coords on 8 R03 events (#366)
-
-The #285 WHIP ingestion landed five R03 entries with `sort: 20260612` (today's date when ingested) instead of the actual incident date — pinned them to the right-edge present on the timeline. Four NASA debriefs also had `coords: [0, 0]` (null-island) despite carrying real KSC / JSC / North Atlantic recovery locations. Fixed:
-
-- `NASA-UAP-D016/D017` Gemini 4 debriefs: sort `20260612` → `19650609`, era `20s` → `60s`, coords `[0, 0]` → `[27.73, -75.95]`
-- `NASA-UAP-D019/D020/D021` Gemini 5 + 7 debriefs: coords `[0, 0]` → `[28.4889, -80.5778]` (KSC LC-39)
-- `NASA-UAP-D024/D025` Apollo 16 audio: sort `20260612` → `19720501/02`, era `20s` → `70s`, coords `[0, 0]` → `[29.5502, -95.0972]` (JSC), date `"Undated"` → `"May, 1972"`
-- `CIA-UAP-009`: region `"Asia"` → `"Europe"` (Budapest)
-
-### 75 events with `[0, 0]` placeholder coords (#367)
-
-Same class of bug at 10× scale — mostly auto-generated R02 DOW DVIDS PR records from the `data-raw/uap-data.csv` ingestion. 25% of the entire catalog was pinned to null-island (Gulf of Guinea). Assigned regional centroids consistent with existing curated entries:
-
-- 24 events at CENTCOM AOR → `[25.0, 50.0]` (Persian Gulf centroid)
-- 8 events at Arabian Gulf → `[26.5, 51.5]`
-- Plus regional fixes for Iraq (matches `iraq-may-2022`), Syria (matches `syria-july-2022`), Greece, UAE, Yellow Sea, AFRICOM, Mediterranean, Strait of Hormuz, Gulf of Oman, East China Sea, Pacific, Aegean, Iran, Kazakhstan, Texas, North Atlantic, and Pacific Time Zone.
-- 9 events with `loc: "N/A"` / `"(unknown)"` intentionally kept at `[0, 0]` — no defensible guess; the marker now flags them as needing human attention.
-
-Patch: `scripts/patch-r02-coords.mjs` committed for reproducibility.
-
-### Duplicate Apollo 17 stubs + IC/USG agency palette (#368)
-
-Two auto-generated NASA Apollo 17 stub records in `events-auto.js` (`nasa-uap-d5-apollo-17-…`, `nasa-uap-d6-apollo-17-…`) were duplicating the curated `NASA-UAP-D005` + `NASA-UAP-D006` entries in `events.js` RAW. The dedup match in `EVENTS = [...RAW, ..._autoMinusDupes]` uses string-equal IDs, but the curated forms use uppercase while the gemini auto-import uses lowercase semantic ids — so both copies survived to the published catalog. Removed.
-
-Same removal also fixed the agency palette: the two duplicate stubs carried `agency: "Unknown"`, and combined with `ICA-UAP-D001` (`"Intelligence Community"`) + `USG-UAP-D001` (`"U.S. Government"`), four catalog records weren't rendering in the agency dropdown. Dropped the stubs (-2), added two palette entries (-2 unmapped). Catalog: 293 → 291.
-
-### Tag normalization (#369, #370)
-
-Two passes:
-
-1. The PURSUE Release 02 + Release 03 disclosure anchors tagged themselves with `"release 02"` / `"release 03"` (space-separated) while every other R02/R03 event uses the hyphenated form. Filter-invisible bug — the anchors weren't surfacing in their own release groupings. Two-character fix.
-
-2. Case-token normalization across **142 tag instances** in `events.js` + `events-auto.js`. The same tag appeared in both upper- and lowercase across the catalog (`FBI` + `fbi`, `CIA` + `cia`, `DOW` + `dow` + `DoW`, `NASA` + `nasa`, `USSR`, `UAP`, `CENTCOM`, `AFRICOM`, `INDOPACOM`, `Borman`, `Lovell`, `Conrad`, `Cernan`, `Djibouti`, `Army`, `Propulsion`, `Radar`) — 17 case-variant pairs total. Each pair rendered as **separate filter chips** in facet dropdowns, so selecting "FBI" gave a strict subset of selecting "fbi". Convention: acronyms uppercase, proper nouns Title Case, common nouns lowercase. After: 0 variant pairs.
-
-Also surfaced 6 R02 events with `loc` strings but `region: "Unknown"` — inferred correct regions:
-
-- 2× UAE → Middle East
-- 1× Indo-PACOM → Asia-Pacific
-- 2× Yellow Sea → Asia-Pacific
-- 1× Kazakhstan → Asia
-
-Patches: `scripts/patch-tag-case.mjs` committed for reproducibility.
-
-### Remaining `region: "Unknown"` audit
-
-6 events kept at `region: "Unknown"` post-sweep, all with `loc: "(unknown)"` or `"N/A"`. No defensible geographic inference — left as discoverable markers for human attention rather than papering over with fake values.
-
-## DVIDS-via-MCP video collector (2026-05-26, `@unverified`)
-
-The same Akamai-style TLS-fingerprint block that makes us route war.gov traffic through a real Chrome tab also afflicts `dvidshub.net`: yt-dlp returns `ConnectionResetError(10054)` against every DVIDS video URL we tried. Rather than chase yt-dlp config flags, we retired the yt-dlp path and reused the trick the rest of the MCP already uses.
-
-What landed:
-- **`pursue-vision-mcp/dvids-driver.mjs`** — new `DVIDSDriver` class mirroring the structure of `war-gov-driver.mjs`. `resolveVideoUrl({ videoId })` navigates a logged-in `www.dvidshub.net/` tab to `/video/<id>` and tries three strategies in order — network intercept on the player's own mp4 fetch, DOM scrape (`<video>`/`<source>`/`og:video`/JSON-LD `VideoObject.contentUrl`), and a regex pass over the page's embedded JSON (`videoUrl`/`playbackUrl`/`mp4Url`). `downloadFile({ url, destPath })` reuses the same 1-byte Range probe → one-shot for ≤50 MB / 8 MB Range chunks for larger → base64-shuttle via `page.evaluate` → `.part` rename pattern the war.gov driver uses, with the same Akamai-style block detection (403/406/429/503 status + challenge-body patterns) so we never write block HTML to disk pretending it's an mp4.
-- **Daemon endpoints `/dvids/resolve` and `/dvids/download`** — same `queues.dvids` single-slot serialization pattern as the LLM and warGov drivers; same bearer-token auth; same path-jail on per-item `destPath`. Batch capped at 32 videos. `/status` now reports the dvids driver alongside the others.
-- **`pursue-vision-mcp/start.mjs`** opens `www.dvidshub.net/` alongside the existing chatgpt + gemini + war.gov tabs. DVIDS is public DoD media so the tab shouldn't trigger a challenge — it's there only so the dvids driver can issue in-page `fetch()` calls that inherit Chrome's real TLS handshake.
-- **`scripts/transcribe-videos.mjs`** rewritten: the `yt-dlp` `execFile` is gone, replaced by a POST to `${DAEMON}/dvids/download` with a 15 min timeout. Whisper stays the default transcription path with identical output (`public/text/<eid>.txt` + `manifest.json` keyed by `whisper`). New `--analyze=gemini` flag (or `ANALYZE_VIDEO=gemini` env) ALSO posts the video to `/chat-with-files` with `provider: "gemini"` and a transcribe-and-describe prompt, saving the response as a sibling `<eid>.gemini-analysis.md` (best-effort — failures don't block Whisper). New `--daemon=` and `--dry-run` flags. Token loading mirrors `volunteer.mjs` (env → whipgen-token → pursue-vision-token).
-- **README** documents `/dvids/resolve` and `/dvids/download` in the same style as the war.gov endpoints, calls out the `@unverified` status, and notes the new dvidshub.net tab requirement.
-
-Why **`@unverified`:** the agent that wrote this couldn't exercise it. DVIDS blocks our IPs the same way war.gov does; only the maintainer's real Chrome can verify the round-trip. The DOM shape inside `https://www.dvidshub.net/video/<id>` is a best-guess — the three strategies are layered defensively in case the player's mp4 traffic doesn't fire on initial load (intercept), the page renders the mp4 server-side into `<video>`/`<source>`/`og:video`/JSON-LD (DOM scrape), or only the inline-JS player config carries the URL (regex). Whichever strategy hits first wins; the others stay as backups. `scripts/find-unverified.mjs` surfaces `pursue-vision-mcp/dvids-driver.mjs` and `scripts/transcribe-videos.mjs` in `corpus:unverified`. See ROADMAP R9 for the verification plan.
+- **R7 — static claims ledger wired.** `config/leasing.json` (already committed
+  in 2.2) is now actually read. `scripts/build-work-available.mjs` passes the
+  parsed config through as a top-level `leasing` field on
+  `public/work-available.json`. `scripts/volunteer.mjs` (phase `ocr`, default
+  3600s) and `scripts/volunteer-media.mjs` (phase `media`, default 86400s) now
+  read claims from `public/claims/<eid>/p<NNNN>.json`, skip pages an active
+  claim by a different handle covers, and write their own claim per picked page.
+  Claims auto-expire at `lease_secs`; on success we do **not** delete the file
+  (advisory only). Best-effort throughout — parse errors → no-claim; write
+  errors → log + continue. See [design/VOLUNTEER-LEASING.md](./design/VOLUNTEER-LEASING.md).
+- **R10 — `volunteer.mjs --review` producer landed.** Pulls disputed pages from
+  `public/review-queue.json` (sibling of work-available.json), re-renders +
+  re-transcribes each through `scripts/prompts/standard-transcription.txt` (same
+  prompt `reevaluate-disputed.mjs` uses), and writes to
+  `contributions/<handle>/<gpt-vision|gemini>-review/<eid>/p<NNN>.txt` — the
+  exact path `scripts/import-contributions.mjs` already lands as the v2 for
+  `compare-sources.mjs` to re-score. Honors `--eid`, applies R7 leasing
+  (phase `review`, default 1800s), forces single-page calls (the standardized
+  prompt has no batch protocol), skips pages whose `.v2.txt` already exists
+  locally, and emits a PR with the re-OCR scope spelled out. Exits cleanly with
+  a friendly message if the REVIEW queue is empty (the current live state).
 
 ## 2.2 — Security review sweep
 
