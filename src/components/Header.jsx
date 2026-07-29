@@ -27,6 +27,7 @@ const ANALYSIS = [
   { id: "atlas",    key: "nav.atlas",    glyph: "▦" },
   { id: "globe",    key: "nav.globe",    glyph: "◉" },
   { id: "network",  key: "nav.network",  glyph: "✦" },
+  { id: "map",      key: "nav.map",      glyph: "❋" },
 ];
 
 export default function Header({ view, onViewChange, onVolunteer }) {
