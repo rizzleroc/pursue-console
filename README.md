@@ -12,7 +12,7 @@ Late 2025, SECRET//NOFORN. An FBI 302 from a senior US intelligence official abo
 
 ## What you can do here
 
-- **Browse 293 declassified records** across three war.gov releases — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
+- **Browse 332 declassified records** across four war.gov releases — open any case file with cross-linked entities and recurring patterns. → DOSSIER tab.
 - **See where the AI transcriptions disagree** — every page is transcribed by up to four sources (Gemini, ChatGPT, Claude, OCR); disputes are queued worst-first. → REVIEW tab.
 - **Fix one disputed page in 30 seconds** — read the source side-by-side with each AI's guess, type the correct version, submit. Becomes the gold standard that grades every machine source forever.
 - **Read it in your own language** — full UI translated into 18 languages including right-to-left Arabic and Hebrew. The site auto-detects your browser locale on first load; switch via the picker in the nav.
@@ -67,7 +67,10 @@ npm start --prefix pursue-vision-mcp                              # opens chatgp
 npm run volunteer -- --my-handle=YOU --slice=20                   # ChatGPT
 npm run volunteer -- --my-handle=YOU --slice=20 --provider=gemini # Gemini
 npm run volunteer -- --my-handle=YOU --slice=20 --provider=claude # Claude
+npm run volunteer -- --my-handle=YOU --slice=10 --review          # re-transcribe disputed pages
 ```
+
+The `--review` mode (landed in #373) pulls from `public/review-queue.json`, uses the standardized-transcription prompt, and writes v2 transcripts that `compare-sources` re-scores against the existing dispute. Page-level leasing (via `public/claims/<eid>/p<NNNN>.json`) keeps two volunteers off the same page.
 
 Full architecture in [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md).
 
@@ -80,7 +83,7 @@ Full architecture in [HOW-CAN-I-HELP.md](./HOW-CAN-I-HELP.md).
 
 Two different things share the name and they're unrelated.
 
-- **war.gov's releases** are the government's UAP document tranches under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters). **Release 01** dropped May 8 2026 (162 records); **Release 02** dropped May 22 2026 (64 records — 6 PDFs + 51 videos + 7 audio); **Release 03** dropped June 12 2026 (72 records). R01 is fully mirrored; R02's 6 PDFs are mirrored at `public/release_2/` with audio/video pending; R03 has been staged through the WHIP pipeline (`data(R03): full pipeline`, #285).
+- **war.gov's releases** are the government's UAP document tranches under PURSUE (Presidential Unsealing and Reporting System for UAP Encounters). **Release 01** dropped May 8 2026 (162 records); **Release 02** dropped May 22 2026 (64 records — 6 PDFs + 51 videos + 7 audio); **Release 03** dropped June 12 2026 (72 records); **Release 04** dropped July 10 2026 (40 records). R01 is fully mirrored; R02's 6 PDFs are mirrored at `public/release_2/` with audio/video pending; R03 was staged through the WHIP pipeline (#285); R04 was ingested in #374 with a tail follow-up in #375.
 - **This project's "Release 2.0"** is just the console's own **software version**. It doesn't track or correspond to war.gov's release numbering.
 
 </details>
@@ -177,7 +180,7 @@ runs          append-only build/scrape/import log
 pursue-console/
 ├── src/
 │   ├── App.jsx                       view router · volunteer modal · hero gating
-│   ├── data/events.js                catalogued records (R01 + R02 + R03 = 293 total)
+│   ├── data/events.js                catalogued records (R01 + R02 + R03 + R04 = 332 total)
 │   ├── data/entities.js              hand-curated entity graph
 │   ├── components/
 │   │   ├── Header.jsx                primary nav + analysis nav + VOLUNTEER button
@@ -314,7 +317,7 @@ When new Release tranches drop, that's where new event records come from.
 
 | | |
 |---|---|
-| **Records inventoried** | 162 Release 01 (fully mirrored) + 64 Release 02 (6 PDFs mirrored at `public/release_2/`; 7 audio + 51 video pending) + 72 Release 03 (staged via the WHIP pipeline, #285). 293 events catalogued. |
+| **Records inventoried** | 162 Release 01 (fully mirrored) + 64 Release 02 (6 PDFs mirrored at `public/release_2/`; 7 audio + 51 video pending) + 72 Release 03 (staged via the WHIP pipeline, #285) + 40 Release 04 (ingested in #374 + tail #375). 332 events catalogued. |
 | **Pages transcribed** | 3,543 across 75 events |
 | **First-pull backlog** | 29 catalogued docs · 731 pages awaiting download + transcription |
 | **Per source** | 3,370 Gemini · 470 GPT-vision · 0 Claude · 787 OCR transcripts (94 pages OCR-only · 693 cross-checked against vision) · 80 contributor-submitted |
