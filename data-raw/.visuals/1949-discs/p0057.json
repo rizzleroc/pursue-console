@@ -1,13 +1,8 @@
 {
   "kind": "map",
   "title": "Annotations",
-  "description": "Map Annotations",
-  "additional_markers": [
-    {
-      "kind": "diagram",
-      "title": "Bottom Left Diagram"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.135Z"
+  "description": "CONFIDENTIAL\nCONFIDENTIAL\nDIO-17MD, Serial 13-49\n23 April 1949\nSubject:     US/ALASKA  -  Meteorological Phenomena - Luminous Energy\ncalled the Naval Air Base and learned there were no aircraft of any description\nin the air in the vicinity of the Naval Air Station.\n\n\nLieutenant Commander D. SHEPARD, USN, Operations Officer, U.S. Naval\nOperating Base, Kodiak, Alaska, reported that while standing near the NOB Post\nOffice he had observed \"a strange object streaking across the sky, near Old\nWoman Mountain\", on 8 April 1949 at approximately 2040 hours.  Lieutenant\nCommander SHEPARD described the object as a reddish ball of fire approximately\ntwo (2) feet in diameter travelling from West to East at an estimated 2,500 feet\naltitude.  The object was a brilliant color, without a tail, traveling with a\nflat trajectory of decline between 21 and 20 degrees.  It seemed to disintegrate\nover Chiniak Bay\" was Lieutenant Commander SHEPARD's report of his observation.\nNo opinion as to the nature of the object was advanced by Lieutenant Commander\nSHEPARD.\n\n\nLawrence B. SHAW, taxicab driver, Arrow Cab, Kodiak, Alaska, stated that\nhe was enroute from the Enlisted Mens Club to the Administration Building on\n8 April 1949, when he saw a strange bright blue object streak across the sky at\napproximately 2055 hours.  To SHAW, the object appeared to be about 1-1/2 feet\nin diameter trailed by a three (3) foot streamer which was \"pinkish in shading\".\nThis object, stated SHAW, appeared in the sky over Old ",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T06:43:07.930Z",
+  "contributor": "Rizzleroc"
 }

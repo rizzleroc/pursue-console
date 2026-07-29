@@ -1,17 +1,8 @@
 {
   "kind": "photograph",
   "title": "of train",
-  "description": "Image of train",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of logo"
-    },
-    {
-      "kind": "photograph",
-      "title": "of Skyhook"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.433Z"
+  "description": "Today\nthe average freight train\nhelps national rearmament\nby carrying more freight\nand carrying it faster\nthan ever before in history!\nASSOCIATION OF AMERICAN RAILROADS\nWASHINGTON 6, D. C.\nListen to THE RAILROAD HOUR every Monday evening on NBC\n64",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.662Z",
+  "contributor": "Rizzleroc"
 }

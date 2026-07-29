@@ -63,17 +63,20 @@ if (!/^[A-Za-z0-9_-]{1,39}$/.test(HANDLE)) {
 
 const SLICE = Number(args.slice || 20);
 const ONLY_EID = args.eid || null;
-const BATCH_PAGES = Number(args["batch-pages"] || 4);
+// Review mode uses the standardized transcription prompt (no batch protocol),
+// so force one page per call. Explicit --batch-pages still wins for OCR mode.
+const BATCH_PAGES = Number(args["batch-pages"] || (args.review ? 1 : 4));
 const DAEMON = args.daemon || "http://127.0.0.1:9223";
 const QUEUE_URL = args["queue-url"] || "https://rizzleroc.github.io/pursue-console/work-available.json";
 const DRY = !!args["dry-run"];
 const NO_PR = !!args["no-pr"];
-// --review: claim disputed pages (the reviewQueue) instead of the OCR queue and
-// write an independent re-transcription into gpt-vision-review so the judge can
-// break the tie between disagreeing sources. Without this flag being honored,
-// TAKE REVIEW JOB just grabbed unrelated OCR pages and never cleared the review
-// queue.
-const REVIEW = !!args["review"];
+// R10 — --review mode: re-run disputed pages (from public/review-queue.json)
+// through the standardized prompt. Output lands at
+// contributions/<handle>/<source>-review/<eid>/p<NNN>.txt and is consumed by
+// import-contributions.mjs as p<NNN>.<base>.v2.txt for compare-sources to
+// re-score the dispute. The default --my-handle invocation behaves exactly
+// as before; --review only changes the picking + prompt + output path.
+const REVIEW_MODE = !!args.review;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -92,7 +95,10 @@ if (!CONTRIB_SOURCE) {
   console.error(`error: --provider must be 'chatgpt', 'gemini', or 'claude' (got '${PROVIDER}')`);
   process.exit(1);
 }
-const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SOURCE);
+// In --review mode the contribution lands under <source>-review/ so the
+// importer treats it as the v2 re-OCR of a disputed page, not a fresh source.
+const CONTRIB_SLOT = REVIEW_MODE ? `${CONTRIB_SOURCE}-review` : CONTRIB_SOURCE;
+const CONTRIB_ROOT = path.join(ROOT, "contributions", HANDLE, CONTRIB_SLOT);
 const TOKEN_FILE = (args["token-file"] || "~/.pursue-vision-token").replace(/^~/, os.homedir());
 
 async function loadToken() {
@@ -131,39 +137,50 @@ async function checkGhAuth() {
 }
 await checkGhAuth();
 
-// Probe the OCR daemon before doing anything else. Without this, the
-// volunteer happily downloads PDFs, renders pages, then burns minutes on
-// "↻ upload retry 1/2 — fetch failed" loops + per-page single-page fallback
-// when the daemon is simply not running (or its ChatGPT tab is dead).
-async function daemonAlive(timeoutMs = 2000) {
-  try {
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), timeoutMs);
-    const r = await fetch(`${DAEMON}/health`, { signal: ac.signal });
-    clearTimeout(t);
-    return r.ok;
-  } catch { return false; }
+// ----- R7 Phase 1: static claims ledger -----
+// A claim is just a JSON file at public/claims/<eid>/p<NNNN>.json with
+// { handle, claimed_at, lease_secs, phase }. Other volunteers skip pages with
+// an unexpired claim by a different handle. Best-effort throughout — parse
+// errors → "no claim"; write errors → log + continue (the claim is advisory).
+// See design/VOLUNTEER-LEASING.md.
+const CLAIMS_DIR = path.join(ROOT, "public", "claims");
+function claimPath(eid, pageNum) {
+  return path.join(CLAIMS_DIR, eid, `p${String(pageNum).padStart(4, "0")}.json`);
 }
-if (!DRY && !(await daemonAlive())) {
-  console.error(`error: OCR daemon at ${DAEMON} is unreachable.`);
-  console.error("  → start it with: cd pursue-vision-mcp && npm start");
-  console.error("  → and make sure Chrome is running with --remote-debugging-port=9222, logged into chatgpt.com");
-  process.exit(1);
+async function readClaim(eid, pageNum) {
+  try {
+    const txt = await readFile(claimPath(eid, pageNum), "utf8");
+    return JSON.parse(txt);
+  } catch { return null; }
+}
+function claimIsActive(claim) {
+  if (!claim?.claimed_at || !claim?.lease_secs) return false;
+  const ageSecs = (Date.now() - new Date(claim.claimed_at).getTime()) / 1000;
+  return Number.isFinite(ageSecs) && ageSecs < Number(claim.lease_secs);
+}
+async function writeClaim(eid, pageNum, handle, leaseSecs, phase) {
+  try {
+    await mkdir(path.join(CLAIMS_DIR, eid), { recursive: true });
+    await writeFile(claimPath(eid, pageNum), JSON.stringify({
+      handle, claimed_at: new Date().toISOString(), lease_secs: leaseSecs, phase,
+    }) + "\n", "utf8");
+  } catch (e) {
+    console.log(`    ! claim write failed for ${eid} p${pageNum}: ${e.message.slice(0, 80)}`);
+  }
 }
 
 // ----- step 1: fetch the work queue -----
-// Load the work queue — preferring whichever of {passed queue, deployed remote}
-// has the NEWER generatedAt. The local public/work-available.json can be staler
-// than the deployed GitHub Pages copy (or fresher); trusting the timestamp is
-// what made the dashboard say "1 page needs review" while the worker saw 0.
-const REMOTE_QUEUE = "https://rizzleroc.github.io/pursue-console/work-available.json";
-async function _loadQueue(src) {
-  try {
-    const q = /^https?:\/\//i.test(src)
-      ? await (await fetch(src + (src.includes("?") ? "" : "?t=" + Date.now()))).json()
-      : JSON.parse(await readFile(src, "utf8"));
-    return { q, ts: Date.parse(q.generatedAt) || 0, kind: /^https?:\/\//i.test(src) ? "remote" : "local" };
-  } catch { return null; }
+// In --review mode the picking strategy switches to public/review-queue.json
+// (sibling of work-available.json on the same Pages base). The OCR-queue
+// fetch still happens — we read its `leasing` field for the lease windows.
+console.log(`[volunteer] fetching ${QUEUE_URL}`);
+let queue;
+if (QUEUE_URL.startsWith("http://") || QUEUE_URL.startsWith("https://")) {
+  const queueRes = await fetch(QUEUE_URL);
+  if (!queueRes.ok) { console.error(`error: queue fetch HTTP ${queueRes.status}`); process.exit(1); }
+  queue = await queueRes.json();
+} else {
+  queue = JSON.parse(await readFile(QUEUE_URL, "utf8"));
 }
 const _qSources = [await _loadQueue(QUEUE_URL)];
 if (QUEUE_URL !== REMOTE_QUEUE) _qSources.push(await _loadQueue(REMOTE_QUEUE));
@@ -176,42 +193,133 @@ const _qLabel = REVIEW
   : `${queue.totalDocsRemaining || 0} docs · ${queue.totalPagesNeeded || 0} pages need vision OCR`;
 console.log(`[volunteer] ${_qLabel}`);
 
-// ----- step 2: pick a slice -----
-// Picking strategy: hash(handle) determines a stable starting event so two
-// volunteers running concurrently don't both grab the same first doc.
-// Within an event we just take the head of the queue.
-function hash(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return Math.abs(h); }
-let candidateEids = Object.keys(queue.byEvent);
-if (ONLY_EID) {
-  if (!queue.byEvent[ONLY_EID]) { console.error(`error: --eid=${ONLY_EID} is not in the queue (already done?)`); process.exit(1); }
-  candidateEids = [ONLY_EID];
-} else {
-  // Stable rotation: start from hash(handle) % length, but always rotate
-  // to favor pdfjs-render-friendly docs over the known-bad ones.
-  // Removed in 2.1 — KNOWN_RENDER_HARD used to block fbi-62hq83894 and
-  // skylab because of the Windows pdfjs file-URL bug. That was fixed
-  // weeks ago by the pathToFileURL refactor; the block was stale code
-  // keeping those 185 + 11 pages out of the volunteer rotation.
-  const start = hash(HANDLE) % Math.max(1, candidateEids.length);
-  candidateEids = candidateEids.slice(start).concat(candidateEids.slice(0, start));
+// Lease windows come from leasing.json (passed through work-available.json's
+// `leasing` field). OCR phase default: 3600s. Review phase default: 1800s.
+const LEASING = queue.leasing || {};
+const PHASE = REVIEW_MODE ? "review" : "ocr";
+const PHASE_DEFAULTS = { ocr: 3600, media: 86400, review: 1800 };
+const LEASE_SECS = Number(LEASING.phases?.[PHASE] ?? LEASING.default_lease_secs ?? PHASE_DEFAULTS[PHASE]);
+
+// Fetch the review queue in --review mode. Derived from QUEUE_URL by swapping
+// the trailing filename so a custom --queue-url (e.g. local file) still works.
+let reviewQueue = null;
+if (REVIEW_MODE) {
+  const reviewUrl = QUEUE_URL.replace(/work-available\.json([^/]*)$/i, "review-queue.json$1");
+  console.log(`[volunteer] --review · fetching ${reviewUrl}`);
+  try {
+    if (reviewUrl.startsWith("http://") || reviewUrl.startsWith("https://")) {
+      const r = await fetch(reviewUrl);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      reviewQueue = await r.json();
+    } else {
+      reviewQueue = JSON.parse(await readFile(reviewUrl, "utf8"));
+    }
+  } catch (e) {
+    console.error(`error: could not fetch review queue (${e.message})`);
+    process.exit(1);
+  }
+  if (!reviewQueue?.total) {
+    console.log("[volunteer] nothing in REVIEW queue — try the OCR flow with `volunteer.mjs --my-handle=" + HANDLE + "` instead.");
+    process.exit(0);
+  }
+  console.log(`[volunteer] review queue gen ${reviewQueue.generatedAt} · ${reviewQueue.total} disputed page(s)`);
 }
 
+// ----- step 2: pick a slice -----
+// OCR mode: hash(handle) determines a stable starting event so two
+// volunteers running concurrently don't both grab the same first doc.
+// Within an event we just take the head of the queue.
+// REVIEW mode: walk review-queue.json entries in order (already sorted
+// worst-agreement-first), group by eid, honor --eid, apply R7 lease checks.
+function hash(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return Math.abs(h); }
+
 const claims = [];   // { eid, doc, pages: [pageNumbers] }
-let remaining = SLICE;
-for (const eid of candidateEids) {
-  if (remaining <= 0) break;
-  const doc = queue.byEvent[eid];
-  if (!doc.pdfUrl) continue;
-  // REVIEW mode targets disputed pages (doc.reviewQueue) so the worker actually
-  // addresses the queue the dashboard shows, not the OCR backlog.
-  const pageList = REVIEW ? (doc.reviewQueue || []) : (doc.queue || []);
-  const take = pageList.slice(0, remaining);
-  if (!take.length) continue;
-  claims.push({ eid, doc, pages: take });
-  remaining -= take.length;
+
+if (REVIEW_MODE) {
+  // Group disputed pages by eid, preserving worst-first order; pull doc
+  // metadata (pdfUrl, title, agency) from the OCR queue. A disputed page
+  // can only be re-OCR'd if the underlying PDF is still discoverable.
+  const byEid = new Map();
+  for (const item of reviewQueue.queue) {
+    if (ONLY_EID && item.eventId !== ONLY_EID) continue;
+    if (!byEid.has(item.eventId)) byEid.set(item.eventId, []);
+    byEid.get(item.eventId).push(item.page);
+  }
+  let remaining = SLICE;
+  for (const [eid, pages] of byEid) {
+    if (remaining <= 0) break;
+    // doc may not be in work-available.json (event is fully OCR'd; only
+    // disputed pages remain) — fall back to a synthesized record from the
+    // review-queue entry. We still need pdfUrl to download.
+    let doc = queue.byEvent[eid];
+    if (!doc) {
+      const sample = reviewQueue.queue.find(q => q.eventId === eid);
+      // Without pdfUrl we can't render — pull it from events.js via the
+      // OCR queue's notYetPulled bucket if present, else skip.
+      const npull = (queue.notYetPulled || []).find(n => n.eid === eid);
+      doc = {
+        title: sample?.title || eid,
+        agency: sample?.agency || null,
+        pdfUrl: npull?.pdfUrl || null,
+      };
+    }
+    if (!doc.pdfUrl) { console.log(`    ⊖ ${eid}: no pdfUrl, skipping`); continue; }
+    const take = pages.slice(0, remaining);
+    if (!take.length) continue;
+    claims.push({ eid, doc, pages: take });
+    remaining -= take.length;
+  }
+} else {
+  let candidateEids = Object.keys(queue.byEvent);
+  if (ONLY_EID) {
+    if (!queue.byEvent[ONLY_EID]) { console.error(`error: --eid=${ONLY_EID} is not in the queue (already done?)`); process.exit(1); }
+    candidateEids = [ONLY_EID];
+  } else {
+    // Stable rotation: start from hash(handle) % length, but always rotate
+    // to favor pdfjs-render-friendly docs over the known-bad ones.
+    // Removed in 2.1 — KNOWN_RENDER_HARD used to block fbi-62hq83894 and
+    // skylab because of the Windows pdfjs file-URL bug. That was fixed
+    // weeks ago by the pathToFileURL refactor; the block was stale code
+    // keeping those 185 + 11 pages out of the volunteer rotation.
+    const start = hash(HANDLE) % Math.max(1, candidateEids.length);
+    candidateEids = candidateEids.slice(start).concat(candidateEids.slice(0, start));
+  }
+
+  let remaining = SLICE;
+  for (const eid of candidateEids) {
+    if (remaining <= 0) break;
+    const doc = queue.byEvent[eid];
+    if (!doc.pdfUrl) continue;
+    const take = doc.queue.slice(0, remaining);
+    if (!take.length) continue;
+    claims.push({ eid, doc, pages: take });
+    remaining -= take.length;
+  }
 }
+
+// R7 Phase 1 — drop pages held by another volunteer's unexpired claim, then
+// write our own claim for the survivors. Self-owned claims are honored (we
+// resume our own slice). Best-effort: a parse error on read = treat as unclaimed.
+let skippedClaimed = 0;
+for (const c of claims) {
+  const kept = [];
+  for (const p of c.pages) {
+    const existing = await readClaim(c.eid, p);
+    if (existing && claimIsActive(existing) && existing.handle !== HANDLE) {
+      skippedClaimed++;
+      continue;
+    }
+    kept.push(p);
+    await writeClaim(c.eid, p, HANDLE, LEASE_SECS, PHASE);
+  }
+  c.pages = kept;
+}
+// Drop docs whose pages all got claimed away.
+for (let i = claims.length - 1; i >= 0; i--) if (!claims[i].pages.length) claims.splice(i, 1);
+if (skippedClaimed) console.log(`[volunteer] skipped ${skippedClaimed} page(s) under active claim by another handle`);
+
 const total = claims.reduce((s, c) => s + c.pages.length, 0);
-console.log(`[volunteer] claiming ${total} page(s) across ${claims.length} doc(s):`);
+console.log(`[volunteer] claiming ${total} page(s) across ${claims.length} doc(s) · phase=${PHASE} · lease=${LEASE_SECS}s:`);
 for (const c of claims) console.log(`    ${c.eid.padEnd(28)} pages ${c.pages.join(",")}`);
 
 // ---- progress reporter → MONITOR (separate process from MCP daemon) ----
@@ -277,8 +385,12 @@ await mkdir(PDF_ROOT, { recursive: true });
 for (const c of claims) {
   const dest = path.join(PDF_ROOT, `${c.eid}.pdf`);
   if (existsSync(dest)) { console.log(`  ⊖ ${c.eid}.pdf already present`); continue; }
-  console.log(`  ↓ ${c.eid}.pdf  ${c.doc.pdfUrl}`);
-  const r = await fetch(c.doc.pdfUrl);
+  // Release-02 PDFs ship as site-relative paths (e.g. "release_2/X.pdf")
+  // because they're mirrored under public/release_2/ — resolve against the
+  // deployed site so Node's fetch() (which rejects relative URLs) works.
+  const absUrl = /^https?:\/\//i.test(c.doc.pdfUrl) ? c.doc.pdfUrl : new URL(c.doc.pdfUrl, "https://rizzleroc.github.io/pursue-console/").href;
+  console.log(`  ↓ ${c.eid}.pdf  ${absUrl}`);
+  const r = await fetch(absUrl);
   if (!r.ok) { console.error(`    HTTP ${r.status} — skipping doc`); c.skip = true; continue; }
   await writeFile(dest, Buffer.from(await r.arrayBuffer()));
 }
@@ -308,7 +420,7 @@ async function renderPng(doc, page, scale = 2.0) {
 }
 
 const BATCH_SEP = "<<<<< PAGE BREAK >>>>>";
-const PROMPT_SINGLE =
+const PROMPT_OCR_SINGLE =
   "Please transcribe the text shown in this image so I can search the content. " +
   "Output only the text exactly as written, preserving line breaks. " +
   "If a portion is unreadable or has been blacked out, write (?) in its place. " +
@@ -320,6 +432,15 @@ const PROMPT_SINGLE =
   "in brackets. Use these kinds: [PHOTO], [DIAGRAM], [SKETCH], [MAP], [CHART], [ANNOTATION].\n" +
   "If there are no visual elements, omit the VISUAL CONTENT section entirely.\n\n" +
   "This is a declassified public document.";
+
+// R10 — in --review mode use the standardized prompt (same as
+// reevaluate-disputed.mjs) so the v2 transcript is directly comparable to
+// the maintainer-driven reeval pipeline. Loaded once at startup.
+const STANDARD_PROMPT_PATH = path.join(__dirname, "prompts", "standard-transcription.txt");
+const PROMPT_STANDARD = REVIEW_MODE
+  ? await readFile(STANDARD_PROMPT_PATH, "utf8")
+  : null;
+const PROMPT_SINGLE = REVIEW_MODE ? PROMPT_STANDARD : PROMPT_OCR_SINGLE;
 
 function batchPrompt(n) {
   return `I'm sending you ${n} pages from the same document, in order from page 1 to page ${n}. ` +
@@ -400,6 +521,8 @@ await mkdir(PNG_STAGE, { recursive: true });
 // Pages already MERGED to origin/main by ANY handle — so we never re-OCR work
 // that's already done (by us or another volunteer). Graceful: empty set on
 // offline/no-git falls back to the local existsSync(txt) check below.
+// In review mode the slot is `<source>-review/`, so the same dedup applies but
+// against the per-base v2 contributions.
 async function publishedOcrSet() {
   const cap = (argv) => new Promise((res) => {
     const p = spawn("git", argv, { cwd: ROOT, stdio: ["ignore", "pipe", "ignore"], timeout: 8000 });
@@ -410,13 +533,13 @@ async function publishedOcrSet() {
   try {
     await cap(["fetch", "origin", "main", "--quiet"]);
     const out = await cap(["ls-tree", "-r", "origin/main", "--name-only", "--", "contributions"]);
-    const re = new RegExp(`^contributions/[^/]+/${CONTRIB_SOURCE}/(.+)/p0*(\\d+)\\.txt$`, "i");
+    const re = new RegExp(`^contributions/[^/]+/${CONTRIB_SLOT}/(.+)/p0*(\\d+)\\.txt$`, "i");
     for (const line of out.split(/\r?\n/)) { const m = line.match(re); if (m) set.add(`${m[1]}|${Number(m[2])}`); }
   } catch {}
   return set;
 }
 const publishedDone = await publishedOcrSet();
-if (publishedDone.size) console.log(`[volunteer] ${publishedDone.size} ${CONTRIB_SOURCE} page(s) already on main — won't re-OCR those`);
+if (publishedDone.size) console.log(`[volunteer] ${publishedDone.size} ${CONTRIB_SLOT} page(s) already on main — won't re-OCR those`);
 
 let pagesOK = 0, pagesErr = 0;
 const tAll = Date.now();
@@ -438,7 +561,13 @@ for (const c of live) {
   for (const p of c.pages) {
     const txt = path.join(docDir, `p${String(p).padStart(4,"0")}.txt`);
     const jsn = path.join(docDir, `p${String(p).padStart(4,"0")}.json`);
-    if (existsSync(txt) || publishedDone.has(`${c.eid}|${Number(p)}`)) { console.log(`  ⊖ ${c.eid} p${p} already done (local or merged to main)`); continue; }
+    // Review mode also skips when the per-source v2 transcript already exists
+    // in the local vision cache — that page's dispute has been re-OCR'd here
+    // already (by us or a prior reeval pass) and committing again is churn.
+    const v2Local = REVIEW_MODE
+      ? path.join(ROOT, "data-raw", ".vision-cache", c.eid, `p${String(p).padStart(4,"0")}.${CONTRIB_SOURCE}.v2.txt`)
+      : null;
+    if (existsSync(txt) || publishedDone.has(`${c.eid}|${Number(p)}`) || (v2Local && existsSync(v2Local))) { console.log(`  ⊖ ${c.eid} p${p} already done (local or merged to main)`); continue; }
     const png = path.join(docPngDir, `p${String(p).padStart(4,"0")}.png`);
     try {
       if (!existsSync(png)) await writeFile(png, await renderPng(doc, p, 2.0));
@@ -570,15 +699,28 @@ try {
   await run("git", ["checkout", "-b", branch]);
   await run("git", ["add", `contributions/${HANDLE}`]);
   const docsTouched = [...new Set(claims.map(c => c.eid))].join(", ");
-  await run("git", ["commit", "-m", `corpus: volunteer transcriptions for ${docsTouched}\n\nSubmitted by @${HANDLE} via scripts/volunteer.mjs (${pagesOK} pages).`]);
+  const commitTitle = REVIEW_MODE
+    ? `corpus: review re-OCR for ${docsTouched}`
+    : `corpus: volunteer transcriptions for ${docsTouched}`;
+  await run("git", ["commit", "-m", `${commitTitle}\n\nSubmitted by @${HANDLE} via scripts/volunteer.mjs${REVIEW_MODE ? " --review" : ""} (${pagesOK} pages).`]);
   await run("git", ["push", "-u", "origin", branch]);
-  const body = `## Volunteer contribution\n\n` +
-    `Submitted ${pagesOK} vision-OCR'd pages across ${claims.length} document(s):\n\n` +
-    claims.map(c => `- \`${c.eid}\` pages ${c.pages.join(", ")}`).join("\n") +
-    `\n\nGenerated via [pursue-vision-mcp](../tree/main/pursue-vision-mcp) by @${HANDLE}.\n\n` +
-    `CI will validate against [JUDGE-STANDARD.md](../blob/main/JUDGE-STANDARD.md). ` +
-    `Pages in the \`?-review\` quality band will be checked manually.`;
-  await run("gh", ["pr", "create", "--title", `Volunteer corpus contribution from @${HANDLE}`, "--body", body]);
+  const body = REVIEW_MODE
+    ? `## Volunteer REVIEW re-transcription\n\n` +
+      `Re-OCR'd ${pagesOK} disputed page(s) across ${claims.length} document(s) using the standardized prompt ` +
+      `(\`scripts/prompts/standard-transcription.txt\`). Output lands under \`${CONTRIB_SLOT}/\` and the importer ` +
+      `writes it as \`p<NNN>.${CONTRIB_SOURCE}.v2.txt\` so \`compare-sources.mjs\` re-scores each dispute:\n\n` +
+      claims.map(c => `- \`${c.eid}\` pages ${c.pages.join(", ")}`).join("\n") +
+      `\n\nGenerated via [pursue-vision-mcp](../tree/main/pursue-vision-mcp) by @${HANDLE}.`
+    : `## Volunteer contribution\n\n` +
+      `Submitted ${pagesOK} vision-OCR'd pages across ${claims.length} document(s):\n\n` +
+      claims.map(c => `- \`${c.eid}\` pages ${c.pages.join(", ")}`).join("\n") +
+      `\n\nGenerated via [pursue-vision-mcp](../tree/main/pursue-vision-mcp) by @${HANDLE}.\n\n` +
+      `CI will validate against [JUDGE-STANDARD.md](../blob/main/JUDGE-STANDARD.md). ` +
+      `Pages in the \`?-review\` quality band will be checked manually.`;
+  const prTitle = REVIEW_MODE
+    ? `Review re-OCR contribution from @${HANDLE}`
+    : `Volunteer corpus contribution from @${HANDLE}`;
+  await run("gh", ["pr", "create", "--title", prTitle, "--body", body]);
   console.log("[volunteer] PR opened. Thank you!");
 } catch (e) {
   console.error("[volunteer] PR step failed:", e.message);

@@ -22,7 +22,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:26.416Z",
+    "computed_at": "2026-07-10T15:32:48.876Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -36,12 +36,12 @@
       {
         "a": "gpt-vision",
         "b": "judge",
-        "score": 0.871
+        "score": 0.889
       },
       {
         "a": "gemini",
         "b": "judge",
-        "score": 0.491
+        "score": 0.478
       }
     ],
     "confidence": "high",
@@ -55,17 +55,6 @@
       "judge": "chatgpt",
       "text_length": 86
     },
-    "dispute_kind": "judged",
-    "reevaluation": {
-      "providers": {
-        "gpt-vision": {
-          "text_file": "p0066.gpt-vision.v2.txt",
-          "chars": 78,
-          "imported_at": "2026-05-26T21:46:41.374Z",
-          "contributor": "Rizzleroc",
-          "via": "volunteer-review"
-        }
-      }
-    }
+    "dispute_kind": "judged"
   }
 }

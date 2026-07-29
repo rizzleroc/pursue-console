@@ -112,6 +112,36 @@ if (!DAEMON_TOKEN) {
 }
 
 function hash(s) { let h = 5381; for (const c of s) h = ((h << 5) + h + c.charCodeAt(0)) | 0; return Math.abs(h); }
+
+// ----- R7 Phase 1: static claims ledger (phase=media) -----
+// Mirrors the helpers in volunteer.mjs. Best-effort: any parse failure on read
+// → treat as "no claim"; any write failure → log and continue (claim is
+// advisory). See design/VOLUNTEER-LEASING.md.
+const CLAIMS_DIR = path.join(ROOT, "public", "claims");
+function claimPath(eid, pageNum) {
+  return path.join(CLAIMS_DIR, eid, `p${String(pageNum).padStart(4, "0")}.json`);
+}
+async function readClaim(eid, pageNum) {
+  try {
+    const txt = await readFile(claimPath(eid, pageNum), "utf8");
+    return JSON.parse(txt);
+  } catch { return null; }
+}
+function claimIsActive(claim) {
+  if (!claim?.claimed_at || !claim?.lease_secs) return false;
+  const ageSecs = (Date.now() - new Date(claim.claimed_at).getTime()) / 1000;
+  return Number.isFinite(ageSecs) && ageSecs < Number(claim.lease_secs);
+}
+async function writeClaim(eid, pageNum, handle, leaseSecs, phase) {
+  try {
+    await mkdir(path.join(CLAIMS_DIR, eid), { recursive: true });
+    await writeFile(claimPath(eid, pageNum), JSON.stringify({
+      handle, claimed_at: new Date().toISOString(), lease_secs: leaseSecs, phase,
+    }) + "\n", "utf8");
+  } catch (e) {
+    console.log(`    ! claim write failed for ${eid} p${pageNum}: ${e.message.slice(0, 80)}`);
+  }
+}
 async function run(cmd, argv, opts = {}) {
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, argv, { stdio: "inherit", ...opts });
@@ -283,8 +313,15 @@ async function claimPhase() {
     } catch { return true; }
   };
 
+  // R7 leasing: lease length comes from work-available.json's `leasing` field
+  // (passed through from config/leasing.json). Default 86400s for media — these
+  // claims span a human reading + editing the staged template, hours to days.
+  const LEASING = queue.leasing || {};
+  const LEASE_SECS = Number(LEASING.phases?.media ?? LEASING.default_lease_secs ?? 86400);
+
   const claims = [];
   let skippedDone = 0;
+  let skippedClaimed = 0;
   let remaining = SLICE;
   for (const [eid, d] of rotated) {
     if (remaining <= 0) break;
@@ -292,15 +329,24 @@ async function claimPhase() {
       if (remaining <= 0) break;
       const page = (v && typeof v === "object") ? v.page : v;
       if (alreadyDone(eid, page)) { skippedDone++; continue; }
+      // R7 — skip pages another volunteer holds an active claim on.
+      const existing = await readClaim(eid, page);
+      if (existing && claimIsActive(existing) && existing.handle !== HANDLE) {
+        skippedClaimed++;
+        continue;
+      }
       claims.push({ eid, doc: d, ...v });
       remaining--;
     }
   }
   if (skippedDone) console.log(`[claim] skipped ${skippedDone} page(s) already contributed or staged`);
+  if (skippedClaimed) console.log(`[claim] skipped ${skippedClaimed} page(s) under active claim by another handle`);
   if (!claims.length) {
     console.log("[claim] nothing fresh to claim — every queued page already has a contribution or staged template. Push/merge your open PR or wait for the queue to regenerate.");
     process.exit(0);
   }
+  // Write our own claims for the survivors. Best-effort.
+  for (const c of claims) await writeClaim(c.eid, c.page, HANDLE, LEASE_SECS, "media");
   console.log(`[claim] claiming ${claims.length} page(s):`);
   for (const c of claims) console.log(`    ${c.eid.padEnd(28)} p${String(c.page).padStart(4, "0")}  ${c.kind.padEnd(20)}  "${c.suggestedTitle.slice(0, 40)}"`);
 
@@ -339,8 +385,12 @@ async function claimPhase() {
     // Fall back to downloading from war.gov into the volunteer scratch dir.
     const filename = path.join(PDF_ROOT, `${eid}.pdf`);
     if (!existsSync(filename)) {
-      console.log(`    ↓ downloading ${url}`);
-      const r = await fetch(url);
+      // Release-02 PDFs ship as site-relative paths (e.g. "release_2/X.pdf")
+      // because they're mirrored under public/release_2/ — resolve against the
+      // deployed site so Node's fetch() (which rejects relative URLs) works.
+      const absUrl = /^https?:\/\//i.test(url) ? url : new URL(url, "https://rizzleroc.github.io/pursue-console/").href;
+      console.log(`    ↓ downloading ${absUrl}`);
+      const r = await fetch(absUrl);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const buf = Buffer.from(await r.arrayBuffer());
       await writeFile(filename, buf);

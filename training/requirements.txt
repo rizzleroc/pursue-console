@@ -1,0 +1,13 @@
+# Inference + judge — used by generate_qa.py and run_eval.py
+anthropic>=0.40.0
+
+# Training — used by finetune.py and run_eval.py's local generation
+torch>=2.3.0
+transformers>=4.45.0
+datasets>=2.20.0
+peft>=0.12.0
+trl>=0.11.0
+accelerate>=0.34.0
+
+# Optional: 4-bit quantization (only needed with finetune.py --qlora)
+bitsandbytes>=0.43.0

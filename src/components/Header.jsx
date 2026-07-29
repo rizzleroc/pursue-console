@@ -74,6 +74,12 @@ export default function Header({ view, onViewChange, onVolunteer }) {
           )}
         </button>
         <div className="flex items-center gap-2">
+          <a
+            href={`${import.meta.env.BASE_URL}mc/`}
+            className="font-mono text-[10px] tracking-[0.25em] px-2.5 py-1 rounded-sm border border-amber-700/50 bg-amber-950/30 text-amber-300/90 hover:bg-amber-900/40 hover:border-amber-500/70 hover:text-amber-200 transition-colors"
+            title="Preview the next release — Mission Control 3.0">
+            ▣ MISSION CONTROL 3.0 →
+          </a>
           <LanguagePicker />
           <button
             onClick={onVolunteer}

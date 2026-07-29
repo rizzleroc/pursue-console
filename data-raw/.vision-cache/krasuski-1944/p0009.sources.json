@@ -3,7 +3,7 @@
   "sources": {
     "gpt-vision": {
       "chars": 1934,
-      "imported_at": "2026-05-26T21:46:41.917Z",
+      "imported_at": "2026-07-10T15:32:48.645Z",
       "handle": "Rizzleroc",
       "text_file": "p0009.gpt-vision.txt"
     },
@@ -16,16 +16,16 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-05-20T14:25:27.061Z",
+    "computed_at": "2026-07-10T15:32:51.726Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gemini",
-    "agreement_score": 0.964,
+    "agreement_score": 0.959,
     "pairs": [
       {
         "a": "gpt-vision",
         "b": "gemini",
-        "score": 0.964
+        "score": 0.959
       }
     ],
     "confidence": "high",

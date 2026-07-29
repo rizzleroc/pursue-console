@@ -1,0 +1,6 @@
+# Training outputs — don't commit big artifacts or paid API products.
+out/
+__pycache__/
+*.pyc
+.venv/
+venv/

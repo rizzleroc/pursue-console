@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of Highboy Desk",
-  "description": "Image of Highboy Desk",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of Blanket"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.490Z"
+  "description": "HIGHBOY DESK in genuine\nSOLID mahogany from the New\nArlington Group by Kling. A\ndistinctive addition to any room.\nAt leading stores.\nFull color booklet, “Your Bed-\nroom and YOU” contains helpful\nsuggestions on the care of furn-\niture and bedroom decoration\nand arrangement. Send 25¢ in\ncoin to Kling Factories, Dept. Y9,\nMayville, N. Y.\nKLING MEANS SOLID MAHOGANY\nMAPLE • CHERRY\npage 71, 72",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.687Z",
+  "contributor": "Rizzleroc"
 }

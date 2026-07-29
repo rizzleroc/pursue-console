@@ -75,9 +75,10 @@ const HEADER_TYPE_TO_KINDS = {
   Audio: new Set(),
 };
 
-// IR-scope poster for video tiles — reticle + scanlines + play affordance.
-// DVIDS clips can't be embedded, so this stands in for a thumbnail and the
-// whole tile/modal links out to dvidshub.net.
+// IR-scope poster for video tiles in the grid — reticle + scanlines + play
+// affordance. The full iframe player only mounts inside the modal (one at
+// a time); grid tiles stay as posters to keep scroll cheap and avoid
+// dozens of concurrent iframes.
 function VideoPoster({ label, big }) {
   // Caller provides the label so we don't need to thread `t` into a
   // purely-presentational SVG. Defaults to the English DVIDS CTA when
@@ -510,12 +511,17 @@ export default function MediaView({ onSelect, headerFilters }) {
             </div>
             <div className="flex-1 overflow-auto bg-black flex items-center justify-center p-6 min-h-[40vh]">
               {focused.kind === "video" ? (
-                <a href={focused.dvidsUrl || `https://www.dvidshub.net/video/${focused.videoId}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="group w-full max-w-3xl aspect-video rounded-sm border border-blue-700/40 overflow-hidden bg-black block"
-                  aria-label={`Watch on DVIDS: ${focused.title || "DVIDS video"}`}>
-                  <VideoPoster big label="PLAY ON DVIDS ↗" />
-                </a>
+                <div className="w-full max-w-3xl aspect-video rounded-sm border border-blue-700/40 overflow-hidden bg-black">
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.dvidshub.net/video/embed/${focused.videoId}`}
+                    title={focused.title || "DVIDS video"}
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
               ) : focused.imagePath ? (
                 <img src={`${import.meta.env.BASE_URL}${focused.imagePath}`} alt={focused.title || focused.kind}
                   className="max-w-full max-h-[70vh] object-contain" />

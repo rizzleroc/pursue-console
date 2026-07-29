@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PURSUE CONSOLE — OPERATIONAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #03060A;
+    --void-2: #060B12;
+    --void-3: #0A111B;
+    --surface:  rgba(12, 19, 28, 0.62);
+    --surface-2: rgba(18, 26, 36, 0.70);
+    --hairline: rgba(242, 166, 35, 0.09);
+    --border: rgba(242, 166, 35, 0.18);
+    --border-strong: rgba(242, 166, 35, 0.34);
+    --border-cyan: rgba(97, 215, 240, 0.22);
+
+    --text: #F4ECD4;
+    --text-2: #B8A887;
+    --text-3: #756647;
+    --text-4: #463C2D;
+    --text-cyan: #9BD5E8;
+
+    --amber: #F2A623;
+    --amber-glow: rgba(242, 166, 35, 0.50);
+    --amber-bright: #FFB840;
+    --gold: #E8A33B;
+
+    --cyan: #61D7F0;
+    --cyan-deep: #2D9DBA;
+
+    --emerald: #4ADE80;
+    --rose: #E04968;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--void); }
+  body {
+    width: 1600px;
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ───────── Cinematic background stack ───────── */
+  .bg-void {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(1200px 700px at 78% -8%,  rgba(242, 166, 35, 0.10), transparent 70%),
+      radial-gradient(900px 600px at 18% 100%, rgba(97, 215, 240, 0.05), transparent 70%),
+      radial-gradient(1500px 900px at 50% 50%, rgba(8, 14, 22, 0.0),    rgba(0,0,0,0.7) 100%),
+      linear-gradient(180deg, var(--void) 0%, var(--void-2) 50%, var(--void) 100%);
+    pointer-events: none;
+  }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(to right, rgba(242, 166, 35, 0.030) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(242, 166, 35, 0.030) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 65% 25%, black 30%, transparent 80%);
+    pointer-events: none;
+  }
+  .bg-noise {
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2"/><feColorMatrix values="0 0 0 0 0.95  0 0 0 0 0.65  0 0 0 0 0.14  0 0 0 0.05 0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>');
+    opacity: 0.55;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+  .vignette {
+    position: fixed; inset: 0; z-index: 1;
+    pointer-events: none;
+    box-shadow: inset 0 0 220px 60px rgba(0, 0, 0, 0.85);
+  }
+  .scanline {
+    position: fixed; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(242, 166, 35, 0.55), transparent);
+    box-shadow: 0 0 18px rgba(242, 166, 35, 0.55), 0 0 32px rgba(242, 166, 35, 0.32);
+    top: -2px;
+    animation: scanline 11s linear infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes scanline {
+    0% { top: -3px; opacity: 0; }
+    6% { opacity: 1; }
+    94% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* ── Classification banner (Bond-style top & bottom strip) ── */
+  .classified {
+    position: relative; z-index: 5;
+    background: linear-gradient(90deg, rgba(242,166,35,0.10), rgba(242,166,35,0.04), rgba(242,166,35,0.10));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.36em;
+    text-transform: uppercase;
+  }
+  .classified .dash { color: var(--text-3); }
+  .classified .stamp { display: inline-flex; align-items: center; gap: 8px; }
+  .classified .stamp::before { content:''; display:inline-block; width:6px; height:6px; background: var(--amber); box-shadow: 0 0 8px var(--amber-glow); }
+
+  /* ───────── Corner reticles (full canvas) ───────── */
+  .corner {
+    position: fixed; width: 32px; height: 32px;
+    z-index: 4; pointer-events: none;
+    border-color: rgba(242, 166, 35, 0.4);
+  }
+  .corner::before, .corner::after { content: ''; position: absolute; background: rgba(242, 166, 35, 0.55); }
+  .corner.tl { top: 32px; left: 32px;     border-top: 1px solid; border-left: 1px solid; }
+  .corner.tr { top: 32px; right: 32px;    border-top: 1px solid; border-right: 1px solid; }
+  .corner.bl { bottom: 32px; left: 32px;  border-bottom: 1px solid; border-left: 1px solid; }
+  .corner.br { bottom: 32px; right: 32px; border-bottom: 1px solid; border-right: 1px solid; }
+  .corner.tl::before { left:-1px; top:6px; width:1px; height:8px; }
+  .corner.tl::after  { top:-1px; left:6px; height:1px; width:8px; }
+
+  /* ───────── Top bar ───────── */
+  header {
+    position: relative; z-index: 5;
+    display: grid; grid-template-columns: auto 1fr auto;
+    align-items: center; gap: 28px;
+    padding: 22px 56px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand-mark {
+    width: 12px; height: 12px;
+    background: var(--amber);
+    transform: rotate(45deg);
+    box-shadow: 0 0 14px var(--amber-glow);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 14px var(--amber-glow); transform: rotate(45deg) scale(1); }
+    50%      { box-shadow: 0 0 24px rgba(242,166,35,0.85); transform: rotate(45deg) scale(1.1); }
+  }
+  .brand-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px; letter-spacing: 0.20em;
+    color: var(--text);
+  }
+  .brand-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.22em;
+    padding-left: 14px;
+    border-left: 1px solid var(--border);
+  }
+  .center-strip {
+    display: flex; justify-content: center; align-items: center; gap: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    letter-spacing: 0.18em;
+  }
+  .center-strip .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+  }
+  .center-strip .badge .dot {
+    width: 7px; height: 7px; background: var(--emerald);
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+    border-radius: 50%;
+    animation: pulse-soft 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+  }
+  .center-strip .badge.amber .dot { background: var(--amber); box-shadow: 0 0 10px var(--amber-glow); }
+  .center-strip .badge .v { color: var(--text); font-weight: 600; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .ghost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all .2s;
+  }
+  .ghost:hover { color: var(--text); border-color: var(--border-strong); }
+  .ops-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em; font-weight: 600;
+    color: var(--void);
+    background: linear-gradient(180deg, var(--amber-bright) 0%, var(--gold) 100%);
+    border: 1px solid var(--amber);
+    padding: 9px 18px;
+    cursor: pointer;
+    box-shadow: 0 12px 28px -10px rgba(242, 166, 35, 0.55);
+  }
+
+  /* ───────── Nav ───────── */
+  nav {
+    position: relative; z-index: 5;
+    display: flex; align-items: center; gap: 4px;
+    padding: 22px 56px 0;
+  }
+  .nav-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em;
+    color: var(--text-3);
+    padding: 10px 16px;
+    border: none; background: transparent;
+    cursor: pointer; position: relative;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-tab:hover { color: var(--text-2); }
+  .nav-tab.active {
+    color: var(--amber);
+    text-shadow: 0 0 10px rgba(242, 166, 35, 0.45);
+  }
+  .nav-tab.active::after {
+    content: '';
+    position: absolute; left: 16px; right: 16px; bottom: -1px;
+    height: 1px; background: var(--amber);
+    box-shadow: 0 0 10px var(--amber-glow);
+  }
+  .nav-divider { width: 1px; height: 14px; background: var(--border); margin: 0 14px; }
+  .nav-group { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: var(--text-4); }
+  .nav-badge {
+    margin-left: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--amber);
+    background: rgba(242, 166, 35, 0.10);
+    border: 1px solid var(--border-strong);
+    padding: 1px 7px;
+  }
+
+  /* ───────── Hero ───────── */
+  .hero {
+    position: relative; z-index: 4;
+    padding: 76px 56px 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 720px;
+    gap: 64px;
+    align-items: start;
+  }
+  .eyebrow {
+    display: flex; align-items: center; gap: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    animation: rise 0.7s 0.35s both cubic-bezier(.2,.7,.2,1);
+  }
+  .eyebrow .div { width: 32px; height: 1px; background: var(--amber); opacity: 0.6; }
+  .eyebrow .code { color: var(--text-3); }
+  h1.headline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 72px; font-weight: 700;
+    line-height: 1.02;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    margin: 28px 0 28px;
+    max-width: 740px;
+    text-shadow: 0 0 60px rgba(242, 166, 35, 0.06);
+  }
+  h1.headline .l1 { display: block; animation: rise-soft 0.9s 0.5s both cubic-bezier(.2,.7,.2,1); }
+  h1.headline .l2 {
+    display: block;
+    background: linear-gradient(95deg, var(--amber-bright), var(--amber), #B07816);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(242, 166, 35, 0.30);
+    animation: rise-soft 0.9s 0.65s both cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes rise-soft { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
+  .subhead {
+    font-size: 18px; line-height: 1.6;
+    color: var(--text-2);
+    max-width: 600px;
+    animation: rise 0.8s 0.8s both cubic-bezier(.2,.7,.2,1);
+  }
+
+  /* Status — mission readout style */
+  .mission-status {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(8px);
+    animation: rise 0.8s 0.95s both cubic-bezier(.2,.7,.2,1);
+    max-width: 720px;
+  }
+  .mission-cell {
+    padding: 20px 22px;
+    border-right: 1px solid var(--hairline);
+    position: relative;
+  }
+  .mission-cell:last-child { border-right: none; }
+  .mission-cell .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.28em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .mission-cell .v {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px; font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .mission-cell .v .small { font-size: 16px; color: var(--text-3); margin-left: 3px; }
+  .mission-cell .v.amber { color: var(--amber); text-shadow: 0 0 18px var(--amber-glow); }
+  .mission-cell .v.rose { color: var(--rose); }
+  .mission-cell .v.cyan { color: var(--cyan); }
+  .mission-cell .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--text-4); letter-spacing: 0.18em;
+    margin-top: 4px;
+  }
+
+  .cta-row {
+    margin-top: 40px;
+    display: flex; align-items: center; gap: 28px;
+    animation: rise 0.8s 1.1s both cubic-bezier(.2,.7,.2,1);
+  }
+  .primary-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--void);
+    background: linear-gradient(180deg, var(--amber-bright) 0%, var(--gold) 100%);
+    border: 1px solid var(--amber);
+    padding: 18px 28px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 14px;
+    box-shadow: 0 22px 36px -10px rgba(242, 166, 35, 0.52);
+    position: relative;
+    animation: breathe 4s ease-in-out infinite;
+  }
+  .primary-cta::before, .primary-cta::after {
+    content: ''; position: absolute; width: 9px; height: 9px;
+    border-color: var(--void); border-style: solid;
+  }
+  .primary-cta::before { top: 4px; left: 4px; border-top-width: 1px; border-left-width: 1px; }
+  .primary-cta::after  { bottom: 4px; right: 4px; border-bottom-width: 1px; border-right-width: 1px; }
+  @keyframes breathe {
+    0%, 100% { box-shadow: 0 22px 36px -10px rgba(242, 166, 35, 0.52), 0 0 0 0 rgba(242, 166, 35, 0); }
+    50%      { box-shadow: 0 22px 42px -10px rgba(242, 166, 35, 0.68), 0 0 36px 6px rgba(242, 166, 35, 0.20); }
+  }
+  .cta-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    border-left: 1px solid var(--border);
+    padding-left: 22px;
+    line-height: 1.7;
+  }
+  .cta-meta .ping {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--amber); margin-right: 7px; box-shadow: 0 0 8px var(--amber-glow);
+    animation: pulse-soft 2.4s ease-in-out infinite;
+    vertical-align: middle; transform: translateY(-1px);
+  }
+  .cta-meta .v { color: var(--text); font-weight: 600; }
+
+  /* ─────────── Coverage card (right side hero) ─────────── */
+  .ops-panel {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    padding: 28px 32px 32px;
+    box-shadow: 0 32px 80px -24px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+    animation: rise-soft 0.95s 0.4s both cubic-bezier(.2,.7,.2,1);
+    overflow: hidden;
+  }
+  .ops-panel::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    box-shadow: 0 0 18px var(--amber-glow);
+    animation: cw-scan 6s linear infinite;
+  }
+  @keyframes cw-scan {
+    0% { transform: translateY(0); opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { transform: translateY(720px); opacity: 0; }
+  }
+  .ops-panel::after {
+    content: '';
+    position: absolute; left: 14px; right: 14px; bottom: 14px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(242, 166, 35, 0.4), transparent);
+    pointer-events: none;
+  }
+  .ops-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 18px; margin-bottom: 22px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .ops-head .left { display: flex; align-items: center; gap: 12px; }
+  .ops-head .icon {
+    width: 18px; height: 18px;
+    border: 1px solid var(--amber);
+    transform: rotate(45deg);
+    position: relative;
+  }
+  .ops-head .icon::before {
+    content: '';
+    position: absolute; inset: 4px;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber-glow);
+  }
+  .ops-head .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.30em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .ops-head .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em;
+    color: var(--text-3);
+  }
+  .ops-head .sub .v { color: var(--amber); }
+
+  /* radar dome above coverage map */
+  .radar-wrap {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+    align-items: start;
+    margin-bottom: 26px;
+  }
+  .radar { position: relative; width: 280px; height: 280px; }
+  .radar svg { width: 100%; height: 100%; }
+  .radar .sweep-g { transform-origin: 140px 140px; animation: sweep 6s linear infinite; }
+  @keyframes sweep { to { transform: rotate(360deg); } }
+  .radar .ping {
+    animation: ping-fade 4s ease-in-out infinite;
+  }
+  .radar .ping:nth-child(2){animation-delay:0.4s}
+  .radar .ping:nth-child(3){animation-delay:1.6s}
+  .radar .ping:nth-child(4){animation-delay:2.4s}
+  .radar .ping:nth-child(5){animation-delay:3.1s}
+  @keyframes ping-fade {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+  .radar-stack { display: flex; flex-direction: column; gap: 14px; }
+  .radar-row {
+    display: flex; align-items: baseline; gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .radar-row:last-child { border-bottom: none; }
+  .radar-row .k {
+    font-size: 9px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase;
+    flex: 1;
+  }
+  .radar-row .v {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 600; color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .radar-row .v.amber { color: var(--amber); }
+  .radar-row .v.rose { color: var(--rose); }
+  .radar-row .v.emerald { color: var(--emerald); }
+  .radar-row .v.cyan { color: var(--cyan); }
+  .radar-row .pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-3);
+    width: 46px; text-align: right;
+  }
+
+  /* coverage grid */
+  .cw-title-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .cw-title-row .left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.26em;
+    color: var(--text-2);
+    text-transform: uppercase;
+  }
+  .cw-title-row .left .accent { color: var(--amber); }
+  .cw-title-row .right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.20em; color: var(--text-4);
+  }
+  .cw-grid {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 5px;
+  }
+  .cw-cell {
+    aspect-ratio: 1;
+    background: #0A1018;
+    border: 1px solid #182232;
+    opacity: 0;
+    animation: cw-in 0.5s cubic-bezier(.2,.7,.2,1) forwards;
+    transition: transform .2s;
+  }
+  .cw-cell:hover { transform: scale(1.18); border-color: var(--amber); }
+  @keyframes cw-in { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+  .cw-cell.partial {
+    background: rgba(242, 166, 35, 0.16);
+    border-color: rgba(242, 166, 35, 0.55);
+  }
+  .cw-cell.complete {
+    background: rgba(74, 222, 128, 0.22);
+    border-color: var(--emerald);
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.65), inset 0 0 10px rgba(74, 222, 128, 0.4);
+    animation: cw-in 0.5s cubic-bezier(.2,.7,.2,1) forwards, complete-pulse 2.6s ease-in-out 1.5s infinite;
+  }
+  @keyframes complete-pulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(74, 222, 128, 0.65), inset 0 0 10px rgba(74, 222, 128, 0.4); }
+    50%      { box-shadow: 0 0 28px rgba(74, 222, 128, 0.95), inset 0 0 14px rgba(74, 222, 128, 0.6); }
+  }
+  .cw-legend {
+    margin-top: 16px;
+    display: flex; gap: 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.16em;
+  }
+  .cw-legend .swatch {
+    width: 9px; height: 9px;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+  .cw-legend .lbl { color: var(--text-3); }
+  .cw-legend .v { color: var(--text); margin-left: 5px; font-weight: 700; }
+
+  /* ───────── Filter strip ───────── */
+  .filter-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 22px 56px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    background: rgba(6, 11, 18, 0.55);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 3;
+  }
+  .filter-input {
+    flex: 1; max-width: 460px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 11px 14px;
+    transition: border-color .2s;
+  }
+  .filter-input:focus-within { border-color: var(--border-strong); box-shadow: 0 0 0 4px rgba(242,166,35,0.06); }
+  .filter-input .icon { color: var(--amber); font-size: 14px; }
+  .filter-input input {
+    background: transparent; border: none; outline: none;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    flex: 1;
+  }
+  .filter-input input::placeholder { color: var(--text-4); }
+  .filter-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 11px 30px 11px 14px;
+    letter-spacing: 0.14em;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--amber) 50%), linear-gradient(135deg, var(--amber) 50%, transparent 50%);
+    background-position: calc(100% - 14px) 14px, calc(100% - 10px) 14px;
+    background-size: 4px 4px;
+    background-repeat: no-repeat;
+  }
+  .filter-meta {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-4);
+    letter-spacing: 0.20em;
+  }
+
+  /* ───────── Section header ───────── */
+  .section-divider {
+    padding: 0 56px;
+    margin: 56px 0 24px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .section-divider .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-strong), transparent); }
+  .section-divider .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.34em;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .section-divider .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-4); letter-spacing: 0.18em;
+  }
+
+  /* ───────── Progress card ───────── */
+  .progress-section { padding: 0 56px; position: relative; z-index: 3; }
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 30px 34px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .progress-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.30em;
+    color: var(--text);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .progress-title .icon { width: 9px; height: 9px; background: var(--amber); transform: rotate(45deg); box-shadow: 0 0 8px var(--amber-glow); }
+  .progress-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.20em; }
+  .progress-meta .accent { color: var(--amber); }
+  .progress-bar-row { display: flex; align-items: center; gap: 22px; margin-bottom: 32px; }
+  .progress-pct { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .progress-pct .sym { color: var(--text-3); font-weight: 500; font-size: 28px; }
+  .progress-bar {
+    flex: 1; height: 5px;
+    background: rgba(110, 138, 124, 0.10);
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber), var(--amber-bright));
+    box-shadow: 0 0 12px var(--amber-glow);
+    width: 0;
+    animation: bar-fill 1.4s 1.0s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes bar-fill { to { width: 27%; } }
+  .progress-bar::after {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(242, 166, 35, 0.6), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 4s 2s ease-in-out infinite;
+  }
+  @keyframes shimmer { to { transform: translateX(100%); } }
+  .progress-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+  .progress-bucket {
+    padding: 6px 22px;
+    border-left: 1px solid var(--hairline);
+  }
+  .progress-bucket:first-child { border-left: none; padding-left: 0; }
+  .progress-bucket .k { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: var(--text-3); text-transform: uppercase; }
+  .progress-bucket .v { font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700; color: var(--text); margin: 10px 0 4px; letter-spacing: -0.025em; }
+  .progress-bucket .sub { font-size: 11px; color: var(--text-4); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; }
+  .progress-bucket.emerald .v { color: var(--emerald); text-shadow: 0 0 16px rgba(74, 222, 128, 0.35); }
+  .progress-bucket.cyan .v { color: var(--cyan); }
+  .progress-bucket.amber .v { color: var(--amber); text-shadow: 0 0 16px var(--amber-glow); }
+  .progress-bucket.rose .v { color: var(--rose); text-shadow: 0 0 16px rgba(224, 73, 104, 0.35); }
+
+  /* ───────── 3-col body ───────── */
+  .body3 {
+    padding: 0 56px 64px;
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr) 360px;
+    gap: 22px;
+    position: relative; z-index: 3;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 24px 20px;
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+  .panel-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.28em; font-weight: 700;
+    color: var(--text-2);
+    margin-bottom: 18px;
+    text-transform: uppercase;
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .panel-head .icon-sq { width: 6px; height: 6px; background: var(--amber); transform: rotate(45deg); display: inline-block; margin-right: 10px; vertical-align: middle; box-shadow: 0 0 8px var(--amber-glow); }
+  .panel-head .right { color: var(--text-4); font-size: 9px; letter-spacing: 0.18em; font-weight: 500; }
+  .panel-stack { display: flex; flex-direction: column; gap: 22px; }
+
+  /* histogram */
+  .histo { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+  .histo div {
+    flex: 1;
+    background: linear-gradient(180deg, var(--amber-bright), rgba(242, 166, 35, 0.20));
+    box-shadow: 0 0 6px rgba(242, 166, 35, 0.30);
+  }
+  .histo-axis { margin-top: 12px; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); letter-spacing: 0.18em; }
+
+  .ch-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--hairline); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .ch-row:last-child { border-bottom: none; }
+  .ch-row .name { color: var(--text-2); letter-spacing: 0.10em; }
+  .ch-row .rate { color: var(--text-3); }
+  .ch-row .rate.v { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; }
+
+  /* signals */
+  .signals-filter {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 7px 13px;
+    letter-spacing: 0.10em;
+  }
+  .pill.active {
+    color: var(--amber);
+    border-color: var(--border-strong);
+    background: rgba(242, 166, 35, 0.10);
+    box-shadow: 0 0 16px rgba(242, 166, 35, 0.18);
+  }
+  .pill .count { color: var(--text-4); margin-left: 5px; font-size: 9px; }
+  .refresh { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.18em; cursor: pointer; }
+
+  .signal { padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .signal:last-child { border-bottom: none; }
+  .signal-meta { display: flex; align-items: center; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); margin-bottom: 10px; letter-spacing: 0.10em; }
+  .signal-meta .tag { background: rgba(242, 166, 35, 0.08); border: 1px solid var(--border-strong); color: var(--amber); padding: 2px 8px; font-size: 9px; letter-spacing: 0.16em; font-weight: 600; }
+  .signal-meta .eid { color: var(--text); font-weight: 600; }
+  .signal-quote {
+    font-size: 14px; line-height: 1.65;
+    color: var(--text-2);
+    max-width: 760px;
+  }
+  .signal-quote em { color: var(--text); font-style: normal; font-weight: 500; background: rgba(242, 166, 35, 0.08); padding: 0 4px; }
+  .signal-quote .redacted { background: var(--text-4); color: var(--text-4); padding: 0 6px; border-radius: 1px; }
+
+  /* help wanted */
+  .help-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .help-row:last-child { border-bottom: none; }
+  .help-row .eid { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); font-weight: 500; }
+  .help-row .pp { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); margin-left: 10px; }
+  .claim {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.20em; font-weight: 700;
+    color: var(--amber);
+    background: rgba(242, 166, 35, 0.10);
+    border: 1px solid var(--border-strong);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .claim:hover { background: rgba(242, 166, 35, 0.22); box-shadow: 0 0 16px rgba(242, 166, 35, 0.25); }
+
+  /* mined index */
+  .entity-list { display: flex; flex-direction: column; gap: 11px; }
+  .entity-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .entity-row .name { color: var(--text-2); letter-spacing: 0.06em; }
+  .entity-row .meter {
+    width: 70px; height: 3px;
+    background: rgba(242, 166, 35, 0.10);
+    position: relative;
+  }
+  .entity-row .meter span { display: block; height: 100%; background: var(--amber); box-shadow: 0 0 6px var(--amber-glow); }
+  .entity-row .count { color: var(--text); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; min-width: 50px; text-align: right; }
+
+  /* Footer */
+  footer {
+    padding: 28px 56px 16px;
+    border-top: 1px solid var(--hairline);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-3);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    position: relative; z-index: 3;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-void"></div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+<div class="scanline"></div>
+<div class="vignette"></div>
+
+<span class="corner tl"></span>
+<span class="corner tr"></span>
+<span class="corner bl"></span>
+<span class="corner br"></span>
+
+<div class="classified">
+  <span class="stamp">// declassified · war.gov · open-source mirror</span>
+  <span class="dash">— — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —</span>
+  <span class="stamp">community-run · not agency-affiliated</span>
+</div>
+
+<header>
+  <div class="brand">
+    <span class="brand-mark"></span>
+    <span class="brand-name">PURSUE&nbsp;CONSOLE</span>
+    <span class="brand-sub">RELEASE 2.1 · WAR.GOV/UAP</span>
+  </div>
+  <div class="center-strip">
+    <span class="badge"><span class="dot"></span>OPERATIONAL</span>
+    <span class="badge"><span class="v">2026·06·01</span> · 17:15:08 UTC</span>
+    <span class="badge amber"><span class="dot"></span>LIVE WATCH</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="ghost">EN ▾</button>
+    <button class="ops-btn">＋ ENLIST</button>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-tab active">Live</button>
+  <button class="nav-tab">Coverage</button>
+  <button class="nav-tab">Search</button>
+  <button class="nav-tab">Ask</button>
+  <button class="nav-tab">Review<span class="nav-badge">3</span></button>
+  <button class="nav-tab">Media</button>
+  <span class="nav-divider"></span>
+  <span class="nav-group">ANALYSIS</span>
+  <button class="nav-tab">Timeline</button>
+  <button class="nav-tab">Atlas</button>
+  <button class="nav-tab">Globe</button>
+  <button class="nav-tab">Network</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">
+      <span class="div"></span>
+      Dept. of War · Declassified UAP · Release 01–02
+      <span class="code">// 2026-05-08 → 2026-06-22</span>
+    </div>
+    <h1 class="headline">
+      <span class="l1">The archive of what the</span>
+      <span class="l1">Department of War released —</span>
+      <span class="l2">and what's still dark.</span>
+    </h1>
+    <p class="subhead">Community-run. Every page transcribed in the open, catalogued event by event. Pages stream in as machine + volunteer transcriptions land — the gap is the mission.</p>
+
+    <div class="mission-status">
+      <div class="mission-cell">
+        <div class="k">Catalogued</div>
+        <div class="v"><span data-count="121">0</span><span class="small">/ 162</span></div>
+        <div class="sub">R01 inventory</div>
+      </div>
+      <div class="mission-cell">
+        <div class="k">Complete</div>
+        <div class="v amber" data-count="1">0</div>
+        <div class="sub">of 121 events</div>
+      </div>
+      <div class="mission-cell">
+        <div class="k">Awaiting</div>
+        <div class="v rose"><span data-count="46">0</span>%</div>
+        <div class="sub">no body text</div>
+      </div>
+      <div class="mission-cell">
+        <div class="k">R02 Intake</div>
+        <div class="v cyan"><span data-count="7">0</span><span class="small">/ 64</span></div>
+        <div class="sub">partial-mirror</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="primary-cta">Open the next missing page <span style="font-size:16px">→</span></button>
+      <div class="cta-meta">
+        <div><span class="ping"></span>No account needed</div>
+        <div><span class="v">8</span> transcribers online · queue from <span style="color:var(--amber)">next-missing.json</span></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="ops-panel">
+    <div class="ops-head">
+      <div class="left">
+        <div class="icon"></div>
+        <div>
+          <div class="title">TACTICAL OVERVIEW</div>
+          <div class="sub">coverage.json · <span class="v">live</span></div>
+        </div>
+      </div>
+      <div class="sub">121 events</div>
+    </div>
+
+    <div class="radar-wrap">
+      <div class="radar">
+        <svg viewBox="0 0 280 280">
+          <defs>
+            <radialGradient id="sweepGrad">
+              <stop offset="0%" stop-color="rgba(242,166,35,0.45)"/>
+              <stop offset="100%" stop-color="rgba(242,166,35,0)"/>
+            </radialGradient>
+          </defs>
+          <!-- rings -->
+          <circle cx="140" cy="140" r="130" fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="95"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="58"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <circle cx="140" cy="140" r="22"  fill="none" stroke="rgba(242,166,35,0.16)" stroke-width="1"/>
+          <!-- crosshair -->
+          <line x1="140" y1="8"  x2="140" y2="272" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
+          <line x1="8"  y1="140" x2="272" y2="140" stroke="rgba(242,166,35,0.10)" stroke-width="0.6"/>
+          <line x1="48" y1="48"  x2="232" y2="232" stroke="rgba(242,166,35,0.06)" stroke-width="0.6"/>
+          <line x1="48" y1="232" x2="232" y2="48"  stroke="rgba(242,166,35,0.06)" stroke-width="0.6"/>
+          <!-- sweep wedge -->
+          <g class="sweep-g">
+            <path d="M140 140 L270 140 A130 130 0 0 1 200 240 Z" fill="url(#sweepGrad)" stroke="rgba(242,166,35,0.55)" stroke-width="0.7"/>
+          </g>
+          <!-- pings -->
+          <g class="ping"><circle cx="200" cy="84"  r="3.6" fill="#F2A623"/><circle cx="200" cy="84"  r="8" fill="none" stroke="rgba(242,166,35,0.45)" stroke-width="0.6"/></g>
+          <g class="ping"><circle cx="86"  cy="68"  r="3"   fill="#61D7F0"/><circle cx="86"  cy="68"  r="7" fill="none" stroke="rgba(97,215,240,0.4)" stroke-width="0.5"/></g>
+          <g class="ping"><circle cx="58"  cy="196" r="3.4" fill="#F2A623"/><circle cx="58"  cy="196" r="7" fill="none" stroke="rgba(242,166,35,0.35)" stroke-width="0.5"/></g>
+          <g class="ping"><circle cx="198" cy="190" r="3.2" fill="#4ADE80"/><circle cx="198" cy="190" r="9" fill="none" stroke="rgba(74,222,128,0.5)" stroke-width="0.6"/></g>
+          <g class="ping"><circle cx="148" cy="110" r="2.8" fill="#F2A623"/></g>
+          <!-- center marker -->
+          <circle cx="140" cy="140" r="3" fill="var(--text)"/>
+          <!-- corner labels -->
+          <text x="146" y="22"  fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">N</text>
+          <text x="262" y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">E</text>
+          <text x="146" y="270" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">S</text>
+          <text x="12"  y="146" fill="rgba(180,160,120,0.55)" font-family="JetBrains Mono" font-size="9" letter-spacing="0.2em">W</text>
+        </svg>
+      </div>
+
+      <div class="radar-stack">
+        <div class="radar-row">
+          <span class="k">complete</span>
+          <span class="v emerald">1</span>
+          <span class="pct">0.8%</span>
+        </div>
+        <div class="radar-row">
+          <span class="k">partial</span>
+          <span class="v amber">63</span>
+          <span class="pct">52%</span>
+        </div>
+        <div class="radar-row">
+          <span class="k">no-data</span>
+          <span class="v rose">57</span>
+          <span class="pct">47%</span>
+        </div>
+        <div class="radar-row">
+          <span class="k">total events</span>
+          <span class="v">121</span>
+          <span class="pct">·</span>
+        </div>
+        <div class="radar-row">
+          <span class="k">priority queue</span>
+          <span class="v cyan">57</span>
+          <span class="pct">candidates</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cw-title-row">
+      <span class="left"><span class="accent">▣</span>&nbsp;&nbsp;COVERAGE MATRIX · per-event status</span>
+      <span class="right">click cell → dossier</span>
+    </div>
+    <div class="cw-grid" id="cw"></div>
+    <div class="cw-legend">
+      <span><span class="swatch" style="background:var(--emerald);box-shadow:0 0 8px rgba(74,222,128,0.6)"></span><span class="lbl">COMPLETE</span><span class="v">1</span></span>
+      <span><span class="swatch" style="background:rgba(242,166,35,0.4);border:1px solid var(--amber)"></span><span class="lbl">PARTIAL</span><span class="v">63</span></span>
+      <span><span class="swatch" style="background:#0A1018;border:1px solid #182232"></span><span class="lbl">EMPTY</span><span class="v">57</span></span>
+    </div>
+  </aside>
+</section>
+
+<div class="filter-strip">
+  <div class="filter-input">
+    <span class="icon">⌖</span>
+    <input placeholder="QUERY · 220 events · 3,530 pages · semantic + lexical" />
+  </div>
+  <select class="filter-select"><option>ALL AGENCIES</option></select>
+  <select class="filter-select"><option>ALL RELEASES</option></select>
+  <select class="filter-select"><option>ALL TYPES</option></select>
+  <span class="filter-meta">filter scopes catalogue views · live shows everything</span>
+</div>
+
+<div class="section-divider">
+  <span class="label">▸ CORPUS TELEMETRY</span>
+  <span class="meta">refresh interval 30s · source corpus-stats.json</span>
+  <div class="line"></div>
+</div>
+
+<section class="progress-section">
+  <div class="progress-card">
+    <div class="progress-head">
+      <span class="progress-title"><span class="icon"></span>Document progress · Release 01–02</span>
+      <span class="progress-meta">denominator <span class="accent">244 inventory items</span></span>
+    </div>
+    <div class="progress-bar-row">
+      <span class="progress-pct"><span data-count="27">0</span><span class="sym">%</span></span>
+      <div class="progress-bar"><div class="fill"></div></div>
+      <span class="progress-meta">toward fully search-ready</span>
+    </div>
+    <div class="progress-grid">
+      <div class="progress-bucket emerald"><span class="k">READY</span><span class="v">65</span><span class="sub">of 244 · vision-OCR</span></div>
+      <div class="progress-bucket cyan"><span class="k">IMPROVING</span><span class="v">0</span><span class="sub">in-flight</span></div>
+      <div class="progress-bucket amber"><span class="k">QUEUED</span><span class="v">6</span><span class="sub">tesseract-only</span></div>
+      <div class="progress-bucket rose"><span class="k">MISSING</span><span class="v">149</span><span class="sub">no body text</span></div>
+      <div class="progress-bucket"><span class="k">UNCATALOGUED</span><span class="v">24</span><span class="sub">to catalogue</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider">
+  <span class="label">▸ FIELD OPERATIONS</span>
+  <span class="meta">live transcription stream · per-agency channels · field assignments</span>
+  <div class="line"></div>
+</div>
+
+<section class="body3">
+  <div class="panel-stack">
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Ingest rate · 24h</span><span class="right">pages/hr</span></div>
+      <div class="histo" id="histo"></div>
+      <div class="histo-axis"><span>00</span><span>12</span><span>24</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Oscillation · 60s</span><span class="right">activity</span></div>
+      <svg viewBox="0 0 320 60" style="width:100%;height:60px;margin-top:6px"><polyline fill="none" stroke="#F2A623" stroke-width="1.8" opacity="0.9" points="0,30 22,22 44,36 66,16 88,40 110,24 132,32 154,10 176,44 198,20 220,36 242,28 264,30 286,22 308,30 320,28"/></svg>
+      <div class="histo-axis"><span>−60s</span><span>NOW</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Channels</span><span class="right">/hr</span></div>
+      <div class="ch-row"><span class="name">Vision</span><span class="rate">0 /hr</span></div>
+      <div class="ch-row"><span class="name">Tesseract</span><span class="rate">0 /hr</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Media types</span><span class="right">media.json</span></div>
+      <div class="ch-row"><span class="name">Document</span><span class="rate v">105</span></div>
+      <div class="ch-row"><span class="name">Photo</span><span class="rate v">13</span></div>
+      <div class="ch-row"><span class="name">Video</span><span class="rate v">94</span></div>
+      <div class="ch-row"><span class="name">Audio</span><span class="rate v">8</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span><span class="icon-sq"></span>Arriving signals</span><span class="right">vision × ocr · utc · most recent</span></div>
+    <div class="signals-filter">
+      <span class="pill active">All <span class="count">200</span></span>
+      <span class="pill">Vision <span class="count">3,402</span></span>
+      <span class="pill">Tesseract <span class="count">128</span></span>
+      <span class="refresh">↻ refresh</span>
+    </div>
+
+    <div class="signal">
+      <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">usper-2025</span><span>FBI · p1</span></div>
+      <p class="signal-quote">"<em>SECRET//NOFORN.</em> On <span class="redacted">_____</span> 2025, at approximately 1700 hours, [<em>witness 1 — a senior US intelligence official</em>] accompanied by two pilots from [<em>state partner organization</em>]…"</p>
+    </div>
+    <div class="signal">
+      <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">western-us-2023</span><span>DEPT/War · p2</span></div>
+      <p class="signal-quote">"<em>Large, Fiery Orb.</em> Two federal law-enforcement special agents witness a glowing orange orb at approximately 500–600 meters. Location: Western U.S. Time of day: dusk."</p>
+    </div>
+    <div class="signal">
+      <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">uae-june-2024</span><span>DEPT/War · p1</span></div>
+      <p class="signal-quote">"Declassified by MG Richard A. Harrison, <em>USCENTCOM</em> Chief of Staff. AT 2100Z <span class="redacted">_____</span> took off from OMAM via SLR. Proceeded to fragged tasking…"</p>
+    </div>
+    <div class="signal">
+      <div class="signal-meta"><span>T + 16h</span><span class="tag">VISION</span><span class="eid">netherlands-1948</span><span>DEPT/War · p3</span></div>
+      <p class="signal-quote">"[stamp: <em>SECRET</em>] USAFE 2 TT 1524 · 4 Nov 48 · To Gen Cabell: we now have one complete set of all reports prepared by special intelligence organization of the European Command…"</p>
+    </div>
+  </div>
+
+  <div class="panel-stack">
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Field assignments</span><span class="right">119 open</span></div>
+      <div class="help-row"><span><span class="eid">indopacom-2024</span><span class="pp">· ANCHOR · 24pp</span></span><button class="claim">CLAIM</button></div>
+      <div class="help-row"><span><span class="eid">army-2026</span><span class="pp">· HIGH · 14pp</span></span><button class="claim">CLAIM</button></div>
+      <div class="help-row"><span><span class="eid">dow-uap-d62</span><span class="pp">· MED · 9pp</span></span><button class="claim">CLAIM</button></div>
+      <div class="help-row"><span><span class="eid">dow-uap-d65</span><span class="pp">· MED · 8pp</span></span><button class="claim">CLAIM</button></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><span><span class="icon-sq"></span>Mined index</span><span class="right">199 ents · 67 dates</span></div>
+      <div class="entity-list">
+        <div class="entity-row"><span class="name">USCENTCOM</span>     <span class="meter"><span style="width:90%"></span></span><span class="count">202</span></div>
+        <div class="entity-row"><span class="name">Air Force</span>      <span class="meter"><span style="width:100%"></span></span><span class="count">338</span></div>
+        <div class="entity-row"><span class="name">FBI</span>            <span class="meter"><span style="width:45%"></span></span><span class="count">88</span></div>
+        <div class="entity-row"><span class="name">AARO</span>           <span class="meter"><span style="width:18%"></span></span><span class="count">31</span></div>
+        <div class="entity-row"><span class="name">USAFE</span>          <span class="meter"><span style="width:16%"></span></span><span class="count">29</span></div>
+        <div class="entity-row"><span class="name">NORTHCOM</span>       <span class="meter"><span style="width:13%"></span></span><span class="count">24</span></div>
+        <div class="entity-row"><span class="name">Handwritten note</span><span class="meter"><span style="width:100%"></span></span><span class="count">1,649</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>watchkeeper · automated vigil · human-in-loop</span>
+  <span>// build 161586fb · 2026-06-01 17:15:08 UTC</span>
+  <span>community-run · not agency-affiliated</span>
+</footer>
+
+<div class="classified" style="margin-top: 12px;">
+  <span class="stamp">// end of transmission</span>
+  <span class="dash">— — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — — —</span>
+  <span class="stamp">classification · open · public mirror</span>
+</div>
+
+<script>
+  // Coverage matrix
+  const cls = [];
+  cls.push('complete');
+  for (let i = 0; i < 63; i++) cls.push('partial');
+  for (let i = 0; i < 57; i++) cls.push('');
+  let s = 41;
+  const rng = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  for (let i = cls.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [cls[i], cls[j]] = [cls[j], cls[i]];
+  }
+  const ci = cls.indexOf('complete');
+  cls.splice(ci, 1);
+  cls.splice(35, 0, 'complete');
+  const grid = document.getElementById('cw');
+  cls.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'cw-cell' + (c ? ' ' + c : '');
+    d.style.animationDelay = (300 + i * 6) + 'ms';
+    grid.appendChild(d);
+  });
+
+  // Histogram
+  const h = document.getElementById('histo');
+  const bars = [2,1,0,0,1,3,5,8,12,9,7,11,6,4,9,14,10,6,3,8,5,2,1,0];
+  const mx = Math.max(...bars);
+  bars.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.style.height = '0%';
+    h.appendChild(d);
+    setTimeout(() => { d.style.transition = 'height .9s cubic-bezier(.2,.7,.2,1)'; d.style.height = ((b / mx) * 100) + '%'; }, 1400 + i * 28);
+  });
+
+  // Count-up
+  function easeOut(t){return 1-Math.pow(1-t,3);}
+  function animateCount(el, target, duration) {
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      el.textContent = Math.round(target * easeOut(t)).toLocaleString();
+      if (t < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const tgt = parseFloat(el.dataset.count);
+    setTimeout(() => animateCount(el, tgt, 1500), 1000);
+  });
+</script>
+</body>
+</html>

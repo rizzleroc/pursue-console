@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useT } from "../i18n/context.js";
 
-// One-time launch overlay for the 2.0 drop. Hypes the release and surfaces
-// the declassified DVIDS sensor footage as a clickable reticle poster that
-// links out to dvidshub.net (the embed iframe stopped playing — see #257
-// and MediaView's matching pattern). Once dismissed it never shows again
-// (localStorage gate lives in App — this component just calls onClose).
-// Motion follows Emil Kowalski's playbook: ease-out entrances, blur+scale
-// reveals, staggered transform/opacity.
+// One-time launch overlay for the 2.0 drop. Hypes the release and plays
+// the declassified DVIDS sensor footage inline via the DVIDS embed player.
+// Once dismissed it never shows again (localStorage gate lives in App —
+// this component just calls onClose). Motion follows Emil Kowalski's
+// playbook: ease-out entrances, blur+scale reveals, staggered
+// transform/opacity.
 
 const SEEN_KEY = "pursue:launch-2.0-seen";
 
@@ -220,38 +219,16 @@ export default function LaunchOverlay({ onClose }) {
           <div className="lo-rise mt-6 grid lg:grid-cols-[1.6fr_1fr] gap-5" style={{ animationDelay: "200ms" }}>
             <div>
               <div className="relative aspect-video w-full overflow-hidden rounded-sm border border-emerald-700/40 bg-black">
-                <a
+                <iframe
                   key={swapKey}
-                  href={`https://www.dvidshub.net/video/${clip.videoId}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="lo-swap absolute inset-0 group block"
-                  aria-label={`Watch on DVIDS: ${clip.code} — ${clip.tag}`}
-                >
-                  <div className="absolute inset-0" style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 50% 46%, rgba(52,211,153,0.16), rgba(2,8,6,0) 62%)," +
-                      "repeating-linear-gradient(0deg, rgba(52,211,153,0.06) 0px, rgba(52,211,153,0.06) 1px, transparent 1px, transparent 3px)",
-                  }} />
-                  <svg className="absolute inset-0 w-full h-full text-emerald-400/25" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                    <line x1="50" y1="0" x2="50" y2="100" stroke="currentColor" strokeWidth="0.4" />
-                    <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.4" />
-                    <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                  </svg>
-                  <span className="absolute top-2 left-2 w-3 h-3 border-t border-l border-emerald-400/50" />
-                  <span className="absolute top-2 right-2 w-3 h-3 border-t border-r border-emerald-400/50" />
-                  <span className="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-emerald-400/50" />
-                  <span className="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-emerald-400/50" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                    <span className="flex items-center justify-center rounded-full border border-emerald-400/60 bg-emerald-950/40 w-20 h-20 transition-all group-hover:scale-110 group-hover:border-emerald-300">
-                      <svg width={26} height={28} viewBox="0 0 22 24" aria-hidden="true">
-                        <path d="M2 2 L20 12 L2 22 Z" fill="#6ee7b7" />
-                      </svg>
-                    </span>
-                    <span className="text-[10px] tracking-[0.3em] text-emerald-300 group-hover:text-emerald-100 transition-colors">
-                      WATCH ON DVIDS ↗
-                    </span>
-                  </div>
-                </a>
+                  className="lo-swap absolute inset-0 w-full h-full"
+                  src={`https://www.dvidshub.net/video/embed/${clip.videoId}`}
+                  title={`${clip.code} — ${clip.tag}`}
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
               <div key={`meta-${swapKey}`} className="lo-swap mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
                 <span className={`text-[9px] tracking-[0.25em] px-1.5 py-0.5 border rounded-sm ${FLAG_COLOR[clip.flag]}`}>{t(`launch.flag.${clip.flag}`)}</span>

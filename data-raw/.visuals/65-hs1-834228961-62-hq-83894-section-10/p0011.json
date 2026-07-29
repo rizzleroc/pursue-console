@@ -1,29 +1,8 @@
 {
   "kind": "newspaper-clipping",
   "title": "1: Top Right",
-  "description": "Clipping 1: Top Right",
-  "additional_markers": [
-    {
-      "kind": "newspaper-clipping",
-      "title": "2: Top Center"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "3: Middle Left"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "4: Middle Right"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "5: Bottom Right"
-    },
-    {
-      "kind": "newspaper-clipping",
-      "title": "6: Bottom Left"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.162Z"
+  "description": "The London Free Press\nWestern Ontario's Foremost Newspaper\n118th YEAR OF PUBLICATION\nLONDON, ONTARIO, TUESDAY, MARCH 29, 1966—36 PAGES\nTracked by Radar\nUFOs Sighted Over Wide Section of District\nUFO SIGHTED BY\nLEWISTON PEOPLE\nAn unidentified flying object\nwas spotted Saturday night in\nLewiston by a family of eight\npersons.\nLewiston police said [illegible]\nLashley of 15 Gary Ave., spotted\nthe UFO at about 8:17 p.m.\nabove her home.\nAccording to police, the\nLashley woman and seven other\npersons sighted the object which\nwas described as bright blue\nand grey in color, with [illegible] shapes\nat one end. The UFO hovered\nfor a few seconds and then\nsped off at a high rate of\nspeed in an easterly direction.",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-21T00:09:00.163Z",
+  "contributor": "Rizzleroc"
 }

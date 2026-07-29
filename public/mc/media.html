@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PURSUE Mission Control · Media</title>
+  <meta name="description" content="332 visual records from the war.gov PURSUE release. DVIDS embeds, filterable by agency and kind.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PURSUE Console · Mission Control">
+  <meta property="og:title" content="PURSUE Media — declassified photos, videos, diagrams">
+  <meta property="og:description" content="332 visual records from the war.gov PURSUE release. DVIDS embeds, filterable by agency and kind.">
+  <meta property="og:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <meta property="og:url" content="https://rizzleroc.github.io/pursue-console/mc/media.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PURSUE Media — declassified photos, videos, diagrams">
+  <meta name="twitter:description" content="332 visual records from the war.gov PURSUE release. DVIDS embeds, filterable by agency and kind.">
+  <meta name="twitter:image" content="https://rizzleroc.github.io/pursue-console/og/default.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    .md-shell { padding: 0 56px 64px; position: relative; z-index: 3; }
+    .md-filterbar { display: flex; align-items: center; gap: 10px; padding: 18px 0; flex-wrap: wrap; }
+    .md-pill { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: var(--text-3); background: var(--surface); border: 1px solid var(--border); padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; user-select: none; }
+    .md-pill .ic { width: 9px; height: 9px; background: var(--text-3); display: inline-block; }
+    .md-pill.active { color: var(--amber); border-color: var(--border-strong); background: rgba(242,166,35,0.10); box-shadow: 0 0 14px rgba(242,166,35,0.18); }
+    .md-pill .n { color: var(--text-4); margin-left: 4px; font-size: 9px; }
+    .md-pill.video .ic { background: #61D7F0; }
+    .md-pill.photo .ic { background: #6EE7B7; }
+    .md-pill.diagram .ic { background: #B280FF; }
+    .md-pill.map .ic { background: #F472B6; }
+
+    /* Secondary row — event dropdown + sort + placeholder toggle + search */
+    .md-row2 { display: flex; align-items: center; gap: 12px; padding: 4px 0 18px; flex-wrap: wrap; }
+    .md-input { background: var(--surface-3); border: 1px solid var(--border-strong); padding: 8px 14px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.04em; min-width: 220px; }
+    .md-input::placeholder { color: var(--text-4); }
+    .md-select { background: var(--surface); border: 1px solid var(--border); color: var(--text-2); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.10em; padding: 8px 12px; cursor: pointer; }
+    .md-toggle { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--text-3); padding: 6px 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; }
+    .md-toggle .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-4); }
+    .md-toggle.on { color: var(--cyan); border-color: rgba(97,215,240,0.55); background: rgba(97,215,240,0.08); }
+    .md-toggle.on .dot { background: var(--cyan); box-shadow: 0 0 6px rgba(97,215,240,0.6); }
+    .md-stat { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-4); letter-spacing: 0.16em; margin-left: auto; }
+    .md-stat .v { color: var(--amber); font-weight: 600; }
+
+    .md-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .tile { background: var(--surface); border: 1px solid var(--border); aspect-ratio: 1; padding: 0; backdrop-filter: blur(10px); cursor: pointer; transition: all .2s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .tile:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .tile .thumb { flex: 1; background: linear-gradient(135deg, rgba(242,166,35,0.08), rgba(8,12,20,0.7)); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .tile .thumb::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(242,166,35,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(242,166,35,0.06) 1px, transparent 1px); background-size: 18px 18px; opacity: 0.4; pointer-events: none; }
+    .tile.video .thumb { background: radial-gradient(circle at center, rgba(97,215,240,0.18), rgba(8,14,22,0.7)); }
+    .tile.photo .thumb { background: radial-gradient(circle at center, rgba(110,231,183,0.16), rgba(8,14,22,0.7)); }
+    .tile.diagram .thumb { background: linear-gradient(135deg, rgba(178,128,255,0.14), rgba(8,14,22,0.7)); }
+    .tile.map .thumb { background: linear-gradient(135deg, rgba(244,114,182,0.14), rgba(8,14,22,0.7)); }
+    .tile .icon { width: 36px; height: 36px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); z-index: 1; background: rgba(0,0,0,0.5); }
+    .tile.video .icon { color: #61D7F0; border-color: rgba(97,215,240,0.5); }
+    .tile.photo .icon { color: #6EE7B7; border-color: rgba(110,231,183,0.5); }
+    .tile.diagram .icon { color: #B280FF; border-color: rgba(178,128,255,0.5); }
+    .tile.map .icon { color: #F472B6; border-color: rgba(244,114,182,0.5); }
+    .tile .ribbon { position: absolute; left: 6px; top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.14em; color: var(--text-3); background: rgba(0,0,0,0.6); padding: 2px 6px; border: 1px solid var(--hairline); text-transform: uppercase; z-index: 2; }
+    .tile .views { position: absolute; right: 6px; top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.1em; color: var(--text-3); background: rgba(0,0,0,0.6); padding: 2px 6px; border: 1px solid var(--hairline); z-index: 2; }
+    .tile .views::before { content: '◉ '; color: var(--amber); }
+    .tile .footer { padding: 10px 12px; border-top: 1px solid var(--hairline); background: rgba(0,0,0,0.4); }
+    .tile .kind { font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--text-3); text-transform: uppercase; margin-bottom: 3px; }
+    .tile .title { font-size: 11px; color: var(--text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .tile .ev { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-4); margin-top: 4px; letter-spacing: 0.06em; }
+
+    /* Focus modal */
+    .md-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 56px; backdrop-filter: blur(8px); }
+    .md-modal.on { display: flex; }
+    .md-modal .panel { background: var(--surface); border: 1px solid var(--border-strong); max-width: 1100px; width: 100%; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1.4fr) 360px; gap: 0; backdrop-filter: blur(14px); }
+    .md-modal .visual { background: #000; min-height: 480px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .md-modal .visual img { max-width: 100%; max-height: 80vh; object-fit: contain; }
+    .md-modal .visual iframe { width: 100%; height: 60vh; border: 0; }
+    .md-modal .visual .icon-big { width: 96px; height: 96px; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 36px; color: var(--text); }
+    .md-modal .meta { padding: 28px 30px; display: flex; flex-direction: column; gap: 14px; }
+    .md-modal .meta .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); text-transform: uppercase; }
+    .md-modal .meta h2 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; color: var(--text); font-weight: 600; margin: 0; line-height: 1.25; letter-spacing: -0.01em; }
+    .md-modal .meta p { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-2); line-height: 1.6; margin: 0; max-height: 32vh; overflow-y: auto; }
+    .md-modal .meta .kv { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+    .md-modal .meta .kv .k { color: var(--text-4); letter-spacing: 0.18em; text-transform: uppercase; }
+    .md-modal .meta .kv .v { color: var(--text-2); }
+    .md-modal .meta .ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .md-modal .meta .cta { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; padding: 8px 14px; border: 1px solid var(--border-strong); color: var(--text); background: var(--surface-2); text-decoration: none; }
+    .md-modal .meta .cta.primary { color: var(--amber); border-color: var(--amber); background: rgba(242,166,35,0.10); }
+    .md-modal .meta .cta:hover { color: var(--amber); border-color: var(--amber); }
+    .md-modal .close { position: absolute; top: 16px; right: 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-2); cursor: pointer; padding: 6px 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); z-index: 2; }
+    .md-modal .close:hover { color: var(--amber); border-color: var(--amber); }
+
+    /* Prev/next nav arrows */
+    .md-modal .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 20px; color: var(--text-2); cursor: pointer; padding: 14px 12px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); z-index: 10; user-select: none; line-height: 1; }
+    .md-modal .nav-arrow:hover { color: var(--amber); border-color: var(--amber); background: rgba(0,0,0,0.75); }
+    .md-modal .nav-arrow.prev { left: 18px; }
+    .md-modal .nav-arrow.next { right: 18px; }
+    .md-modal .nav-arrow.disabled { opacity: 0.25; pointer-events: none; }
+
+    /* Event dossier preview */
+    .md-modal .dossier-prev { padding: 12px 0; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 6px; }
+    .md-modal .dossier-prev .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .md-modal .dossier-prev .badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 3px 7px; border: 1px solid var(--border); color: var(--text-2); text-transform: uppercase; background: var(--surface-2); }
+    .md-modal .dossier-prev .badge.flag { color: var(--amber); border-color: rgba(242,166,35,0.55); background: rgba(242,166,35,0.08); }
+    .md-modal .dossier-prev .badge.pri-critical { color: #FF6B6B; border-color: rgba(255,107,107,0.65); background: rgba(255,107,107,0.10); }
+    .md-modal .dossier-prev .badge.pri-high { color: #FF6B6B; border-color: rgba(255,107,107,0.55); background: rgba(255,107,107,0.08); }
+    .md-modal .dossier-prev .badge.pri-medium { color: #FFD93D; border-color: rgba(255,217,61,0.55); background: rgba(255,217,61,0.08); }
+    .md-modal .dossier-prev .badge.pri-low { color: var(--text-3); }
+    .md-modal .dossier-prev .snippet { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-3); line-height: 1.45; }
+
+    /* Sibling thumbstrip */
+    .md-modal .siblings { padding-top: 14px; border-top: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px; }
+    .md-modal .siblings .sib-head { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.18em; color: var(--text-4); text-transform: uppercase; }
+    .md-modal .siblings .sib-strip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .md-modal .sib-thumb { width: 40px; height: 40px; flex: 0 0 40px; border: 1px solid var(--border); background: var(--surface-2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; text-decoration: none; }
+    .md-modal .sib-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .md-modal .sib-thumb:hover { border-color: var(--amber); }
+    .md-modal .sib-thumb .sib-ic { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-3); }
+  </style>
+</head>
+<body data-view="media">
+
+<main>
+  <section class="page-title">
+    <div class="eyebrow"><span class="div"></span>SURFACE · 06 — visual library</div>
+    <h1><span data-mc="mediaTotal">362</span> tiles. <em>Every diagram, every video, every page worth seeing.</em></h1>
+    <p class="sub">Photos · DVIDS sensor footage · diagrams · maps · sketches · scanned negatives. Click any tile for the full description and a deep-link to the source page in DOSSIER. Video tiles play inline via the DVIDS embed iframe.</p>
+  </section>
+
+  <section class="md-shell">
+    <div class="md-filterbar" id="md-pills">
+      <span class="md-pill active" data-kind="ALL"><span class="ic"></span>ALL <span class="n" id="n-all">324</span></span>
+      <span class="md-pill video" data-kind="video"><span class="ic"></span>VIDEO <span class="n" id="n-video">106</span></span>
+      <span class="md-pill photo" data-kind="photograph"><span class="ic"></span>PHOTO <span class="n" id="n-photograph">113</span></span>
+      <span class="md-pill" data-kind="hand-drawing"><span class="ic" style="background:#FFD93D"></span>HAND-DRAWING <span class="n" id="n-hand-drawing">42</span></span>
+      <span class="md-pill diagram" data-kind="diagram"><span class="ic"></span>DIAGRAM <span class="n" id="n-diagram">16</span></span>
+      <span class="md-pill map" data-kind="map"><span class="ic"></span>MAP <span class="n" id="n-map">8</span></span>
+      <span class="md-pill" data-kind="photocopied-negative"><span class="ic" style="background:#94A3B8"></span>NEGATIVE <span class="n" id="n-photocopied-negative">6</span></span>
+      <span class="md-pill" data-kind="newspaper-clipping"><span class="ic" style="background:#6EE7B7"></span>CLIPPING <span class="n" id="n-newspaper-clipping">0</span></span>
+      <span class="md-pill" data-kind="table"><span class="ic" style="background:#7FB6FF"></span>TABLE <span class="n" id="n-table">0</span></span>
+    </div>
+    <div class="md-row2">
+      <input class="md-input" id="md-q" placeholder="search · title / description / event…" autocomplete="off"/>
+      <select class="md-select" id="md-event"><option value="all">ALL EVENTS</option></select>
+      <span class="md-toggle" id="sort-recent"><span class="dot"></span>SORT · RECENT</span>
+      <span class="md-toggle" id="sort-popular"><span class="dot"></span>SORT · POPULAR</span>
+      <span class="md-toggle" id="t-placeholders"><span class="dot"></span>INCLUDE PLACEHOLDERS</span>
+      <span class="md-stat"><span class="v" id="md-shown">0</span> SHOWN · <span class="v" id="md-total">0</span> AFTER FILTER</span>
+    </div>
+
+    <div class="md-grid" id="grid"></div>
+  </section>
+
+  <div class="md-modal" id="modal" role="dialog" aria-hidden="true">
+    <span class="nav-arrow prev" id="md-prev" title="Previous (←)">◀</span>
+    <span class="nav-arrow next" id="md-next" title="Next (→)">▶</span>
+    <div class="panel">
+      <div class="visual" id="md-visual">
+        <span class="close" id="md-close">✕ CLOSE</span>
+      </div>
+      <div class="meta">
+        <div class="eyebrow" id="md-eyebrow">PHOTOGRAPH · PAGE 01</div>
+        <h2 id="md-title">—</h2>
+        <p id="md-desc">—</p>
+        <div class="kv" id="md-kv"></div>
+        <div class="dossier-prev" id="md-dossier-prev" style="display:none"></div>
+        <div class="siblings" id="md-siblings" style="display:none"></div>
+        <div class="ctas">
+          <a class="cta primary" id="md-dossier-link" href="dossier.html">→ OPEN DOSSIER</a>
+          <a class="cta" id="md-source-link" href="#" target="_blank" rel="noopener" style="display:none">↗ SOURCE</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script src="chrome.js" defer></script>
+<script>
+(function(){
+  if (!window.MC || !MC.ready) return;
+
+  var ICONS = { video: '▶', photograph: '◫', diagram: '◬', map: '◐', 'hand-drawing': '✎', 'newspaper-clipping': '▤', 'photocopied-negative': '▦', table: '▦' };
+  var KIND_CLS = { video:'video', photograph:'photo', diagram:'diagram', map:'map' };
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function fmtViews(n){
+    if (typeof n !== 'number' || !isFinite(n)) return n != null ? String(n) : '';
+    var a = Math.abs(n);
+    if (a >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+    if (a >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/,'') + 'K';
+    return String(n);
+  }
+
+  // ─── State ───
+  var activeKinds  = new Set(['ALL']);          // ALL means no kind filter
+  var activeEvent  = 'all';
+  var query        = '';
+  var sortMode     = 'RECENT';                  // RECENT | POPULAR
+  var inclPlace    = false;
+  var allItems     = [];
+
+  // DOM
+  var pills    = document.getElementById('md-pills');
+  var grid     = document.getElementById('grid');
+  var inp      = document.getElementById('md-q');
+  var selEvent = document.getElementById('md-event');
+  var btnRecent= document.getElementById('sort-recent');
+  var btnPop   = document.getElementById('sort-popular');
+  var btnPlace = document.getElementById('t-placeholders');
+  var statShown= document.getElementById('md-shown');
+  var statTotal= document.getElementById('md-total');
+
+  // Modal
+  var modal       = document.getElementById('modal');
+  var mdVisual    = document.getElementById('md-visual');
+  var mdEyebrow   = document.getElementById('md-eyebrow');
+  var mdTitle     = document.getElementById('md-title');
+  var mdDesc      = document.getElementById('md-desc');
+  var mdKv        = document.getElementById('md-kv');
+  var mdDossier   = document.getElementById('md-dossier-link');
+  var mdSource    = document.getElementById('md-source-link');
+  var mdClose     = document.getElementById('md-close');
+  var mdPrev      = document.getElementById('md-prev');
+  var mdNext      = document.getElementById('md-next');
+  var mdDossPrev  = document.getElementById('md-dossier-prev');
+  var mdSiblings  = document.getElementById('md-siblings');
+
+  // Navigation state — the FILTERED result set the modal is paging through.
+  var itemById      = {};
+  var currentFiltered = [];
+  var currentIndex  = -1;
+
+  function setSortBtns(){
+    btnRecent.classList.toggle('on', sortMode === 'RECENT');
+    btnPop.classList.toggle('on', sortMode === 'POPULAR');
+  }
+  function setPlaceBtn(){ btnPlace.classList.toggle('on', inclPlace); }
+  function setActivePill(){
+    pills.querySelectorAll('.md-pill').forEach(function(p){
+      var k = p.dataset.kind;
+      p.classList.toggle('active', activeKinds.has(k));
+    });
+  }
+
+  function updateCounts(items){
+    var c = { ALL: 0, video: 0, photograph: 0, 'hand-drawing': 0, diagram: 0, map: 0, 'photocopied-negative': 0, 'newspaper-clipping': 0, table: 0 };
+    items.forEach(function(it){
+      c.ALL++;
+      if (c[it.kind] != null) c[it.kind]++;
+    });
+    for (var k in c){ var el = document.getElementById('n-' + k); if (el) el.textContent = c[k]; }
+  }
+
+  function populateEventFilter(items){
+    var seen = {}, evs = [];
+    items.forEach(function(it){
+      if (it.eventId && !seen[it.eventId]){ seen[it.eventId] = true; evs.push({ id: it.eventId, title: it.eventTitle || it.eventId }); }
+    });
+    evs.sort(function(a,b){ return a.title.localeCompare(b.title); });
+    selEvent.innerHTML = '<option value="all">ALL EVENTS · ' + evs.length + '</option>' +
+      evs.map(function(e){ return '<option value="' + esc(e.id) + '">' + esc(e.title) + '</option>'; }).join('');
+  }
+
+  function filterAndSort(){
+    var q = query.trim().toLowerCase();
+    var out = allItems.filter(function(it){
+      // Placeholder gating (only when no image and not video).
+      if (it.kind !== 'video' && !it.imagePath && !inclPlace) return false;
+      // Kind filter.
+      if (!activeKinds.has('ALL') && !activeKinds.has(it.kind)) return false;
+      // Event filter.
+      if (activeEvent !== 'all' && it.eventId !== activeEvent) return false;
+      // Query — title + description + event title.
+      if (q){
+        var hay = ((it.title || '') + ' ' + (it.description || '') + ' ' + (it.eventTitle || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    if (sortMode === 'POPULAR'){
+      // Items don't carry view counts in this corpus, so when views are
+      // absent fall back to event-flag weight (anchor→4, high→3, med→2,
+      // low→1) so the toggle visibly reorders the grid by importance.
+      var fw = { anchor: 4, high: 3, med: 2, low: 1 };
+      out.sort(function(a, b){
+        var av = typeof a.views === 'number' ? a.views : null;
+        var bv = typeof b.views === 'number' ? b.views : null;
+        if (av != null && bv != null) return bv - av;
+        if (av != null) return -1;
+        if (bv != null) return 1;
+        // Both views absent — use the event's flag weight as the tiebreaker.
+        var arec = a.eventId ? MC.byEid(a.eventId) : null;
+        var brec = b.eventId ? MC.byEid(b.eventId) : null;
+        var aw = (arec && fw[arec.flag]) || 0;
+        var bw = (brec && fw[brec.flag]) || 0;
+        return bw - aw;
+      });
+    }
+    return out;
+  }
+
+  function renderGrid(){
+    var rows = filterAndSort();
+    statTotal.textContent = rows.length;
+    // Cap visible tiles for paint perf. When INCLUDE PLACEHOLDERS is on, bump
+    // the cap to 500 so the extra ~120 placeholder items actually become
+    // visible (without this, the cap masked the toggle as inert).
+    var shown = rows.slice(0, inclPlace ? 500 : 200);
+    currentFiltered = shown;
+    statShown.textContent = shown.length;
+    var html = shown.map(function(m, i){
+      var cls = KIND_CLS[m.kind] || '';
+      var label = (m.kind || '').toUpperCase();
+      var hasViews = typeof m.views === 'number';
+      var thumb = m.imagePath
+        ? '<img src="../' + esc(m.imagePath) + '" alt="' + esc(m.title) + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1">'
+        : '<span class="icon">' + (ICONS[m.kind] || '?') + '</span>';
+      // Note: only one kind label per tile — the ribbon. Footer drops the
+      // redundant `.kind` div (was rendering "PHOTOGRAPHPHOTOGRAPH" when read
+      // as textContent).
+      return '<div class="tile' + (cls ? ' ' + cls : '') + '" data-idx="' + i + '">' +
+        '<div class="thumb">' +
+          '<span class="ribbon">' + esc(label) + '</span>' +
+          (hasViews ? '<span class="views">' + fmtViews(m.views) + '</span>' : '') +
+          thumb +
+        '</div>' +
+        '<div class="footer">' +
+          '<div class="title">' + esc(m.title || '—') + '</div>' +
+          '<div class="ev">' + esc(m.eventTitle || m.eventId || '') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    grid.innerHTML = html;
+    // Wire click → open modal
+    grid.querySelectorAll('.tile').forEach(function(t){
+      t.addEventListener('click', function(){
+        var idx = parseInt(t.dataset.idx, 10);
+        openModal(shown[idx]);
+      });
+    });
+  }
+
+  function truncate(s, n){
+    s = String(s == null ? '' : s);
+    if (s.length <= n) return s;
+    return s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…';
+  }
+
+  function renderDossierPreview(rec){
+    if (!rec){ mdDossPrev.style.display = 'none'; mdDossPrev.innerHTML = ''; return; }
+    var badges = [];
+    if (rec.flag) badges.push('<span class="badge flag">' + esc(rec.flag) + '</span>');
+    if (rec.priority){
+      var pcls = 'pri-' + String(rec.priority).toLowerCase();
+      badges.push('<span class="badge ' + pcls + '">PRIORITY · ' + esc(rec.priority) + '</span>');
+    }
+    var snippet = rec.summary ? truncate(rec.summary, 120) : '';
+    if (!badges.length && !snippet){ mdDossPrev.style.display = 'none'; mdDossPrev.innerHTML = ''; return; }
+    var html = '';
+    if (badges.length) html += '<div class="badges">' + badges.join('') + '</div>';
+    if (snippet)       html += '<div class="snippet">' + esc(snippet) + '</div>';
+    mdDossPrev.innerHTML = html;
+    mdDossPrev.style.display = '';
+  }
+
+  function renderSiblings(m){
+    if (!m || !m.eventId){ mdSiblings.style.display = 'none'; mdSiblings.innerHTML = ''; return; }
+    var sibs = allItems.filter(function(x){ return x.eventId === m.eventId && x.id !== m.id; }).slice(0, 8);
+    if (!sibs.length){ mdSiblings.style.display = 'none'; mdSiblings.innerHTML = ''; return; }
+    var thumbs = sibs.map(function(s){
+      var src = s.thumbnailPath || s.imagePath || '';
+      var inner;
+      if (src && /^https?:/i.test(src)){
+        inner = '<img src="' + esc(src) + '" alt="' + esc(s.title || '') + '" loading="lazy">';
+      } else if (src){
+        inner = '<img src="../' + esc(src) + '" alt="' + esc(s.title || '') + '" loading="lazy">';
+      } else {
+        inner = '<span class="sib-ic">' + (ICONS[s.kind] || '?') + '</span>';
+      }
+      return '<a class="sib-thumb" data-mid="' + esc(s.id) + '" title="' + esc(s.title || '') + '">' + inner + '</a>';
+    }).join('');
+    mdSiblings.innerHTML =
+      '<div class="sib-head">OTHER MEDIA FROM THIS EVENT · ' + sibs.length + ' ITEMS</div>' +
+      '<div class="sib-strip">' + thumbs + '</div>';
+    mdSiblings.style.display = '';
+    mdSiblings.querySelectorAll('.sib-thumb').forEach(function(a){
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        var id = a.dataset.mid;
+        var target = itemById[id];
+        if (target) openModal(target);
+      });
+    });
+  }
+
+  function updateNavArrows(){
+    var n = currentFiltered.length;
+    mdPrev.classList.toggle('disabled', !(currentIndex > 0));
+    mdNext.classList.toggle('disabled', !(currentIndex >= 0 && currentIndex < n - 1));
+  }
+
+  function openModal(m){
+    if (!m) return;
+    // Recompute currentIndex against the filtered list; if not present (e.g. sibling
+    // from a different event/kind), index becomes -1 and arrows go disabled.
+    currentIndex = currentFiltered.indexOf(m);
+    if (currentIndex === -1 && m.id){
+      for (var i = 0; i < currentFiltered.length; i++){
+        if (currentFiltered[i] && currentFiltered[i].id === m.id){ currentIndex = i; break; }
+      }
+    }
+    mdTitle.textContent = m.title || m.eventTitle || '—';
+    mdDesc.textContent  = m.description || 'No description recorded.';
+    mdEyebrow.textContent = (m.kind || 'MEDIA').toUpperCase() + (m.page ? ' · PAGE ' + String(m.page).padStart(3, '0') : '');
+    var visual = '';
+    // DVIDS iframe embed for videos that have one. The dvidsUrl field on
+    // media.json items is the public DVIDS player URL; embedding that URL
+    // directly works as a standalone iframe.
+    var dvids = m.dvidsUrl || m.iframeUrl || m.embedUrl || null;
+    if (m.kind === 'video' && dvids){
+      visual = '<iframe src="' + esc(dvids) + '" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>';
+    } else if (m.imagePath){
+      visual = '<img src="../' + esc(m.imagePath) + '" alt="' + esc(m.title) + '">';
+    } else if (m.thumbnailPath && /^https?:/.test(m.thumbnailPath)){
+      visual = '<img src="' + esc(m.thumbnailPath) + '" alt="' + esc(m.title) + '">';
+    } else {
+      visual = '<span class="icon-big">' + (ICONS[m.kind] || '?') + '</span>';
+    }
+    // Close button is appended via DOM so the inner HTML can be reset safely.
+    mdVisual.innerHTML = visual + '<span class="close" id="md-close-i">✕ CLOSE</span>';
+    document.getElementById('md-close-i').addEventListener('click', closeModal);
+    var rec = m.eventId ? MC.byEid(m.eventId) : null;
+    var kv = [];
+    if (m.eventId)            kv.push(['EVENT', m.eventId]);
+    if (rec && rec.agency)    kv.push(['AGENCY', rec.agency]);
+    if (rec && rec.date)      kv.push(['DATE', rec.date]);
+    if (m.kind)               kv.push(['KIND', m.kind]);
+    if (m.page != null)       kv.push(['PAGE', String(m.page)]);
+    if (m.incidentDate)       kv.push(['INCIDENT', m.incidentDate]);
+    if (m.incidentLocation)   kv.push(['LOCATION', m.incidentLocation]);
+    if (typeof m.views === 'number') kv.push(['VIEWS', fmtViews(m.views)]);
+    if (m.classifier)         kv.push(['CLASSIFIER', m.classifier]);
+    mdKv.innerHTML = kv.map(function(p){ return '<span class="k">' + esc(p[0]) + '</span><span class="v">' + esc(p[1]) + '</span>'; }).join('');
+    mdDossier.href = m.eventId ? MC.url.dossier(m.eventId) : 'dossier.html';
+    var sourceUrl = m.dvidsUrl || m.url || null;
+    if (sourceUrl){
+      mdSource.style.display = '';
+      mdSource.href = /^https?:/i.test(sourceUrl) ? sourceUrl : ('../' + sourceUrl);
+    } else {
+      mdSource.style.display = 'none';
+    }
+    renderDossierPreview(rec);
+    renderSiblings(m);
+    updateNavArrows();
+    modal.classList.add('on');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function navStep(delta){
+    if (!modal.classList.contains('on')) return;
+    if (currentIndex < 0) return;
+    var ni = currentIndex + delta;
+    if (ni < 0 || ni >= currentFiltered.length) return;
+    openModal(currentFiltered[ni]);
+  }
+  mdPrev.addEventListener('click', function(){ navStep(-1); });
+  mdNext.addEventListener('click', function(){ navStep(1); });
+
+  function closeModal(){
+    modal.classList.remove('on');
+    modal.setAttribute('aria-hidden', 'true');
+    // Stop any iframe playback by clearing it.
+    mdVisual.innerHTML = '<span class="close" id="md-close">✕ CLOSE</span>';
+    document.getElementById('md-close').addEventListener('click', closeModal);
+  }
+  mdClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (!modal.classList.contains('on')) return;
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); navStep(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); navStep(1); }
+  });
+
+  // ─── Wire pills ───
+  pills.querySelectorAll('.md-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      var k = p.dataset.kind;
+      if (k === 'ALL'){
+        activeKinds = new Set(['ALL']);
+      } else {
+        activeKinds.delete('ALL');
+        if (activeKinds.has(k)) activeKinds.delete(k); else activeKinds.add(k);
+        if (!activeKinds.size) activeKinds = new Set(['ALL']);
+      }
+      setActivePill();
+      renderGrid();
+    });
+  });
+  inp.addEventListener('input', function(){ query = inp.value; renderGrid(); });
+  selEvent.addEventListener('change', function(){ activeEvent = selEvent.value; renderGrid(); });
+  btnRecent.addEventListener('click', function(){ sortMode = 'RECENT'; setSortBtns(); renderGrid(); });
+  btnPop.addEventListener('click', function(){ sortMode = 'POPULAR'; setSortBtns(); renderGrid(); });
+  btnPlace.addEventListener('click', function(){ inclPlace = !inclPlace; setPlaceBtn(); renderGrid(); });
+
+  setSortBtns();
+  setPlaceBtn();
+  setActivePill();
+
+  // ─── Hydrate from MC ───
+  function hydrate(){
+    allItems = (MC.derive && MC.derive.mediaItems) || [];
+    itemById = {};
+    allItems.forEach(function(it){ if (it && it.id != null) itemById[it.id] = it; });
+    if (!allItems.length){
+      // Keep the page usable even with zero data.
+      grid.innerHTML = '<div style="font-family:\'JetBrains Mono\',monospace;font-size:12px;color:var(--text-4);grid-column:1/-1;padding:40px 0;text-align:center">media.json loading…</div>';
+      return;
+    }
+    updateCounts(allItems);
+    populateEventFilter(allItems);
+    renderGrid();
+  }
+  // Header-filter integration — mirrors src/components/Header.jsx: typing
+  // in the topbar pipes into the local search query; the agency filter
+  // restricts by event-agency via MC.byEid; the type filter maps to the
+  // media-kind taxonomy (Image/Video/Document buckets).
+  var HEADER_TYPE_TO_KIND = {
+    'Video':    ['video'],
+    'Image':    ['photograph','hand-drawing','photocopied-negative','newspaper-clipping','map','diagram','table'],
+    'Document': ['table','photocopied-negative'],
+  };
+  function syncFromHeader(){
+    var HF = MC.headerFilters || {};
+    query = HF.query || '';
+    if (inp) inp.value = query;
+    if (HF.type && HEADER_TYPE_TO_KIND[HF.type]){
+      activeKinds = new Set(HEADER_TYPE_TO_KIND[HF.type]);
+    } else if (HF.type === 'all'){
+      activeKinds = new Set(['ALL']);
+    }
+    setActivePill();
+    renderGrid();
+  }
+  // Wrap filterAndSort so agency filter from the header constrains the result set.
+  var _origFAS = filterAndSort;
+  filterAndSort = function(){
+    var rows = _origFAS();
+    var HF = MC.headerFilters || {};
+    if (HF.agency && HF.agency !== 'all'){
+      rows = rows.filter(function(it){
+        var rec = it.eventId ? MC.byEid(it.eventId) : null;
+        return rec && rec.agency === HF.agency;
+      });
+    }
+    return rows;
+  };
+
+  MC.ready().then(function(){ hydrate(); syncFromHeader(); });
+  MC.onUpdate(hydrate);
+  if (MC.onHeaderFilters) MC.onHeaderFilters(syncFromHeader);
+})();
+</script>
+</body>
+</html>

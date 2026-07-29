@@ -1,13 +1,8 @@
 {
   "kind": "photograph",
   "title": "of a disk-shaped aircraft",
-  "description": "Image of a disk-shaped aircraft",
-  "additional_markers": [
-    {
-      "kind": "photograph",
-      "title": "of a model in a wind tunnel"
-    }
-  ],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.372Z"
+  "description": "VOLUME XXVIII—No. 14\nU.S. News & World Report\nWASHINGTON, D. C.\nFLYING SAUCERS—THE REAL STORY:\nU.S. BUILT FIRST ONE IN 1942\nJet-Propelled Disks Can Outfly Other Planes\nNo official announcements are being made yet. But about the only big secret left is who makes them. Evidence points to Navy experiments.\nEarly models of the flying saucer, pictured on this page and the next, were built by U.S. Government engineers of the National Advisory Committee for Aeronautics. Similar flying-saucer projects were begun in Germany and Italy at the same time, in 1942.\nThe first U.S. model, designed by Charles H. Zimmerman, of NACA, was elliptical in shape, powered by two piston engines and driven by twin propellers. It had a maximum speed between 400 and 500 miles an hour. More important, it could rise almost vertically and its minimum speed for landing was only about 35 miles an hour, a great advantage in military and naval aircraft. And it was far more maneuverable than conventional military planes.\nIdea behind those original flying-saucer projects, both in U.S. and abroad in Germany and Italy, was to overcome basic drawbacks of conventional aircraft by new techniques. A plane that could rise almost straight would not need long airfields, could be used from any cleared area just behind front-line troops or from the deck of any Navy combat ship. If that plane, in addition, had great speed and more maneuverability, it could probably outfly any conventional aircraft. In United States, the firs",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.632Z",
+  "contributor": "Rizzleroc"
 }

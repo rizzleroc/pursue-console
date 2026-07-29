@@ -1,8 +1,8 @@
 {
   "kind": "photograph",
   "title": "A photograph of a man holding a large circular saw blade.",
-  "description": "Image: A photograph of a man holding a large circular saw blade.",
-  "additional_markers": [],
-  "classifier": "gemini-text-extract",
-  "classifiedAt": "2026-05-20T14:25:33.837Z"
+  "description": "‘Saucer’ Tales\nBuzz in State\nDisk Found by a Priest\nIs Circular Saw; Others\nSeen by Milwaukeeans\nFrom page 1, column 3\nSharp-Eyed Sight Disks, but Only a Saw Blade Is Found\n[illegible]\nJUL 16\n[illegible]",
+  "classifier": "human:Rizzleroc",
+  "classifiedAt": "2026-05-22T03:16:19.796Z",
+  "contributor": "Rizzleroc"
 }
