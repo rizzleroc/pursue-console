@@ -1,11 +1,17 @@
 {
-  "best": "ocr",
+  "best": "gpt-vision",
   "sources": {
     "ocr": {
       "chars": 2897,
       "imported_at": "2026-05-25T17:44:44.913Z",
       "note": "tesseract eng @ 200dpi via ingest-release-02-pdfs.mjs",
       "text_file": "p0001.ocr.txt"
+    },
+    "gpt-vision": {
+      "chars": 2903,
+      "imported_at": "2026-07-31T23:25:59.330Z",
+      "handle": "Rizzleroc",
+      "text_file": "p0001.gpt-vision.txt"
     }
   },
   "comparison": {

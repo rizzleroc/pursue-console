@@ -10,7 +10,7 @@
     },
     "gpt-vision": {
       "chars": 119,
-      "imported_at": "2026-07-10T15:32:48.522Z",
+      "imported_at": "2026-07-31T23:25:59.297Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.gpt-vision.txt"
     }
@@ -38,6 +38,17 @@
       "judged_at": "2026-05-27T00:35:37.432Z",
       "judge": "human:Rizzleroc"
     },
-    "dispute_kind": "judged"
+    "dispute_kind": "judged",
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0001.gpt-vision.v2.txt",
+          "chars": 172,
+          "imported_at": "2026-07-31T23:25:57.772Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      }
+    }
   }
 }
