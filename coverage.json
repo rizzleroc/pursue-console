@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-29T22:48:51.176Z",
+  "generatedAt": "2026-07-31T23:26:27.500Z",
   "events": 332,
   "aggregate": {
     "byStatus": {
@@ -10,7 +10,7 @@
     "totalPages": 3496,
     "bothMachine": 438,
     "geminiOnly": 2932,
-    "gptOnly": 32,
+    "gptOnly": 37,
     "human": 0,
     "gap": 0,
     "mismatch": 0
@@ -500,10 +500,10 @@
       "pagesTouched": 2,
       "bothMachineSources": 0,
       "geminiOnly": 0,
-      "gptVisionOnly": 0,
+      "gptVisionOnly": 2,
       "humanPages": 0,
       "claudeOnly": 0,
-      "ocrOnlyPages": 2,
+      "ocrOnlyPages": 0,
       "gapPages": 0,
       "mismatchPages": 0,
       "chars": 7974,
@@ -1333,10 +1333,10 @@
       "pagesTouched": 7,
       "bothMachineSources": 0,
       "geminiOnly": 0,
-      "gptVisionOnly": 0,
+      "gptVisionOnly": 1,
       "humanPages": 0,
       "claudeOnly": 0,
-      "ocrOnlyPages": 7,
+      "ocrOnlyPages": 6,
       "gapPages": 0,
       "mismatchPages": 0,
       "chars": 17725,
@@ -4291,13 +4291,13 @@
       "pagesTouched": 2,
       "bothMachineSources": 0,
       "geminiOnly": 0,
-      "gptVisionOnly": 0,
+      "gptVisionOnly": 2,
       "humanPages": 0,
       "claudeOnly": 0,
-      "ocrOnlyPages": 2,
+      "ocrOnlyPages": 0,
       "gapPages": 0,
       "mismatchPages": 0,
-      "chars": 5150,
+      "chars": 5158,
       "status": "gap"
     },
     {

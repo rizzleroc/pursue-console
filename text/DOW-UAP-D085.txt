@@ -5,22 +5,23 @@ Agency: Department of War
 Date: 1953
 Location: United States
 Type: Document
-Source extraction: OCR · 7 pages
+Source extraction: MIXED · 7 pages
 
 ---
 
-=== Page 1 ===
+=== Page 1 (vision) ===
 
-do men ang ERE ee
-LL ase ssn snenin ste ss aD ss Ea Be ae hE eT
-ee...
-LL aaa : -.--. 4
-a. . Authority: . . =~ =. ._ . . - - --._ ~ - - .
-NND 823015 =}
-ee . -.. -- a oo = -..._____ _ ____ _ _ _ ___ = _
-..______________
-pie.
-Dodldi a soars paneEn
+CO 000.92
+1953
+
+DECLASSIFIED
+
+Authority:
+
+NND 823015
+
+NW 91672
+DocId:4748472 Page 1
 
 
 === Page 2 ===
