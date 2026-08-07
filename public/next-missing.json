@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T15:33:29.840Z",
+  "generatedAt": "2026-08-07T15:31:24.584Z",
   "queue": [
     {
       "eid": "CIA-UAP-003",
@@ -82,6 +82,14 @@
       "priority": 47.4828
     },
     {
+      "eid": "DOW-UAP-D100",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 36.004
+    },
+    {
       "eid": "USG-UAP-D001",
       "page": 1,
       "agency": "U.S. Government",
@@ -128,6 +136,14 @@
       "flag": "med",
       "reason": "gap",
       "priority": 20.237
+    },
+    {
+      "eid": "DOW-UAP-D098",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 17.1448
     },
     {
       "eid": "DOE-UAP-D004",
@@ -226,6 +242,14 @@
       "priority": 4.9704
     },
     {
+      "eid": "DOW-UAP-D101",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 4.8962
+    },
+    {
       "eid": "DOW-UAP-D079",
       "page": 1,
       "agency": "Department of War",
@@ -240,6 +264,14 @@
       "flag": "high",
       "reason": "no-data",
       "priority": 4.6587
+    },
+    {
+      "eid": "DOW-UAP-D099",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 4.3176
     },
     {
       "eid": "ICA-UAP-D001",
@@ -298,12 +330,28 @@
       "priority": 4
     },
     {
+      "eid": "pursue-release-05",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "anchor",
+      "reason": "no-data",
+      "priority": 4
+    },
+    {
       "eid": "FBI-UAP-D011",
       "page": 1,
       "agency": "FBI",
       "flag": "high",
       "reason": "no-data",
       "priority": 3.8328
+    },
+    {
+      "eid": "CIA-UAP-D022",
+      "page": 1,
+      "agency": "Central Intelligence Agency",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 3.553
     },
     {
       "eid": "DOE-UAP-D005",
@@ -330,12 +378,28 @@
       "priority": 3.3717
     },
     {
+      "eid": "FBI-UAP-D037",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 3.2714
+    },
+    {
       "eid": "CIA-UAP-016",
       "page": 1,
       "agency": "Central Intelligence Agency",
       "flag": "med",
       "reason": "no-data",
       "priority": 3.0856
+    },
+    {
+      "eid": "FBI-UAP-D024",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 3.0824
     },
     {
       "eid": "FBI-UAP-D014-R04",
@@ -426,12 +490,28 @@
       "priority": 2.942
     },
     {
+      "eid": "FBI-UAP-D026",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.9362
+    },
+    {
       "eid": "CIA-UAP-D020",
       "page": 1,
       "agency": "Central Intelligence Agency",
       "flag": "med",
       "reason": "gap",
       "priority": 2.8946
+    },
+    {
+      "eid": "FBI-UAP-D030",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.8178
     },
     {
       "eid": "FBI-UAP-D007",
@@ -456,6 +536,14 @@
       "flag": "med",
       "reason": "no-data",
       "priority": 2.6966
+    },
+    {
+      "eid": "FBI-UAP-D028",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.6944
     },
     {
       "eid": "FBI-UAP-D004",
@@ -496,6 +584,14 @@
       "flag": "med",
       "reason": "gap",
       "priority": 2.5908
+    },
+    {
+      "eid": "FBI-UAP-D033",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.5526
     },
     {
       "eid": "FBI-UAP-D006",
@@ -546,6 +642,30 @@
       "priority": 2.5042
     },
     {
+      "eid": "FBI-UAP-D032",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.4966
+    },
+    {
+      "eid": "FBI-UAP-D040",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.463
+    },
+    {
+      "eid": "DOS-UAP-D002",
+      "page": 1,
+      "agency": "Department of State",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.4602
+    },
+    {
       "eid": "FBI-UAP-D008",
       "page": 1,
       "agency": "FBI",
@@ -562,6 +682,14 @@
       "priority": 2.4362
     },
     {
+      "eid": "DOS-UAP-D001",
+      "page": 1,
+      "agency": "Department of State",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.3446
+    },
+    {
       "eid": "CIA-UAP-005",
       "page": 1,
       "agency": "Central Intelligence Agency",
@@ -570,12 +698,28 @@
       "priority": 2.3274
     },
     {
+      "eid": "CIA-UAP-D023",
+      "page": 1,
+      "agency": "Central Intelligence Agency",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.303
+    },
+    {
       "eid": "DOW-UAP-D078",
       "page": 1,
       "agency": "Department of War",
       "flag": "med",
       "reason": "no-data",
       "priority": 2.2146
+    },
+    {
+      "eid": "EOP-UAP-D001",
+      "page": 1,
+      "agency": "Executive Office of the President",
+      "flag": "med",
+      "reason": "gap",
+      "priority": 2.164
     },
     {
       "eid": "FBI-UAP-PR005",
@@ -1554,6 +1698,126 @@
       "priority": 2
     },
     {
+      "eid": "DOW-UAP-PR117",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR118",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR119",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR120",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR121",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR122",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR123",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR124",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR125",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR126",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR127",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR134",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR136",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR142",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "DOW-UAP-PR149",
+      "page": 1,
+      "agency": "Department of War",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
       "eid": "FBI-UAP-D015",
       "page": 1,
       "agency": "FBI",
@@ -1619,6 +1883,78 @@
     },
     {
       "eid": "FBI-UAP-D023",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D025",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D027",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D029",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D031",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D038",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D039",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D041",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-D042",
+      "page": 1,
+      "agency": "FBI",
+      "flag": "med",
+      "reason": "no-data",
+      "priority": 2
+    },
+    {
+      "eid": "FBI-UAP-PR007",
       "page": 1,
       "agency": "FBI",
       "flag": "med",

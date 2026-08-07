@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T15:33:09.663Z",
+  "generatedAt": "2026-08-07T15:31:05.988Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -38,63 +38,77 @@
     }
   },
   "inventory": {
-    "total": 356,
-    "enumerated": 232,
+    "total": 398,
+    "enumerated": 257,
     "placeholders": 0,
-    "pdfs": 213,
+    "pdfs": 235,
     "videos": 0,
-    "images": 19,
+    "images": 22,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 332,
+    "catalogued": 374,
     "withPdfDownloaded": 0,
     "withAnyPages": 75,
-    "withVisionPages": 65,
-    "fullyVision": 65
+    "withVisionPages": 68,
+    "fullyVision": 67
   },
   "pages": {
-    "totalKnown": 3834,
+    "totalKnown": 4150,
     "totalIndexed": 3543,
-    "vision": 3402,
-    "ocrOnly": 94,
+    "vision": 3407,
+    "ocrOnly": 89,
     "visualsAnnotated": 0,
-    "totalChars": 7135941
+    "totalChars": 7135949
   },
   "bySource": {
     "gemini": 3370,
     "claude": 0,
-    "gptVision": 470,
+    "gptVision": 475,
     "human": 0,
     "ocr": 787,
     "pagesWithMultipleSources": 438
   },
   "bestSource": {
     "human": 0,
-    "gptVision": 453,
+    "gptVision": 458,
     "gemini": 2949,
     "claude": 0,
-    "ocr": 141
+    "ocr": 136
   },
   "contributions": {
-    "total": 80,
+    "total": 85,
     "contributors": [
       {
         "handle": "Rizzleroc",
-        "pages": 80,
-        "chars": 80889
+        "pages": 85,
+        "chars": 93898
       }
     ]
   },
   "runs": {
     "last": {
-      "ts": "2026-07-10T15:33:09.663Z",
+      "ts": "2026-08-07T15:31:05.988Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 3217,
-      "note": "events=332 inventory=356 contributions=80"
+      "duration_ms": 3401,
+      "note": "events=374 inventory=398 contributions=85"
     },
     "recent": [
+      {
+        "ts": "2026-08-07T15:31:05.988Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 3401,
+        "note": "events=374 inventory=398 contributions=85"
+      },
+      {
+        "ts": "2026-08-07T15:16:20.490Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 3581,
+        "note": "events=374 inventory=398 contributions=80"
+      },
       {
         "ts": "2026-07-10T15:33:09.663Z",
         "kind": "db-rebuild",
@@ -150,33 +164,19 @@
         "outcome": "ok",
         "duration_ms": 2564,
         "note": "events=128 inventory=162 contributions=55"
-      },
-      {
-        "ts": "2026-05-24T15:27:09.234Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 4197,
-        "note": "events=128 inventory=162 contributions=55"
-      },
-      {
-        "ts": "2026-05-22T22:52:24.540Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 6519,
-        "note": "events=121 inventory=162 contributions=54"
       }
     ]
   },
   "gap": {
     "uncataloguedRecords": 24,
-    "cataloguedButNoPages": 257,
-    "partialOcrNeedsVision": 10
+    "cataloguedButNoPages": 299,
+    "partialOcrNeedsVision": 8
   },
   "review": {
     "pagesNeedingReview": 0,
-    "pagesHighConfidence": 392,
+    "pagesHighConfidence": 394,
     "pagesMediumConfidence": 46,
-    "pagesLowConfidence": 128,
+    "pagesLowConfidence": 126,
     "topEventsByReviewQueue": [],
     "reevaluated": 23,
     "resolvedByPromptStandard": 3,
@@ -363,9 +363,10 @@
       "pages": 2,
       "chars": 7974,
       "sources": [
+        "gpt-vision",
         "ocr"
       ],
-      "dominantBest": "ocr",
+      "dominantBest": "gpt-vision",
       "needsReview": 0
     },
     "CIA-UAP-D001": {
@@ -417,6 +418,7 @@
       "pages": 7,
       "chars": 17725,
       "sources": [
+        "gpt-vision",
         "ocr"
       ],
       "dominantBest": "ocr",
@@ -442,11 +444,12 @@
     },
     "ODNI-UAP-D001": {
       "pages": 2,
-      "chars": 5150,
+      "chars": 5158,
       "sources": [
+        "gpt-vision",
         "ocr"
       ],
-      "dominantBest": "ocr",
+      "dominantBest": "gpt-vision",
       "needsReview": 0
     },
     "africa-2025": {
