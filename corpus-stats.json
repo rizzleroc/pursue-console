@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-31T23:26:17.494Z",
+  "generatedAt": "2026-08-07T15:36:35.985Z",
   "pressReleaseClaim": 162,
   "byRelease": {
     "Release 01": {
@@ -38,16 +38,16 @@
     }
   },
   "inventory": {
-    "total": 356,
-    "enumerated": 232,
+    "total": 398,
+    "enumerated": 257,
     "placeholders": 0,
-    "pdfs": 213,
+    "pdfs": 235,
     "videos": 0,
-    "images": 19,
+    "images": 22,
     "bytesKnown": 0
   },
   "events": {
-    "catalogued": 332,
+    "catalogued": 374,
     "withPdfDownloaded": 0,
     "withAnyPages": 75,
     "withVisionPages": 68,
@@ -88,19 +88,33 @@
   },
   "runs": {
     "last": {
-      "ts": "2026-07-31T23:26:17.494Z",
+      "ts": "2026-08-07T15:36:35.985Z",
       "kind": "db-rebuild",
       "outcome": "ok",
-      "duration_ms": 1923,
-      "note": "events=332 inventory=356 contributions=85"
+      "duration_ms": 1399,
+      "note": "events=374 inventory=398 contributions=85"
     },
     "recent": [
       {
-        "ts": "2026-07-31T23:26:17.494Z",
+        "ts": "2026-08-07T15:36:35.985Z",
         "kind": "db-rebuild",
         "outcome": "ok",
-        "duration_ms": 1923,
-        "note": "events=332 inventory=356 contributions=85"
+        "duration_ms": 1399,
+        "note": "events=374 inventory=398 contributions=85"
+      },
+      {
+        "ts": "2026-08-07T15:31:05.988Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 3401,
+        "note": "events=374 inventory=398 contributions=85"
+      },
+      {
+        "ts": "2026-08-07T15:16:20.490Z",
+        "kind": "db-rebuild",
+        "outcome": "ok",
+        "duration_ms": 3581,
+        "note": "events=374 inventory=398 contributions=80"
       },
       {
         "ts": "2026-07-10T15:33:09.663Z",
@@ -150,26 +164,12 @@
         "outcome": "ok",
         "duration_ms": 4760,
         "note": "events=128 inventory=162 contributions=55"
-      },
-      {
-        "ts": "2026-05-24T16:28:00.783Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 2564,
-        "note": "events=128 inventory=162 contributions=55"
-      },
-      {
-        "ts": "2026-05-24T15:27:09.234Z",
-        "kind": "db-rebuild",
-        "outcome": "ok",
-        "duration_ms": 4197,
-        "note": "events=128 inventory=162 contributions=55"
       }
     ]
   },
   "gap": {
     "uncataloguedRecords": 24,
-    "cataloguedButNoPages": 257,
+    "cataloguedButNoPages": 299,
     "partialOcrNeedsVision": 8
   },
   "review": {
