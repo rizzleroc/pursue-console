@@ -9,19 +9,25 @@
     },
     "gpt-vision": {
       "chars": 2903,
-      "imported_at": "2026-07-31T23:25:59.330Z",
+      "imported_at": "2026-08-07T15:30:23.942Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.gpt-vision.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-05-25T17:44:44.913Z",
-    "method": "single-source",
-    "sources_count": 1,
-    "canonical": "ocr",
-    "agreement_score": null,
-    "pairs": [],
-    "confidence": "low",
+    "computed_at": "2026-08-07T15:30:26.295Z",
+    "method": "token-jaccard+length-ratio",
+    "sources_count": 2,
+    "canonical": "gpt-vision",
+    "agreement_score": 0.984,
+    "pairs": [
+      {
+        "a": "ocr",
+        "b": "gpt-vision",
+        "score": 0.984
+      }
+    ],
+    "confidence": "high",
     "needs_review": false
   }
 }
