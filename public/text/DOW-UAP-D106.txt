@@ -1,0 +1,39 @@
+DOW-UAP-D106, Mission Report, Iraq, 2022
+========================================
+
+Agency: Department of War
+Date: 2022
+Location: Iraq
+Type: Document
+Source extraction: PDFJS · 6 pages
+
+---
+
+=== Page 1 ===
+
+Declassified by MG Richard A. Hiimson "C"5( EJ\;1COM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies Misrep 7468013 Narrative AT0614Z, j 1.4a !TOOKOFFLATEFROM! 1.4g !DUETOWEATHERAT THE LRE. AT 06242.! 14a !HANDED OVER FROM THE LRE. FROM 06402 TO 0005Z,! 1.4a I COLLECTED SIGINT VIA AIRHANDLER VERSION 2. FROM 10542 TO 21 00Z, I 1.4a I SUPPORTED OP! 1.4a !IVO 38SMD3rn41.iia] ISO MAG (SEE ISR 1). (S//REL) AT 20262! 1.4a !WAS SCANNING POI IVO 38SMD38W54iw AND PERIODICALLY OBSERVED UAPS FLYING SPORATICALLY WITHIN THE TARGET AREA OF 92AS. ACCORDING TO THE h .4a, 1.4dMTS, THE UAPs WERE TRAVELLING AT VARIOUS SPEEDS BETWEEN 80-180 MPH. WE WERE UNABLE TO DETERMINE ALTITUDE. THE SIZE OF THE UAPs WERE APPROXIMATELY 1-2 METERS. THE UAPs DID NOT HINDER THE MISSION. (SEE OBS 1) AT 21002,! 1.4a !WAS CLEARED TO RTB. AT 00142,~DED BACK TO THE LRE.AT 00392, CDR74 LANDED AT OKAS. FMV WAS EXPLOITED BY DGS 1. Admin CLASSIFICATION • Classification • Associated Caveats: • Classification Source (MS or Classification Guide ID): MULTIPLE SOURCES • Declassification Date (YYYYMMDD): 20470506 OPERATION • Operation: INHERENT RESOLVE • Domain: AIR • Operations Center: 609th • Major Command (MAJCOM): ACC • Combatant Command (COCOM): USCENTCOM MSGJD • Report Type: MISREP • Originator (Unit or Squadron): 196 ATKS • Submit Date (Auto-generated): 3.Sc.(b}/6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 031
+
+
+=== Page 2 ===
+
+MSNID • Tasking Order (ATO): AA • Mission Type: RECONNAISSANCE • ATO Mission Number:~ • Country Tasked: US - UNITED STATES • Service Tasked: A - AIR FORCE Poe POC • Rank: TSgt • Full N ame: _1 _ 3 - .5 -c-, (b -)( -6)- - • Unit: 163 ATKW • Wing: 163 AW • Phone Number~.5c , (b)(§) • Email: ._! ________ 3. __ 5c_.,,(._b.._)( 6 ...,l______. • Service: Air Force • Operations Center: Other QC • Rank: Ctr • Full Name: I 3.5c, (b)(6) • Unit: 15AF, Det 1, PAROC • Wing: Other • Phone Number: I 3.5c, (b)(6) • Email:! 3.5c, (b)(6) • Service: Air Force • Operations Center: Other APPROVER • Rank: SSgt • Full N ame:lr-- 3 -.5 -c,-(b - }( _ 6_ ) -, • Unit: ISRD • Wing: 379 AEW • Phone Number:-! - 3 -.5 -c,- (- b}- (6-) - • Email:... l ____ 3._ 5c _,___ (b ___ )( ___ 6}______. • Service: Air Force • Operations Center: 609 CAOC Declassified by MG Richard A. Hiimson "C"5( EJ\; 1COM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies 3.5c, (b)(6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 032
+
+
+=== Page 3 ===
+
+Declassified by MG Richard A. Hiimson "C"5( EJ\;1COM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies INGEST • Rank: • Full Name: • Unit: • Wing: • Phone Number: • Email: • Service: • Operations Center: ACEQUIP ACEQUIP • Aircraft Callsign: I 1.4a • Radar Name or Destination: • Radar Software Load or Mission Data: • Radar Warning Receiver (RWR) Name or Designator: • RWR Software Load or Mission Data: • MWS Name or Designator: • MWS Software Load or Mission Data: • IRCM Name or Designator: • IRCM Software Load or Mission Data: • ECM Name or Designator: • ECM Software Load or Mission Data: • CMD Name or Designator: • Chaff Designator: • Num Chaff or Cartridges: • Flare Designator: • Num Flares: • Towed Decoy Name or Designator: • Towed Decoy Software Load or Mission Data: • Num Towed Decoys: • Type of Radar-Guided AAM: • Num Radar-Guided AAM: • Type of IR-Guided AAM: • Num IR-Guided AAM: • Gun Name or Designator: • Num Gun Rounds: • Air-to-Ground Wpn to Include Num of Each: • TGT Pod Name or Designator: ANDAS4 • Additional Avionics: AHv2 3.5c 1 (b)(6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 033
+
+
+=== Page 4 ===
+
+Declassified by MG Richard A. Hiimson "C"5( EJ\; 1COM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies • Data Link: • Gentext: Timeline Takeoff • Callsign:I 1.4a • Number of Aircraft:,[1 • Asset Type (Aircraft): ,...'1- .4a - ,- 1- .4g -l • Aircraft Tail Number(s): I 1.4g • Takeoff Location (ICAO Code): ,...! _1_ .4g _ --. • Takeoff Time DTG: 050614:00ZMAY22 • Mode 3 (IFF Codes): 2232 • Gentext/Additional Details: ,__--:.:. 1.4 -=-= a'---_,I DELAYED TAKEOFF DUE TO WX AT THE LRE. • Mission Canceled: On Station • Time On Station DTG: 050624:00ZMAY22 • Callsign:f 1.4a I • JTARNumber: • Killbox (Location): 91AS5 • Mission Type: RECONNAISSANCE • JTAC Callsign: • Gentext/Additional Details: • Did not Arrive On Station: OffStation • Time Off Station DTG: 060014:00ZMAY22 • Total Time On Station: 17 hours 50 minutes • Gentext/Additional Details: Landing • Last Land Location (ICAO Code): ! 1.4g • Last Land Time: 060039:00ZMAY22 • Last Engine Shutdown Time: 060049:00ZMAY22 • Total Mission Time: 18 hours 25 minutes • Gentext/Additional Details: 3.5c 1 (b)(6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 034
+
+
+=== Page 5 ===
+
+Declassified by MG Richard A. Hiimson "C"5( EJ\; 1COM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies JSR • Time-on Station DTG: 051054:00ZMAY22 • Time-off Station DTG: 052100:00ZMAY22 • Aircraft Callsign: I 1.4a I • Msn Type: RECON • Primary Sensor: ANDAS4 • Sensors Available: AHv2 • Tasking Type: Planned • Tasking or Request Number (JTAR#, AEM#, PRI#, or TIC#): ~ • BE Number (if NTISR): • Tasked Start Point: 38SMD38!1.4al5~ • Activity Description: ISR • FMV or Image File Name (if NTISR): • EEis Observed: • Number of EEis: GENTEXTIISR • Gentext: ••I) ua I COORDINATED WITH MAG 409 MINUTES PRIOR TO TAKE OFF. PRE-COORDINATION WAS SATISFACTORY DUE TO THE SUPPORTED UNIT PROVIDING ADEQUATE MISSION INFORMATION. AT l054Z, ! 1.4a !ARRIVED ON OP PHANTOM FLEX ISO MAG AND CONDUCTED FMV AND SI. AT 2100Z, ! 1.4a !WAS CLEARED OFF STATION AND RETURNED TO BASE. JSR ASSET UTILIZATION • Supported Unit: MAG • Supported Operation: OP! 1.4a • Precoord Time: 409 MINUTES • Precoord Effectiveness: SATISFACTORY WEATHER • Weather: (U) WEATHER WAS NOT A FACTOR. EFFECTIVENESS • Tasker: • Intel Gap Filled?: Yes • Gentext: OBSERVATION 3.5c.(b)(6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 035
+
+
+=== Page 6 ===
+
+Declassified by MG Richard A. Hiimson "C'5( EJ\;"TC OM C luet ot \taff Decl,1ss1fied on ~o Jtme :?016 FOCO Pm dcy Act applies • Observation DTG: 052026:00ZMAY22 • Aircraft Callsign:l 1.4a I • Aircraft Location: 38S MD 41~ 4~ • Aircraft Heading: -75 • Aircraft Altitude: FL200 • Aircraft Airspeed: 100 KIAS • Relative Bearing or Clock Position: • Range: 4.98NM • Killbox & Keypad: 91AS • Observed Activity Location: 38SMD3~;@ • Observed Activity Description: UAS • Method of Observation: FMV • EEis Observed: • Number of EEis: GENTEXTIOBSERVATION • Gentext: --1) AT 20262 I 1.4a !WAS SCANNING POI IVO 38SMD38WS4Iuii}AND PERIODICALLY OBSERVED UAPS FLYING SPORATICALLY WITHIN THE TARGET AREA OF 92AS. ACCORDING TO THEb.4a, 1.4glMTS, THE UAPs WERE TRAVELLING AT VARIOUS SPEEDS BETWEEN 80-180 MPH. WE WERE UNABLE TO DETERMINE ALTITUDE. THE SIZE OF THE UAPs WERE APPROXIMATELY 1-2 METERS. THE UAPs DID NOT HINDER THE MISSION. WEATHER • Weather: 3.5c, (b)(6) USCENTCOM MDR 26-0084 to 26-0095 Approved for Release to AARO - FOUO I PA applies 06/30/26 036
