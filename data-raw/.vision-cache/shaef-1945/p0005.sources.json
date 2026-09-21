@@ -3,7 +3,7 @@
   "sources": {
     "gpt-vision": {
       "chars": 1010,
-      "imported_at": "2026-08-07T15:30:24.015Z",
+      "imported_at": "2026-09-21T05:42:24.268Z",
       "handle": "Rizzleroc",
       "text_file": "p0005.gpt-vision.txt"
     },
@@ -16,7 +16,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-08-07T15:30:27.680Z",
+    "computed_at": "2026-09-21T05:42:25.280Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gemini",

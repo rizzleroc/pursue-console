@@ -27,7 +27,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-08-07T15:30:26.771Z",
+    "computed_at": "2026-09-21T05:42:24.932Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",

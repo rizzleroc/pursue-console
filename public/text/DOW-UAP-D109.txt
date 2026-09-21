@@ -1,0 +1,39 @@
+DOW-UAP-D109, Mission Report, Middle East, 2022
+===============================================
+
+Agency: Department of War
+Date: 2022
+Location: Iraq
+Type: Document
+Source extraction: PDFJS · 6 pages
+
+---
+
+=== Page 1 ===
+
+Misrep 7467030 Narrative (SECRET\\REL TO USA, FVEY) AT 2149Z, TOOK OFF FROM AT 2158Z, HANDED OVER WITH WITH FULLY MISSION CAPABLE SENSORS. AT FROM 0057Z TO 1552Z, CONDUCTED TARGET DEVELOPMENT ON O ISO (SEE ISR 1). AT 0524Z, OBSERVED PROB UAPS TRAVELING SW AT ROUGHLY 80-180 MPH. (SEE OBSERVATION 1) AT RETURNED TO BASE. AT . AT FULL MOTION VIDEO WAS EXPLOITED BY AT 1924Z, LANDED AT WITH A LAST ENGINE SHUT-DOWN TIME OF 1934Z. TASKING PROSECUTED, TASKING PROSECUTED, TOTAL TASKINGS PROSECUTED Admin CLASSIFICATION • Classification: SECRET • Associated Caveats: REL TO USA, FVEY • Classification Source (MS or Classification Guide ID): MS • Declassification Date (YYYYMMDD): 20470504 OPERATION • Operation: INHERENT RESOLVE • Domain: AIR • Operations Center: 609th • Major Command (MAJCOM): AFCENT • Combatant Command (COCOM): USCENTCOM SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) ( (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1 3.5C. (B)(6)
+
+
+=== Page 2 ===
+
+MSGID • Report Type: MISREP • Originator (Unit or Squadron): 20 ATKS • Submit Date (Auto-generated): MSNID • Tasking Order (ATO): ZZ • Mission Type: • ATO Mission Number: • Country Tasked: US - United States • Service Tasked: A - AIR FORCE Poc POC • Rank: A1C • Full Name: • Unit: • Wing: • Phone Number: • Email: • Service: Air Force • Operations Center: QC • Rank: SSgt • Full Name: • Unit: • Wing: • Phone Number: • Email: • Service: Air Force • Operations APPROVER • Rank: SSgt • Full Name: • Unit: SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 (b) (1) (B) (b) (1) (B) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) 3.5C. (B)(6)
+
+
+=== Page 3 ===
+
+• Wing: • Phone Number: • Email: • Service: Air Force • Operations Center: INGEST • Rank: • Full Name: • Unit: • Wing: • Phone Number: • Email: • Service: • Operations Center: ACEQUIP ACEQUIP • Aircraft Callsign: • Radar Name or Destination: • Radar Software Load or Mission Data: • Radar Warning Receiver (RWR) Name or Designator: • RWR Software Load or Mission Data: • MWS Name or Designator: • MWS Software Load or Mission Data: • IRCM Name or Designator: • IRCM Software Load or Mission Data: • ECM Name or Designator: • ECM Software Load or Mission Data: • CMD Name or Designator: • Chaff Designator: • Num Chaff or Cartridges: • Flare Designator: • Num Flares: • Towed Decoy Name or Designator: • Towed Decoy Software Load or Mission Data: • Num Towed Decoys: • Type of Radar-Guided AAM: • Num Radar-Guided AAM: SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 (b) (6) (b) (6) (b) (6) (b) (6) (b) (6) 3.5C. (B)(6)
+
+
+=== Page 4 ===
+
+• Type of IR-Guided AAM: • Num IR-Guided AAM: • Gun Name or Designator: • Num Gun Rounds: • Air-to-Ground Wpn to Include Num of Each: • TGT Pod Name or Designator: • Additional Avionics: • Data Link: • Gentext: Timeline Takeoff • Callsign: • Number of Aircraft: • Asset Type (Aircraft): • Aircraft Tail Number(s): • Takeoff Location (ICAO Code): • Takeoff Time DTG: 042149:00ZMAY22 • Mode 3 (IFF Codes): • Gentext/Additional Details: • Mission Canceled: On Station • Time On Station DTG: • Callsign: • JTAR Number: • Killbox (Location): • Mission Type: • JTAC Callsign: • Gentext/Additional Details: • Did not Arrive On Station: Off Station • Time Off Station DTG: • Total Time On Station: • Gentext/Additional Details: Landing SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 - (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (b) (1) (B) (b) (1) (B) (b) (1) (B) - (b) (1) (B) (b) (1) (B) - - (b) (1) (B) - - (b) (1) (B) (b) (1) (B) 3.5C. (B)(6)
+
+
+=== Page 5 ===
+
+• Last Land Location (ICAO Code): • Last Land Time: 051924:00ZMAY22 • Last Engine Shutdown Time: 051934:00ZMAY22 • Total Mission Time: • Gentext/Additional Details: ISR • Time-on Station DTG: 050057:00ZMAY22 • Time-off Station DTG: 051552:00ZMAY22 • Aircraft Callsign: • Msn Type: • Primary Sensor: • Sensors Available: • Tasking Type: PLANNED • Tasking or Request Number (JTAR#, AEM#, PRI#, or TIC#): • BE Number (if NTISR): • Tasked Start Point: • Activity Description: TARGET DEVELOPMENT • FMV or Image File Name (if NTISR): • EEIs Observed: • Number of EEIs: GENTEXT/ISR • Gentext: (SECRET//REL TO USA, FVEY) CONDUCTED TARGET DEVELOPMENT ON MISSION INTENT FOR THE TASKING WAS TO CONDUCT POL, IDENTIFY PID OF WEAPONS AND WEAPONS/AMMO STORAGE AREAS, AS WELL AS IDENTIFY PERSONNEL WITHIN THE COMPOUND. LOOKING FOR PID OF CONDUCTED EEI RELATED ACTIVITY AND OBSERVED NO SIGNIFICANT/NEFARIOUS ACTIVITY UNTIL RTB. ISR ASSET UTILIZATION • Supported Unit: • Supported Operation: • Precoord Time: • Precoord Effectiveness: SATISFACTORY WEATHER • Weather: (SECRET\\REL TO USA, FVEY) DUE TO DUST STORMS SOME COLLECTION ON UAPS WAS AFFECTED BETWEEN 0524Z AND 0704Z. SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 (b) (1) (B) (b) (1) (B) - (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) - - (b) (1) (B) - (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) 3.5C. (B)(6)
+
+
+=== Page 6 ===
+
+EFFECTIVENESS • Tasker: • Intel Gap Filled?: Yes • Gentext: OBSERVATION • Observation DTG: 050524:00ZMAY22 • Aircraft Callsign: • Aircraft Location: • Aircraft Heading: • Aircraft Altitude: • Aircraft Airspeed: • Relative Bearing or Clock Position: • Range: • Killbox & Keypad: • Observed Activity Location: • Observed Activity Description: • Method of Observation: FMV • EEIs Observed: • Number of EEIs: GENTEXT/OBSERVATION • Gentext: FROM 0524Z-0704Z, WAS SCANNING VARIOUS POIs IVO AND PERIODICALLY OBSERVED UAPS FLYING SPORATICALLY WITHIN THE TARGET AREA AND IN THE NE PORTION OF ACCORDING TO THE , THE UAPs WERE TRAVELLING AT VARIOUS SPEEDS BETWEEN 80-180 MPH. WE WERE UNABLE TO DETERMINE ALTITUDE. THE SIZE OF THE UAPs WERE APPROXIMATELY 1-2 METERS. DURING THE OBSERVATION PERIOD, WOULD REACQUIRE THE UAPs AFTER RETURNING THE SENSOR BACK TO THE ORIGIONAL POI LOCATIONS. THE UAPs DID NOT HINDER THE MISSION. WSV IS ATTACHED BELOW WEATHER • Weather: SECRET//REL TO USA, FVEY SECRET//REL TO USA, FVEY DECLASSIFED DECLASSIFED UNCLASSIFIED UNCLASSIFIED Declassified by: MG Richard A. Harrison USCENTCOM Chief of Staff Declassified on: 20260710 - (b) (1) (B) (b) (1) (B) - - - - - (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) (B) (b) (1) ( (b) (1) (B) (b) (1) (B) (b) (1) (B) 3.5C. (B)(6)
