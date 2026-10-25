@@ -29,7 +29,8 @@ if (existsSync(WAR)) {
   for (const dir of await readdir(WAR)) {
     if (!/^release_\d+$/.test(dir)) continue;
     for (const f of await readdir(path.join(WAR, dir))) {
-      const m = f.match(/^([A-Z]+-UAP-(?:D|PR)\d+[A-Za-z]?)_.*\.(pdf|jpg|png)$/);
+      // Separator after the id is '_' in R04-R06 filenames, '-' in most R07 ones.
+      const m = f.match(/^([A-Z]+-UAP-(?:D|PR)\d+[A-Za-z]?)[_-].*\.(pdf|jpg|png)$/);
       if (!m) continue;
       const id = ID_OVERRIDES[`${dir}/${m[1]}`] || m[1];
       const linkPath = path.join(RAW, `${id}.${m[2]}`);
