@@ -69,8 +69,25 @@ await mkdir(OUT, { recursive: true });
 const PORT = 17891;
 const server = await startServer(PUBLIC, PORT);
 
+// Resolve the bundled Chromium wherever this container image put it: the
+// stable /opt/pw-browsers/chromium symlink (newer images), any versioned
+// chromium-*/chrome-linux*/chrome, or the original pinned path.
+import { existsSync as _existsSync } from 'node:fs';
+import { globSync as _globSync } from 'node:fs';
+const CHROME_CANDIDATES = [
+  process.env.OG_CHROME_PATH,
+  '/opt/pw-browsers/chromium',
+  ..._globSync('/opt/pw-browsers/chromium-*/chrome-linux*/chrome'),
+  '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+].filter(Boolean);
+const CHROME_PATH = CHROME_CANDIDATES.find(p => _existsSync(p));
+if (!CHROME_PATH) {
+  console.error('[og-cards] no Chromium executable found under /opt/pw-browsers — skipping og-card render');
+  server.close();
+  process.exit(0);
+}
 const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+  executablePath: CHROME_PATH,
 });
 const ctx = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 2 });
 
