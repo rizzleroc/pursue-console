@@ -71,13 +71,26 @@ const server = await startServer(PUBLIC, PORT);
 
 // Resolve the bundled Chromium wherever this container image put it: the
 // stable /opt/pw-browsers/chromium symlink (newer images), any versioned
-// chromium-*/chrome-linux*/chrome, or the original pinned path.
-import { existsSync as _existsSync } from 'node:fs';
-import { globSync as _globSync } from 'node:fs';
+// chromium-*/chrome-linux*/chrome, or the original pinned path. Node 20
+// compatible on purpose (CI runs Node 20; fs.globSync needs 22+) — the
+// versioned dirs are enumerated with readdirSync instead of a glob.
+import { existsSync as _existsSync, readdirSync as _readdirSync } from 'node:fs';
+function _versionedChromes() {
+  const out = [];
+  try {
+    for (const d of _readdirSync('/opt/pw-browsers')) {
+      if (!/^chromium-\d+$/.test(d)) continue;
+      for (const sub of ['chrome-linux', 'chrome-linux64']) {
+        out.push(`/opt/pw-browsers/${d}/${sub}/chrome`);
+      }
+    }
+  } catch { /* no /opt/pw-browsers (e.g. CI runner) — fall through */ }
+  return out;
+}
 const CHROME_CANDIDATES = [
   process.env.OG_CHROME_PATH,
   '/opt/pw-browsers/chromium',
-  ..._globSync('/opt/pw-browsers/chromium-*/chrome-linux*/chrome'),
+  ..._versionedChromes(),
   '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
 ].filter(Boolean);
 const CHROME_PATH = CHROME_CANDIDATES.find(p => _existsSync(p));
