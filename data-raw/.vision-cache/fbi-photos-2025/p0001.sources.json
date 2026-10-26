@@ -10,13 +10,13 @@
     },
     "gpt-vision": {
       "chars": 119,
-      "imported_at": "2026-10-25T04:13:46.415Z",
+      "imported_at": "2026-10-26T16:56:04.982Z",
       "handle": "Rizzleroc",
       "text_file": "p0001.gpt-vision.txt"
     }
   },
   "comparison": {
-    "computed_at": "2026-10-25T04:13:47.637Z",
+    "computed_at": "2026-10-26T16:53:11.607Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 2,
     "canonical": "gemini",
@@ -38,6 +38,17 @@
       "judged_at": "2026-05-27T00:35:37.432Z",
       "judge": "human:Rizzleroc"
     },
-    "dispute_kind": "judged"
+    "dispute_kind": "judged",
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0001.gpt-vision.v2.txt",
+          "chars": 172,
+          "imported_at": "2026-10-26T16:56:04.263Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      }
+    }
   }
 }
