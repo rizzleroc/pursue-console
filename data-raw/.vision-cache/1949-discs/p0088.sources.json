@@ -27,7 +27,7 @@
     }
   },
   "comparison": {
-    "computed_at": "2026-10-25T04:13:46.675Z",
+    "computed_at": "2026-10-26T16:53:05.372Z",
     "method": "token-jaccard+length-ratio",
     "sources_count": 3,
     "canonical": "gpt-vision",
@@ -65,6 +65,17 @@
         "gpt-vision (v2)"
       ]
     },
-    "dispute_kind": "judged"
+    "dispute_kind": "judged",
+    "reevaluation": {
+      "providers": {
+        "gpt-vision": {
+          "text_file": "p0088.gpt-vision.v2.txt",
+          "chars": 533,
+          "imported_at": "2026-10-26T16:56:04.252Z",
+          "contributor": "Rizzleroc",
+          "via": "volunteer-review"
+        }
+      }
+    }
   }
 }
